@@ -1,7 +1,9 @@
 package lwjglview.graphics;
 
+import lwjglview.graphics.shader.ShaderType;
 import model.board.HexTile;
 import model.board.TileType;
+import model.testing.PresetBoard;
 
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
@@ -11,23 +13,27 @@ import utils.resources.ResourceHandler;
 import view.graphics.Drawable;
 import view.graphics.Graphics;
  
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.HashSet;
-
  
 import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL12.*;
+import static org.lwjgl.opengl.GL13.*;
+import static org.lwjgl.opengl.GL30.*;
+import static org.lwjgl.opengl.ARBTextureStorage.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
 public final class LWJGLGraphics implements Graphics {
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
+		ResourceHandler rh = new ResourceHandler();
 		LWJGLGraphics gfx = new LWJGLGraphics(null);
 		for(int i = 0; i < 20; ++i) {
-			gfx.addDrawable(new LWJGLTileDrawable(
-					new HexTile(TileType.BAD_LANDS, (int)(Math.random()*5), (int)(Math.random()*5))));
+			gfx.addDrawable(new LWJGLBoardDrawable(new PresetBoard(), rh));
 		}
 		gfx.start();
 	}
@@ -45,8 +51,36 @@ public final class LWJGLGraphics implements Graphics {
 		glLoadIdentity();
 	}
 
+	public void rotateCameraX(float ang) {
+		glRotatef(ang, 0, 0, 0);
+	}
+
 	public void translateModel(float x, float y, float z) {
 		glTranslatef(x, y, z);
+	}
+	
+	public int loadTextureArray(byte[] rawData, int number, int height,
+			int width) {
+		glActiveTexture(GL_TEXTURE0);
+		int texID = glGenTextures();
+		glBindTexture(GL_TEXTURE_2D_ARRAY, texID);
+		glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_RGBA8, width, height,
+				number);
+		glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, 0, width, height,
+				number, GL_RGBA, GL_UNSIGNED_BYTE, ByteBuffer.wrap(rawData));
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		return texID;
+	}
+	
+	public void bindTextureArray(int location) {
+		glBindTexture(GL_TEXTURE_2D_ARRAY, location);
+	}
+	
+	public void loadShaderProgram(ShaderType st) {
+		
 	}
 	
 	@Override
@@ -84,7 +118,7 @@ public final class LWJGLGraphics implements Graphics {
 		errorCallback = errorCallbackPrint(System.err);
 		glfwSetErrorCallback(errorCallback);
 		
-		if ( glfwInit() != GL11.GL_TRUE ) {
+		if ( glfwInit() != GL_TRUE ) {
             throw new IllegalStateException("Unable to initialize GLFW");
 		}
 		glfwDefaultWindowHints(); // optional, the current window hints are already the default

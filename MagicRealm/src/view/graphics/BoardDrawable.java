@@ -2,7 +2,7 @@ package view.graphics;
 
 import model.board.Board;
 
-public abstract class BoardDrawable {
+public abstract class BoardDrawable implements Drawable {
 	
 	public Board getBoard() {
 		return board;

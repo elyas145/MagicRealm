@@ -6,8 +6,10 @@ import view.graphics.TileDrawable;
 
 public class LWJGLTileDrawable extends TileDrawable {
 
-	public LWJGLTileDrawable(HexTile ht) {
+	public LWJGLTileDrawable(HexTile ht, int norm, int enchant) {
 		super(ht);
+		normalTex = norm;
+		enchantedTex = enchant;
 	}
 
 	@Override
@@ -24,5 +26,8 @@ public class LWJGLTileDrawable extends TileDrawable {
 		lwgfx.translateModel(x, y, -1f);
 		lwgfx.getPrimitiveTool().drawHexagon();
 	}
+	
+	private int normalTex;
+	private int enchantedTex;
 
 }

@@ -12,7 +12,9 @@ import javax.imageio.ImageIO;
 public class ResourceHandler {
 	
 	public URL getResource(String fname) throws IOException {
-		return getClass().getResource(new File("/res", fname).getPath());
+		File fl = new File("/res", fname);
+		System.out.println(fl.getPath());
+		return getClass().getResource(fl.getPath());
 	}
 	
 	public String readFile(String fname) throws IOException {
@@ -20,7 +22,9 @@ public class ResourceHandler {
 	}
 	
 	public BufferedImage readImage(String fname) throws IOException {
-		return ImageIO.read(getResource(fname));
+		URL ur = getResource(fname);
+		System.out.println(ur);
+		return ImageIO.read(ur);
 	}
 	
 }

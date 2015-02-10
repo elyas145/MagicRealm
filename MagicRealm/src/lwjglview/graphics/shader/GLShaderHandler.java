@@ -1,4 +1,4 @@
-package lwjglview.graphics;
+package lwjglview.graphics.shader;
 
 import static org.lwjgl.opengl.ARBFragmentShader.*;
 import static org.lwjgl.opengl.ARBShaderObjects.*;
@@ -13,10 +13,6 @@ import static org.lwjgl.opengl.GL11.*;
 import utils.resources.ResourceHandler;
 
 public class GLShaderHandler {
-	
-	public enum ShaderType {
-		TILE_SHADER
-	}
 	
 	public GLShaderHandler(ResourceHandler rh) {
 		resources = rh;
