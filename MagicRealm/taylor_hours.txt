@@ -1,0 +1,17 @@
+
+Last week we had a hangouts session but i cant remember which day
+
+Saturday February 7th
+Start:  1:00pm
+End:    3:00pm
+Details:
+    Continued to read over rulebook and watched video explanations
+    of the game.
+
+Monday February 9th
+Start:  2:00pm
+End:    9:30pm
+Details:
+    Discussed and made progress on use cases with partner, and began
+    graphics implementation.
+
