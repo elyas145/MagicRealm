@@ -52,7 +52,6 @@ public final class LWJGLGraphics implements Graphics {
 	@Override
 	public void start() {
 		running = true;
-		//thread.start();
 		initGL();
 		mainLoop();
 	}
@@ -60,11 +59,6 @@ public final class LWJGLGraphics implements Graphics {
 	@Override
 	public void stop() {
 		running = false;
-		try {
-			thread.join();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
 	}
 	
 	@Override
@@ -83,13 +77,6 @@ public final class LWJGLGraphics implements Graphics {
 		primitives = new GLPrimitives();
 		camera = new Matrix(4, 4);
 		camera.identity();
-		thread = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				initGL();
-				mainLoop();
-			}
-		});
 		drawables = new HashSet<Drawable>();
 	}
 	
@@ -116,8 +103,9 @@ public final class LWJGLGraphics implements Graphics {
         keyCallback = new GLFWKeyCallback() {
             @Override
             public void invoke(long window, int key, int scancode, int action, int mods) {
-                if ( key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE )
+                if(key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) {
                     glfwSetWindowShouldClose(window, GL_TRUE); // We will detect this in our rendering loop
+                }
             }
         };
         glfwSetKeyCallback(window, keyCallback);
@@ -142,11 +130,11 @@ public final class LWJGLGraphics implements Graphics {
         glfwMakeContextCurrent(window);
         // Enable v-sync
         glfwSwapInterval(0);
+        
+        GLContext.createFromCurrent();
  
         // Make the window visible
         glfwShowWindow(window);
-        
-        GLContext.createFromCurrent();
         
         onResize(width, height);
  
@@ -158,7 +146,8 @@ public final class LWJGLGraphics implements Graphics {
 		glViewport(0, 0, width, height);
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
-		glFrustum(-1.0, 1.0, -1.0, 1.0, .1f, 10f);
+		float ar = width / (float) height;
+		glFrustum(-ar, ar, -1.0, 1.0, .1f, 10f);
 	}
 	
 	private void drawAll() {
@@ -178,9 +167,9 @@ public final class LWJGLGraphics implements Graphics {
             // invoked during this call.
             glfwPollEvents();
 		}
+		running = false;
 	}
 	
-	private Thread thread;
 	private boolean running;
 	
 	private GLPrimitives primitives;

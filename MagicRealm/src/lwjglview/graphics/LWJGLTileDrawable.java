@@ -19,7 +19,7 @@ public class LWJGLTileDrawable extends TileDrawable {
 		float x, y;
 		x = col % 2 == 0 ? 1.5f : 0f;
 		x += row * 3f;
-		y = col * 0.866025f;
+		y = -col * 0.866025f;
 		lwgfx.resetModel();
 		lwgfx.translateModel(x, y, -1f);
 		lwgfx.getPrimitiveTool().drawHexagon();
