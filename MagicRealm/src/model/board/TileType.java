@@ -21,5 +21,6 @@ public enum TileType {
 	NUT_WOODS,
 	OAK_WOODS,
 	PINE_WOODS,
-	RUINS
+	RUINS,
+	EMPTY
 }
