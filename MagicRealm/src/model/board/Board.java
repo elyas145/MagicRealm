@@ -18,7 +18,7 @@ public class Board implements Iterable<HexTile> {
 	private void hardCodeTiles() {
 		// this setup is based on the picture found here, rotated left to match video:
 		//http://people.scs.carleton.ca/~jeanpier//304W15/Board%20for%20iteration%201/IMG_4841.jpg
-		//I have rotated the actual image files, so they look like they fit together.
+		//I am rotating the actual image files, so they look like they fit together.
 		
 		tiles[0][0] = new HexTile(TileType.EMPTY, 0, 0);
 		tiles[0][1] = new HexTile(TileType.EMPTY, 0, 0);
