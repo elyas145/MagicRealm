@@ -52,7 +52,9 @@ public final class LWJGLGraphics implements Graphics {
 	@Override
 	public void start() {
 		running = true;
-		thread.start();
+		//thread.start();
+		initGL();
+		mainLoop();
 	}
 	
 	@Override

@@ -17,7 +17,7 @@ public class LWJGLTileDrawable extends TileDrawable {
 		int row = tile.getBoardRow();
 		int col = tile.getBoardColumn();
 		float x, y;
-		x = col % 2 == 0 ? 1f : 0f;
+		x = col % 2 == 0 ? 1.5f : 0f;
 		x += row * 3f;
 		y = col * 0.866025f;
 		lwgfx.resetModel();
