@@ -1,37 +1,45 @@
 package model.board;
 
+import java.awt.List;
+
 public class HexTile {
-	
-	/*
-	 * Board should be set up so every odd row has one less hex / hex is shifted
-	 * 		_   _   _   _   _
-	 * 	0  /0\_/1\_/2\_/3\_/4\
-	 * 	1  \_/0\_/1\_/2\_/3\_/
-	 * 	2  /0\_/1\_/2\_/3\_/4\_
-	 * 	3  \_/0\_/1\_/2\_/3\_/4\
-	 * 	4	 \_/ \_/ \_/ \_/ \_/
-	 */
-	
+
+	private TileType type;
+	private int row;
+	private int column;
+	private List clearings;
+
+	public List getClearings() {
+		return clearings;
+	}
+
+	public void setClearings(List clearings) {
+		this.clearings = clearings;
+	}
+
 	public HexTile(TileType tp, int rw, int col) {
 		type = tp;
 		row = rw;
 		column = col;
+		clearings = setClearings();
 	}
-	
+
+	private List setClearings() {
+		// TODO get clearing location from external file, and create the
+		// clearings that go with this tile.
+		return null;
+	}
+
 	public int getBoardRow() {
 		return row;
 	}
-	
+
 	public int getBoardColumn() {
 		return column;
 	}
-	
+
 	public TileType getType() {
 		return type;
 	}
-	
-	private TileType type;
-	private int row;
-	private int column;
-	
+
 }
