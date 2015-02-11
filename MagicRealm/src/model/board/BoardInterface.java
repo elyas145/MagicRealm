@@ -9,7 +9,7 @@ package model.board;
 
 import java.util.Iterator;
 
-public interface BoeardInterface {
+public interface BoardInterface {
 	
 	/**
 	 * @return iterator over the board tiles

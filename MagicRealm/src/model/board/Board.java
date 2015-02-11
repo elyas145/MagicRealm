@@ -11,7 +11,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 
-public class Board implements Iterable<HexTile>, BoeardInterface {
+public class Board implements Iterable<HexTile>, BoardInterface {
 	private Collection<HexTile> collectionOfTiles;
 	
 	public Board(){
