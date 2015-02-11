@@ -1,3 +1,10 @@
+/**
+ * This should be split up into different enums:
+ * soundType
+ * warningType
+ * siteType
+ * TreasureType
+ */
 package model.board;
 
 public enum ChitType {
@@ -23,4 +30,6 @@ public enum ChitType {
 	CAIRNS,
 	SHRINE,
 	LOST_CASTLE
+	//treasureType
+	//TODO
 }
