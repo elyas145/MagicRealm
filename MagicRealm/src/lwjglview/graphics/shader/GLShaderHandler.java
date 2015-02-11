@@ -20,7 +20,7 @@ public class GLShaderHandler {
 		vertShaders = new HashMap<String, Integer>();
 		fragShaders = new HashMap<String, Integer>();
 		programs = new HashMap<ShaderType, Integer>();
-		uniforms = new HashMap<ShaderType, Map<String, Object>>();
+		uniforms = new HashMap<ShaderType, Map<String, Integer>>();
 	}
 	
 	public void loadShaderProgram(ShaderType shader) throws IOException {
@@ -42,18 +42,13 @@ public class GLShaderHandler {
 	}
 	
 	public void setUniformIntValue(ShaderType st, String name, int value) {
-		if(!hasProgram(st)) {
-			throw new RuntimeException("The shader has not been loaded yet: " + st);
-		}
-		if(!uniforms.containsKey(st)) {
-			uniforms.put(st,  new HashMap<String, Object>());
-		}
-		Map<String, Object> locs = uniforms.get(st);
-		if(!locs.containsKey(name)) {
-			locs.put(name, glGetUniformLocation(programs.get(st), name));
-		}
-		int loc = (Integer) locs.get(name);
+		int loc = initUniform(st, name);
 		glUniform1i(loc, value);
+	}
+	
+	public void setUniformFloatValue(ShaderType st, String name, float value) {
+		int loc = initUniform(st, name);
+		glUniform1f(loc, value);
 	}
 	
 	public void useShaderProgram(ShaderType shader) {
@@ -62,6 +57,20 @@ public class GLShaderHandler {
 	
 	public boolean hasProgram(ShaderType shader) {
 		return programs.containsKey(shader);
+	}
+	
+	private int initUniform(ShaderType st, String name) {
+		if(!hasProgram(st)) {
+			throw new RuntimeException("The shader has not been loaded yet: " + st);
+		}
+		if(!uniforms.containsKey(st)) {
+			uniforms.put(st,  new HashMap<String, Integer>());
+		}
+		Map<String, Integer> locs = uniforms.get(st);
+		if(!locs.containsKey(name)) {
+			locs.put(name, glGetUniformLocation(programs.get(st), name));
+		}
+		return locs.get(name);
 	}
 	
 	private static String getVSFname(ShaderType shader) {
@@ -93,6 +102,6 @@ public class GLShaderHandler {
 	private Map<String, Integer> vertShaders;
 	private Map<String, Integer> fragShaders;
 	private Map<ShaderType, Integer> programs;
-	private Map<ShaderType, Map<String, Object>> uniforms;
+	private Map<ShaderType, Map<String, Integer>> uniforms;
 
 }

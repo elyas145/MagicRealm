@@ -208,7 +208,7 @@ public final class LWJGLGraphics implements Graphics {
         onResize(width, height);
  
         // Set the clear color
-        glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
+        glClearColor(0.1f, 0.2f, 1f, 0.0f);
 	}
 	
 	private void onResize(int width, int height) {

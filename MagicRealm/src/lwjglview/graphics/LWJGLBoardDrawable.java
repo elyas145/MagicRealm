@@ -61,6 +61,7 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 			}
 		}
 		shaders.useShaderProgram(st);
+		shaders.setUniformFloatValue(st, "time", System.nanoTime() * 1e-9f);
 		for(LWJGLTileDrawable tile: tiles) {
 			tile.draw(lwgfx);
 		}

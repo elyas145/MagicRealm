@@ -1,6 +1,5 @@
 package utils.resources;
 
-import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
@@ -10,7 +9,7 @@ public class TileImages {
 	
 	public static BufferedImage getTileImage(ResourceHandler rh, TileType type, boolean enchanted)
 			throws IOException {
-		return rh.readImage("images/" + getName(type) + (enchanted ? "-e.gif" : ".gif"));
+		return rh.readImage("images/tiles/" + getName(type) + (enchanted ? "-e1.gif" : "1.gif"));
 	}
 	
 	private static String getName(TileType tile) {
