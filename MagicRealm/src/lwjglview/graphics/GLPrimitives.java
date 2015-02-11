@@ -81,12 +81,12 @@ public class GLPrimitives {
 	}
 	
 	private void vertHex2() {
-		glTexCoord2f(0.25f, 0.9330127f);
+		glTexCoord2f(0.25f, 0f);
 		glVertex3f(-.5f, 0.866025f, 0f);
 	}
 	
 	private void vertHex3() {
-		glTexCoord2f(0.75f, 0.9330127f);
+		glTexCoord2f(0.75f, 0f);
 		glVertex3f(.5f, 0.866025f, 0f);
 	}
 
@@ -96,12 +96,12 @@ public class GLPrimitives {
 	}
 	
 	private void vertHex5() {
-		glTexCoord2f(0.75f, 0.06698729f);
+		glTexCoord2f(0.75f, 1f);
 		glVertex3f(.5f, -0.866025f, 0f);
 	}
 	
 	private void vertHex6() {
-		glTexCoord2f(0.25f, 0.06698729f);
+		glTexCoord2f(0.25f, 1f);
 		glVertex3f(-.5f, -0.866025f, 0f);
 	}
 	

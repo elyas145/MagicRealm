@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL20.*;
 
 import utils.resources.ResourceHandler;
 
@@ -19,6 +20,7 @@ public class GLShaderHandler {
 		vertShaders = new HashMap<String, Integer>();
 		fragShaders = new HashMap<String, Integer>();
 		programs = new HashMap<ShaderType, Integer>();
+		uniforms = new HashMap<ShaderType, Map<String, Object>>();
 	}
 	
 	public void loadShaderProgram(ShaderType shader) throws IOException {
@@ -37,19 +39,37 @@ public class GLShaderHandler {
 	        }
 	        programs.put(shader, program);
 		}
+	}
+	
+	public void setUniformIntValue(ShaderType st, String name, int value) {
+		if(!hasProgram(st)) {
+			throw new RuntimeException("The shader has not been loaded yet: " + st);
+		}
+		if(!uniforms.containsKey(st)) {
+			uniforms.put(st,  new HashMap<String, Object>());
+		}
+		Map<String, Object> locs = uniforms.get(st);
+		if(!locs.containsKey(name)) {
+			locs.put(name, glGetUniformLocation(programs.get(st), name));
+		}
+		int loc = (Integer) locs.get(name);
+		glUniform1i(loc, value);
+	}
+	
+	public void useShaderProgram(ShaderType shader) {
 		glUseProgramObjectARB(programs.get(shader));
 	}
 	
-	private boolean hasProgram(ShaderType shader) {
+	public boolean hasProgram(ShaderType shader) {
 		return programs.containsKey(shader);
 	}
 	
 	private static String getVSFname(ShaderType shader) {
-		return "shaders/vertex/flat.vs";
+		return "shaders/vertex/flat.glsl";
 	}
 	
 	private static String getFSFname(ShaderType shader) {
-		return "shaders/fragment/flat.fs";
+		return "shaders/fragment/flat.glsl";
 	}
 	
 	private int getShader(String fname, Map<String, Integer> shaders, int type) throws IOException {
@@ -57,7 +77,8 @@ public class GLShaderHandler {
 			return shaders.get(fname);
 		}
 		int shade = glCreateShaderObjectARB(type);
-		glShaderSourceARB(shade, resources.readFile(fname));
+		String shader = resources.readFile(fname);
+		glShaderSourceARB(shade, shader);
 		glCompileShaderARB(shade);
 		if(glGetObjectParameteriARB(shade, GL_OBJECT_COMPILE_STATUS_ARB) == GL_FALSE) {
             throw new RuntimeException("Error creating shader: "
@@ -72,5 +93,6 @@ public class GLShaderHandler {
 	private Map<String, Integer> vertShaders;
 	private Map<String, Integer> fragShaders;
 	private Map<ShaderType, Integer> programs;
+	private Map<ShaderType, Map<String, Object>> uniforms;
 
 }

@@ -1,9 +1,7 @@
 package lwjglview.graphics;
 
-import lwjglview.graphics.shader.ShaderType;
-import model.board.HexTile;
-import model.board.TileType;
-import model.testing.PresetBoard;
+import lwjglview.graphics.shader.GLShaderHandler;
+import model.board.Board;
 
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
@@ -31,10 +29,8 @@ public final class LWJGLGraphics implements Graphics {
 	
 	public static void main(String[] args) throws IOException {
 		ResourceHandler rh = new ResourceHandler();
-		LWJGLGraphics gfx = new LWJGLGraphics(null);
-		for(int i = 0; i < 20; ++i) {
-			gfx.addDrawable(new LWJGLBoardDrawable(new PresetBoard(), rh));
-		}
+		LWJGLGraphics gfx = new LWJGLGraphics(rh);
+		gfx.addDrawable(new LWJGLBoardDrawable(new Board(), rh));
 		gfx.start();
 	}
 
@@ -59,15 +55,31 @@ public final class LWJGLGraphics implements Graphics {
 		glTranslatef(x, y, z);
 	}
 	
-	public int loadTextureArray(byte[] rawData, int number, int height,
-			int width) {
-		glActiveTexture(GL_TEXTURE0);
+	public int loadTexture(ByteBuffer rawData, int height, int width) {
 		int texID = glGenTextures();
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, texID);
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, rawData);
+		/*glBindTexture(GL_TEXTURE_2D_ARRAY, texID);
+		glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_RGBA8, width, height, number);
+		glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, 0, width, height, number,
+				GL_RGBA, GL_UNSIGNED_BYTE, rawData);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);*/
+		return texID;
+	}
+	
+	public int loadTextureArray(ByteBuffer rawData, int number, int height,
+			int width) {
+		int texID = glGenTextures();
+		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D_ARRAY, texID);
-		glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_RGBA8, width, height,
-				number);
-		glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, 0, width, height,
-				number, GL_RGBA, GL_UNSIGNED_BYTE, ByteBuffer.wrap(rawData));
+		glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_RGBA8, width, height, number);
+		glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, 0, width, height, number,
+				GL_RGBA, GL_UNSIGNED_BYTE, rawData);
 		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -76,11 +88,25 @@ public final class LWJGLGraphics implements Graphics {
 	}
 	
 	public void bindTextureArray(int location) {
+		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D_ARRAY, location);
+        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameterf(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameterf(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	}
 	
-	public void loadShaderProgram(ShaderType st) {
-		
+	public void bindTexture(int location) {
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, location);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	}
+	
+	public GLShaderHandler getShaders() {
+		return shaders;
 	}
 	
 	@Override
@@ -112,6 +138,7 @@ public final class LWJGLGraphics implements Graphics {
 		camera = new Matrix(4, 4);
 		camera.identity();
 		drawables = new HashSet<Drawable>();
+		shaders = new GLShaderHandler(rh);
 	}
 	
 	private void initGL() {
@@ -144,12 +171,14 @@ public final class LWJGLGraphics implements Graphics {
         };
         glfwSetKeyCallback(window, keyCallback);
         
-    	glfwSetWindowSizeCallback(window, new GLFWWindowSizeCallback() {
+        windowCallback = new GLFWWindowSizeCallback() {
 			@Override
 			public void invoke(long window, int width, int height) {
 				onResize(width, height);
 			}
-    	});
+    	};
+        
+    	glfwSetWindowSizeCallback(window, windowCallback);
     	
         // Get the resolution of the primary monitor
         ByteBuffer vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
@@ -166,6 +195,12 @@ public final class LWJGLGraphics implements Graphics {
         glfwSwapInterval(0);
         
         GLContext.createFromCurrent();
+        
+        glEnable(GL_TEXTURE_2D_ARRAY);
+        
+        glEnable(GL_TEXTURE_3D);
+        
+        glEnable(GL_DEPTH_TEST);
  
         // Make the window visible
         glfwShowWindow(window);
@@ -213,8 +248,11 @@ public final class LWJGLGraphics implements Graphics {
 	private Collection<Drawable> drawables;
 	
 	private long window;
+	
+	private GLShaderHandler shaders;
 
     private GLFWErrorCallback errorCallback;
     private GLFWKeyCallback   keyCallback;
+    private GLFWWindowSizeCallback windowCallback;
     
 }
