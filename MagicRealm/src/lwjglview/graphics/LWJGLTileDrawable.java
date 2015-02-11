@@ -36,7 +36,7 @@ public class LWJGLTileDrawable extends TileDrawable {
 		sh.setUniformIntValue(ShaderType.TILE_SHADER, "index", normalTex);
 		lwgfx.resetModel();
 		lwgfx.translateModel(x, y, 0f);
-		lwgfx.translateModel(-3f, 3f, -0.5f);
+		lwgfx.translateModel(-7f, 3f, -0.5f);
 		lwgfx.getShaders().setUniformIntValue(ShaderType.TILE_SHADER, "index", normalTex);
 		lwgfx.getPrimitiveTool().drawHexagon();
 	}
