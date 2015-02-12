@@ -9,7 +9,9 @@ public class TileImages {
 	
 	public static BufferedImage getTileImage(ResourceHandler rh, TileType type, boolean enchanted)
 			throws IOException {
-		return rh.readImage("images/tiles/" + getName(type) + (enchanted ? "-e1.gif" : "1.gif"));
+		return rh.readImage(ResourceHandler.joinPath(new String[] {
+				"images", "tiles",
+				getName(type) + (enchanted ? "-e1.gif" : "1.gif")}));
 	}
 	
 	private static String getName(TileType tile) {
