@@ -11,7 +11,10 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 
-public class Board implements Iterable<HexTile>, BoeardInterface {
+import model.board.enums.TileType;
+import model.board.interfaces.BoardInterface;
+
+public class Board implements Iterable<HexTile>, BoardInterface {
 	private Collection<HexTile> collectionOfTiles;
 	
 	public Board(){

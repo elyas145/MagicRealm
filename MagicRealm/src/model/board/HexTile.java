@@ -2,6 +2,8 @@ package model.board;
 
 import java.awt.List;
 
+import model.board.enums.TileType;
+
 public class HexTile {
 
 	private TileType type;

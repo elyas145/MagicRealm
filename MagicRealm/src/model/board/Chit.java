@@ -5,18 +5,10 @@ package model.board;
 // warning chits,
 // site chits,
 // action chits.
+// treasure chits
 
 public class Chit {
-	protected ChitType type;
 	protected boolean flipped;	//unflipped chits, mean they are face down.
-
-	public ChitType getType() {
-		return type;
-	}
-
-	public void setType(ChitType type) {
-		this.type = type;
-	}
 
 	public boolean isFlipped() {
 		return flipped;

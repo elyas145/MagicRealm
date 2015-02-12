@@ -1,4 +1,4 @@
-package model.board;
+package model.board.enums;
 
 public enum TileType {
 	AWFUL_VALLEY,
