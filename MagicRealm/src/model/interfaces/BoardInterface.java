@@ -9,8 +9,6 @@ package model.interfaces;
 
 import java.util.Iterator;
 
-import model.board.HexTile;
-
 public interface BoardInterface {
   
   /**
@@ -26,6 +24,6 @@ public interface BoardInterface {
 	/**
 	 * @return iterator over the board tiles
 	 */
-	public Iterator<HexTile> iterator();
+	public Iterator<? extends HexTileInterface> iterator();
 	
 }

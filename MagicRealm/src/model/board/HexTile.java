@@ -1,10 +1,14 @@
 package model.board;
 
 import java.awt.List;
+import java.io.IOException;
 
 import model.enums.TileType;
 import model.interfaces.HexTileInterface;
 
+import org.json.*;
+
+import utils.resources.ResourceHandler;
 public class HexTile implements HexTileInterface {
 
 	public HexTile(TileType tp, int rw, int col, int rot) {
@@ -12,6 +16,13 @@ public class HexTile implements HexTileInterface {
 		row = rw;
 		column = col;
 		rotation = rot;
+		try {
+			obj = new JSONObject(new ResourceHandler().getResource("data.json"));
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		setClearings();
 	}
 
@@ -63,5 +74,6 @@ public class HexTile implements HexTileInterface {
 	private int column;
 	private List clearings;
 	private int rotation;
+	JSONObject obj;
 
 }
