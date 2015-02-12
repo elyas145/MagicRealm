@@ -19,7 +19,12 @@ public class ResourceHandler {
 	}
 	
 	public URL getResource(String fname) throws IOException {
-		return getClass().getResource(new File("/resources", fname).getPath());
+		URL ret = getClass().getResource(new File("/resources", fname).getPath());
+		if(ret == null) {
+			throw new IOException("The file " + fname + " could not be found, "
+					+ "try refreshing the project (F5)");
+		}
+		return ret;
 	}
 	
 	public String readFile(String fname) throws IOException {
