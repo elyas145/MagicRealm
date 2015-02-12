@@ -1,4 +1,4 @@
-package model.board.interfaces;
+package model.interfaces;
 
 public interface ChitInterface {
   

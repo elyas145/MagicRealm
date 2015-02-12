@@ -2,8 +2,8 @@ package model.board;
 
 import java.awt.List;
 
-import model.board.enums.TileType;
-import model.board.interfaces.HexTileInterface;
+import model.enums.TileType;
+import model.interfaces.HexTileInterface;
 
 public class HexTile implements HexTileInterface {
 

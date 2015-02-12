@@ -11,8 +11,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 
-import model.board.enums.TileType;
-import model.board.interfaces.BoardInterface;
+import model.enums.TileType;
+import model.interfaces.BoardInterface;
 
 public class Board implements Iterable<HexTile>, BoardInterface {
 	

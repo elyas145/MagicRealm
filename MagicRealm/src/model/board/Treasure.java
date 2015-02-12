@@ -12,7 +12,7 @@
  */
 package model.board;
 
-import model.board.enums.TreasureType;
+import model.enums.TreasureType;
 
 public class Treasure extends Chit {
 	private boolean enchanted = false;
