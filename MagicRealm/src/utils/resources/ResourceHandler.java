@@ -13,6 +13,7 @@ import javax.imageio.ImageIO;
 
 public class ResourceHandler {
 	
+	// default constructor initializes maps
 	public ResourceHandler() {
 		files = new HashMap<String, String>();
 		images = new HashMap<String, BufferedImage>();
