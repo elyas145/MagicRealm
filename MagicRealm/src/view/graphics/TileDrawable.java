@@ -1,23 +1,36 @@
 package view.graphics;
 
-import model.board.HexTile;
 import model.board.enums.TileType;
 
 
 public abstract class TileDrawable implements Drawable {
 	
-	public HexTile getTile() {
-		return tile;
-	}
-	
 	public TileType getTileType() {
-		return tile.getType();
+		return type;
 	}
 	
-	protected TileDrawable(HexTile ht) {
-		tile = ht;
+	public int getTileRotation() {
+	  return rotation;
 	}
 	
-	private HexTile tile;
+	public int getTileRow() {
+	  return y;
+	}
+	
+	public int getTileColumn() {
+	  return x;
+	}
+	
+	protected TileDrawable(TileType tt, int j, int i, int rot) {
+	  x = j;
+	  y = i;
+		type = tt;
+		rotation = rot;
+	}
+	
+	private int x;
+	private int y;
+	private TileType type;
+	private int rotation;
 	
 }

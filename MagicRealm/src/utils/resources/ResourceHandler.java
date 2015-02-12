@@ -1,8 +1,13 @@
 package utils.resources;
 
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -36,7 +41,21 @@ public class ResourceHandler {
 		String rep = ur.toString();
 		if(!files.containsKey(rep)) {
 			System.out.println("Reading file: " + rep);
-			files.put(rep, new String(Files.readAllBytes(Paths.get(ur.getFile()))));
+			BufferedReader br;
+      try {
+        br = new BufferedReader(new FileReader(ur.toURI().getPath()));
+      }
+      catch(URISyntaxException e) {
+        throw new RuntimeException(e);
+      }
+			char[] charbuf = new char[1024];
+			int read = 0;
+			StringBuilder sb = new StringBuilder();
+			while((read = br.read(charbuf)) > 0) {
+			  sb.append(charbuf, 0, read);
+			}
+			files.put(rep, sb.toString());
+			br.close();
 		}
 		String loaded = files.get(rep);
 		System.out.println("Retreived file: " + rep);

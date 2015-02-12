@@ -3,7 +3,8 @@ uniform float time;
 
 void main() {
 	vec4 pos = gl_ModelViewMatrix * gl_Vertex;
-	float u = sin(time) * .1;
+	float scale = .03;
+	float u = sin(time) * scale;
 	float s = sin(u);
 	float c = cos(u);
 	pos = mat4(
@@ -12,7 +13,7 @@ void main() {
 			-s, 0., c, 0.,
 			0., 0., 0., 1.
 		) * pos;
-	u = cos(time*.7) * .1;
+	u = cos(time*.7) * scale;
 	s = sin(u);
 	c = cos(u);
 	pos = mat4(

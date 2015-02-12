@@ -12,12 +12,20 @@ import java.util.Iterator;
 import model.board.HexTile;
 
 public interface BoardInterface {
+  
+  /**
+   * Board should set up the tiles in the following fashion
+   *    _   _   _   _
+   * 0 /0\_/1\_/2\_/3\_
+   * 1 \_/0\_/1\_/2\_/3\
+   * 2 /0\_/1\_/2\_/3\_/
+   * 3 \_/0\_/1\_/2\_/3\
+   *     \_/ \_/ \_/ \_/
+   */
 	
 	/**
 	 * @return iterator over the board tiles
 	 */
 	public Iterator<HexTile> iterator();
-	
-	
 	
 }

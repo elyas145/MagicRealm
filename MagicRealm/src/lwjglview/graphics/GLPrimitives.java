@@ -10,7 +10,7 @@ public class GLPrimitives {
 	
 	/*
 	 * Makes a hexagon of width 2 centered at the origin
-	 * 		2_3
+	 * 		  2_3
 	 * 	  1 /0\
 	 *      \_/ 4
 	 *      6 5

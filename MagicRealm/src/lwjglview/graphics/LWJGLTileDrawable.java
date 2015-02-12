@@ -3,13 +3,15 @@ package lwjglview.graphics;
 import lwjglview.graphics.shader.GLShaderHandler;
 import lwjglview.graphics.shader.ShaderType;
 import model.board.HexTile;
+import model.board.enums.TileType;
+import model.board.interfaces.HexTileInterface;
 import view.graphics.Graphics;
 import view.graphics.TileDrawable;
 
 public class LWJGLTileDrawable extends TileDrawable {
 
-	public LWJGLTileDrawable(HexTile ht, int norm, int enchant) {
-		super(ht);
+	public LWJGLTileDrawable(HexTileInterface ht, int norm, int enchant) {
+		super(ht.getType(), ht.getBoardRow(), ht.getBoardColumn(), ht.getRotation());
 		normalTex = norm;
 		enchantedTex = enchant;
 	}
@@ -25,18 +27,18 @@ public class LWJGLTileDrawable extends TileDrawable {
 	}
 	
 	public void draw(LWJGLGraphics lwgfx) {
-		HexTile tile = getTile();
-		int row = tile.getBoardRow();
-		int col = tile.getBoardColumn();
+		int row = getTileRow();
+		int col = getTileColumn();
 		float x, y;
-		x = col % 2 == 0 ? 1.5f : 0f;
-		x += row * 3f;
-		y = -col * 0.866025f;
+		x = row % 2 == 0 ? 0f : 1.5f;
+		x += col * 3f;
+		y = -row * 0.866025f;
 		GLShaderHandler sh = lwgfx.getShaders();
 		sh.setUniformIntValue(ShaderType.TILE_SHADER, "index", normalTex);
 		lwgfx.resetModel();
+		lwgfx.translateModel(-3.5f, 3.5f, -0.5f);
 		lwgfx.translateModel(x, y, 0f);
-		lwgfx.translateModel(-7f, 3f, -0.5f);
+		lwgfx.rotateModelZ(-60f * getTileRotation());
 		lwgfx.getShaders().setUniformIntValue(ShaderType.TILE_SHADER, "index", normalTex);
 		lwgfx.getPrimitiveTool().drawHexagon();
 	}

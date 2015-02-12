@@ -3,13 +3,17 @@ package model.board;
 import java.awt.List;
 
 import model.board.enums.TileType;
+import model.board.interfaces.HexTileInterface;
 
-public class HexTile {
+public class HexTile implements HexTileInterface {
 
-	private TileType type;
-	private int row;
-	private int column;
-	private List clearings;
+	public HexTile(TileType tp, int rw, int col, int rot) {
+		type = tp;
+		row = rw;
+		column = col;
+		clearings = setClearings();
+		rotation = rot;
+	}
 
 	public List getClearings() {
 		return clearings;
@@ -17,13 +21,6 @@ public class HexTile {
 
 	public void setClearings(List clearings) {
 		this.clearings = clearings;
-	}
-
-	public HexTile(TileType tp, int rw, int col) {
-		type = tp;
-		row = rw;
-		column = col;
-		clearings = setClearings();
 	}
 
 	private List setClearings() {
@@ -40,8 +37,30 @@ public class HexTile {
 		return column;
 	}
 
+  public void setRotation(int rot) {
+    rotation = rot;
+  }
+
+  @Override
 	public TileType getType() {
 		return type;
 	}
+
+  @Override
+  public int getRotation() {
+    return rotation;
+  }
+  
+  @Override
+  public boolean isEnchanted() {
+    // TODO Auto-generated method stub
+    return false;
+  }
+
+	private TileType type;
+	private int row;
+	private int column;
+	private List clearings;
+	private int rotation;
 
 }

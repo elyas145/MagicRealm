@@ -74,7 +74,9 @@ public class GLShaderHandler {
 	}
 	
 	private static String getVSFname(ShaderType shader) {
-		return "shaders/vertex/flat.glsl";
+		return ResourceHandler.joinPath(new String[] {
+		    "shaders", "vertex", "flat.glsl"
+		});
 	}
 	
 	private static String getFSFname(ShaderType shader) {
