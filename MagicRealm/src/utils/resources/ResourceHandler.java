@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,7 +21,9 @@ public class ResourceHandler {
 	}
 	
 	public URL getResource(String fname) throws IOException {
-		URL ret = getClass().getResource(new File("/resources", fname).getPath());
+		URL ret = getClass().getResource(ResourceHandler.joinPath(new String[]{
+				"..", "..", "resources", fname
+		}));
 		if(ret == null) {
 			throw new IOException("The file " + fname + " could not be found, "
 					+ "try refreshing the project (F5)");
@@ -52,6 +55,27 @@ public class ResourceHandler {
 		BufferedImage bi = images.get(rep);
 		System.out.println("Dimensions: " + bi.getWidth() + ", " + bi.getHeight());
 		return bi;
+	}
+	
+	public static String joinPath(String[] paths) {
+		if(paths.length == 0) {
+			throw new RuntimeException("The number of paths must not be 0");
+		}
+		if(paths.length == 1) {
+			return paths[0];
+		}
+		ArrayList<String> parts = new ArrayList<String>();
+		for(String p: paths) {
+			parts.add(p);
+		}
+		return joinPath(parts.remove(0), parts);
+	}
+	
+	private static String joinPath(String path, ArrayList<String> paths) {
+		if(paths.isEmpty()) {
+			return path;
+		}
+		return new File(path, joinPath(paths.remove(0), paths)).getPath();
 	}
 	
 	private Map<String, String> files;
