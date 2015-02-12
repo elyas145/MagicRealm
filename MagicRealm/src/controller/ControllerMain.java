@@ -16,7 +16,7 @@ public class ControllerMain {
 	private LWJGLGraphics gfx;
 	private ResourceHandler rh;
 	private Board board;	// main game board
-	private Treasure[] treasures;	// holds a bunch of treasures.
+	private ArrayList<Treasure> treasures;	// holds a bunch of treasures.
 	private Character[] characters;
 	private int numCharacters;
 	
@@ -24,7 +24,7 @@ public class ControllerMain {
 		rh = new ResourceHandler();
 		gfx = new LWJGLGraphics(rh);
 		board = new Board();
-		treasures = new Treasure[GameConfiguration.NUMBER_OF_TREASURES];
+		treasures = new ArrayList<Treasure>();
 		randomTreasures();
 		try {
 			gfx.addDrawable(new LWJGLBoardDrawable(board, rh));
@@ -39,9 +39,9 @@ public class ControllerMain {
 		for(int i = 1; i < 6; i++){
 			possibleValues.add(i*10);
 		}
-		
-		for (int i = 0; i < treasures.length; i++){
-			treasures[i] = new Treasure(possibleValues);
+		System.out.println(possibleValues.size());
+		for (int i = 0; i < treasures.size(); i++){
+			treasures.add(new Treasure(possibleValues));
 		}
 		
 	}
