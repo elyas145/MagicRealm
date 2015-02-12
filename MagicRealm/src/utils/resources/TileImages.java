@@ -55,7 +55,7 @@ public class TileImages {
 		case RUINS:
 			return "ruins";
 		default:
-			return null;
+			return "colourful";
 		}
 	}
 
