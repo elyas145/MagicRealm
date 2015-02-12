@@ -13,6 +13,7 @@ public class HexTile implements HexTileInterface {
 		column = col;
 		clearings = setClearings();
 		rotation = rot;
+		setClearings();
 	}
 
 	public List getClearings() {
@@ -23,10 +24,11 @@ public class HexTile implements HexTileInterface {
 		this.clearings = clearings;
 	}
 
-	private List setClearings() {
+	private void setClearings() {
 		// TODO get clearing location from external file, and create the
 		// clearings that go with this tile.
-		return null;
+		
+		
 	}
 
 	public int getBoardRow() {
