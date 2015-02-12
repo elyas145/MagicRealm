@@ -25,15 +25,7 @@ import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.opengl.ARBTextureStorage.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
-public final class LWJGLGraphics implements Graphics {
-	
-	public static void main(String[] args) throws IOException {
-		ResourceHandler rh = new ResourceHandler();
-		LWJGLGraphics gfx = new LWJGLGraphics(rh);
-		gfx.addDrawable(new LWJGLBoardDrawable(new Board(), rh));
-		gfx.start();
-	}
-
+public final class LWJGLGraphics implements Graphics {	
 	public LWJGLGraphics(ResourceHandler rh) {
 		init(rh);
 	}
