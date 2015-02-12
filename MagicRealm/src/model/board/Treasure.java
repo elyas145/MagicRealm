@@ -7,28 +7,41 @@
  * 3. weapon treasure not implemented
  * potion treasure not implemented
  * 
- * We are only implementing treasures affecting the use of tables:
- * First encounter:
- * Deft gloves
- * Lost keys
- * lucky charm
- * magic wand?
- * Map of lost castle
- * map of lost city
- * map of ruins
- * shoes of stealth
- * 
- * fourth encounter:
- * phantom glass
+ * We are only implementing treasures affecting the use of tables.
  * 
  */
 package model.board;
 
-public class Treasure extends Chit{
+import model.board.enums.TreasureType;
+
+public class Treasure extends Chit {
 	private boolean enchanted = false;
-	
-	public Treasure(){
+
+	public boolean isEnchanted() {
+		return enchanted;
+	}
+
+	public void setEnchanted(boolean enchanted) {
+		this.enchanted = enchanted;
+	}
+
+	public TreasureType getType() {
+		return type;
+	}
+
+	public void setType(TreasureType type) {
+		this.type = type;
+	}
+
+	private TreasureType type;
+
+	public Treasure(TreasureType t, boolean e) {
+		type = t;
+		enchanted = e;
+	}
+
+	public Treasure() {
 		super();
-		//super.type = new TreasureType(); this would be cool! TODO
-	}	
+	}
+
 }

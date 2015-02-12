@@ -5,9 +5,11 @@
  * If you see a mistake in my class, ask me to fix it and vice versa. This way we don't waste time discussing possible solutions, 
  * since the implementation doesn't really matter as long as it works well.
  */
-package model.board;
+package model.board.interfaces;
 
 import java.util.Iterator;
+
+import model.board.HexTile;
 
 public interface BoardInterface {
 	

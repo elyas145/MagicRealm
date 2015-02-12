@@ -1,7 +1,7 @@
 package view.graphics;
 
 import model.board.HexTile;
-import model.board.TileType;
+import model.board.enums.TileType;
 
 
 public abstract class TileDrawable implements Drawable {

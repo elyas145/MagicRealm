@@ -3,7 +3,7 @@ package utils.resources;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
-import model.board.TileType;
+import model.board.enums.TileType;
 
 public class TileImages {
 	
