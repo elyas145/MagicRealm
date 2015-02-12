@@ -11,7 +11,6 @@ public class HexTile implements HexTileInterface {
 		type = tp;
 		row = rw;
 		column = col;
-		clearings = setClearings();
 		rotation = rot;
 		setClearings();
 	}
