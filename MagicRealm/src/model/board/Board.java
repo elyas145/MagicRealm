@@ -7,10 +7,15 @@
 
 package model.board;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+
+import org.json.simple.JSONArray;
+import org.json.simple.parser.JSONParser;
 
 import model.enums.TileType;
 import model.interfaces.BoardInterface;
@@ -19,11 +24,25 @@ public class Board implements Iterable<HexTile>, BoardInterface {
 
 	public Board() {
 		collectionOfTiles = new HashSet<HexTile>();
+		// get tile info
+		String path = System.getProperty("user.dir") + "\\bin\\resources\\data\\data.json";
+		try {
+			FileReader reader = new FileReader(path);
+			JSONParser parser = new JSONParser();
+			arr = (JSONArray) parser.parse(reader);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
 		hardCodeTiles();
 		initTreasures();
 		
+		
 	}
 
+	public static void main(String[] args){
+		Board b = new Board();
+	}
 	private void initTreasures() {
 		ArrayList<Integer> possibleValues = new ArrayList<Integer>();
 		
@@ -81,9 +100,10 @@ public class Board implements Iterable<HexTile>, BoardInterface {
 	}
 
 	private void setTile(TileType tile, int x, int y, int rot) {
-		collectionOfTiles.add(new HexTile(tile, x, y, rot));
+		collectionOfTiles.add(new HexTile(tile, x, y, rot, arr));
 	}
 
 	private Collection<HexTile> collectionOfTiles;
-	ArrayList<Treasure> treasures = new ArrayList<Treasure>();
+	private ArrayList<Treasure> treasures = new ArrayList<Treasure>();
+	private JSONArray arr;
 }

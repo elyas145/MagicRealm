@@ -7,6 +7,8 @@ import model.enums.TileType;
 import model.interfaces.HexTileInterface;
 
 import org.json.*;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 import utils.resources.ResourceHandler;
 public class HexTile implements HexTileInterface {
@@ -16,7 +18,14 @@ public class HexTile implements HexTileInterface {
 		row = rw;
 		column = col;
 		rotation = rot;
-		
+	}
+
+	public HexTile(TileType tile, int x, int y, int rot, JSONArray arr) {
+		type = tile;
+		row = x;
+		column = y;
+		rotation = rot;
+		this.arr = arr;
 		setClearings();
 	}
 
@@ -31,7 +40,16 @@ public class HexTile implements HexTileInterface {
 	private void setClearings() {
 		// TODO get clearing location from external file, and create the
 		// clearings that go with this tile.
-		
+		for(int i = 0; i < arr.size(); i++){
+			JSONObject obj = (JSONObject) arr.get(i);
+			String name = (String)obj.get("tileName");
+			if(name.equals(type.name())){
+				Boolean enchanted = (Boolean) obj.get("enchanted");
+				if(enchanted == true){
+					
+				}
+			}
+		}
 		
 	}
 
@@ -68,5 +86,5 @@ public class HexTile implements HexTileInterface {
 	private int column;
 	private List clearings;
 	private int rotation;
-
+	private JSONArray arr;
 }

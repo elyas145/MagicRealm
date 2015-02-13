@@ -6,6 +6,16 @@ import utils.math.Point;
 
 public class Clearing {
 	private Point location;
+	private Point location_e;
+
+	public Point getLocation_e() {
+		return location_e;
+	}
+
+	public void setLocation_e(Point location_e) {
+		this.location_e = location_e;
+	}
+
 	private List<Chit> chits;
 	private int number;
 
