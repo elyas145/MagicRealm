@@ -5,12 +5,17 @@ import static org.lwjgl.opengl.ARBShaderObjects.*;
 import static org.lwjgl.opengl.ARBVertexShader.*;
  
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.lwjgl.BufferUtils;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.*;
 
+import utils.math.Matrix;
 import utils.resources.ResourceHandler;
 
 public class GLShaderHandler {
@@ -21,6 +26,7 @@ public class GLShaderHandler {
 		fragShaders = new HashMap<String, Integer>();
 		programs = new HashMap<ShaderType, Integer>();
 		uniforms = new HashMap<ShaderType, Map<String, Integer>>();
+		matrixBuffer = BufferUtils.createFloatBuffer(16);
 	}
 	
 	public void loadShaderProgram(ShaderType shader) throws IOException {
@@ -51,6 +57,14 @@ public class GLShaderHandler {
 		glUniform1f(loc, value);
 	}
 	
+	public void setUniformMatrixValue(ShaderType st, String name,
+			Matrix mat) {
+		int loc = initUniform(st, name);
+		mat.toFloatBuffer(matrixBuffer);
+		//matrixBuffer.flip();
+		glUniformMatrix4(loc, true, matrixBuffer);
+	}
+	
 	public void useShaderProgram(ShaderType shader) {
 		glUseProgramObjectARB(programs.get(shader));
 	}
@@ -69,6 +83,7 @@ public class GLShaderHandler {
 		Map<String, Integer> locs = uniforms.get(st);
 		if(!locs.containsKey(name)) {
 			locs.put(name, glGetUniformLocation(programs.get(st), name));
+			System.out.println(locs.get(name) + ", " + name);
 		}
 		return locs.get(name);
 	}
@@ -105,5 +120,7 @@ public class GLShaderHandler {
 	private Map<String, Integer> fragShaders;
 	private Map<ShaderType, Integer> programs;
 	private Map<ShaderType, Map<String, Integer>> uniforms;
+	
+	private FloatBuffer matrixBuffer;
 
 }
