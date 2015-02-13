@@ -1,0 +1,2 @@
+Add to the interface ControlView
+Implement a swing version for iteration 1
