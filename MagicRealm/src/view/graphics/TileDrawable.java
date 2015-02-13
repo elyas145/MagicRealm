@@ -1,6 +1,6 @@
 package view.graphics;
 
-import model.board.enums.TileType;
+import model.enums.TileType;
 
 
 public abstract class TileDrawable implements Drawable {

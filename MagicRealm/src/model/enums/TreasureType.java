@@ -12,7 +12,7 @@
  * fourth encounter:
  * phantom glass
  */
-package model.board.enums;
+package model.enums;
 
 public enum TreasureType {
 	DEFT_GLOVES,

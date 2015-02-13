@@ -13,7 +13,7 @@ import lwjglview.graphics.shader.GLShaderHandler;
 import lwjglview.graphics.shader.ShaderType;
 import model.board.Board;
 import model.board.HexTile;
-import model.board.enums.TileType;
+import model.enums.TileType;
 import utils.math.Mathf;
 import utils.math.Matrix;
 import utils.resources.ResourceHandler;

@@ -12,36 +12,43 @@
  */
 package model.board;
 
-import model.board.enums.TreasureType;
+import java.util.ArrayList;
+import java.util.Random;
+
+import model.enums.TreasureType;
 
 public class Treasure extends Chit {
-	private boolean enchanted = false;
+	private int goldValue;
+	private Random gen;
+	
+	/*
+	 * private boolean enchanted = false;
+	 * 
+	 * public boolean isEnchanted() { return enchanted; }
+	 * 
+	 * public void setEnchanted(boolean enchanted) { this.enchanted = enchanted;
+	 * }
+	 * 
+	 * public TreasureType getType() { return type; }
+	 * 
+	 * public void setType(TreasureType type) { this.type = type; }
+	 * 
+	 * private TreasureType type;
+	 * 
+	 * public Treasure(TreasureType t, boolean e) { type = t; enchanted = e; }
+	 */
 
-	public boolean isEnchanted() {
-		return enchanted;
+	public int getGoldValue() {
+		return goldValue;
 	}
 
-	public void setEnchanted(boolean enchanted) {
-		this.enchanted = enchanted;
+	public void setGoldValue(int goldValue) {
+		this.goldValue = goldValue;
 	}
 
-	public TreasureType getType() {
-		return type;
-	}
-
-	public void setType(TreasureType type) {
-		this.type = type;
-	}
-
-	private TreasureType type;
-
-	public Treasure(TreasureType t, boolean e) {
-		type = t;
-		enchanted = e;
-	}
-
-	public Treasure() {
+	public Treasure(ArrayList<Integer> possibleValues) {
 		super();
+		goldValue = possibleValues.get(gen.nextInt(possibleValues.size()-1));
 	}
 
 }

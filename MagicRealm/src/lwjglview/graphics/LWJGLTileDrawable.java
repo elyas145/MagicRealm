@@ -2,10 +2,13 @@ package lwjglview.graphics;
 
 import lwjglview.graphics.shader.GLShaderHandler;
 import lwjglview.graphics.shader.ShaderType;
-import model.board.interfaces.HexTileInterface;
+import model.interfaces.HexTileInterface;
 import utils.math.Mathf;
 import utils.math.Matrix;
 import utils.time.Timing;
+import model.board.HexTile;
+import model.enums.TileType;
+import model.interfaces.HexTileInterface;
 import view.graphics.Graphics;
 import view.graphics.TileDrawable;
 

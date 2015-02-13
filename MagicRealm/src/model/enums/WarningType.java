@@ -1,4 +1,4 @@
-package model.board.enums;
+package model.enums;
 
 public enum WarningType {
 	SMOKE,

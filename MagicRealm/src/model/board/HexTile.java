@@ -1,18 +1,31 @@
 package model.board;
 
 import java.awt.List;
+import java.io.IOException;
 
-import model.board.enums.TileType;
-import model.board.interfaces.HexTileInterface;
+import model.enums.TileType;
+import model.interfaces.HexTileInterface;
 
+import org.json.*;
+
+import utils.resources.ResourceHandler;
 public class HexTile implements HexTileInterface {
 
 	public HexTile(TileType tp, int rw, int col, int rot) {
 		type = tp;
 		row = rw;
 		column = col;
-		clearings = setClearings();
 		rotation = rot;
+		try {
+			obj = new JSONObject(new ResourceHandler().getResource(
+					ResourceHandler.joinPath(new String[] {
+							"data",
+							"data.json"
+					})));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		setClearings();
 	}
 
 	public List getClearings() {
@@ -23,10 +36,11 @@ public class HexTile implements HexTileInterface {
 		this.clearings = clearings;
 	}
 
-	private List setClearings() {
+	private void setClearings() {
 		// TODO get clearing location from external file, and create the
 		// clearings that go with this tile.
-		return null;
+		
+		
 	}
 
 	public int getBoardRow() {
@@ -62,5 +76,6 @@ public class HexTile implements HexTileInterface {
 	private int column;
 	private List clearings;
 	private int rotation;
+	JSONObject obj;
 
 }
