@@ -16,15 +16,7 @@ public class HexTile implements HexTileInterface {
 		row = rw;
 		column = col;
 		rotation = rot;
-		try {
-			obj = new JSONObject(new ResourceHandler().getResource(
-					ResourceHandler.joinPath(new String[] {
-							"data",
-							"data.json"
-					})));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		
 		setClearings();
 	}
 
@@ -76,6 +68,5 @@ public class HexTile implements HexTileInterface {
 	private int column;
 	private List clearings;
 	private int rotation;
-	JSONObject obj;
 
 }
