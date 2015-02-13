@@ -14,8 +14,11 @@ import lwjglview.graphics.shader.ShaderType;
 import model.board.Board;
 import model.board.HexTile;
 import model.board.enums.TileType;
+import utils.math.Mathf;
+import utils.math.Matrix;
 import utils.resources.ResourceHandler;
 import utils.resources.TileImages;
+import utils.time.Timing;
 import view.graphics.BoardDrawable;
 import view.graphics.Graphics;
 
@@ -61,7 +64,18 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 			}
 		}
 		shaders.useShaderProgram(st);
-		shaders.setUniformFloatValue(st, "time", System.nanoTime() * 1e-9f);
+
+		lwgfx.resetViewMatrix();
+		float time = Timing.getSeconds() * .6f;
+		Matrix tmp = Matrix.rotationX(4, Mathf.PI / 5f);
+		float k = (Mathf.sin(time * .6f) + 3f) / 3f;
+		tmp = Matrix.translation(new float[] {
+				0f, -4f * k, 3f * k
+		}).multiply(tmp);
+		tmp = Matrix.rotationZ(4, time * .3f).multiply(tmp);
+		lwgfx.applyCameraTransform(tmp);
+		lwgfx.translateCamera(3.5f, -3.5f, 0f);
+		
 		for(LWJGLTileDrawable tile: tiles) {
 			tile.draw(lwgfx);
 		}
