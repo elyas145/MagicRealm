@@ -69,6 +69,11 @@ public final class LWJGLGraphics implements Graphics {
 		}).multiply(viewMatrix);
 		updateViewMatrix();
 	}
+	
+	public void applyCameraTransform(Matrix mat) {
+		viewMatrix = mat.multiply(viewMatrix);
+		updateViewMatrix();
+	}
 
 	public void resetModelMatrix() {
 		modelMatrix.identity();
@@ -80,8 +85,18 @@ public final class LWJGLGraphics implements Graphics {
 		updateMVP();
 	}
 
+	public void rotateModelY(float ang) {
+		modelMatrix = Matrix.rotationY(4, ang).multiply(modelMatrix);
+		updateMVP();
+	}
+
 	public void rotateModelZ(float ang) {
 		modelMatrix = Matrix.rotationZ(4, ang).multiply(modelMatrix);
+		updateMVP();
+	}
+	
+	public void applyModelTransform(Matrix mat) {
+		modelMatrix = mat.multiply(modelMatrix);
 		updateMVP();
 	}
 

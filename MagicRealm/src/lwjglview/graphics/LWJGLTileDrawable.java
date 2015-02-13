@@ -6,6 +6,8 @@ import model.board.HexTile;
 import model.board.enums.TileType;
 import model.board.interfaces.HexTileInterface;
 import utils.math.Mathf;
+import utils.math.Matrix;
+import utils.time.Timing;
 import view.graphics.Graphics;
 import view.graphics.TileDrawable;
 
@@ -42,13 +44,21 @@ public class LWJGLTileDrawable extends TileDrawable {
 		lwgfx.rotateModelZ(- Mathf.PI * getTileRotation() / 3f);
 		lwgfx.translateModel(x, y, 0f);
 		
-		lwgfx.translateCamera(3.5f, -3.5f, 5f);
-		lwgfx.rotateCameraX(Mathf.PI / 6f);
-		lwgfx.translateCamera(0f, -1f, 0f);
+		float time = Timing.getSeconds() * .6f;
+		Matrix tmp = Matrix.rotationX(4, Mathf.PI / 4f);
+		float k = (Mathf.sin(time * .6f) + 3f) / 3f;
+		tmp = Matrix.translation(new float[] {
+				0f, -4f * k, 3f * k
+		}).multiply(tmp);
+		tmp = Matrix.rotationZ(4, time * .3f).multiply(tmp);
+		lwgfx.applyCameraTransform(tmp);
+		lwgfx.translateCamera(3.5f, -3.5f, 0f);
 		
 		lwgfx.updateMVPUniform(ShaderType.TILE_SHADER, "mvpMatrix");
 		lwgfx.getShaders().setUniformIntValue(ShaderType.TILE_SHADER, "index", normalTex);
 		lwgfx.getPrimitiveTool().drawHexagon();
+		
+		System.out.println(System.nanoTime());
 	}
 	
 	private int normalTex;
