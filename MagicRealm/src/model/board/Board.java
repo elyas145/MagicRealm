@@ -29,9 +29,7 @@ public class Board implements Iterable<HexTile>, BoardInterface {
 		// get tile info
 				//System.getProperty("user.dir") + "\\bin\\resources\\data\\data.json";
 		try {
-			String path = new ResourceHandler().getResource(ResourceHandler.joinPath(new String[] {
-					"data", "data.json"
-			})).getPath();
+			String path = new ResourceHandler().getResource(ResourceHandler.joinPath("data", "data.json")).getPath();
 			FileReader reader = new FileReader(path);
 			JSONParser parser = new JSONParser();
 			arr = (JSONArray) parser.parse(reader);
