@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.Map;
 
 import config.GraphicsConfiguration;
-import lwjglview.graphics.model.ModelData;
 import lwjglview.graphics.shader.GLShaderHandler;
 import lwjglview.graphics.shader.ShaderType;
 import model.board.Board;
@@ -39,8 +38,6 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 		readImages(false);
 		readImages(true);
 		System.out.println("Finished loading images");
-		System.out.println("Loading model data");
-		chit = ModelData.loadModelData(resources, "chit.obj");
 		tiles = new HashSet<LWJGLTileDrawable>();
 		for(HexTile ht: bo) {
 			TileType type = ht.getType();
@@ -128,7 +125,6 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 	private ByteBuffer rawData;
 	private ResourceHandler resources;
 	private Collection<LWJGLTileDrawable> tiles;
-	private ModelData chit;
 	private Map<TileType, BufferedImage> normal;
 	private Map<TileType, BufferedImage> enchanted;
 
