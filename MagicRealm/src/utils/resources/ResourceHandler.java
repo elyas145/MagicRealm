@@ -83,6 +83,7 @@ public class ResourceHandler {
 		ArrayList<String> parts = new ArrayList<String>();
 		for (String p : paths) {
 			parts.add(p);
+			parts.add("/");
 		}
 		return joinPath(parts.remove(0), parts);
 	}
