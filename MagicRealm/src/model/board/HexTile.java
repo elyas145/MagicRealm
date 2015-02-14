@@ -2,6 +2,7 @@ package model.board;
 
 import java.awt.List;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import model.enums.TileType;
 import model.interfaces.HexTileInterface;
@@ -10,7 +11,10 @@ import org.json.*;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import config.BoardConfiguration;
+import utils.math.Point;
 import utils.resources.ResourceHandler;
+
 public class HexTile implements HexTileInterface {
 
 	public HexTile(TileType tp, int rw, int col, int rot) {
@@ -29,28 +33,68 @@ public class HexTile implements HexTileInterface {
 		setClearings();
 	}
 
-	public List getClearings() {
+	public ArrayList<Clearing> getClearings() {
 		return clearings;
 	}
 
-	public void setClearings(List clearings) {
+	public void setClearings(ArrayList clearings) {
 		this.clearings = clearings;
 	}
 
 	private void setClearings() {
 		// TODO get clearing location from external file, and create the
 		// clearings that go with this tile.
-		for(int i = 0; i < arr.size(); i++){
+		for (int i = 0; i < arr.size(); i++) {
 			JSONObject obj = (JSONObject) arr.get(i);
-			String name = (String)obj.get("tileName");
-			if(name.equals(type.name())){
+			String name = (String) obj.get("tileName");
+			if (name.equals(type.name())) {
+				JSONObject numbers = (JSONObject) obj.get("numbers");
 				Boolean enchanted = (Boolean) obj.get("enchanted");
-				if(enchanted == true){
-					
+				for (int j = 0; j <= BoardConfiguration.MAX_CLEARINGS_IN_TILE; j++) {
+					JSONObject n = (JSONObject) numbers.get("" + j);
+					if (n != null) {
+						// create a point instance
+						Point p = new Point();
+						p.setX((Long) n.get("x"));
+						p.setY((Long) n.get("y"));
+						if (!containsClearing(j)) {
+							// create the clearing
+							Clearing c = new Clearing();
+							if (enchanted)
+								c.setLocation_e(p);
+							else
+								c.setLocation(p);
+							c.setNumber(j);
+							clearings.add(c);
+						} else {
+							setClearingLocation(j, p, true);
+						}
+					}
 				}
+
 			}
 		}
-		
+	}
+
+	private boolean containsClearing(int j) {
+		for (Clearing c : clearings) {
+			if (c.getNumber() == j)
+				return true;
+		}
+		return false;
+	}
+
+	private void setClearingLocation(int clearingNumber, Point p,
+			boolean enchanted) {
+		for (Clearing c : clearings) {
+			if (c.getNumber() == clearingNumber) {
+				if (enchanted)
+					c.setLocation_e(p);
+				else
+					c.setLocation(p);
+			}
+		}
+
 	}
 
 	public int getBoardRow() {
@@ -61,30 +105,30 @@ public class HexTile implements HexTileInterface {
 		return column;
 	}
 
-  public void setRotation(int rot) {
-    rotation = rot;
-  }
+	public void setRotation(int rot) {
+		rotation = rot;
+	}
 
-  @Override
+	@Override
 	public TileType getType() {
 		return type;
 	}
 
-  @Override
-  public int getRotation() {
-    return rotation;
-  }
-  
-  @Override
-  public boolean isEnchanted() {
-    // TODO Auto-generated method stub
-    return false;
-  }
+	@Override
+	public int getRotation() {
+		return rotation;
+	}
+
+	@Override
+	public boolean isEnchanted() {
+		// TODO Auto-generated method stub
+		return false;
+	}
 
 	private TileType type;
 	private int row;
 	private int column;
-	private List clearings;
+	private ArrayList<Clearing> clearings = new ArrayList<Clearing>();
 	private int rotation;
 	private JSONArray arr;
 }
