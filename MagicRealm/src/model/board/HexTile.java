@@ -37,6 +37,10 @@ public class HexTile implements HexTileInterface {
 		this.clearings = clearings;
 	}
 
+	/**
+	 * reads the data provided by the JSONArray "arr"
+	 * locates the tile, and reads the clearings and their corresponding locations
+	 */
 	private void setClearings() {
 		// TODO get clearing location from external file, and create the
 		// clearings that go with this tile.
