@@ -4,11 +4,6 @@ import lwjglview.graphics.shader.GLShaderHandler;
 import lwjglview.graphics.shader.ShaderType;
 import model.interfaces.HexTileInterface;
 import utils.math.Mathf;
-import utils.math.Matrix;
-import utils.time.Timing;
-import model.board.HexTile;
-import model.enums.TileType;
-import model.interfaces.HexTileInterface;
 import view.graphics.Graphics;
 import view.graphics.TileDrawable;
 
@@ -44,7 +39,8 @@ public class LWJGLTileDrawable extends TileDrawable {
 		lwgfx.rotateModelZ(- Mathf.PI * getTileRotation() / 3f);
 		lwgfx.translateModel(x, y, 0f);
 		
-		lwgfx.updateMVPUniform(ShaderType.TILE_SHADER, "mvpMatrix");
+		// lwgfx.updateMVPUniform(ShaderType.TILE_SHADER, "mvpMatrix");
+		lwgfx.updateModelViewUniform(ShaderType.TILE_SHADER, "modelViewMatrix");
 		lwgfx.getShaders().setUniformIntValue(ShaderType.TILE_SHADER, "index", normalTex);
 		lwgfx.getPrimitiveTool().drawHexagon();
 		

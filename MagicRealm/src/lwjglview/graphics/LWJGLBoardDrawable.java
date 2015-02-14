@@ -64,7 +64,13 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 			}
 		}
 		shaders.useShaderProgram(st);
-
+		float ar = lwgfx.getAspectRatio();
+		float fovScale = 1f;
+		shaders.setUniformFloatValue(st, "xScale", 1f / fovScale / ar);
+		shaders.setUniformFloatValue(st, "yScale", 1f / fovScale);
+		shaders.setUniformFloatValue(st, "nearRadius", .1f);
+		shaders.setUniformFloatValue(st, "oneOverRadiusDifference", 1f/20f);
+		
 		lwgfx.resetViewMatrix();
 		float time = Timing.getSeconds() * .6f;
 		Matrix tmp = Matrix.rotationX(4, Mathf.PI / 5f);
