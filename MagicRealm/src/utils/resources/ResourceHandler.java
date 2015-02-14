@@ -74,7 +74,7 @@ public class ResourceHandler {
 		return bi;
 	}
 	
-	public static String joinPath(String[] paths) {
+	public static String joinPath(String... paths) {
 		if(paths.length == 0) {
 			throw new RuntimeException("The number of paths must not be 0");
 		}

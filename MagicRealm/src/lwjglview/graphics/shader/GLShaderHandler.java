@@ -84,7 +84,6 @@ public class GLShaderHandler {
 		Map<String, Integer> locs = uniforms.get(st);
 		if(!locs.containsKey(name)) {
 			locs.put(name, glGetUniformLocation(programs.get(st), name));
-			System.out.println(locs.get(name) + ", " + name);
 		}
 		return locs.get(name);
 	}
@@ -98,9 +97,7 @@ public class GLShaderHandler {
 	}
 	
 	private String getShaderPath(String folder, String shaderName) {
-		return ResourceHandler.joinPath(new String[] {
-				"shaders", folder, shaderName
-		});
+		return ResourceHandler.joinPath("shaders", folder, shaderName);
 	}
 	
 	private int getShader(String fname, Map<String, Integer> shaders, int type) throws IOException {
