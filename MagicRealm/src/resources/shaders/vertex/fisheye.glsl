@@ -9,6 +9,8 @@ uniform float yScale;
 uniform float nearRadius;
 uniform float oneOverRadiusDifference;
 
+varying vec2 textureCoordinate;
+
 vec4 fishEyeProjection(vec4 coord) {
 	coord /= coord.w;
 	coord.z *= -1f;
@@ -22,5 +24,5 @@ vec4 fishEyeProjection(vec4 coord) {
 
 void main() {
 	gl_Position = fishEyeProjection(modelViewMatrix * gl_Vertex);
-	gl_TexCoord[0] = gl_MultiTexCoord0;
+	textureCoordinate = gl_MultiTexCoord0.xy;
 }

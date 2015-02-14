@@ -49,7 +49,7 @@ public class ModelData implements Drawable {
 					parseVertex(split);
 					break;
 				case 2:
-					switch(nm.charAt(2)) {
+					switch(nm.charAt(1)) {
 					case 't': // vt denotes texture coordinate
 						parseTextureCoordinate(split);
 						break;
@@ -58,6 +58,7 @@ public class ModelData implements Drawable {
 						break;
 					}
 				}
+				break;
 			case 'f':
 				parseFace(split);
 				break;
@@ -110,9 +111,9 @@ public class ModelData implements Drawable {
 		int[][] face = new int[line.length - 1][];
 		for(int i = 0; i + 1 < face.length; ++i) {
 			face[i] = new int[3];
-			String[] split = line[i].split("/");
+			String[] split = line[i + 1].split("/");
 			for(int j = 0; j < 3; ++j) {
-				if(j < split.length) {
+				if(j < split.length && split[j].length() > 0) {
 					face[i][j] = Integer.parseInt(split[j]);
 				}
 				else {

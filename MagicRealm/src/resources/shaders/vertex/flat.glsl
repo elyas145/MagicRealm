@@ -3,7 +3,9 @@
 
 uniform mat4 mvpMatrix;
 
+varying vec2 textureCoordinate;
+
 void main() {
 	gl_Position = mvpMatrix * gl_Vertex;
-	gl_TexCoord[0] = gl_MultiTexCoord0;
+	textureCoordinate = gl_MultiTexCoord0;
 }

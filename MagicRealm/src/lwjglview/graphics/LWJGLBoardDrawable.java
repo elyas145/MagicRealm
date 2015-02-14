@@ -41,6 +41,7 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 		System.out.println("Finished loading images");
 		System.out.println("Loading model data");
 		chit = ModelData.loadModelData(resources, "chit.obj");
+		System.out.println("Finished loading model data");
 		tiles = new HashSet<LWJGLTileDrawable>();
 		for(HexTile ht: bo) {
 			TileType type = ht.getType();

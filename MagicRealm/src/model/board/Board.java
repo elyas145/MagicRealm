@@ -17,6 +17,8 @@ import java.util.Iterator;
 import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
 
+import utils.resources.ResourceHandler;
+
 import model.enums.TileType;
 import model.interfaces.BoardInterface;
 
@@ -25,8 +27,9 @@ public class Board implements Iterable<HexTile>, BoardInterface {
 	public Board() {
 		collectionOfTiles = new HashSet<HexTile>();
 		// get tile info
-		String path = System.getProperty("user.dir") + "\\bin\\resources\\data\\data.json";
+				//System.getProperty("user.dir") + "\\bin\\resources\\data\\data.json";
 		try {
+			String path = new ResourceHandler().getResource(ResourceHandler.joinPath("data", "data.json")).getPath();
 			FileReader reader = new FileReader(path);
 			JSONParser parser = new JSONParser();
 			arr = (JSONArray) parser.parse(reader);
