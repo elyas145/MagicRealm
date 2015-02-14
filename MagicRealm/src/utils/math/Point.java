@@ -27,4 +27,8 @@ public class Point {
 	public float getX() {
 		return x;
 	}
+	
+	public String toSring(){
+		return "X: " + x + " Y: " + y;
+	}
 }

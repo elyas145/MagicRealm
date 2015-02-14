@@ -37,7 +37,7 @@ public class HexTile implements HexTileInterface {
 		return clearings;
 	}
 
-	public void setClearings(ArrayList clearings) {
+	public void setClearings(ArrayList<Clearing> clearings) {
 		this.clearings = clearings;
 	}
 
@@ -48,17 +48,22 @@ public class HexTile implements HexTileInterface {
 			JSONObject obj = (JSONObject) arr.get(i);
 			String name = (String) obj.get("tileName");
 			if (name.equals(type.name())) {
+				//System.out.println("-------------------------------");
+				//System.out.println("tile: " + name);
 				JSONObject numbers = (JSONObject) obj.get("numbers");
 				Boolean enchanted = (Boolean) obj.get("enchanted");
+				//System.out.println("enchanted: " + enchanted);
 				for (int j = 0; j <= BoardConfiguration.MAX_CLEARINGS_IN_TILE; j++) {
 					JSONObject n = (JSONObject) numbers.get("" + j);
 					if (n != null) {
 						// create a point instance
+						//System.out.println("setting clearing: " + j);
 						Point p = new Point();
 						p.setX((Long) n.get("x"));
 						p.setY((Long) n.get("y"));
 						if (!containsClearing(j)) {
 							// create the clearing
+							//System.out.println("creating the clearing: " + j);
 							Clearing c = new Clearing();
 							if (enchanted)
 								c.setLocation_e(p);
@@ -67,6 +72,7 @@ public class HexTile implements HexTileInterface {
 							c.setNumber(j);
 							clearings.add(c);
 						} else {
+							//System.out.println("clearing already exists: " + j);
 							setClearingLocation(j, p, true);
 						}
 					}
