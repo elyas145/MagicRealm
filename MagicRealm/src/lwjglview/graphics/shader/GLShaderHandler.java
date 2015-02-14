@@ -31,9 +31,11 @@ public class GLShaderHandler {
 	
 	public void loadShaderProgram(ShaderType shader) throws IOException {
 		if(!hasProgram(shader)) {
-			String vsfn = GLShaderHandler.getVSFname(shader);
+			String vsfn = getShaderPath("vertex",
+					GLShaderHandler.getVSFname(shader));
 			int vs = getShader(vsfn, vertShaders, GL_VERTEX_SHADER_ARB);
-			String fsfn = GLShaderHandler.getFSFname(shader);
+			String fsfn = getShaderPath("fragment",
+					GLShaderHandler.getFSFname(shader));
 			int fs = getShader(fsfn, fragShaders, GL_FRAGMENT_SHADER_ARB);
 			int program = glCreateProgramObjectARB();
 			glAttachObjectARB(program, vs);
@@ -61,7 +63,6 @@ public class GLShaderHandler {
 			Matrix mat) {
 		int loc = initUniform(st, name);
 		mat.toFloatBuffer(matrixBuffer);
-		//matrixBuffer.flip();
 		glUniformMatrix4(loc, true, matrixBuffer);
 	}
 	
@@ -89,13 +90,17 @@ public class GLShaderHandler {
 	}
 	
 	private static String getVSFname(ShaderType shader) {
-		return ResourceHandler.joinPath(new String[] {
-		    "shaders", "vertex", "flat.glsl"
-		});
+		return "fisheye.glsl";//"flat.glsl";
 	}
 	
 	private static String getFSFname(ShaderType shader) {
-		return "shaders/fragment/flat.glsl";
+		return "flat.glsl";
+	}
+	
+	private String getShaderPath(String folder, String shaderName) {
+		return ResourceHandler.joinPath(new String[] {
+				"shaders", folder, shaderName
+		});
 	}
 	
 	private int getShader(String fname, Map<String, Integer> shaders, int type) throws IOException {

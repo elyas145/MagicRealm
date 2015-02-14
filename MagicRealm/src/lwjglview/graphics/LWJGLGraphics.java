@@ -7,6 +7,7 @@ import model.board.Board;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 
+import utils.math.Mathf;
 import utils.math.Matrix;
 import utils.resources.ResourceHandler;
 import view.graphics.Drawable;
@@ -77,34 +78,34 @@ public final class LWJGLGraphics implements Graphics {
 
 	public void resetModelMatrix() {
 		modelMatrix.identity();
-		updateMVP();
+		updateModelViewMatrix();
 	}
 
 	public void rotateModelX(float ang) {
 		modelMatrix = Matrix.rotationX(4, ang).multiply(modelMatrix);
-		updateMVP();
+		updateModelViewMatrix();
 	}
 
 	public void rotateModelY(float ang) {
 		modelMatrix = Matrix.rotationY(4, ang).multiply(modelMatrix);
-		updateMVP();
+		updateModelViewMatrix();
 	}
 
 	public void rotateModelZ(float ang) {
 		modelMatrix = Matrix.rotationZ(4, ang).multiply(modelMatrix);
-		updateMVP();
+		updateModelViewMatrix();
 	}
 	
 	public void applyModelTransform(Matrix mat) {
 		modelMatrix = mat.multiply(modelMatrix);
-		updateMVP();
+		updateModelViewMatrix();
 	}
 
 	public void translateModel(float x, float y, float z) {
 		modelMatrix = Matrix.translation(new float[] {
 				x, y, z
 		}).multiply(modelMatrix);
-		updateMVP();
+		updateModelViewMatrix();
 	}
 
 	public int loadTexture(ByteBuffer rawData, int height, int width) {
@@ -164,12 +165,20 @@ public final class LWJGLGraphics implements Graphics {
 		shaders.setUniformMatrixValue(st, name, viewInverseMatrix);
 	}
 	
+	public void updateModelViewUniform(ShaderType st, String name) {
+		shaders.setUniformMatrixValue(st, name, modelViewMatrix);
+	}
+	
 	public void updateProjectionUniform(ShaderType st, String name) {
 		shaders.setUniformMatrixValue(st, name, viewInverseMatrix);
 	}
 	
 	public void updateMVPUniform(ShaderType st, String name) {
 		shaders.setUniformMatrixValue(st, name, modelViewProjectionMatrix);
+	}
+	
+	public float getAspectRatio() {
+		return width / (float) height;
 	}
 
 	@Override
@@ -202,14 +211,19 @@ public final class LWJGLGraphics implements Graphics {
 		modelMatrix.identity();
 		viewMatrix = new Matrix(4, 4);
 		viewMatrix.identity();
+		modelMatrix = new Matrix(4, 4);
+		modelMatrix.identity();
 		projectionMatrix = new Matrix(4, 4);
 		projectionMatrix.identity();
 		updateViewMatrix();
 		drawables = new HashSet<Drawable>();
 		shaders = new GLShaderHandler(rh);
+		width = 300;
+		height = 300;
 	}
 
 	private void initGL() {
+		
 		errorCallback = errorCallbackPrint(System.err);
 		glfwSetErrorCallback(errorCallback);
 
@@ -221,9 +235,6 @@ public final class LWJGLGraphics implements Graphics {
 		glfwWindowHint(GLFW_VISIBLE, GL_FALSE); // the window will stay hidden
 												// after creation
 		glfwWindowHint(GLFW_RESIZABLE, GL_TRUE); // the window will be resizable
-
-		int width = 300;
-		int height = 300;
 
 		// Create the window
 		window = glfwCreateWindow(width, height, "LWJGLGraphics", NULL, NULL);
@@ -237,10 +248,7 @@ public final class LWJGLGraphics implements Graphics {
 			public void invoke(long window, int key, int scancode, int action,
 					int mods) {
 				if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) {
-					glfwSetWindowShouldClose(window, GL_TRUE); // We will detect
-																// this in our
-																// rendering
-																// loop
+					glfwSetWindowShouldClose(window, GL_TRUE);
 				}
 			}
 		};
@@ -281,33 +289,35 @@ public final class LWJGLGraphics implements Graphics {
 
 		// Set the clear color
 		glClearColor(0.1f, 0.2f, 1f, 0.0f);
+		
 	}
 	
 	private void updateMVP() {
 		modelViewProjectionMatrix =
-				projectionMatrix.multiply(viewInverseMatrix).multiply(modelMatrix);
-	}
-	
-	public void printTest() {
-		Matrix m = new Matrix(4, 1);
-		m.set(3, 0, 1f);
-		System.out.println(viewInverseMatrix.multiply(m));
+				projectionMatrix.multiply(modelViewMatrix);
 	}
 	
 	private void updateViewMatrix() {
 		viewInverseMatrix = viewMatrix.inverse();
+		updateModelViewMatrix();
+	}
+	
+	private void updateModelViewMatrix() {
+		modelViewMatrix = viewInverseMatrix.multiply(modelMatrix);
 		updateMVP();
 	}
 
-	private void onResize(int width, int height) {
+	private void onResize(int w, int h) {
+		width = w;
+		height = h;
 		glViewport(0, 0, width, height);
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
-		float ar = width / (float) height;
+		float ar = getAspectRatio();
 		float fovScale = .3f;
 		glFrustum(-ar * fovScale, ar * fovScale, -1.0 * fovScale,
 				1.0 * fovScale, .1f, 10f);
-		projectionMatrix.perspective((float) Math.PI * .5f, ar, .1f, 10f);
+		projectionMatrix.perspective(Mathf.PI * .5f, ar, .1f, 10f);
 	}
 
 	private void drawAll() {
@@ -339,7 +349,11 @@ public final class LWJGLGraphics implements Graphics {
 	private Matrix viewMatrix;
 	private Matrix viewInverseMatrix;
 	private Matrix modelMatrix;
+	private Matrix modelViewMatrix;
 	private Matrix modelViewProjectionMatrix;
+	
+	private int width;
+	private int height;
 
 	private Collection<Drawable> drawables;
 
