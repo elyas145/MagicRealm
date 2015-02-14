@@ -14,6 +14,7 @@ public class Clearing {
 
 	public void setLocation_e(Point location_e) {
 		this.location_e = location_e;
+		//System.out.println("Set Location_e: " + location_e.toSring());
 	}
 
 	private List<Chit> chits;
@@ -25,6 +26,7 @@ public class Clearing {
 
 	public void setLocation(Point location) {
 		this.location = location;
+		//System.out.println("Set Location: " + location.toSring());
 	}
 
 	public List<Chit> getChits() {
