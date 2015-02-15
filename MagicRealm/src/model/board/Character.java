@@ -11,4 +11,32 @@ public class Character implements CharacterInterface {
 	private SiteType initialLocation;
 	private boolean hiding;
 	private ArrayList<Chit> belongings;
+
+	public CharacterType getType() {
+		return type;
+	}
+
+	public void setType(CharacterType type) {
+		this.type = type;
+	}
+
+	public boolean isHiding() {
+		return hiding;
+	}
+
+	public void setHiding(boolean hiding) {
+		this.hiding = hiding;
+	}
+
+	public ArrayList<Chit> getBelongings() {
+		return belongings;
+	}
+
+	public void setBelongings(ArrayList<Chit> belongings) {
+		this.belongings = belongings;
+	}
+
+	public SiteType getInitialLocation() {
+		return initialLocation;
+	}
 }
