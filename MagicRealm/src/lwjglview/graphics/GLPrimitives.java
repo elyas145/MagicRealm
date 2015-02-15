@@ -1,11 +1,16 @@
 package lwjglview.graphics;
 
-import static org.lwjgl.opengl.GL11.*;
+import java.nio.FloatBuffer;
+
+import org.lwjgl.BufferUtils;
 
 public class GLPrimitives {
 	
-	public GLPrimitives() {
+	public GLPrimitives(LWJGLGraphics drawer) {
 		hexagon = -1;
+		graphics = drawer;
+		vertBuf = BufferUtils.createFloatBuffer(3);
+		texBuf = BufferUtils.createFloatBuffer(2);
 	}
 	
 	/*
@@ -17,9 +22,7 @@ public class GLPrimitives {
 	 */
 	public void drawHexagon() {
 		if(hexagon < 0) {
-			hexagon = glGenLists(1);
-			glNewList(hexagon, GL_COMPILE);
-			glBegin(GL_TRIANGLES);
+			hexagon = graphics.startTriangleList();
 			// triangle 0 1 2
 				// vertex 0
 				vertOrigin();
@@ -62,49 +65,64 @@ public class GLPrimitives {
 				vertHex6();
 				// vertex 1
 				vertHex1();
-			glEnd();
-			glEndList();
+			graphics.endList();
 		}
 		else {
-			glCallList(1);
+			graphics.callList(hexagon);
 		}
+	}
+	
+	private void vertex(float a, float b, float c) {
+		vertBuf.put(0, a);
+		vertBuf.put(1, b);
+		vertBuf.put(2, c);
+		graphics.setVertex(3, vertBuf);
+	}
+	
+	private void texCoord(float a, float b) {
+		texBuf.put(0, a);
+		texBuf.put(1, b);
+		graphics.setTextureCoordinate(2, texBuf);
 	}
 	
 	private void vertOrigin() {
-		glTexCoord2f(.5f, .5f);
-		glVertex3f(0f, 0f, 0f);
+		texCoord(.5f, .5f);
+		vertex(0f, 0f, 0f);
 	}
 	
 	private void vertHex1() {
-		glTexCoord2f(0f, .5f);
-		glVertex3f(-1f, 0f, 0f);
+		texCoord(0f, .5f);
+		vertex(-1f, 0f, 0f);
 	}
 	
 	private void vertHex2() {
-		glTexCoord2f(0.25f, 0f);
-		glVertex3f(-.5f, 0.866025f, 0f);
+		texCoord(0.25f, 0f);
+		vertex(-.5f, 0.866025f, 0f);
 	}
 	
 	private void vertHex3() {
-		glTexCoord2f(0.75f, 0f);
-		glVertex3f(.5f, 0.866025f, 0f);
+		texCoord(0.75f, 0f);
+		vertex(.5f, 0.866025f, 0f);
 	}
 
 	private void vertHex4() {
-		glTexCoord2f(1f, .5f);
-		glVertex3f(1f, 0f, 0f);
+		texCoord(1f, .5f);
+		vertex(1f, 0f, 0f);
 	}
 	
 	private void vertHex5() {
-		glTexCoord2f(0.75f, 1f);
-		glVertex3f(.5f, -0.866025f, 0f);
+		texCoord(0.75f, 1f);
+		vertex(.5f, -0.866025f, 0f);
 	}
 	
 	private void vertHex6() {
-		glTexCoord2f(0.25f, 1f);
-		glVertex3f(-.5f, -0.866025f, 0f);
+		texCoord(0.25f, 1f);
+		vertex(-.5f, -0.866025f, 0f);
 	}
 	
 	private int hexagon;
+	private LWJGLGraphics graphics;
+	private FloatBuffer vertBuf;
+	private FloatBuffer texBuf;
 
 }

@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -72,6 +73,7 @@ public class ResourceHandler {
 				+ bi.getHeight());
 		return bi;
 	}
+	
 	public static String joinPath(String... paths) {
 		if(paths.length == 0) {
 			throw new RuntimeException("The number of paths must not be 0");

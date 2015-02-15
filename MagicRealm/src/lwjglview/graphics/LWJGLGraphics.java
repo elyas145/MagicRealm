@@ -15,6 +15,7 @@ import view.graphics.Graphics;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -65,12 +66,11 @@ public final class LWJGLGraphics implements Graphics {
 	}
 
 	public void translateCamera(float x, float y, float z) {
-		viewMatrix = Matrix.translation(new float[] {
-				x, y, z
-		}).multiply(viewMatrix);
+		viewMatrix = Matrix.translation(new float[] { x, y, z }).multiply(
+				viewMatrix);
 		updateViewMatrix();
 	}
-	
+
 	public void applyCameraTransform(Matrix mat) {
 		viewMatrix = mat.multiply(viewMatrix);
 		updateViewMatrix();
@@ -95,16 +95,15 @@ public final class LWJGLGraphics implements Graphics {
 		modelMatrix = Matrix.rotationZ(4, ang).multiply(modelMatrix);
 		updateModelViewMatrix();
 	}
-	
+
 	public void applyModelTransform(Matrix mat) {
 		modelMatrix = mat.multiply(modelMatrix);
 		updateModelViewMatrix();
 	}
 
 	public void translateModel(float x, float y, float z) {
-		modelMatrix = Matrix.translation(new float[] {
-				x, y, z
-		}).multiply(modelMatrix);
+		modelMatrix = Matrix.translation(new float[] { x, y, z }).multiply(
+				modelMatrix);
 		updateModelViewMatrix();
 	}
 
@@ -156,29 +155,94 @@ public final class LWJGLGraphics implements Graphics {
 	public GLShaderHandler getShaders() {
 		return shaders;
 	}
-	
+
 	public void updateModelUniform(ShaderType st, String name) {
 		shaders.setUniformMatrixValue(st, name, modelMatrix);
 	}
-	
+
 	public void updateViewUniform(ShaderType st, String name) {
 		shaders.setUniformMatrixValue(st, name, viewInverseMatrix);
 	}
-	
+
 	public void updateModelViewUniform(ShaderType st, String name) {
 		shaders.setUniformMatrixValue(st, name, modelViewMatrix);
 	}
-	
+
 	public void updateProjectionUniform(ShaderType st, String name) {
 		shaders.setUniformMatrixValue(st, name, viewInverseMatrix);
 	}
-	
+
 	public void updateMVPUniform(ShaderType st, String name) {
 		shaders.setUniformMatrixValue(st, name, modelViewProjectionMatrix);
 	}
-	
+
 	public float getAspectRatio() {
 		return width / (float) height;
+	}
+
+	public void callList(int lst) {
+		glCallList(lst);
+	}
+
+	public int startTriangleList() {
+		int lst = glGenLists(1);
+		glNewList(lst, GL_COMPILE);
+		glBegin(GL_TRIANGLES);
+		return lst;
+	}
+
+	public void setVertex(int vertLen, FloatBuffer verts) {
+		switch (vertLen) {
+		case 1:
+			glVertex2f(verts.get(0), 0f);
+			break;
+		case 2:
+			glVertex2f(verts.get(0), verts.get(1));
+			break;
+		case 3:
+			glVertex3f(verts.get(0), verts.get(1), verts.get(2));
+			break;
+		case 4:
+			glVertex4f(verts.get(0), verts.get(1), verts.get(2), verts.get(3));
+			break;
+		}
+	}
+
+	public void setTextureCoordinate(int texLen, FloatBuffer texCoord) {
+		switch (texLen) {
+		case 1:
+			glTexCoord1f(texCoord.get(0));
+			break;
+		case 2:
+			glTexCoord2f(texCoord.get(0), texCoord.get(1));
+			break;
+		case 3:
+			glTexCoord3f(texCoord.get(0), texCoord.get(1), texCoord.get(2));
+			break;
+		case 4:
+			glTexCoord4f(texCoord.get(0), texCoord.get(1), texCoord.get(2),
+					texCoord.get(3));
+			break;
+		}
+	}
+
+	public void setNormal(int normLen, FloatBuffer normal) {
+		switch (normLen) {
+		case 1:
+			glNormal3f(normal.get(0), 0f, 0f);
+			break;
+		case 2:
+			glNormal3f(normal.get(0), normal.get(1), 0f);
+			break;
+		case 3:
+			glNormal3f(normal.get(0), normal.get(1), normal.get(2));
+			break;
+		}
+	}
+
+	public void endList() {
+		glEnd();
+		glEndList();
 	}
 
 	@Override
@@ -206,7 +270,7 @@ public final class LWJGLGraphics implements Graphics {
 	}
 
 	private void init(ResourceHandler rh) {
-		primitives = new GLPrimitives();
+		primitives = new GLPrimitives(this);
 		modelMatrix = new Matrix(4, 4);
 		modelMatrix.identity();
 		viewMatrix = new Matrix(4, 4);
@@ -223,7 +287,7 @@ public final class LWJGLGraphics implements Graphics {
 	}
 
 	private void initGL() {
-		
+
 		errorCallback = errorCallbackPrint(System.err);
 		glfwSetErrorCallback(errorCallback);
 
@@ -289,19 +353,18 @@ public final class LWJGLGraphics implements Graphics {
 
 		// Set the clear color
 		glClearColor(0.1f, 0.2f, 1f, 0.0f);
-		
+
 	}
-	
+
 	private void updateMVP() {
-		modelViewProjectionMatrix =
-				projectionMatrix.multiply(modelViewMatrix);
+		modelViewProjectionMatrix = projectionMatrix.multiply(modelViewMatrix);
 	}
-	
+
 	private void updateViewMatrix() {
 		viewInverseMatrix = viewMatrix.inverse();
 		updateModelViewMatrix();
 	}
-	
+
 	private void updateModelViewMatrix() {
 		modelViewMatrix = viewInverseMatrix.multiply(modelMatrix);
 		updateMVP();
@@ -344,14 +407,14 @@ public final class LWJGLGraphics implements Graphics {
 	private boolean running;
 
 	private GLPrimitives primitives;
-	
+
 	private Matrix projectionMatrix;
 	private Matrix viewMatrix;
 	private Matrix viewInverseMatrix;
 	private Matrix modelMatrix;
 	private Matrix modelViewMatrix;
 	private Matrix modelViewProjectionMatrix;
-	
+
 	private int width;
 	private int height;
 

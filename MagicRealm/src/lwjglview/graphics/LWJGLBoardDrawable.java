@@ -15,6 +15,7 @@ import lwjglview.graphics.shader.ShaderType;
 import model.board.Board;
 import model.board.HexTile;
 import model.enums.TileType;
+import utils.images.ImageTools;
 import utils.math.Mathf;
 import utils.math.Matrix;
 import utils.resources.ResourceHandler;
@@ -36,8 +37,8 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 		rawData = ByteBuffer.allocateDirect(numTiles * height * width * 4);
 		System.out.println("Loading tile images");
 		index = 0;
-		readImages(false);
-		readImages(true);
+		loadImages(false);
+		loadImages(true);
 		System.out.println("Finished loading images");
 		System.out.println("Loading model data");
 		chit = ModelData.loadModelData(resources, "chit.obj");
@@ -89,6 +90,12 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 		for(LWJGLTileDrawable tile: tiles) {
 			tile.draw(lwgfx);
 		}
+		
+		lwgfx.resetModelMatrix();
+		//lwgfx.rotateModelX(Mathf.PI / 2f);
+		lwgfx.updateModelViewUniform(st, "modelViewMatrix");
+		chit.draw(gfx);
+		
 	}
 	
 	private int getTextureIndex(TileType type, boolean enchanted) {
@@ -106,19 +113,11 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 		location = gfx.loadTextureArray(rawData, numTiles, height, width);
 	}
 	
-	private ByteBuffer readImages(boolean enchanted) throws IOException {
+	private void loadImages(boolean enchanted) throws IOException {
 		for(TileType type: TileType.values()) {
 			BufferedImage img = TileImages.getTileImage(resources, type, enchanted);
-			for(int y = 0; y < height; ++y) {
-				for(int x = 0; x < width; ++x) {
-					int i = img.getRGB(x, y);
-					rawData.putInt(index, i);
-					index += 4;
-				}
-			}
+			index = ImageTools.loadRawImage(img, index, width, height, rawData);
 		}
-		System.out.println(rawData);
-		return rawData;
 	}
 	
 	private int index;
