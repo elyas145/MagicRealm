@@ -8,5 +8,9 @@ uniform sampler2DArray texture;
 varying vec2 textureCoordinate;
 
 void main() {
-	gl_FragColor = vec4(texture2DArray(texture, vec3(textureCoordinate, float(index))).gba, 1.);
+	vec4 color = texture2DArray(texture, vec3(textureCoordinate, float(index)));
+	if(color.r < 1.) {
+		color = vec4(1.);
+	}
+	gl_FragColor = vec4(color.gba, 1.);
 }

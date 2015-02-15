@@ -4,9 +4,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 
 import config.GraphicsConfiguration;
 import lwjglview.graphics.model.ModelData;
@@ -14,54 +12,91 @@ import lwjglview.graphics.shader.GLShaderHandler;
 import lwjglview.graphics.shader.ShaderType;
 import model.board.Board;
 import model.board.HexTile;
+import model.enums.ChitType;
 import model.enums.TileType;
 import utils.images.ImageTools;
 import utils.math.Mathf;
 import utils.math.Matrix;
+import utils.resources.ChitImages;
 import utils.resources.ResourceHandler;
 import utils.resources.TileImages;
 import utils.time.Timing;
 import view.graphics.BoardDrawable;
+import view.graphics.Drawable;
 import view.graphics.Graphics;
 
 public class LWJGLBoardDrawable extends BoardDrawable {
 
 	public LWJGLBoardDrawable(Board bo, ResourceHandler rh) throws IOException {
 		super(bo);
-		normal = new HashMap<TileType, BufferedImage>();
-		enchanted = new HashMap<TileType, BufferedImage>();
 		resources = rh;
+
+		// initialize tiles
 		numTiles = TileType.values().length * 2;
-		height = GraphicsConfiguration.TILE_HEIGHT;
-		width = GraphicsConfiguration.TILE_WIDTH;
-		rawData = ByteBuffer.allocateDirect(numTiles * height * width * 4);
+		tileHeight = GraphicsConfiguration.TILE_IMAGE_HEIGHT;
+		tileWidth = GraphicsConfiguration.TILE_IMAGE_WIDTH;
+		rawTileData = ByteBuffer.allocateDirect(numTiles * tileHeight
+				* tileWidth * 4);
+		tileIndex = 0;
+		tileTextureLocation = -1;
 		System.out.println("Loading tile images");
-		index = 0;
-		loadImages(false);
-		loadImages(true);
-		System.out.println("Finished loading images");
-		System.out.println("Loading model data");
-		chit = ModelData.loadModelData(resources, "chit.obj");
-		System.out.println("Finished loading model data");
-		tiles = new HashSet<LWJGLTileDrawable>();
-		for(HexTile ht: bo) {
+		loadTileImages(false);
+		loadTileImages(true);
+		System.out.println("Finished loading tile images");
+
+		// initialize chits
+		numChits = ChitType.values().length;
+		chitWidth = GraphicsConfiguration.CHIT_IMAGE_WIDTH;
+		chitHeight = GraphicsConfiguration.CHIT_IMAGE_HEIGHT;
+		rawChitData = ByteBuffer.allocateDirect(numChits * chitHeight
+				* chitWidth * 4);
+		chitIndex = 0;
+		chitTextureLocation = -1;
+		System.out.println("Loading chit images");
+		loadChitImages();
+		System.out.println("Finished loading chit images");
+		System.out.println("Loading chit model data");
+		Drawable chit = ModelData.loadModelData(resources, "chit.obj");
+		System.out.println("Finished loading chit model data");
+
+		tiles = new HashSet<Drawable>();
+		for (HexTile ht : bo) {
 			TileType type = ht.getType();
 			tiles.add(new LWJGLTileDrawable(ht, getTextureIndex(type, false),
 					getTextureIndex(type, true)));
 		}
-		location = -1;
+
+		chits = new HashSet<Drawable>();
+		chits.add(new LWJGLChitDrawable(3f, -3f, chit, 0));
+		chits.add(new LWJGLChitDrawable(4.8f, -2.2f, chit, 1));
+		chits.add(new LWJGLChitDrawable(4f, -4.5f, chit, 2));
 	}
-	
+
 	@Override
 	public void draw(Graphics gfx) {
 		LWJGLGraphics lwgfx = (LWJGLGraphics) gfx;
-		if(location < 0) {
-			loadTextures(lwgfx);
-		}
-		lwgfx.bindTextureArray(location);
+
+		// reset the view matrix
+		lwgfx.resetViewMatrix();
+		float time = Timing.getSeconds() * .6f;
+		Matrix tmp = Matrix.rotationX(4, Mathf.PI / 5f);
+		float k = (Mathf.sin(time * .6f) + 3f) / 3f;
+		tmp = Matrix.translation(new float[] { 0f, -4f * k, 3f * k }).multiply(
+				tmp);
+		tmp = Matrix.rotationZ(4, time * .3f).multiply(tmp);
+		lwgfx.applyCameraTransform(tmp);
+		lwgfx.translateCamera(3.5f, -3.5f, 0f);
+
+		// load all textures to GPU
+		loadTextures(lwgfx);
+
+		// load tile textures
+		lwgfx.bindTextureArray(tileTextureLocation);
+
+		// load tile shader program
 		GLShaderHandler shaders = lwgfx.getShaders();
 		ShaderType st = ShaderType.TILE_SHADER;
-		if(!shaders.hasProgram(st)) {
+		if (!shaders.hasProgram(st)) {
 			try {
 				shaders.loadShaderProgram(st);
 			} catch (IOException e) {
@@ -69,67 +104,104 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 			}
 		}
 		shaders.useShaderProgram(st);
-		float ar = lwgfx.getAspectRatio();
-		float fovScale = 1f;
-		shaders.setUniformFloatValue(st, "xScale", 1f / fovScale / ar);
-		shaders.setUniformFloatValue(st, "yScale", 1f / fovScale);
-		shaders.setUniformFloatValue(st, "nearRadius", .1f);
-		shaders.setUniformFloatValue(st, "oneOverRadiusDifference", 1f/20f);
-		
-		lwgfx.resetViewMatrix();
-		float time = Timing.getSeconds() * .6f;
-		Matrix tmp = Matrix.rotationX(4, Mathf.PI / 5f);
-		float k = (Mathf.sin(time * .6f) + 3f) / 3f;
-		tmp = Matrix.translation(new float[] {
-				0f, -4f * k, 3f * k
-		}).multiply(tmp);
-		tmp = Matrix.rotationZ(4, time * .3f).multiply(tmp);
-		lwgfx.applyCameraTransform(tmp);
-		lwgfx.translateCamera(3.5f, -3.5f, 0f);
-		
-		for(LWJGLTileDrawable tile: tiles) {
+		/*
+		 * for fisheye projection float ar = lwgfx.getAspectRatio(); float
+		 * fovScale = 1f; shaders.setUniformFloatValue(st, "xScale", 1f /
+		 * fovScale / ar); shaders.setUniformFloatValue(st, "yScale", 1f /
+		 * fovScale); shaders.setUniformFloatValue(st, "nearRadius", .1f);
+		 * shaders.setUniformFloatValue(st, "oneOverRadiusDifference", 1f/20f);
+		 */
+
+		// draw all tiles
+		for (Drawable tile : tiles) {
 			tile.draw(lwgfx);
 		}
-		
-		lwgfx.resetModelMatrix();
-		//lwgfx.rotateModelX(Mathf.PI / 2f);
-		lwgfx.updateModelViewUniform(st, "modelViewMatrix");
-		chit.draw(gfx);
-		
+
+		// load chit textures
+		lwgfx.bindTextureArray(chitTextureLocation);
+
+		// load chit shader program
+		st = ShaderType.CHIT_SHADER;
+		if (!shaders.hasProgram(st)) {
+			try {
+				shaders.loadShaderProgram(st);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		shaders.useShaderProgram(st);
+		/*
+		 * again, for fisheye shaders.setUniformFloatValue(st, "xScale", 1f /
+		 * fovScale / ar); shaders.setUniformFloatValue(st, "yScale", 1f /
+		 * fovScale); shaders.setUniformFloatValue(st, "nearRadius", .1f);
+		 * shaders.setUniformFloatValue(st, "oneOverRadiusDifference", 1f/20f);
+		 */
+
+		// draw all chits
+		for (Drawable chit : chits) {
+			chit.draw(lwgfx);
+		}
+
 	}
-	
+
 	private int getTextureIndex(TileType type, boolean enchanted) {
 		int i = 0;
-		for(TileType tt: TileType.values()) {
-			if(tt == type) {
+		for (TileType tt : TileType.values()) {
+			if (tt == type) {
 				return enchanted ? i + TileType.values().length : i;
 			}
 			++i;
 		}
 		return -1;
 	}
-	
+
 	private void loadTextures(LWJGLGraphics gfx) {
-		location = gfx.loadTextureArray(rawData, numTiles, height, width);
-	}
-	
-	private void loadImages(boolean enchanted) throws IOException {
-		for(TileType type: TileType.values()) {
-			BufferedImage img = TileImages.getTileImage(resources, type, enchanted);
-			index = ImageTools.loadRawImage(img, index, width, height, rawData);
+		if (tileTextureLocation < 0) {
+			tileTextureLocation = gfx.loadTextureArray(rawTileData, numTiles,
+					tileHeight, tileWidth);
+		}
+		if (chitTextureLocation < 0) {
+			chitTextureLocation = gfx.loadTextureArray(rawChitData, numChits,
+					chitHeight, chitWidth);
 		}
 	}
-	
-	private int index;
+
+	private void loadTileImages(boolean enchanted) throws IOException {
+		for (TileType type : TileType.values()) {
+			BufferedImage img = TileImages.getTileImage(resources, type,
+					enchanted);
+			tileIndex = ImageTools.loadRawImage(img, tileIndex, tileWidth,
+					tileHeight, rawTileData);
+		}
+	}
+
+	private void loadChitImages() throws IOException {
+		for (ChitType type : ChitType.values()) {
+			BufferedImage img = ChitImages.getChitImage(resources, type);
+			System.out.println(img);
+			chitIndex = ImageTools.loadRawImage(img, chitIndex, chitWidth,
+					chitHeight, rawChitData);
+		}
+	}
+
+	private int tileIndex;
 	private int numTiles;
-	private int height;
-	private int width;
-	private int location;
-	private ByteBuffer rawData;
+	private int tileHeight;
+	private int tileWidth;
+	private int tileTextureLocation;
+
+	private int chitIndex;
+	private int numChits;
+	private int chitHeight;
+	private int chitWidth;
+	private int chitTextureLocation;
+
+	private ByteBuffer rawTileData;
+	private ByteBuffer rawChitData;
+
+	private Collection<Drawable> tiles;
+	private Collection<Drawable> chits;
+
 	private ResourceHandler resources;
-	private Collection<LWJGLTileDrawable> tiles;
-	private ModelData chit;
-	private Map<TileType, BufferedImage> normal;
-	private Map<TileType, BufferedImage> enchanted;
 
 }

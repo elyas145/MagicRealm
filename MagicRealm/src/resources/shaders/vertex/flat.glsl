@@ -7,5 +7,5 @@ varying vec2 textureCoordinate;
 
 void main() {
 	gl_Position = mvpMatrix * gl_Vertex;
-	textureCoordinate = gl_MultiTexCoord0;
+	textureCoordinate = gl_MultiTexCoord0.xy;
 }

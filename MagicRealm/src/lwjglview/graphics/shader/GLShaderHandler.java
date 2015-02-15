@@ -89,7 +89,7 @@ public class GLShaderHandler {
 	}
 	
 	private static String getVSFname(ShaderType shader) {
-		return "fisheye.glsl";//"flat.glsl";
+		return "flat.glsl";
 	}
 	
 	private static String getFSFname(ShaderType shader) {

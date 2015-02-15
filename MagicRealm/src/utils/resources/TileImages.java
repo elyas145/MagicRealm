@@ -6,16 +6,15 @@ import java.io.IOException;
 import model.enums.TileType;
 
 public class TileImages {
-	
-	public static BufferedImage getTileImage(ResourceHandler rh, TileType type, boolean enchanted)
-			throws IOException {
-		return rh.readImage(ResourceHandler.joinPath(new String[] {
-				"images", "tiles",
-				getName(type) + (enchanted ? "-e1.gif" : "1.gif")}));
+
+	public static BufferedImage getTileImage(ResourceHandler rh, TileType type,
+			boolean enchanted) throws IOException {
+		return rh.readImage(ResourceHandler.joinPath("images", "tiles",
+				getName(type) + (enchanted ? "-e1.gif" : "1.gif")));
 	}
-	
+
 	private static String getName(TileType tile) {
-		switch(tile) {
+		switch (tile) {
 		case AWFUL_VALLEY:
 			return "awfulvalley";
 		case BAD_VALLEY:

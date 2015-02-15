@@ -33,6 +33,18 @@ public class Matrix {
 		return trans;
 	}
 	
+	public static Matrix dilation(float[] fs) {
+		Matrix ret = new Matrix(fs.length, fs.length);
+		ret.scale(fs);
+		return ret;
+	}
+	
+	public static Matrix identityMatrix(int i) {
+		Matrix ret = new Matrix(i, i);
+		ret.identity();
+		return ret;
+	}
+	
 	// new matrix with blank data
 	public Matrix(int r, int c) {
 		rows = r;
@@ -56,7 +68,7 @@ public class Matrix {
 	public void identity() {
 		for(int i = 0; i < rows; ++i) {
 			for(int j = 0; j < columns; ++j) {
-				data[i][j] = i == j ? 1 : 0;
+				set(i, j, i == j ? 1f : 0f);
 			}
 		}
 	}
@@ -65,7 +77,15 @@ public class Matrix {
 		identity();
 		int c = vec.length;
 		for(int i = 0; i < vec.length; ++i) {
-			data[i][c] = vec[i];
+			set(i, c, vec[i]);
+		}
+	}
+	
+	public void scale(float[] vec) {
+		for(int i = 0; i < rowCount(); ++i) {
+			for(int j = 0; j < columnCount(); ++j) {
+				set(i, j, i == j ? vec[i] : 0f);
+			}
 		}
 	}
 	
@@ -326,5 +346,4 @@ public class Matrix {
 	private int rows;
 	private int columns;
 	private float[][] data;
-
 }

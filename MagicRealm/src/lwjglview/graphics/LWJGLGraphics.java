@@ -51,24 +51,19 @@ public final class LWJGLGraphics implements Graphics {
 	}
 
 	public void rotateCameraX(float ang) {
-		viewMatrix = Matrix.rotationX(4, ang).multiply(viewMatrix);
-		updateViewMatrix();
+		applyCameraTransform(Matrix.rotationX(4, ang));
 	}
 
 	public void rotateCameraY(float ang) {
-		viewMatrix = Matrix.rotationY(4, ang).multiply(viewMatrix);
-		updateViewMatrix();
+		applyCameraTransform(Matrix.rotationY(4, ang).multiply(viewMatrix));
 	}
 
 	public void rotateCameraZ(float ang) {
-		viewMatrix = Matrix.rotationZ(4, ang).multiply(viewMatrix);
-		updateViewMatrix();
+		applyCameraTransform(Matrix.rotationZ(4, ang).multiply(viewMatrix));
 	}
 
 	public void translateCamera(float x, float y, float z) {
-		viewMatrix = Matrix.translation(new float[] { x, y, z }).multiply(
-				viewMatrix);
-		updateViewMatrix();
+		applyCameraTransform(Matrix.translation(new float[] { x, y, z }));
 	}
 
 	public void applyCameraTransform(Matrix mat) {
@@ -82,18 +77,21 @@ public final class LWJGLGraphics implements Graphics {
 	}
 
 	public void rotateModelX(float ang) {
-		modelMatrix = Matrix.rotationX(4, ang).multiply(modelMatrix);
-		updateModelViewMatrix();
+		applyModelTransform(Matrix.rotationX(4, ang).multiply(modelMatrix));
 	}
 
 	public void rotateModelY(float ang) {
-		modelMatrix = Matrix.rotationY(4, ang).multiply(modelMatrix);
-		updateModelViewMatrix();
+		applyModelTransform(Matrix.rotationY(4, ang));
 	}
 
 	public void rotateModelZ(float ang) {
-		modelMatrix = Matrix.rotationZ(4, ang).multiply(modelMatrix);
-		updateModelViewMatrix();
+		applyModelTransform(Matrix.rotationZ(4, ang));
+	}
+	
+	public void scaleModel(float f) {
+		applyModelTransform(Matrix.dilation(new float[] {
+				f, f, f, 1f
+		}));
 	}
 
 	public void applyModelTransform(Matrix mat) {

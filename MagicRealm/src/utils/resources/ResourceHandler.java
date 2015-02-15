@@ -38,7 +38,7 @@ public class ResourceHandler {
 		URL ur = getResource(fname);
 		String rep = ur.toString();
 		if (!files.containsKey(rep)) {
-			System.out.println("Reading file: " + rep);
+			//System.out.println("Reading file: " + rep);
 			BufferedReader br;
 			try {
 				br = new BufferedReader(new FileReader(ur.toURI().getPath()));
@@ -55,8 +55,8 @@ public class ResourceHandler {
 			br.close();
 		}
 		String loaded = files.get(rep);
-		System.out.println("Retreived file: " + rep);
-		System.out.println(loaded);
+		//System.out.println("Retreived file: " + rep);
+		//System.out.println(loaded);
 		return loaded;
 	}
 
@@ -64,13 +64,13 @@ public class ResourceHandler {
 		URL ur = getResource(fname);
 		String rep = ur.toString();
 		if (!images.containsKey(rep)) {
-			System.out.println("Reading image: " + rep);
+			//System.out.println("Reading image: " + rep);
 			images.put(rep, ImageIO.read(ur));
 		}
-		System.out.println("Retreived image: " + rep);
+		//System.out.println("Retreived image: " + rep);
 		BufferedImage bi = images.get(rep);
-		System.out.println("Dimensions: " + bi.getWidth() + ", "
-				+ bi.getHeight());
+		//System.out.println("Dimensions: " + bi.getWidth() + ", "
+		//		+ bi.getHeight());
 		return bi;
 	}
 	

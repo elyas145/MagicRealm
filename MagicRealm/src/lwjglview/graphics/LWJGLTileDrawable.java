@@ -8,6 +8,8 @@ import view.graphics.Graphics;
 import view.graphics.TileDrawable;
 
 public class LWJGLTileDrawable extends TileDrawable {
+	
+	public static final ShaderType SHADER = ShaderType.TILE_SHADER;
 
 	public LWJGLTileDrawable(HexTileInterface ht, int norm, int enchant) {
 		super(ht.getType(), ht.getBoardRow(), ht.getBoardColumn(), ht.getRotation());
@@ -33,15 +35,15 @@ public class LWJGLTileDrawable extends TileDrawable {
 		x += col * 3f;
 		y = -row * 0.866025f;
 		GLShaderHandler sh = lwgfx.getShaders();
-		sh.setUniformIntValue(ShaderType.TILE_SHADER, "index", normalTex);
+		sh.setUniformIntValue(SHADER, "index", normalTex);
 		
 		lwgfx.resetModelMatrix();
 		lwgfx.rotateModelZ(- Mathf.PI * getTileRotation() / 3f);
 		lwgfx.translateModel(x, y, 0f);
 		
-		// lwgfx.updateMVPUniform(ShaderType.TILE_SHADER, "mvpMatrix");
-		lwgfx.updateModelViewUniform(ShaderType.TILE_SHADER, "modelViewMatrix");
-		lwgfx.getShaders().setUniformIntValue(ShaderType.TILE_SHADER, "index", normalTex);
+		lwgfx.updateMVPUniform(SHADER, "mvpMatrix");
+		lwgfx.updateModelViewUniform(SHADER, "modelViewMatrix");
+		lwgfx.getShaders().setUniformIntValue(SHADER, "index", enchantedTex);
 		lwgfx.getPrimitiveTool().drawHexagon();
 		
 	}
