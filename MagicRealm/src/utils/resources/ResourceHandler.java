@@ -72,9 +72,8 @@ public class ResourceHandler {
 				+ bi.getHeight());
 		return bi;
 	}
-
 	public static String joinPath(String... paths) {
-		if (paths.length == 0) {
+		if(paths.length == 0) {
 			throw new RuntimeException("The number of paths must not be 0");
 		}
 		if (paths.length == 1) {
@@ -83,7 +82,6 @@ public class ResourceHandler {
 		ArrayList<String> parts = new ArrayList<String>();
 		for (String p : paths) {
 			parts.add(p);
-			parts.add("/");
 		}
 		return joinPath(parts.remove(0), parts);
 	}
@@ -92,7 +90,7 @@ public class ResourceHandler {
 		if (paths.isEmpty()) {
 			return path;
 		}
-		return path + joinPath(paths.remove(0), paths);
+		return path + "/" + joinPath(paths.remove(0), paths);
 	}
 
 	private Map<String, String> files;

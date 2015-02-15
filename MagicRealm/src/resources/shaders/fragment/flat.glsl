@@ -3,9 +3,10 @@
 #extension GL_EXT_texture_array : enable
 
 uniform int index;
-
 uniform sampler2DArray texture;
 
+varying vec2 textureCoordinate;
+
 void main() {
-	gl_FragColor = vec4(texture2DArray(texture, vec3(gl_TexCoord[0].xy, float(index))).gba, 1.);
+	gl_FragColor = vec4(texture2DArray(texture, vec3(textureCoordinate, float(index))).gba, 1.);
 }
