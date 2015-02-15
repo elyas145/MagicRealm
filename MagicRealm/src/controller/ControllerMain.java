@@ -31,6 +31,7 @@ public class ControllerMain {
 	}
 
 	private void start() {
+		
 		gfx.start();
 
 	}
