@@ -4,6 +4,7 @@
 
 uniform int index;
 uniform sampler2DArray texture;
+uniform vec4 ambientColour;
 
 in vec2 textureCoordinate;
 
@@ -12,5 +13,6 @@ void main() {
 	if(color.r < 1.) {
 		color = vec4(1.);
 	}
+	color *= ambientColour;
 	gl_FragColor = vec4(color.gba, 1.);
 }

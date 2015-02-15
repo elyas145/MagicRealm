@@ -3,8 +3,11 @@ package lwjglview.graphics;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 import java.util.Collection;
 import java.util.HashSet;
+
+import org.lwjgl.BufferUtils;
 
 import config.GraphicsConfiguration;
 import lwjglview.graphics.model.ModelData;
@@ -26,6 +29,17 @@ import view.graphics.Drawable;
 import view.graphics.Graphics;
 
 public class LWJGLBoardDrawable extends BoardDrawable {
+
+	public static final Matrix[] AMBIENT_COLOURS = new Matrix[] {
+			Matrix.columnVector(new float[] { .3f, .3f, .3f, 1f // 00:00
+			}), Matrix.columnVector(new float[] { .3f, .3f, .3f, 1f // 03:00
+					}), Matrix.columnVector(new float[] { .3f, .3f, .5f, 1f // 06:00
+					}), Matrix.columnVector(new float[] { .9f, .9f, .5f, 1f // 09:00
+					}), Matrix.columnVector(new float[] { 1f, 1f, 1f, 1f // 12:00
+					}), Matrix.columnVector(new float[] { 1f, .8f, .8f, 1f // 15:00
+					}), Matrix.columnVector(new float[] { .7f, .7f, .8f, 1f // 18:00
+					}), Matrix.columnVector(new float[] { .4f, .4f, .5f, 1f // 21:00
+					}) };
 
 	public LWJGLBoardDrawable(Board bo, ResourceHandler rh) throws IOException {
 		super(bo);
@@ -59,7 +73,7 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 		Drawable chit = ModelData.loadModelData(resources, "chit.obj");
 		System.out.println("Finished loading chit model data");
 
-		tiles = new HashSet<Drawable>();
+		tiles = new HashSet<LWJGLTileDrawable>();
 		for (HexTile ht : bo) {
 			TileType type = ht.getType();
 			tiles.add(new LWJGLTileDrawable(ht, getTextureIndex(type, false),
@@ -70,6 +84,8 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 		chits.add(new LWJGLChitDrawable(3f, -3f, chit, 0));
 		chits.add(new LWJGLChitDrawable(4.8f, -2.2f, chit, 1));
 		chits.add(new LWJGLChitDrawable(4f, -4.5f, chit, 2));
+
+		ambientColour = BufferUtils.createFloatBuffer(4);
 	}
 
 	@Override
@@ -112,6 +128,9 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 		 * shaders.setUniformFloatValue(st, "oneOverRadiusDifference", 1f/20f);
 		 */
 
+		updateAmbientColour();
+		shaders.setUniformFloatArrayValue(st, "ambientColour", 4, ambientColour);
+
 		// draw all tiles
 		for (Drawable tile : tiles) {
 			tile.draw(lwgfx);
@@ -137,11 +156,34 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 		 * shaders.setUniformFloatValue(st, "oneOverRadiusDifference", 1f/20f);
 		 */
 
+		// update shader colour
+		shaders.setUniformFloatArrayValue(st, "ambientColour", 4, ambientColour);
+
 		// draw all chits
 		for (Drawable chit : chits) {
 			chit.draw(lwgfx);
 		}
 
+	}
+
+	private void updateAmbientColour() {
+		float time = Timing.getSeconds() * .3f;
+		int idx = (int) time % AMBIENT_COLOURS.length;
+		int nidx = (idx + 1) % AMBIENT_COLOURS.length;
+		float scale = time % 1f;
+		AMBIENT_COLOURS[idx].multiply(1f - scale)
+				.add(AMBIENT_COLOURS[nidx].multiply(scale))
+				.toFloatBuffer(ambientColour);
+		if(idx == AMBIENT_COLOURS.length / 4) {
+			for(LWJGLTileDrawable tile: tiles) {
+				tile.setEnchanted(false);
+			}
+		}
+		else if(idx == AMBIENT_COLOURS.length * 3 / 4) {
+			for(LWJGLTileDrawable tile: tiles) {
+				tile.setEnchanted(true);
+			}
+		}
 	}
 
 	private int getTextureIndex(TileType type, boolean enchanted) {
@@ -199,9 +241,11 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 	private ByteBuffer rawTileData;
 	private ByteBuffer rawChitData;
 
-	private Collection<Drawable> tiles;
+	private Collection<LWJGLTileDrawable> tiles;
 	private Collection<Drawable> chits;
 
 	private ResourceHandler resources;
+
+	private FloatBuffer ambientColour;
 
 }

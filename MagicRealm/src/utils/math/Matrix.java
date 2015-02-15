@@ -39,6 +39,14 @@ public class Matrix {
 		return ret;
 	}
 	
+	public static Matrix columnVector(float[] fs) {
+		Matrix ret = new Matrix(fs.length, 1);
+		for(int i = 0; i < fs.length; ++i) {
+			ret.set(i, 0, fs[i]);
+		}
+		return ret;
+	}
+	
 	public static Matrix identityMatrix(int i) {
 		Matrix ret = new Matrix(i, i);
 		ret.identity();
@@ -147,6 +155,16 @@ public class Matrix {
 		set(2, 2, - (f + n) / (f - n));
 		set(2, 3, - (2 * f * n) / (f - n));
 		set(3, 2, -1f);
+	}
+	
+	public Matrix add(Matrix other) {
+		Matrix ret = new Matrix(rowCount(), columnCount());
+		for(int i = 0; i < ret.rowCount(); ++i) {
+			for(int j = 0; j < ret.columnCount(); ++j) {
+				ret.set(i, j, get(i, j) + other.get(i, j));
+			}
+		}
+		return ret;
 	}
 	
 	public Matrix multiply(float k) {

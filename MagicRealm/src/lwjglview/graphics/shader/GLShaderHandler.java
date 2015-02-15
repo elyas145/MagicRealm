@@ -58,6 +58,14 @@ public class GLShaderHandler {
 		int loc = initUniform(st, name);
 		glUniform1f(loc, value);
 	}
+
+	public void setUniformFloatArrayValue(ShaderType st, String name, int sz,
+			FloatBuffer values) {
+		int loc = initUniform(st, name);
+		values.limit(sz);
+		//glUniform1ARB(loc, values);
+		glUniform4f(loc, values.get(0), values.get(1), values.get(2), values.get(3));
+	}
 	
 	public void setUniformMatrixValue(ShaderType st, String name,
 			Matrix mat) {
@@ -93,6 +101,12 @@ public class GLShaderHandler {
 	}
 	
 	private static String getFSFname(ShaderType shader) {
+		switch(shader) {
+		case TILE_SHADER:
+			return "tile.glsl";
+		case CHIT_SHADER:
+			return "chit.glsl";
+		}
 		return "flat.glsl";
 	}
 	

@@ -15,11 +15,20 @@ public class LWJGLTileDrawable extends TileDrawable {
 		super(ht.getType(), ht.getBoardRow(), ht.getBoardColumn(), ht.getRotation());
 		normalTex = norm;
 		enchantedTex = enchant;
+		enchanted = false;
 	}
 	
 	public void setTextures(int norm, int ench) {
 		normalTex = norm;
 		enchantedTex = ench;
+	}
+	
+	public void setEnchanted(boolean ench) {
+		enchanted = ench;
+	}
+	
+	public void swap() {
+		enchanted ^= true;
 	}
 
 	@Override
@@ -27,7 +36,7 @@ public class LWJGLTileDrawable extends TileDrawable {
 		draw((LWJGLGraphics) gfx);
 	}
 	
-	public void draw(LWJGLGraphics lwgfx) {
+	private void draw(LWJGLGraphics lwgfx) {
 		int row = getTileRow();
 		int col = getTileColumn();
 		float x, y;
@@ -35,20 +44,20 @@ public class LWJGLTileDrawable extends TileDrawable {
 		x += col * 3f;
 		y = -row * 0.866025f;
 		GLShaderHandler sh = lwgfx.getShaders();
-		sh.setUniformIntValue(SHADER, "index", normalTex);
+		sh.setUniformIntValue(SHADER, "index", enchanted ? enchantedTex : normalTex);
 		
 		lwgfx.resetModelMatrix();
 		lwgfx.rotateModelZ(- Mathf.PI * getTileRotation() / 3f);
 		lwgfx.translateModel(x, y, 0f);
 		
-		lwgfx.updateMVPUniform(SHADER, "mvpMatrix");
 		lwgfx.updateModelViewUniform(SHADER, "modelViewMatrix");
-		lwgfx.getShaders().setUniformIntValue(SHADER, "index", enchantedTex);
+		lwgfx.updateMVPUniform(SHADER, "mvpMatrix");
 		lwgfx.getPrimitiveTool().drawHexagon();
 		
 	}
 	
 	private int normalTex;
 	private int enchantedTex;
+	private boolean enchanted;
 
 }
