@@ -4,6 +4,7 @@ import java.awt.AlphaComposite;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Menu;
@@ -22,6 +23,7 @@ import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -59,7 +61,7 @@ public class StartView extends JFrame implements ActionListener, MouseListener {
 		charCards = new JLabel[GameConfiguration.MAX_PLAYERS];
 		setUndecorated(true);
 		setSize(xSize, ySize);
-		setLayout(new BoxLayout(this.getContentPane(), BoxLayout.Y_AXIS));
+		setLayout(new BoxLayout(this.getContentPane(), BoxLayout.X_AXIS));
 
 		// just for testing.
 		Menu m1 = new Menu("File");
@@ -99,10 +101,11 @@ public class StartView extends JFrame implements ActionListener, MouseListener {
 
 		// title
 		JLabel title = new JLabel("Select Characters!");
-		title.setAlignmentX(Component.CENTER_ALIGNMENT);
 		title.setForeground(Color.WHITE);
 		title.setFont(new Font("Castellar", Font.PLAIN, 32));
+		title.setAlignmentX(Component.CENTER_ALIGNMENT);
 		this.getContentPane().add(title);
+		this.getContentPane().add(Box.createVerticalGlue());
 
 		// character cards.
 		// labels with pics in them. once clicked, pic will change to the
@@ -116,7 +119,8 @@ public class StartView extends JFrame implements ActionListener, MouseListener {
 				System.out.println(parent.getRh().getResource(
 						ResourceHandler.joinPath("images", "cards",
 								parent.getAllCharacters().get(i).getType().name()+"_F.jpg")));
-				charCards[i].setAlignmentX(LEFT_ALIGNMENT);
+				charCards[i].setAlignmentY(TOP_ALIGNMENT);
+				charCards[i].setAlignmentY(LEFT_ALIGNMENT);
 				charCards[i].addMouseListener(this);
 				this.getContentPane().add(charCards[i]);
 			} catch (IOException e) {

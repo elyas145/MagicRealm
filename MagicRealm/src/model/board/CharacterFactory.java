@@ -10,8 +10,12 @@ public class CharacterFactory implements CharacterFactoryInterface{
 	@Override
 	public ArrayList<Character> getPossibleCharacters() {
 		Character c = new Character(CharacterType.AMAZON);
+		Character d = new Character(CharacterType.CAPTAIN);
+		Character e = new Character(CharacterType.SWORDSMAN);
 		ArrayList<Character> a = new ArrayList<Character>();
 		a.add(c);
+		a.add(d);
+		a.add(e);
 		return a;
 	}
 
