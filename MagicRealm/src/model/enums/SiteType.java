@@ -10,5 +10,9 @@ public enum SiteType {
 	LAIR,
 	CAIRNS,
 	SHRINE,
-	LOST_CASTLE
+	LOST_CASTLE,
+	CHAPEL,
+	GUEARD_HOUSE,
+	HOUSE,
+	INN,
 }

@@ -12,6 +12,10 @@ public class Character implements CharacterInterface {
 	private boolean hiding;
 	private ArrayList<Chit> belongings;
 
+	public Character(CharacterType t){
+		type = t;
+		initialLocation = SiteType.INN;
+	}
 	public CharacterType getType() {
 		return type;
 	}
