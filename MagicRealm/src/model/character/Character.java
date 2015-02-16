@@ -1,7 +1,8 @@
-package model.board;
+package model.character;
 
 import java.util.ArrayList;
 
+import model.board.chit.Chit;
 import model.enums.CharacterType;
 import model.enums.SiteType;
 import model.interfaces.CharacterInterface;

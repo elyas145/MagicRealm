@@ -13,16 +13,28 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 
 import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
 
+import utils.random.Random;
 import utils.resources.ResourceHandler;
 
+import model.board.chit.Chit;
+import model.board.tile.HexTile;
+import model.enums.CharacterType;
+import model.enums.ChitType;
 import model.enums.TileType;
 import model.interfaces.BoardInterface;
+import model.interfaces.ChitInterface;
+import model.interfaces.HexTileInterface;
 
-public class Board implements Iterable<HexTile>, BoardInterface {
+public class Board implements BoardInterface {
+
+	public static void main(String[] args) {
+		Board b = new Board(new ResourceHandler());
+	}
 
 	public Board(ResourceHandler rh) {
 		collectionOfTiles = new HashSet<HexTile>();
@@ -40,9 +52,16 @@ public class Board implements Iterable<HexTile>, BoardInterface {
 		initTreasures();
 
 	}
-
-	public static void main(String[] args) {
-		Board b = new Board(new ResourceHandler());
+	
+	public void moveCharacter(Character character, TileType tt, int clearing) {
+		// TODO
+		//HexTile loc = mapOfChitPositions.get(character);
+		//Clearing clr = loc.getClearing(character);
+	}
+	
+	public void removeCharacter(Character character) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	private void initTreasures() {
@@ -51,9 +70,14 @@ public class Board implements Iterable<HexTile>, BoardInterface {
 		for (int i = 1; i < 6; i++) {
 			possibleValues.add(i * 10);
 		}
+		
+		ArrayList<TileType> tiles = new ArrayList<TileType>();
+		for(TileType tt: TileType.values()) {
+			tiles.add(tt);
+		}
 
 		for (int i = 0; i < treasures.size(); i++) {
-			treasures.add(new Treasure(possibleValues));
+			treasures.add(new Treasure(Random.choose(tiles), possibleValues));
 			possibleValues.remove(treasures.get(treasures.size() - 1));
 		}
 	}
@@ -97,8 +121,13 @@ public class Board implements Iterable<HexTile>, BoardInterface {
 	}
 
 	@Override
-	public Iterator<HexTile> iterator() {
-		return collectionOfTiles.iterator();
+	public Iterable<? extends HexTileInterface> iterateTiles() {
+		return collectionOfTiles;
+	}
+
+	@Override
+	public Iterable<? extends ChitInterface> iterateChits() {
+		return collectionOfChits;
 	}
 
 	private void setTile(TileType tile, int x, int y, int rot) {
@@ -106,6 +135,8 @@ public class Board implements Iterable<HexTile>, BoardInterface {
 	}
 
 	private Collection<HexTile> collectionOfTiles;
+	private Collection<Chit> collectionOfChits;
+	private Map<ChitType, HexTile> mapOfChitPositions;
 	private ArrayList<Treasure> treasures = new ArrayList<Treasure>();
 	private JSONArray arr;
 }

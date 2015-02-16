@@ -1,19 +1,20 @@
-package model.board;
+package model.board.tile;
 
-import java.awt.List;
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
 
+import model.board.chit.Chit;
+import model.board.clearing.Clearing;
 import model.enums.TileType;
+import model.interfaces.ClearingInterface;
 import model.interfaces.HexTileInterface;
 
-import org.json.*;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import config.BoardConfiguration;
 import utils.math.Point;
-import utils.resources.ResourceHandler;
 
 public class HexTile implements HexTileInterface {
 
@@ -33,8 +34,14 @@ public class HexTile implements HexTileInterface {
 		setClearings();
 	}
 
-	public ArrayList<Clearing> getClearings() {
+	@Override
+	public Collection<? extends ClearingInterface> getClearings() {
 		return clearings;
+	}
+	
+	@Override
+	public ClearingInterface getClearing(Chit chit) {
+		return chitMap.get(chit);
 	}
 
 	public void setClearings(ArrayList<Clearing> clearings) {
@@ -139,6 +146,7 @@ public class HexTile implements HexTileInterface {
 	private int row;
 	private int column;
 	private ArrayList<Clearing> clearings = new ArrayList<Clearing>();
+	private Map<Chit, Clearing> chitMap;
 	private int rotation;
 	private JSONArray arr;
 }

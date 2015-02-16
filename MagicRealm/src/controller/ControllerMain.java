@@ -6,12 +6,12 @@ import java.util.ArrayList;
 
 import config.GameConfiguration;
 import controlview.StartView;
-import lwjglview.graphics.LWJGLBoardDrawable;
 import lwjglview.graphics.LWJGLGraphics;
+import lwjglview.graphics.board.LWJGLBoardDrawable;
 import model.board.Board;
-import model.board.Character;
-import model.board.CharacterFactory;
 import model.board.Treasure;
+import model.character.Character;
+import model.character.CharacterFactory;
 import model.interfaces.CharacterFactoryInterface;
 import utils.resources.ResourceHandler;
 

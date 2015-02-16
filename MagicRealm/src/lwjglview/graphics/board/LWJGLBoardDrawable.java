@@ -1,4 +1,4 @@
-package lwjglview.graphics;
+package lwjglview.graphics.board;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -14,11 +14,12 @@ import java.util.Map;
 import org.lwjgl.BufferUtils;
 
 import config.GraphicsConfiguration;
+import lwjglview.graphics.LWJGLGraphics;
 import lwjglview.graphics.model.ModelData;
 import lwjglview.graphics.shader.GLShaderHandler;
 import lwjglview.graphics.shader.ShaderType;
 import model.board.Board;
-import model.board.HexTile;
+import model.board.tile.HexTile;
 import model.enums.ChitType;
 import model.enums.TileType;
 import model.interfaces.HexTileInterface;
@@ -75,11 +76,13 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 		loadChitImages();
 		System.out.println("Finished loading chit images");
 		System.out.println("Loading chit model data");
-		Drawable chit = ModelData.loadModelData(resources, "chit.obj");
+		Drawable chit = ModelData.loadModelData(resources, "chit_circle.obj");
 		System.out.println("Finished loading chit model data");
 
+		// initialize tile and clearings info
 		tiles = new HashSet<LWJGLTileDrawable>();
-		for (HexTileInterface ht : bo) {
+		clearings = new HashMap<TileType, ClearingStorage[]>();
+		for (HexTileInterface ht : bo.iterateTiles()) {
 			TileType type = ht.getType();
 			int row = ht.getBoardColumn();
 			int col = ht.getBoardRow();
@@ -149,13 +152,6 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 			}
 		}
 		shaders.useShaderProgram(st);
-		/*
-		 * for fisheye projection float ar = lwgfx.getAspectRatio(); float
-		 * fovScale = 1f; shaders.setUniformFloatValue(st, "xScale", 1f /
-		 * fovScale / ar); shaders.setUniformFloatValue(st, "yScale", 1f /
-		 * fovScale); shaders.setUniformFloatValue(st, "nearRadius", .1f);
-		 * shaders.setUniformFloatValue(st, "oneOverRadiusDifference", 1f/20f);
-		 */
 
 		updateAmbientColour();
 		shaders.setUniformFloatArrayValue(st, "ambientColour", 4, ambientColour);

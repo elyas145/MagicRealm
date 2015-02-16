@@ -1,5 +1,26 @@
 package model.interfaces;
 
-public interface ChitInterface {
+import model.enums.TileType;
+
+public abstract class ChitInterface {
+	
+	public boolean onTile() {
+		return getTile() != null;
+	}
+	
+	public boolean onClearing() {
+		return getClearing() != 0;
+	}
+	
+	/**
+	 * @return the tile that the chit is on
+	 */
+	public abstract TileType getTile();
+
+	/**
+	 * @return the clearing that the chit is on
+	 *         return 0 if the chit is on the tile
+	 */
+	public abstract int getClearing();
   
 }

@@ -7,8 +7,6 @@
  */
 package model.interfaces;
 
-import java.util.Iterator;
-
 public interface BoardInterface {
   
   /**
@@ -24,6 +22,11 @@ public interface BoardInterface {
 	/**
 	 * @return iterator over the board tiles
 	 */
-	public Iterator<? extends HexTileInterface> iterator();
+	public Iterable<? extends HexTileInterface> iterateTiles();
+	
+	/**
+	 * @return iterator over the board tiles
+	 */
+	public Iterable<? extends ChitInterface> iterateChits();
 	
 }

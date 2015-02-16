@@ -1,5 +1,6 @@
 package lwjglview.graphics;
 
+import lwjglview.graphics.board.LWJGLBoardDrawable;
 import lwjglview.graphics.shader.GLShaderHandler;
 import lwjglview.graphics.shader.ShaderType;
 import model.board.Board;

@@ -1,7 +1,7 @@
-package model.board;
+package model.character;
 
 import java.util.ArrayList;
-import model.board.Character;
+
 import model.enums.CharacterType;
 import model.interfaces.CharacterFactoryInterface;
 

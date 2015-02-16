@@ -1,6 +1,7 @@
-package lwjglview.graphics;
+package lwjglview.graphics.board;
 
 import config.GraphicsConfiguration;
+import lwjglview.graphics.LWJGLGraphics;
 import lwjglview.graphics.animator.AnimationQueue;
 import lwjglview.graphics.animator.TimedAnimator;
 import lwjglview.graphics.shader.GLShaderHandler;

@@ -1,9 +1,10 @@
-package lwjglview.graphics;
+package lwjglview.graphics.board;
 
 import java.nio.FloatBuffer;
 
 import org.lwjgl.BufferUtils;
 
+import lwjglview.graphics.LWJGLGraphics;
 import lwjglview.graphics.animator.AnimationQueue;
 import lwjglview.graphics.shader.ShaderType;
 import model.enums.ChitType;
