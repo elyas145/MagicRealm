@@ -14,5 +14,5 @@ public enum SiteType {
 	CHAPEL,
 	GUEARD_HOUSE,
 	HOUSE,
-	INN,
+	INN
 }

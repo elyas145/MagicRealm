@@ -18,6 +18,42 @@ import utils.resources.ResourceHandler;
 public class ControllerMain {
 	private LWJGLGraphics gfx;
 	private ResourceHandler rh;
+	private Board board; // main game board
+	private Character[] characters;
+	private int numCharacters = 1;
+	private StartView startView;
+
+	public ControllerMain() {
+		rh = new ResourceHandler();
+		board = new Board(rh);
+		startView = new StartView(this);
+	}
+
+	private void start() {
+		// startView.start();
+		startBoardView();
+	}
+
+	public void startBoardView() {
+		gfx = new LWJGLGraphics(rh);
+		try {
+			gfx.addDrawable(new LWJGLBoardDrawable(board, rh));
+			gfx.start();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public ArrayList<Character> getAllCharacters() {
+		CharacterFactory cf = new CharacterFactory();
+		return cf.getPossibleCharacters();
+	}
+
+	public static void main(String[] args) throws IOException {
+		ControllerMain main = new ControllerMain();
+		main.start();
+	}
+
 
 	public ResourceHandler getRh() {
 		return rh;
@@ -30,38 +66,4 @@ public class ControllerMain {
 	public int getNumCharacters() {
 		return numCharacters;
 	}
-
-	private Board board; // main game board
-	private Character[] characters;
-	private int numCharacters;
-	private StartView startView;
-
-	public ControllerMain() {
-		rh = new ResourceHandler();
-		board = new Board(rh);
-		startView = new StartView(this);
-	}
-
-	private void start() {
-		startView.start();
-	}
-
-	public void StartBoardView() {
-		gfx = new LWJGLGraphics(rh);
-		try {
-			gfx.addDrawable(new LWJGLBoardDrawable(board, rh));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	public ArrayList<Character> getAllCharacters(){
-		CharacterFactory cf = new CharacterFactory();		
-		return cf.getPossibleCharacters();
-		
-	}
-	public static void main(String[] args) throws IOException {
-		ControllerMain main = new ControllerMain();
-		main.start();
-	}
-
 }

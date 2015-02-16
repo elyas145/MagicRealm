@@ -16,12 +16,12 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import model.board.chit.Chit;
-import model.enums.TileType;
-import model.enums.TreasureType;
+import model.enums.SiteType;
 
 public class Treasure extends Chit {
 	private int goldValue;
 	private Random gen;
+	private SiteType site;
 
 	/*
 	private boolean enchanted = false;
@@ -51,9 +51,17 @@ public class Treasure extends Chit {
 	}
 	*/
 
-	public Treasure(TileType tile, ArrayList<Integer> possibleValues) {
-		super(tile);
+	public Treasure(SiteType siteType, ArrayList<Integer> possibleValues) {
 		goldValue = possibleValues.get(gen.nextInt(possibleValues.size() - 1));
+		site = siteType;
+	}
+
+	public SiteType getSite() {
+		return site;
+	}
+
+	public void setSite(SiteType site) {
+		this.site = site;
 	}
 
 	public int getGoldValue() {

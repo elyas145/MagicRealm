@@ -20,11 +20,11 @@ import org.json.simple.parser.JSONParser;
 
 import utils.random.Random;
 import utils.resources.ResourceHandler;
-
 import model.board.chit.Chit;
 import model.board.tile.HexTile;
 import model.enums.CharacterType;
 import model.enums.ChitType;
+import model.enums.SiteType;
 import model.enums.TileType;
 import model.interfaces.BoardInterface;
 import model.interfaces.ChitInterface;
@@ -71,13 +71,13 @@ public class Board implements BoardInterface {
 			possibleValues.add(i * 10);
 		}
 		
-		ArrayList<TileType> tiles = new ArrayList<TileType>();
-		for(TileType tt: TileType.values()) {
-			tiles.add(tt);
+		ArrayList<SiteType> sites = new ArrayList<SiteType>();
+		for(SiteType tt: SiteType.values()) {
+			sites.add(tt);
 		}
 
 		for (int i = 0; i < treasures.size(); i++) {
-			treasures.add(new Treasure(Random.choose(tiles), possibleValues));
+			treasures.add(new Treasure(Random.choose(sites), possibleValues));
 			possibleValues.remove(treasures.get(treasures.size() - 1));
 		}
 	}
