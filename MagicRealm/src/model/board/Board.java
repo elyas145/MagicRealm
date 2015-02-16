@@ -18,6 +18,7 @@ import java.util.Map;
 import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
 
+import config.BoardConfiguration;
 import utils.random.Random;
 import utils.resources.ResourceHandler;
 import model.board.chit.Chit;
@@ -44,17 +45,23 @@ public class Board implements BoardInterface {
 			FileReader reader = new FileReader(path);
 			JSONParser parser = new JSONParser();
 			arr = (JSONArray) parser.parse(reader);
+			//TODO fix array loop.
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		hardCodeTiles();
 		initTreasures();
+		initSound();
 
 	}
 	
+	private void initSound() {
+		
+		
+	}
+
 	public void moveCharacter(Character character, TileType tt, int clearing) {
-		// TODO
+		// TODO move character
 		//HexTile loc = mapOfChitPositions.get(character);
 		//Clearing clr = loc.getClearing(character);
 	}
@@ -67,7 +74,7 @@ public class Board implements BoardInterface {
 	private void initTreasures() {
 		ArrayList<Integer> possibleValues = new ArrayList<Integer>();
 
-		for (int i = 1; i < 6; i++) {
+		for (int i = 1; i <= BoardConfiguration.MAX_TREASURES; i++) {
 			possibleValues.add(i * 10);
 		}
 		
@@ -76,9 +83,8 @@ public class Board implements BoardInterface {
 			sites.add(tt);
 		}
 
-		for (int i = 0; i < treasures.size(); i++) {
-			treasures.add(new Treasure(Random.choose(sites), possibleValues));
-			possibleValues.remove(treasures.get(treasures.size() - 1));
+		for (int i = 0; i < BoardConfiguration.MAX_TREASURES; i++) {
+			treasures.add(new Treasure(Random.choose(sites), Random.remove(possibleValues)));
 		}
 	}
 

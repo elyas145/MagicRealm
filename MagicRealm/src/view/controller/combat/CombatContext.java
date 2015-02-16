@@ -4,5 +4,5 @@ public interface CombatContext {
 	/*
 	 * Not really sure what to do in here
 	 */
-	// TODO
+	// TODO combat context interface
 }

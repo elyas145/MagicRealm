@@ -12,15 +12,11 @@
  */
 package model.board;
 
-import java.util.ArrayList;
-import java.util.Random;
-
 import model.board.chit.Chit;
 import model.enums.SiteType;
 
 public class Treasure extends Chit {
 	private int goldValue;
-	private Random gen;
 	private SiteType site;
 
 	/*
@@ -51,8 +47,8 @@ public class Treasure extends Chit {
 	}
 	*/
 
-	public Treasure(SiteType siteType, ArrayList<Integer> possibleValues) {
-		goldValue = possibleValues.get(gen.nextInt(possibleValues.size() - 1));
+	public Treasure(SiteType siteType, Integer gv) {
+		goldValue = gv;
 		site = siteType;
 	}
 

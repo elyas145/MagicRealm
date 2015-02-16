@@ -5,5 +5,5 @@ public enum SoundType {
 	FLUTTER,
 	ROAR,
 	PATTER,
-	SLITHER,
+	SLITHER
 }

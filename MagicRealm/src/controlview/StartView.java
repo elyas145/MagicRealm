@@ -116,9 +116,6 @@ public class StartView extends JFrame implements ActionListener, MouseListener {
 				charCards[i].setIcon(new ImageIcon(parent.getRh().getResource(
 						ResourceHandler.joinPath("images", "cards",
 								parent.getAllCharacters().get(i).getType().name()+"_F.jpg"))));
-				System.out.println(parent.getRh().getResource(
-						ResourceHandler.joinPath("images", "cards",
-								parent.getAllCharacters().get(i).getType().name()+"_F.jpg")));
 				charCards[i].setAlignmentY(TOP_ALIGNMENT);
 				charCards[i].setAlignmentY(LEFT_ALIGNMENT);
 				charCards[i].addMouseListener(this);
