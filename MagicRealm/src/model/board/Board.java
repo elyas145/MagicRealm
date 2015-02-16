@@ -24,39 +24,38 @@ import model.interfaces.BoardInterface;
 
 public class Board implements Iterable<HexTile>, BoardInterface {
 
-	public Board() {
+	public Board(ResourceHandler rh) {
 		collectionOfTiles = new HashSet<HexTile>();
-		// get tile info
-				//System.getProperty("user.dir") + "\\bin\\resources\\data\\data.json";
 		try {
-			String path = new ResourceHandler().getResource(ResourceHandler.joinPath("data", "data.json")).getPath();
+			String path = rh.getResource(
+					ResourceHandler.joinPath("data", "data.json")).getPath();
 			FileReader reader = new FileReader(path);
 			JSONParser parser = new JSONParser();
 			arr = (JSONArray) parser.parse(reader);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}		
+		}
 		hardCodeTiles();
 		initTreasures();
-		
-		
+
 	}
 
-	public static void main(String[] args){
-		Board b = new Board();
+	public static void main(String[] args) {
+		Board b = new Board(new ResourceHandler());
 	}
+
 	private void initTreasures() {
 		ArrayList<Integer> possibleValues = new ArrayList<Integer>();
-		
-		for(int i = 1; i < 6; i++){
-			possibleValues.add(i*10);
+
+		for (int i = 1; i < 6; i++) {
+			possibleValues.add(i * 10);
 		}
-		
-		for (int i = 0; i < treasures.size(); i++){
+
+		for (int i = 0; i < treasures.size(); i++) {
 			treasures.add(new Treasure(possibleValues));
-			possibleValues.remove(treasures.get(treasures.size()-1));
-		}	
+			possibleValues.remove(treasures.get(treasures.size() - 1));
+		}
 	}
 
 	private void hardCodeTiles() {

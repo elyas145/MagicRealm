@@ -33,6 +33,13 @@ public class Matrix {
 		return trans;
 	}
 	
+	public static Matrix translation(Matrix mat) {
+		int sz = mat.rowCount() + 1;
+		Matrix trans = new Matrix(sz, sz);
+		trans.translate(mat);
+		return trans;
+	}
+	
 	public static Matrix dilation(float[] fs) {
 		Matrix ret = new Matrix(fs.length, fs.length);
 		ret.scale(fs);
@@ -86,6 +93,14 @@ public class Matrix {
 		int c = vec.length;
 		for(int i = 0; i < vec.length; ++i) {
 			set(i, c, vec[i]);
+		}
+	}
+	
+	public void translate(Matrix vec) {
+		identity();
+		int c = vec.rowCount();
+		for(int i = 0; i < vec.rowCount(); ++i) {
+			set(i, c, vec.get(i, 0));
 		}
 	}
 	

@@ -7,6 +7,7 @@ import org.lwjgl.BufferUtils;
 public class GLPrimitives {
 	
 	public GLPrimitives(LWJGLGraphics drawer) {
+		square = -1;
 		hexagon = -1;
 		graphics = drawer;
 		vertBuf = BufferUtils.createFloatBuffer(3);
@@ -14,8 +15,29 @@ public class GLPrimitives {
 	}
 	
 	/*
+	 * Makes the square [-1,1] X [-1,1]
+	 */
+	public void drawSquare() {
+		if(square < 0) {
+			square = graphics.startQuadList();
+				texCoord(0f, 0f);
+				vertex(-1f, -1f, 0f);
+				texCoord(0f, 1f);
+				vertex(-1f, 1f, 0f);
+				texCoord(1f, 1f);
+				vertex(1f, 1f, 0f);
+				texCoord(1f, 0f);
+				vertex(1f, -1f, 0f);
+			graphics.endList();
+		}
+		else {
+			graphics.callList(square);
+		}
+	}
+	
+	/*
 	 * Makes a hexagon of width 2 centered at the origin
-	 * 		  2_3
+	 *      2_3
 	 * 	  1 /0\
 	 *      \_/ 4
 	 *      6 5
@@ -120,6 +142,7 @@ public class GLPrimitives {
 		vertex(-.5f, -0.866025f, 0f);
 	}
 	
+	private int square;
 	private int hexagon;
 	private LWJGLGraphics graphics;
 	private FloatBuffer vertBuf;

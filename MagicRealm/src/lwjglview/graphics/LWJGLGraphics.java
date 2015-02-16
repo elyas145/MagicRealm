@@ -33,7 +33,7 @@ public final class LWJGLGraphics implements Graphics {
 	public static void main(String[] args) throws IOException {
 		ResourceHandler rh = new ResourceHandler();
 		LWJGLGraphics gfx = new LWJGLGraphics(rh);
-		gfx.addDrawable(new LWJGLBoardDrawable(new Board(), rh));
+		gfx.addDrawable(new LWJGLBoardDrawable(new Board(rh), rh));
 		gfx.start();
 	}
 
@@ -180,6 +180,13 @@ public final class LWJGLGraphics implements Graphics {
 
 	public void callList(int lst) {
 		glCallList(lst);
+	}
+
+	public int startQuadList() {
+		int lst = glGenLists(1);
+		glNewList(lst, GL_COMPILE);
+		glBegin(GL_QUADS);
+		return lst;
 	}
 
 	public int startTriangleList() {

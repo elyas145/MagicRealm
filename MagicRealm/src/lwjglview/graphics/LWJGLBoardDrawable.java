@@ -4,8 +4,12 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
 import org.lwjgl.BufferUtils;
 
@@ -17,6 +21,7 @@ import model.board.Board;
 import model.board.HexTile;
 import model.enums.ChitType;
 import model.enums.TileType;
+import model.interfaces.HexTileInterface;
 import utils.images.ImageTools;
 import utils.math.Mathf;
 import utils.math.Matrix;
@@ -24,9 +29,9 @@ import utils.resources.ChitImages;
 import utils.resources.ResourceHandler;
 import utils.resources.TileImages;
 import utils.time.Timing;
-import view.graphics.BoardDrawable;
 import view.graphics.Drawable;
 import view.graphics.Graphics;
+import view.graphics.board.BoardDrawable;
 
 public class LWJGLBoardDrawable extends BoardDrawable {
 
@@ -74,18 +79,42 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 		System.out.println("Finished loading chit model data");
 
 		tiles = new HashSet<LWJGLTileDrawable>();
-		for (HexTile ht : bo) {
+		for (HexTileInterface ht : bo) {
 			TileType type = ht.getType();
-			tiles.add(new LWJGLTileDrawable(ht, getTextureIndex(type, false),
-					getTextureIndex(type, true)));
+			int row = ht.getBoardColumn();
+			int col = ht.getBoardRow();
+			float x, y, r;
+			x = row % 2 == 0 ? 0f : 1.5f;
+			x += col * 3f;
+			y = -row * 0.866025f;
+			r = Mathf.PI * ht.getRotation() / 3f;
+			tiles.add(new LWJGLTileDrawable(this, ht.getType(), x, y, r,
+					getTextureIndex(type, false), getTextureIndex(type, true)));
 		}
 
-		chits = new HashSet<Drawable>();
-		chits.add(new LWJGLChitDrawable(3f, -3f, chit, 0));
-		chits.add(new LWJGLChitDrawable(4.8f, -2.2f, chit, 1));
-		chits.add(new LWJGLChitDrawable(4f, -4.5f, chit, 2));
+		chitDrawables = new HashMap<ChitType, LWJGLChitDrawable>();
+		chitDrawables.put(ChitType.CHARACTER_AMAZON, new LWJGLChitDrawable(
+				this, ChitType.CHARACTER_AMAZON, chit, 0));
+		chitDrawables.put(ChitType.CHARACTER_CAPTAIN, new LWJGLChitDrawable(
+				this, ChitType.CHARACTER_CAPTAIN, chit, 1));
+		chitDrawables.put(ChitType.CHARACTER_SWORDSMAN, new LWJGLChitDrawable(
+				this, ChitType.CHARACTER_SWORDSMAN, chit, 2));
 
 		ambientColour = BufferUtils.createFloatBuffer(4);
+	}
+
+	/*
+	 * Tiles can request their position from the board
+	 */
+	public void getTilePosition(TileType tt, FloatBuffer position) {
+
+	}
+
+	/*
+	 * Chits can request their position from the board
+	 */
+	public void getChitPosition(ChitType ct, FloatBuffer position) {
+
 	}
 
 	@Override
@@ -94,7 +123,7 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 
 		// reset the view matrix
 		lwgfx.resetViewMatrix();
-		float time = Timing.getSeconds() * .6f;
+		float time = Timing.getSeconds() * .1f;
 		Matrix tmp = Matrix.rotationX(4, Mathf.PI / 5f);
 		float k = (Mathf.sin(time * .6f) + 3f) / 3f;
 		tmp = Matrix.translation(new float[] { 0f, -4f * k, 3f * k }).multiply(
@@ -160,7 +189,7 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 		shaders.setUniformFloatArrayValue(st, "ambientColour", 4, ambientColour);
 
 		// draw all chits
-		for (Drawable chit : chits) {
+		for (Drawable chit : chitDrawables.values()) {
 			chit.draw(lwgfx);
 		}
 
@@ -174,13 +203,12 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 		AMBIENT_COLOURS[idx].multiply(1f - scale)
 				.add(AMBIENT_COLOURS[nidx].multiply(scale))
 				.toFloatBuffer(ambientColour);
-		if(idx == AMBIENT_COLOURS.length / 4) {
-			for(LWJGLTileDrawable tile: tiles) {
+		if (idx == AMBIENT_COLOURS.length / 4) {
+			for (LWJGLTileDrawable tile : tiles) {
 				tile.setEnchanted(false);
 			}
-		}
-		else if(idx == AMBIENT_COLOURS.length * 3 / 4) {
-			for(LWJGLTileDrawable tile: tiles) {
+		} else if (idx == AMBIENT_COLOURS.length * 3 / 4) {
+			for (LWJGLTileDrawable tile : tiles) {
 				tile.setEnchanted(true);
 			}
 		}
@@ -220,10 +248,95 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 	private void loadChitImages() throws IOException {
 		for (ChitType type : ChitType.values()) {
 			BufferedImage img = ChitImages.getChitImage(resources, type);
-			System.out.println(img);
 			chitIndex = ImageTools.loadRawImage(img, chitIndex, chitWidth,
 					chitHeight, rawChitData);
 		}
+	}
+
+	private void relocateChit(ChitType type, float x, float y) {
+		chitDrawables.get(type).moveTo(x, y);
+	}
+
+	private class ClearingStorage {
+		public ClearingStorage(float x, float y) {
+			chits = new ArrayList<ChitType>();
+			dim = 0;
+			xLocation = x;
+			yLocation = y;
+			buff = BufferUtils.createFloatBuffer(2);
+		}
+
+		public void put(ChitType ct) {
+			if (!chits.contains(ct)) {
+				chits.add(ct);
+				if (changeDim()) {
+					relocateAllChits();
+				}
+			}
+		}
+
+		public void remove(ChitType ct) {
+			if (chits.contains(ct)) {
+				int idx = chits.indexOf(ct);
+				chits.remove(ct);
+				if (changeDim()) {
+					relocateAllChits();
+				} else {
+					for (; idx < chits.size(); ++idx) {
+						getLocation(chits.get(idx), buff);
+						relocateChit(chits.get(idx), buff.get(0), buff.get(1));
+					}
+				}
+			}
+		}
+
+		public void getLocation(ChitType chit, FloatBuffer loc) {
+			int idx = chits.indexOf(chit);
+			int row = dim - idx / dim - 1;
+			int col = idx % dim;
+			int gaps = dim - 1;
+			float spacing = 2f * GraphicsConfiguration.CHIT_SCALE
+					+ GraphicsConfiguration.CHIT_SPACING;
+			float offs = spacing * gaps * .5f;
+			loc.put(0, col * spacing + offs + xLocation);
+			loc.put(1, row * spacing - offs + yLocation);
+		}
+
+		private boolean changeDim() {
+			double sqrt = Math.sqrt(chits.size());
+			int tmp = (int) sqrt;
+			if (sqrt % 1. != 0.) {
+				tmp += 1;
+			}
+			if (tmp > dim) {
+				dim = tmp;
+				return true;
+			}
+			return false;
+		}
+
+		private void relocateAllChits() {
+			for (ChitType type : chits) {
+				getLocation(type, buff);
+				relocateChit(type, buff.get(0), buff.get(1));
+			}
+		}
+
+		private float xLocation;
+		private float yLocation;
+		private int dim;
+		private List<ChitType> chits;
+		private FloatBuffer buff;
+	}
+
+	private static class ChitLocation {
+		public ChitLocation(TileType tt, int clear) {
+			tile = tt;
+			clearing = clear;
+		}
+
+		public TileType tile;
+		public int clearing;
 	}
 
 	private int tileIndex;
@@ -242,7 +355,9 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 	private ByteBuffer rawChitData;
 
 	private Collection<LWJGLTileDrawable> tiles;
-	private Collection<Drawable> chits;
+	private Map<ChitType, LWJGLChitDrawable> chitDrawables;
+	private Map<TileType, ClearingStorage[]> clearings;
+	private Map<ChitType, ChitLocation> chitLocations;
 
 	private ResourceHandler resources;
 

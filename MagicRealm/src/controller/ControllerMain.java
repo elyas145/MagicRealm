@@ -38,7 +38,7 @@ public class ControllerMain {
 
 	public ControllerMain() {
 		rh = new ResourceHandler();
-		board = new Board();
+		board = new Board(rh);
 		startView = new StartView(this);
 	}
 
