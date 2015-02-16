@@ -140,7 +140,6 @@ public class LWJGLTileDrawable extends TileDrawable {
 
 		@Override
 		public void finish() {
-			System.out.println("HERE");
 			setShowEnchanted(whenDone);
 		}
 
