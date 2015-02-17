@@ -12,7 +12,7 @@
  */
 package model.board;
 
-import model.board.chit.Chit;
+import model.counter.chit.Chit;
 import model.enums.SiteType;
 
 public class Treasure extends Chit {

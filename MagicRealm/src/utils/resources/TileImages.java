@@ -3,17 +3,17 @@ package utils.resources;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
-import model.enums.TileType;
+import model.enums.TileName;
 
 public class TileImages {
 
-	public static BufferedImage getTileImage(ResourceHandler rh, TileType type,
+	public static BufferedImage getTileImage(ResourceHandler rh, TileName type,
 			boolean enchanted) throws IOException {
 		return rh.readImage(ResourceHandler.joinPath("images", "tiles",
 				getName(type) + (enchanted ? "-e1.gif" : "1.gif")));
 	}
 
-	private static String getName(TileType tile) {
+	private static String getName(TileName tile) {
 		switch (tile) {
 		case AWFUL_VALLEY:
 			return "awfulvalley";

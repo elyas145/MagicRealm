@@ -2,16 +2,15 @@ package model.interfaces;
 
 import java.util.Collection;
 
-import model.board.chit.Chit;
-import model.enums.ChitType;
-import model.enums.TileType;
+import model.counter.chit.Chit;
+import model.enums.TileName;
 
 public interface HexTileInterface {
 
 	/**
 	 * @return type of hex tile
 	 */
-	TileType getType();
+	TileName getType();
 
 	/**
 	 * @return type of hex tile

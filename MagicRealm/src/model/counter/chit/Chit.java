@@ -1,6 +1,6 @@
-package model.board.chit;
+package model.counter.chit;
 
-import model.enums.TileType;
+import model.enums.TileName;
 import model.interfaces.ChitInterface;
 
 // a chit is placed on the map. it is one of the following: 
@@ -21,7 +21,7 @@ public abstract class Chit extends ChitInterface {
 	}
 
 	@Override
-	public TileType getTile() {
+	public TileName getTile() {
 		return tile;
 	}
 
@@ -36,19 +36,19 @@ public abstract class Chit extends ChitInterface {
 		clearing = 0;
 	}
 	
-	protected Chit(TileType tt) {
+	protected Chit(TileName tt) {
 		flipped = false;
 		tile = tt;
 		clearing = 0;
 	}
 	
-	protected Chit(TileType tt, int clear) {
+	protected Chit(TileName tt, int clear) {
 		flipped = false;
 		tile = tt;
 		clearing = clear;
 	}
 	
 	private boolean flipped;	//unflipped chits, mean they are face down.
-	private TileType tile;
+	private TileName tile;
 	private int clearing;
 }

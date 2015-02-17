@@ -1,6 +1,6 @@
 package model.enums;
 
-public enum TileType {
+public enum TileName {
 	AWFUL_VALLEY,
 	BAD_LANDS,
 	BAD_VALLEY,

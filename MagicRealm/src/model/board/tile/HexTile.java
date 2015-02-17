@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
-import model.board.chit.Chit;
 import model.board.clearing.Clearing;
-import model.enums.TileType;
+import model.counter.chit.Chit;
+import model.enums.TileName;
 import model.interfaces.ClearingInterface;
 import model.interfaces.HexTileInterface;
 
@@ -18,14 +18,14 @@ import utils.math.Point;
 
 public class HexTile implements HexTileInterface {
 
-	public HexTile(TileType tp, int rw, int col, int rot) {
+	public HexTile(TileName tp, int rw, int col, int rot) {
 		type = tp;
 		row = rw;
 		column = col;
 		rotation = rot;
 	}
 
-	public HexTile(TileType tile, int x, int y, int rot, JSONArray arr) {
+	public HexTile(TileName tile, int x, int y, int rot, JSONArray arr) {
 		type = tile;
 		row = x;
 		column = y;
@@ -127,7 +127,7 @@ public class HexTile implements HexTileInterface {
 	}
 
 	@Override
-	public TileType getType() {
+	public TileName getType() {
 		return type;
 	}
 
@@ -142,7 +142,7 @@ public class HexTile implements HexTileInterface {
 		return false;
 	}
 
-	private TileType type;
+	private TileName type;
 	private int row;
 	private int column;
 	private ArrayList<Clearing> clearings = new ArrayList<Clearing>();

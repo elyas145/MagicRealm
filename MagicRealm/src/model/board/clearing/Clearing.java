@@ -3,7 +3,7 @@ package model.board.clearing;
 import java.nio.FloatBuffer;
 import java.util.List;
 
-import model.board.chit.Chit;
+import model.counter.chit.Chit;
 import model.interfaces.ClearingInterface;
 
 import utils.math.Point;

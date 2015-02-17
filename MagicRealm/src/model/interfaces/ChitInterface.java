@@ -1,6 +1,6 @@
 package model.interfaces;
 
-import model.enums.TileType;
+import model.enums.TileName;
 
 public abstract class ChitInterface {
 	
@@ -15,7 +15,7 @@ public abstract class ChitInterface {
 	/**
 	 * @return the tile that the chit is on
 	 */
-	public abstract TileType getTile();
+	public abstract TileName getTile();
 
 	/**
 	 * @return the clearing that the chit is on

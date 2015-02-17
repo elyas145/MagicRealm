@@ -21,7 +21,7 @@ import lwjglview.graphics.shader.ShaderType;
 import model.board.Board;
 import model.board.tile.HexTile;
 import model.enums.ChitType;
-import model.enums.TileType;
+import model.enums.TileName;
 import model.interfaces.HexTileInterface;
 import utils.images.ImageTools;
 import utils.math.Mathf;
@@ -52,7 +52,7 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 		resources = rh;
 
 		// initialize tiles
-		numTiles = TileType.values().length * 2;
+		numTiles = TileName.values().length * 2;
 		tileHeight = GraphicsConfiguration.TILE_IMAGE_HEIGHT;
 		tileWidth = GraphicsConfiguration.TILE_IMAGE_WIDTH;
 		rawTileData = ByteBuffer.allocateDirect(numTiles * tileHeight
@@ -81,9 +81,9 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 
 		// initialize tile and clearings info
 		tiles = new HashSet<LWJGLTileDrawable>();
-		clearings = new HashMap<TileType, ClearingStorage[]>();
+		clearings = new HashMap<TileName, ClearingStorage[]>();
 		for (HexTileInterface ht : bo.iterateTiles()) {
-			TileType type = ht.getType();
+			TileName type = ht.getType();
 			int row = ht.getBoardColumn();
 			int col = ht.getBoardRow();
 			float x, y, r;
@@ -109,7 +109,7 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 	/*
 	 * Tiles can request their position from the board
 	 */
-	public void getTilePosition(TileType tt, FloatBuffer position) {
+	public void getTilePosition(TileName tt, FloatBuffer position) {
 
 	}
 
@@ -210,11 +210,11 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 		}
 	}
 
-	private int getTextureIndex(TileType type, boolean enchanted) {
+	private int getTextureIndex(TileName type, boolean enchanted) {
 		int i = 0;
-		for (TileType tt : TileType.values()) {
+		for (TileName tt : TileName.values()) {
 			if (tt == type) {
-				return enchanted ? i + TileType.values().length : i;
+				return enchanted ? i + TileName.values().length : i;
 			}
 			++i;
 		}
@@ -233,7 +233,7 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 	}
 
 	private void loadTileImages(boolean enchanted) throws IOException {
-		for (TileType type : TileType.values()) {
+		for (TileName type : TileName.values()) {
 			BufferedImage img = TileImages.getTileImage(resources, type,
 					enchanted);
 			tileIndex = ImageTools.loadRawImage(img, tileIndex, tileWidth,
@@ -326,12 +326,12 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 	}
 
 	private static class ChitLocation {
-		public ChitLocation(TileType tt, int clear) {
+		public ChitLocation(TileName tt, int clear) {
 			tile = tt;
 			clearing = clear;
 		}
 
-		public TileType tile;
+		public TileName tile;
 		public int clearing;
 	}
 
@@ -352,7 +352,7 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 
 	private Collection<LWJGLTileDrawable> tiles;
 	private Map<ChitType, LWJGLChitDrawable> chitDrawables;
-	private Map<TileType, ClearingStorage[]> clearings;
+	private Map<TileName, ClearingStorage[]> clearings;
 	private Map<ChitType, ChitLocation> chitLocations;
 
 	private ResourceHandler resources;

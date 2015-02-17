@@ -4,7 +4,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 import model.enums.ChitType;
-import model.enums.TileType;
+import model.enums.TileName;
 
 public class ChitImages {
 

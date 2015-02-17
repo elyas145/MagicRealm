@@ -1,10 +1,10 @@
 package view.graphics.board;
 
 import model.enums.ChitType;
-import model.enums.TileType;
+import model.enums.TileName;
 
 public interface BoardUpdater {
 	
-	void updateBoard(ChitType chit, TileType tile, int clearing);
+	void updateBoard(ChitType chit, TileName tile, int clearing);
 
 }

@@ -1,18 +1,18 @@
 package view.graphics.board;
 
-import model.enums.TileType;
+import model.enums.TileName;
 
 public abstract class TileDrawable extends BoardItemDrawable {
 
-	public TileType getTileType() {
+	public TileName getTileName() {
 		return type;
 	}
 
-	protected TileDrawable(BoardDrawable bd, TileType tt) {
+	protected TileDrawable(BoardDrawable bd, TileName tt) {
 		super(bd);
 		type = tt;
 	}
 
-	private TileType type;
+	private TileName type;
 
 }

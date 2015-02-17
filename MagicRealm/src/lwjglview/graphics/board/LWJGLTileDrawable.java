@@ -6,7 +6,7 @@ import lwjglview.graphics.animator.AnimationQueue;
 import lwjglview.graphics.animator.TimedAnimator;
 import lwjglview.graphics.shader.GLShaderHandler;
 import lwjglview.graphics.shader.ShaderType;
-import model.enums.TileType;
+import model.enums.TileName;
 import utils.math.Mathf;
 import utils.math.Matrix;
 import view.graphics.Graphics;
@@ -16,7 +16,7 @@ public class LWJGLTileDrawable extends TileDrawable {
 
 	public static final ShaderType SHADER = ShaderType.TILE_SHADER;
 
-	public LWJGLTileDrawable(LWJGLBoardDrawable bd, TileType tt, float x,
+	public LWJGLTileDrawable(LWJGLBoardDrawable bd, TileName tt, float x,
 			float y, float rot, int norm, int enchant) {
 		super(bd, tt);
 		xPosition = x;

@@ -8,7 +8,7 @@ import lwjglview.graphics.LWJGLGraphics;
 import lwjglview.graphics.animator.AnimationQueue;
 import lwjglview.graphics.shader.ShaderType;
 import model.enums.ChitType;
-import model.enums.TileType;
+import model.enums.TileName;
 import config.GraphicsConfiguration;
 import view.graphics.board.ChitDrawable;
 import view.graphics.Drawable;
