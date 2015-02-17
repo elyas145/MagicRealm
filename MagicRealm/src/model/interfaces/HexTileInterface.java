@@ -2,6 +2,7 @@ package model.interfaces;
 
 import java.util.Collection;
 
+import model.board.clearing.Clearing;
 import model.counter.chit.Chit;
 import model.enums.TileName;
 import model.enums.TileType;
@@ -41,6 +42,12 @@ public interface HexTileInterface {
 	/**
 	 * @return list of clearings
 	 */
-	ClearingInterface getClearing(Chit chit);
+	ClearingInterface getClearing(int clearingNum);
+
+	/**
+	 * @return the Clearing that is at the tiles entrance
+	 */
+	Clearing getEntryClearing(int rot);
+	Clearing getEntryClearing(int rot, boolean enchant);
 
 }

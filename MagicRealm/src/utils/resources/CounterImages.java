@@ -3,18 +3,17 @@ package utils.resources;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
-import model.enums.ChitType;
-import model.enums.TileName;
+import model.enums.CounterType;
 
-public class ChitImages {
+public class CounterImages {
 
-	public static BufferedImage getChitImage(ResourceHandler rh, ChitType type)
+	public static BufferedImage getCounterImage(ResourceHandler rh, CounterType type)
 			throws IOException {
-		return rh.readImage(ResourceHandler.joinPath("images", "chits",
+		return rh.readImage(ResourceHandler.joinPath("images", "counters",
 				getSubDir(type), getName(type) + ".png"));
 	}
 
-	private static String getSubDir(ChitType tile) {
+	private static String getSubDir(CounterType tile) {
 		switch (tile) {
 		case CHARACTER_AMAZON:
 		case CHARACTER_CAPTAIN:
@@ -25,7 +24,7 @@ public class ChitImages {
 		}
 	}
 
-	private static String getName(ChitType tile) {
+	private static String getName(CounterType tile) {
 		switch (tile) {
 		case CHARACTER_AMAZON:
 			return "amazon";

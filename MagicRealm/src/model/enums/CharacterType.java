@@ -4,16 +4,16 @@ public enum CharacterType {
 	AMAZON,
 	CAPTAIN,
 	SWORDSMAN;
-	public ChitType toChit() {
+	public CounterType toCounter() {
 		switch(this) {
 		case AMAZON:
-			return ChitType.CHARACTER_AMAZON;
+			return CounterType.CHARACTER_AMAZON;
 		case CAPTAIN:
-			return ChitType.CHARACTER_CAPTAIN;
+			return CounterType.CHARACTER_CAPTAIN;
 		case SWORDSMAN:
-			return ChitType.CHARACTER_SWORDSMAN;
+			return CounterType.CHARACTER_SWORDSMAN;
 		default:
-			return ChitType.NONE;
+			return CounterType.NONE;
 		}
 	}
 }

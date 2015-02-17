@@ -19,13 +19,15 @@ import lwjglview.graphics.model.ModelData;
 import lwjglview.graphics.shader.GLShaderHandler;
 import lwjglview.graphics.shader.ShaderType;
 import model.board.Board;
-import model.enums.ChitType;
+import model.enums.CounterType;
 import model.enums.TileName;
+import model.interfaces.ClearingInterface;
 import model.interfaces.HexTileInterface;
 import utils.images.ImageTools;
 import utils.math.Mathf;
 import utils.math.Matrix;
-import utils.resources.ChitImages;
+import utils.random.Random;
+import utils.resources.CounterImages;
 import utils.resources.ResourceHandler;
 import utils.resources.TileImages;
 import utils.time.Timing;
@@ -64,7 +66,7 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 		System.out.println("Finished loading tile images");
 
 		// initialize chits
-		numChits = ChitType.values().length;
+		numChits = CounterType.values().length;
 		chitWidth = GraphicsConfiguration.CHIT_IMAGE_WIDTH;
 		chitHeight = GraphicsConfiguration.CHIT_IMAGE_HEIGHT;
 		rawChitData = ByteBuffer.allocateDirect(numChits * chitHeight
@@ -94,13 +96,16 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 					getTextureIndex(type, false), getTextureIndex(type, true)));
 		}
 
-		chitDrawables = new HashMap<ChitType, LWJGLChitDrawable>();
-		chitDrawables.put(ChitType.CHARACTER_AMAZON, new LWJGLChitDrawable(
-				this, ChitType.CHARACTER_AMAZON, chit, 0));
-		chitDrawables.put(ChitType.CHARACTER_CAPTAIN, new LWJGLChitDrawable(
-				this, ChitType.CHARACTER_CAPTAIN, chit, 1));
-		chitDrawables.put(ChitType.CHARACTER_SWORDSMAN, new LWJGLChitDrawable(
-				this, ChitType.CHARACTER_SWORDSMAN, chit, 2));
+		HexTileInterface hti = bo.getTile(TileName.BORDERLAND);
+		ClearingInterface clr = hti.getClearing(1);
+		
+		chitDrawables = new HashMap<CounterType, LWJGLCounterDrawable>();
+		chitDrawables.put(CounterType.CHARACTER_AMAZON, new LWJGLCounterDrawable(
+				this, CounterType.CHARACTER_AMAZON, chit, 0, clr));
+		chitDrawables.put(CounterType.CHARACTER_CAPTAIN, new LWJGLCounterDrawable(
+				this, CounterType.CHARACTER_CAPTAIN, chit, 1, clr));
+		chitDrawables.put(CounterType.CHARACTER_SWORDSMAN, new LWJGLCounterDrawable(
+				this, CounterType.CHARACTER_SWORDSMAN, chit, 2, clr));
 
 		ambientColour = BufferUtils.createFloatBuffer(4);
 	}
@@ -113,10 +118,11 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 	}
 
 	/*
-	 * Chits can request their position from the board
+	 * counters can request their position from the board
 	 */
-	public void getChitPosition(ChitType ct, FloatBuffer position) {
-
+	public void getCounterPosition(CounterType ct, FloatBuffer position) {
+		position.put(0, (float) Random.random() * 6f);
+		position.put(1, -(float) Random.random() * 6f);
 	}
 
 	@Override
@@ -241,27 +247,27 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 	}
 
 	private void loadChitImages() throws IOException {
-		for (ChitType type : ChitType.values()) {
-			BufferedImage img = ChitImages.getChitImage(resources, type);
+		for (CounterType type : CounterType.values()) {
+			BufferedImage img = CounterImages.getCounterImage(resources, type);
 			chitIndex = ImageTools.loadRawImage(img, chitIndex, chitWidth,
 					chitHeight, rawChitData);
 		}
 	}
 
-	private void relocateChit(ChitType type, float x, float y) {
+	private void relocateChit(CounterType type, float x, float y) {
 		chitDrawables.get(type).moveTo(x, y);
 	}
 
 	private class ClearingStorage {
 		public ClearingStorage(float x, float y) {
-			chits = new ArrayList<ChitType>();
+			chits = new ArrayList<CounterType>();
 			dim = 0;
 			xLocation = x;
 			yLocation = y;
 			buff = BufferUtils.createFloatBuffer(2);
 		}
 
-		public void put(ChitType ct) {
+		public void put(CounterType ct) {
 			if (!chits.contains(ct)) {
 				chits.add(ct);
 				if (changeDim()) {
@@ -270,7 +276,7 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 			}
 		}
 
-		public void remove(ChitType ct) {
+		public void remove(CounterType ct) {
 			if (chits.contains(ct)) {
 				int idx = chits.indexOf(ct);
 				chits.remove(ct);
@@ -285,7 +291,7 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 			}
 		}
 
-		public void getLocation(ChitType chit, FloatBuffer loc) {
+		public void getLocation(CounterType chit, FloatBuffer loc) {
 			int idx = chits.indexOf(chit);
 			int row = dim - idx / dim - 1;
 			int col = idx % dim;
@@ -311,7 +317,7 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 		}
 
 		private void relocateAllChits() {
-			for (ChitType type : chits) {
+			for (CounterType type : chits) {
 				getLocation(type, buff);
 				relocateChit(type, buff.get(0), buff.get(1));
 			}
@@ -320,12 +326,12 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 		private float xLocation;
 		private float yLocation;
 		private int dim;
-		private List<ChitType> chits;
+		private List<CounterType> chits;
 		private FloatBuffer buff;
 	}
 
-	private static class ChitLocation {
-		public ChitLocation(TileName tt, int clear) {
+	private static class CounterLocation {
+		public CounterLocation(TileName tt, int clear) {
 			tile = tt;
 			clearing = clear;
 		}
@@ -350,9 +356,9 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 	private ByteBuffer rawChitData;
 
 	private Collection<LWJGLTileDrawable> tiles;
-	private Map<ChitType, LWJGLChitDrawable> chitDrawables;
+	private Map<CounterType, LWJGLCounterDrawable> chitDrawables;
 	private Map<TileName, ClearingStorage[]> clearings;
-	private Map<ChitType, ChitLocation> chitLocations;
+	private Map<CounterType, CounterLocation> chitLocations;
 
 	private ResourceHandler resources;
 

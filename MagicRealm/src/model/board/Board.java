@@ -7,23 +7,24 @@
 
 package model.board;
 
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import config.BoardConfiguration;
+import config.GraphicsConfiguration;
+import utils.math.Point;
 import utils.random.Random;
 import utils.resources.ResourceHandler;
 import model.board.tile.HexTile;
 import model.counter.chit.Chit;
-import model.enums.CharacterType;
 import model.enums.ChitType;
 import model.enums.SiteType;
 import model.enums.TileName;
@@ -38,14 +39,45 @@ public class Board implements BoardInterface {
 	}
 
 	public Board(ResourceHandler rh) {
-		collectionOfTiles = new HashSet<HexTile>();
+		surround = new TileName[6];
+		tileLocations = new HashMap<TileName, int[]>();
+		mapOfTileLocations = new HashMap<Integer, Map<Integer, TileName>>();
+		mapOfTiles = new HashMap<TileName, HexTile>();
+		clearingLocations = new HashMap<TileName, Map<Integer, Point[]>>();
 		try {
 			String path = rh.getResource(
 					ResourceHandler.joinPath("data", "data.json")).getPath();
 			FileReader reader = new FileReader(path);
 			JSONParser parser = new JSONParser();
 			arr = (JSONArray) parser.parse(reader);
-			//TODO fix array loop.
+			for (Object ob : arr) {
+				JSONObject js = (JSONObject) ob;
+				boolean en = (Boolean) js.get("enchanted");
+				TileName tn = TileName.valueOf((String) js.get("tileName"));
+				{
+					JSONObject ns = (JSONObject) js.get("numbers");
+					if (!clearingLocations.containsKey(tn)) {
+						clearingLocations.put(tn,
+								new HashMap<Integer, Point[]>());
+					}
+					Map<Integer, Point[]> pts = clearingLocations.get(tn);
+					for (Object key : ns.keySet()) {
+						int val = Integer.parseInt((String) key);
+						if (!pts.containsKey(val)) {
+							pts.put(val, new Point[2]);
+						}
+						Point[] pt = pts.get(val);
+						JSONObject jpt = (JSONObject) ns.get(key);
+						long x = (Long) jpt.get("x");
+						long y = (Long) jpt.get("y");
+						float a = x
+								/ (float) GraphicsConfiguration.TILE_IMAGE_WIDTH;
+						float b = y
+								/ (float) GraphicsConfiguration.TILE_IMAGE_HEIGHT;
+						pt[en ? 1 : 0] = new Point(a, b);
+					}
+				}
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -55,20 +87,23 @@ public class Board implements BoardInterface {
 
 	}
 	
+	public HexTileInterface getTile(TileName tile) {
+		return mapOfTiles.get(tile);
+	}
+
 	private void initSound() {
-		
-		
+
 	}
 
 	public void moveCharacter(Character character, TileName tt, int clearing) {
 		// TODO move character
-		//HexTile loc = mapOfChitPositions.get(character);
-		//Clearing clr = loc.getClearing(character);
+		// HexTile loc = mapOfChitPositions.get(character);
+		// Clearing clr = loc.getClearing(character);
 	}
-	
+
 	public void removeCharacter(Character character) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	private void initTreasures() {
@@ -77,14 +112,15 @@ public class Board implements BoardInterface {
 		for (int i = 1; i <= BoardConfiguration.MAX_TREASURES; i++) {
 			possibleValues.add(i * 10);
 		}
-		
+
 		ArrayList<SiteType> sites = new ArrayList<SiteType>();
-		for(SiteType tt: SiteType.values()) {
+		for (SiteType tt : SiteType.values()) {
 			sites.add(tt);
 		}
 
-		for (int i = 0; i < BoardConfiguration.MAX_TREASURES; i++) {
-			treasures.add(new Treasure(Random.choose(sites), Random.remove(possibleValues)));
+		while(!possibleValues.isEmpty()) {
+			treasures.add(new Treasure(Random.choose(sites), Random
+					.remove(possibleValues)));
 		}
 	}
 
@@ -128,7 +164,7 @@ public class Board implements BoardInterface {
 
 	@Override
 	public Iterable<? extends HexTileInterface> iterateTiles() {
-		return collectionOfTiles;
+		return mapOfTiles.values();
 	}
 
 	@Override
@@ -137,10 +173,68 @@ public class Board implements BoardInterface {
 	}
 
 	private void setTile(TileName tile, int x, int y, int rot) {
-		collectionOfTiles.add(new HexTile(tile, x, y, rot, arr));
+		getSurround(x, y);
+		Map<Integer, Point[]> locs = clearingLocations.get(tile);
+		HexTile ht = new HexTile(this, tile, x, y, rot, locs, surround);
+		mapOfTiles.put(tile, ht);
+		tileLocations.put(tile, new int[] {x, y});
 	}
 
-	private Collection<HexTile> collectionOfTiles;
+	private void clearSurround() {
+		for (int i = 0; i < 6; ++i) {
+			surround[i] = null;
+		}
+	}
+
+	private void getSurround(int x, int y) {
+		clearSurround();
+		for (int i = 0; i < surround.length; ++i) {
+			setSurround(x, y, i);
+		}
+	}
+
+	private void setSurround(int x, int y, int rot) {
+		rot %= surround.length;
+		int nx, ny;
+		nx = ny = -1;
+		switch (rot) {
+		case 0: // up tile
+			nx = x;
+			ny = y - 2;
+			break;
+		case 1: // NE tile
+			nx = y % 2 == 0 ? x : x + 1;
+			ny = y - 1;
+			break;
+		case 2: // SE tile
+			nx = y % 2 == 0 ? x : x + 1;
+			ny = y + 1;
+			break;
+		case 3: // down tile
+			nx = x;
+			ny = y + 2;
+			break;
+		case 4: // SW tile
+			nx = y % 2 == 0 ? x - 1 : x;
+			ny = y + 1;
+			break;
+		case 5: // NW tile
+			nx = y % 2 == 0 ? x - 1 : x;
+			ny = y - 1;
+			break;
+		}
+		Map<Integer, TileName> row = mapOfTileLocations.get(ny);
+		if (row != null) {
+			surround[rot] = row.get(nx);
+		}
+	}
+
+	private Map<TileName, Map<Integer, Point[]>> clearingLocations;
+	private TileName[] surround;
+	// row column
+	private Map<Integer, Map<Integer, TileName>> mapOfTileLocations;
+	private Map<TileName, HexTile> mapOfTiles;
+	private Map<TileName, int[]> tileLocations;
 	private Collection<Chit> collectionOfChits;
 	private Map<ChitType, HexTile> mapOfChitPositions;
 	private ArrayList<Treasure> treasures = new ArrayList<Treasure>();

@@ -26,6 +26,12 @@ public class Matrix {
 		return rot;
 	}
 	
+	public static Matrix rotation(float ang) {
+		Matrix rot = new Matrix(2, 2);
+		rot.rotate(ang);
+		return rot;
+	}
+	
 	public static Matrix translation(float[] data) {
 		int sz = data.length + 1;
 		Matrix trans = new Matrix(sz, sz);
@@ -177,6 +183,16 @@ public class Matrix {
 		for(int i = 0; i < ret.rowCount(); ++i) {
 			for(int j = 0; j < ret.columnCount(); ++j) {
 				ret.set(i, j, get(i, j) + other.get(i, j));
+			}
+		}
+		return ret;
+	}
+	
+	public Matrix subtract(Matrix other) {
+		Matrix ret = new Matrix(rowCount(), columnCount());
+		for(int i = 0; i < ret.rowCount(); ++i) {
+			for(int j = 0; j < ret.columnCount(); ++j) {
+				ret.set(i, j, get(i, j) - other.get(i, j));
 			}
 		}
 		return ret;

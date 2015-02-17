@@ -15,19 +15,17 @@ public abstract class MovementAnimator extends TimedAnimator {
 	@Override
 	protected Matrix calculateTransform() {
 		float scale = getInterval();
-		Matrix a = initialPosition.multiply(scale);
-		Matrix b = finalPosition.multiply(1f - scale);
+		Matrix a = initialPosition.multiply(1f - scale);
+		Matrix b = finalPosition.multiply(scale);
 		return Matrix.translation(a.add(b));
 	}
 
 	private static float getTime(float vel, float xinit, float yinit,
 			float xfin, float yfin) {
-		return (Mathf.length(xfin, yfin) - Mathf.length(xinit, yinit)) / vel;
+		return Mathf.length(xfin - xinit, yfin - yinit) / vel;
 	}
 
 	private Matrix initialPosition;
 	private Matrix finalPosition;
-
-	private float velocity;
 
 }
