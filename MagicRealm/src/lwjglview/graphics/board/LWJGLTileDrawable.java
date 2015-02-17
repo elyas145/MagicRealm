@@ -1,5 +1,7 @@
 package lwjglview.graphics.board;
 
+import java.nio.FloatBuffer;
+
 import config.GraphicsConfiguration;
 import lwjglview.graphics.LWJGLGraphics;
 import lwjglview.graphics.animator.AnimationQueue;
@@ -45,6 +47,11 @@ public class LWJGLTileDrawable extends TileDrawable {
 
 	public void swap() {
 		setEnchanted(!enchanted);
+	}
+
+	public void getPosition(FloatBuffer position) {
+		position.put(0, xPosition);
+		position.put(1, yPosition);
 	}
 
 	@Override

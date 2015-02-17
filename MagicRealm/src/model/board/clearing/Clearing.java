@@ -126,6 +126,7 @@ public class Clearing implements ClearingInterface {
 				possible.add(ent.getKey());
 			}
 		}
+		System.out.println(internalConnections);
 		for(ClearingResolver[] cr: externalConnections.values()) {
 			if(cr[0] != null) {
 				possible.add(cr[0].getClearing());
@@ -137,6 +138,11 @@ public class Clearing implements ClearingInterface {
 
 	public boolean isEnchanted() {
 		return getParent().isEnchanted();
+	}
+	
+	@Override
+	public String toString() {
+		return "Clearing: Tile: " + getParent().getName() + ", Number: " + getNumber();
 	}
 
 	protected HexTileInterface getParent() {

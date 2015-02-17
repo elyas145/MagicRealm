@@ -81,7 +81,7 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 		System.out.println("Finished loading chit model data");
 
 		// initialize tile and clearings info
-		tiles = new HashSet<LWJGLTileDrawable>();
+		tiles = new HashMap<TileName, LWJGLTileDrawable>();
 		clearings = new HashMap<TileName, ClearingStorage[]>();
 		for (HexTileInterface ht : bo.iterateTiles()) {
 			TileName type = ht.getName();
@@ -92,12 +92,13 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 			x += col * 3f;
 			y = -row * 0.866025f;
 			r = Mathf.PI * ht.getRotation() / 3f;
-			tiles.add(new LWJGLTileDrawable(this, ht.getName(), x, y, r,
+			tiles.put(ht.getName(), new LWJGLTileDrawable(this, ht.getName(), x, y, r,
 					getTextureIndex(type, false), getTextureIndex(type, true)));
 		}
 
 		HexTileInterface hti = bo.getTile(TileName.BORDERLAND);
 		ClearingInterface clr = hti.getClearing(1);
+		System.out.println("BORDERLAND 1 clearing: " + clr);
 		
 		chitDrawables = new HashMap<CounterType, LWJGLCounterDrawable>();
 		chitDrawables.put(CounterType.CHARACTER_AMAZON, new LWJGLCounterDrawable(
@@ -114,7 +115,7 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 	 * Tiles can request their position from the board
 	 */
 	public void getTilePosition(TileName tt, FloatBuffer position) {
-
+		tiles.get(tt).getPosition(position);
 	}
 
 	/*
@@ -162,7 +163,7 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 		shaders.setUniformFloatArrayValue(st, "ambientColour", 4, ambientColour);
 
 		// draw all tiles
-		for (Drawable tile : tiles) {
+		for (Drawable tile : tiles.values()) {
 			tile.draw(lwgfx);
 		}
 
@@ -205,11 +206,11 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 				.add(AMBIENT_COLOURS[nidx].multiply(scale))
 				.toFloatBuffer(ambientColour);
 		if (idx == AMBIENT_COLOURS.length / 4) {
-			for (LWJGLTileDrawable tile : tiles) {
+			for (LWJGLTileDrawable tile : tiles.values()) {
 				tile.setEnchanted(false);
 			}
 		} else if (idx == AMBIENT_COLOURS.length * 3 / 4) {
-			for (LWJGLTileDrawable tile : tiles) {
+			for (LWJGLTileDrawable tile : tiles.values()) {
 				tile.setEnchanted(true);
 			}
 		}
@@ -355,7 +356,7 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 	private ByteBuffer rawTileData;
 	private ByteBuffer rawChitData;
 
-	private Collection<LWJGLTileDrawable> tiles;
+	private Map<TileName, LWJGLTileDrawable> tiles;
 	private Map<CounterType, LWJGLCounterDrawable> chitDrawables;
 	private Map<TileName, ClearingStorage[]> clearings;
 	private Map<CounterType, CounterLocation> chitLocations;
