@@ -8,6 +8,8 @@ import model.board.Board;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 
+import config.GraphicsConfiguration;
+
 import utils.math.Mathf;
 import utils.math.Matrix;
 import utils.resources.ResourceHandler;
@@ -288,8 +290,8 @@ public final class LWJGLGraphics implements Graphics {
 		updateViewMatrix();
 		drawables = new HashSet<Drawable>();
 		shaders = new GLShaderHandler(rh);
-		width = 300;
-		height = 300;
+		width = GraphicsConfiguration.INITIAL_WINDOW_WIDTH;
+		height = GraphicsConfiguration.INITIAL_WINDOW_HEIGHT;
 	}
 
 	private void initGL() {
