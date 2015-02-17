@@ -31,6 +31,7 @@ import javax.swing.JLabel;
 import javax.swing.border.Border;
 
 import utils.resources.ResourceHandler;
+import utils.time.Timing;
 import config.GameConfiguration;
 import config.GraphicsConfiguration;
 import controller.ControllerMain;
@@ -86,7 +87,8 @@ public class StartView extends JFrame implements ActionListener, MouseListener {
 			return;
 		}
 		Rectangle2D r = new Rectangle2D.Double(0, 0, xSize, ySize);
-		for (int i = 0; i < GraphicsConfiguration.SPLASH_TIME; i++) {
+		float endTime = Timing.getSeconds() + GraphicsConfiguration.SPLASH_TIME;
+		for (int i = 0; Timing.getSeconds() < endTime; i++) {
 			g.setPaint(Color.BLACK);
 			g.fill(r);
 			renderSplashFrame(g, i);
