@@ -54,6 +54,10 @@ public class LWJGLTileDrawable extends TileDrawable {
 		position.put(1, yPosition);
 	}
 
+	public boolean isEnchanted() {
+		return enchanted;
+	}
+
 	@Override
 	public void draw(Graphics gfx) {
 		draw((LWJGLGraphics) gfx);

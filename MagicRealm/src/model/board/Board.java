@@ -173,11 +173,16 @@ public class Board implements BoardInterface {
 	}
 
 	private void setTile(TileName tile, int x, int y, int rot) {
-		getSurround(x, y);
+		getSurround(x, y, tile);
 		Map<Integer, Point[]> locs = clearingLocations.get(tile);
 		HexTile ht = new HexTile(this, tile, x, y, rot, locs, surround);
 		mapOfTiles.put(tile, ht);
 		tileLocations.put(tile, new int[] {x, y});
+		if(!mapOfTileLocations.containsKey(y)) {
+			mapOfTileLocations.put(y, new HashMap<Integer, TileName>());
+		}
+		Map<Integer, TileName> row = mapOfTileLocations.get(y);
+		row.put(x, tile);
 	}
 
 	private void clearSurround() {
@@ -186,10 +191,14 @@ public class Board implements BoardInterface {
 		}
 	}
 
-	private void getSurround(int x, int y) {
+	private void getSurround(int x, int y, TileName name) {
 		clearSurround();
 		for (int i = 0; i < surround.length; ++i) {
 			setSurround(x, y, i);
+		}
+		System.out.println("TILES SURROUNDING " + name);
+		for(TileName tn: surround) {
+			System.out.println(tn);
 		}
 	}
 

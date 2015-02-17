@@ -9,7 +9,9 @@ import lwjglview.graphics.animator.AnimationQueue;
 import lwjglview.graphics.animator.MovementAnimator;
 import lwjglview.graphics.shader.ShaderType;
 import model.enums.CounterType;
+import model.enums.TileName;
 import model.interfaces.ClearingInterface;
+import model.interfaces.HexTileInterface;
 import config.GraphicsConfiguration;
 import utils.random.Random;
 import view.graphics.board.CounterDrawable;
@@ -31,12 +33,10 @@ public class LWJGLCounterDrawable extends CounterDrawable {
 		movements = new AnimationQueue();
 		movements.start();
 		current = loc;
-		updatePosition();
 	}
-	
+
 	public void setCurrentClearing(ClearingInterface clear) {
-		current = clear;
-		clear.getTilePosition(false, buffer);
+		board.getCounterPosition(this, position);
 		move();
 	}
 
@@ -52,14 +52,13 @@ public class LWJGLCounterDrawable extends CounterDrawable {
 
 		lwgfx.resetModelMatrix();
 		lwgfx.scaleModel(GraphicsConfiguration.CHIT_SCALE);
-		if(!movements.isFinished()) {
+		if (!movements.isFinished()) {
 			lwgfx.applyModelTransform(movements.apply());
-		}
-		else {
+		} else {
 			lwgfx.translateModel(position.get(0), position.get(1), 0f);
 		}
-		lwgfx.translateModel(0f, 0f,
-				GraphicsConfiguration.CHIT_HOVER + GraphicsConfiguration.TILE_THICKNESS * .5f);
+		lwgfx.translateModel(0f, 0f, GraphicsConfiguration.CHIT_HOVER
+				+ GraphicsConfiguration.TILE_THICKNESS * .5f);
 
 		lwgfx.updateModelViewUniform(SHADER, "modelViewMatrix");
 		lwgfx.updateMVPUniform(SHADER, "mvpMatrix");
@@ -69,7 +68,8 @@ public class LWJGLCounterDrawable extends CounterDrawable {
 	}
 
 	private void updatePosition() {
-		board.getCounterPosition(getCounterType(), buffer);
+		board.setCounter(getCounterType(), current.getParentTile().getName(),
+				current.getClearingNumber());
 		move();
 	}
 
@@ -88,7 +88,7 @@ public class LWJGLCounterDrawable extends CounterDrawable {
 		position.put(0, xf);
 		position.put(1, yf);
 	}
-	
+
 	private ClearingInterface current;
 
 	private AnimationQueue movements;

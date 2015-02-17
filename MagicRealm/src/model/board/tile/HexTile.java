@@ -7,6 +7,7 @@ import java.util.Map;
 import model.board.Board;
 import model.board.clearing.Clearing;
 import model.counter.chit.Chit;
+import model.enums.PathType;
 import model.enums.TileName;
 import model.interfaces.ClearingInterface;
 import model.interfaces.HexTileInterface;
@@ -58,27 +59,35 @@ public class HexTile implements HexTileInterface {
 		exits = new int[2][6];
 		clearExits();
 		connectClearings();
-		for(int i = 0; i < surrounding.length; ++i) {
+		for (int i = 0; i < surrounding.length; ++i) {
 			HexTileInterface other = getParent().getTile(surrounding[i]);
-			if(other != null) {
-				int entr = i + 3 % 6;
-				ClearingInterface thc = getEntryClearing(i, false);
-				thc.connectTo(other, entr, false);
-				thc = getEntryClearing(i, true);
-				thc.connectTo(other, entr, true);
-				//other.connectTo(this);
+			if (other != null) {
+				//System.out.println("OTHER TILE: " + other.getName());
+				int entr = (i + 3) % 6;
+				ClearingInterface thc = other.getEntryClearing(entr, false);
+				System.out.println("ENTRANCE: " + entr);
+				if(thc != null) {
+					thc.connectTo(other, entr, false);
+					getEntryClearing(i, false).connectTo(other, i, false);
+				}
+				thc = other.getEntryClearing(entr, true);
+				if(thc != null) {
+					thc.connectTo(other, entr, true);
+					getEntryClearing(i, true).connectTo(other, i, true);
+				}
 			}
 		}
 	}
-	
+
 	@Override
 	public Clearing getEntryClearing(int rot) {
 		return getEntryClearing(rot, isEnchanted());
 	}
-	
+
 	@Override
 	public Clearing getEntryClearing(int rot, boolean enchant) {
 		int entr = exits[enchant ? 1 : 0][rot % 6];
+		System.out.println(entr);
 		return clearings.get(entr);
 	}
 
@@ -125,7 +134,7 @@ public class HexTile implements HexTileInterface {
 		// TODO Auto-generated method stub
 		return false;
 	}
-	
+
 	protected Board getParent() {
 		return parent;
 	}
@@ -167,6 +176,10 @@ public class HexTile implements HexTileInterface {
 	}
 
 	private void connectClearings() {
+		PathType n, h, s;
+		n = PathType.NORMAL;
+		h = PathType.HIDDEN;
+		s = PathType.SECRET;
 		switch (name) {
 		case AWFUL_VALLEY:
 			connectAlways(1, 4);
@@ -189,7 +202,7 @@ public class HexTile implements HexTileInterface {
 		case BORDERLAND:
 			connectAlways(1, 6);
 			connectAlways(2, 3);
-			connectAlways(4, 5, true);
+			connectAlways(4, 5, s);
 			connectAlways(4, 6);
 			exitAlways(1, 0);
 			exitAlways(2, 1);
@@ -199,32 +212,32 @@ public class HexTile implements HexTileInterface {
 			exitAlways(5, 5);
 			break;
 		case CAVERN:
-			connect(1, 2, true, true);
-			connect(1, 3, true, true);
-			connect(1, 4, false, true);
-			connect(1, 4, true, false);
-			connect(2, 3, false, false);
-			connect(2, 6, true, false);
-			connect(3, 5, false, true);
-			connect(3, 5, true, false);
+			connect(1, 2, true, s);
+			connect(1, 3, true, s);
+			connect(1, 4, false, s);
+			connect(1, 4, true, n);
+			connect(2, 3, false, n);
+			connect(2, 6, true, n);
+			connect(3, 5, false, s);
+			connect(3, 5, true, n);
 			connectAlways(3, 6);
-			connect(4, 5, false, false);
-			connect(4, 5, true, true);
+			connect(4, 5, false, n);
+			connect(4, 5, true, s);
 			connectAlways(4, 6);
 			exitAlways(2, 0);
 			exitAlways(1, 1);
 			exitAlways(5, 5);
 			break;
 		case CAVES:
-			connect(1, 4, true, false);
-			connect(1, 6, false, false);
-			connect(1, 6, false, true);
-			connect(2, 3, false, true);
-			connect(2, 3, true, false);
-			connect(2, 4, false, false);
-			connect(3, 4, true, false);
-			connect(3, 5, false, false);
-			connect(5, 6, true, false);
+			connect(1, 4, true, n);
+			connect(1, 6, false, n);
+			connect(1, 6, true, s);
+			connect(2, 3, false, s);
+			connect(2, 3, true, n);
+			connect(2, 4, false, n);
+			connect(3, 4, true, n);
+			connect(3, 5, false, n);
+			connect(5, 6, true, n);
 			exitAlways(1, 2);
 			exitAlways(2, 4);
 			exitAlways(5, 5);
@@ -232,9 +245,9 @@ public class HexTile implements HexTileInterface {
 		case CLIFF:
 			connectAlways(1, 6);
 			connectAlways(2, 3);
-			connectAlways(2, 5, true);
+			connectAlways(2, 5, h);
 			connectAlways(3, 5);
-			connectAlways(3, 6, true);
+			connectAlways(3, 6, s);
 			connectAlways(4, 6);
 			exitAlways(4, 1);
 			exitAlways(5, 2);
@@ -243,12 +256,12 @@ public class HexTile implements HexTileInterface {
 			break;
 		case CRAG:
 			connectAlways(1, 4);
-			connect(1, 6, false, true);
-			connectAlways(2, 3, true);
+			connect(1, 6, false, s);
+			connectAlways(2, 3, h);
 			connectAlways(2, 5);
 			connectAlways(3, 5);
 			connectAlways(3, 6);
-			connect(4, 5, true, true);
+			connect(4, 5, true, s);
 			connectAlways(4, 6);
 			exitAlways(2, 0);
 			break;
@@ -271,19 +284,19 @@ public class HexTile implements HexTileInterface {
 			exitAlways(4, 5);
 			break;
 		case DEEP_WOODS:
-			connect(1, 3, true, false);
-			connect(1, 4, false, true);
-			connect(1, 4, true, false);
-			connect(1, 6, true, false);
-			connect(2, 3, false, false);
-			connect(2, 5, true, false);
-			connect(2, 6, true, false);
-			connect(3, 4, true, true);
+			connect(1, 3, true, n);
+			connect(1, 4, false, h);
+			connect(1, 4, true, n);
+			connect(1, 6, true, n);
+			connect(2, 3, false, n);
+			connect(2, 5, true, n);
+			connect(2, 6, true, n);
+			connect(3, 4, true, h);
 			connectAlways(3, 5);
-			connectAlways(3, 6, true);
-			connect(4, 5, false, false);
-			connect(4, 6, false, false);
-			connect(4, 6, true, true);
+			connectAlways(3, 6, h);
+			connect(4, 5, false, n);
+			connect(4, 6, false, n);
+			connect(4, 6, true, h);
 			exit(1, 0, false);
 			exit(2, 1, false);
 			exit(2, 2, false);
@@ -315,20 +328,20 @@ public class HexTile implements HexTileInterface {
 			exitAlways(6, 5);
 			break;
 		case LEDGES:
-			connectAlways(1, 3, true);
+			connectAlways(1, 3, h);
 			connectAlways(1, 4);
-			connect(1, 6, false, false);
+			connect(1, 6, false, n);
 			connectAlways(2, 5);
 			connectAlways(3, 6);
-			connectAlways(4, 6, true);
+			connectAlways(4, 6, h);
 			exitAlways(4, 0);
 			exitAlways(2, 1);
 			exitAlways(3, 2);
 			exitAlways(5, 5);
 			break;
 		case LINDEN_WOODS:
-			connect(2, 4, false, false);
-			connect(4, 5, true, false);
+			connect(2, 4, false, n);
+			connect(4, 5, true, n);
 			exitAlways(5, 0);
 			exitAlways(5, 1);
 			exitAlways(2, 2);
@@ -336,8 +349,8 @@ public class HexTile implements HexTileInterface {
 			exitAlways(4, 5);
 			break;
 		case MAPLE_WOODS:
-			connect(2, 4, false, false);
-			connect(4, 5, true, false);
+			connect(2, 4, false, n);
+			connect(4, 5, true, n);
 			exitAlways(2, 0);
 			exitAlways(2, 1);
 			exitAlways(4, 2);
@@ -346,22 +359,22 @@ public class HexTile implements HexTileInterface {
 			break;
 		case MOUNTAIN:
 			connectAlways(1, 3);
-			connect(1, 4, true, true);
+			connect(1, 4, true, s);
 			connectAlways(2, 4);
 			connectAlways(2, 5);
-			connect(3, 6, false, false);
-			connect(3, 6, true, true);
-			connect(4, 6, false, true);
-			connect(4, 6, true, false);
-			connect(5, 6, false, false);
-			connect(5, 6, true, true);
+			connect(3, 6, false, n);
+			connect(3, 6, true, h);
+			connect(4, 6, false, h);
+			connect(4, 6, true, n);
+			connect(5, 6, false, n);
+			connect(5, 6, true, h);
 			exitAlways(4, 0);
 			exitAlways(5, 2);
 			exitAlways(2, 4);
 			break;
 		case NUT_WOODS:
-			connect(2, 4, false, false);
-			connect(4, 5, true, false);
+			connect(2, 4, false, n);
+			connect(4, 5, true, n);
 			exitAlways(2, 0);
 			exitAlways(4, 1);
 			exitAlways(5, 2);
@@ -369,8 +382,8 @@ public class HexTile implements HexTileInterface {
 			exitAlways(2, 5);
 			break;
 		case OAK_WOODS:
-			connect(2, 4, false, false);
-			connect(4, 5, true, false);
+			connect(2, 4, false, n);
+			connect(4, 5, true, n);
 			exitAlways(5, 0);
 			exitAlways(2, 1);
 			exitAlways(2, 2);
@@ -378,8 +391,8 @@ public class HexTile implements HexTileInterface {
 			exitAlways(5, 5);
 			break;
 		case PINE_WOODS:
-			connect(2, 4, false, false);
-			connect(4, 5, true, false);
+			connect(2, 4, false, n);
+			connect(4, 5, true, n);
 			exitAlways(4, 0);
 			exitAlways(5, 1);
 			exitAlways(5, 2);
@@ -387,16 +400,16 @@ public class HexTile implements HexTileInterface {
 			exitAlways(2, 5);
 			break;
 		case RUINS:
-			connect(1, 2, false, false);
-			connect(1, 2, true, true);
-			connect(1, 4, false, false);
-			connect(1, 4, true, true);
-			connect(1, 5, false, true);
-			connect(1, 5, true, false);
-			connect(2, 6, true, true);
+			connect(1, 2, false, n);
+			connect(1, 2, true, h);
+			connect(1, 4, false, n);
+			connect(1, 4, true, h);
+			connect(1, 5, false, h);
+			connect(1, 5, true, n);
+			connect(2, 6, true, h);
 			connectAlways(3, 5);
-			connect(3, 6, false, false);
-			connect(3, 6, true, true);
+			connect(3, 6, false, n);
+			connect(3, 6, true, s);
 			connectAlways(4, 6);
 			exitAlways(2, 0);
 			exit(2, 1, false);
@@ -411,16 +424,25 @@ public class HexTile implements HexTileInterface {
 	}
 
 	private void connectAlways(int a, int b) {
-		connectAlways(a, b, false);
+		connectAlways(a, b, PathType.NORMAL);
 	}
 
-	private void connectAlways(int a, int b, boolean hidden) {
-		connect(a, b, false, hidden);
-		connect(a, b, true, hidden);
+	private void connectAlways(int a, int b, PathType pt) {
+		connect(a, b, false, pt);
+		connect(a, b, true, pt);
 	}
 
-	private void connect(int a, int b, boolean enchanted, boolean hidden) {
-		clearings.get(a).connectTo(clearings.get(b), enchanted, hidden);
+	private void connect(int a, int b, boolean enchanted, PathType pt) {
+		ClearingInterface ca, cb;
+		ca = clearings.get(a);
+		cb = clearings.get(b);
+		connectClearings(ca, cb, enchanted, pt);
+	}
+
+	private static void connectClearings(ClearingInterface ca,
+			ClearingInterface cb, boolean enchanted, PathType pt) {
+		ca.connectTo(cb, enchanted, pt);
+		cb.connectTo(ca, enchanted, pt);
 	}
 
 	private void exitAlways(int clear, int rot) {
