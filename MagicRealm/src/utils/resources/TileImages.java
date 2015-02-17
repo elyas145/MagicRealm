@@ -19,7 +19,7 @@ public class TileImages {
 			return "awfulvalley";
 		case BAD_VALLEY:
 			return "badvalley";
-		case BORDER_LAND:
+		case BORDERLAND:
 			return "borderland";
 		case CAVERN:
 			return "cavern";

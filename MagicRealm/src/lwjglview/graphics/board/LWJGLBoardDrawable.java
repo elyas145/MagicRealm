@@ -19,7 +19,6 @@ import lwjglview.graphics.model.ModelData;
 import lwjglview.graphics.shader.GLShaderHandler;
 import lwjglview.graphics.shader.ShaderType;
 import model.board.Board;
-import model.board.tile.HexTile;
 import model.enums.ChitType;
 import model.enums.TileName;
 import model.interfaces.HexTileInterface;
@@ -83,7 +82,7 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 		tiles = new HashSet<LWJGLTileDrawable>();
 		clearings = new HashMap<TileName, ClearingStorage[]>();
 		for (HexTileInterface ht : bo.iterateTiles()) {
-			TileName type = ht.getType();
+			TileName type = ht.getName();
 			int row = ht.getBoardColumn();
 			int col = ht.getBoardRow();
 			float x, y, r;
@@ -91,7 +90,7 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 			x += col * 3f;
 			y = -row * 0.866025f;
 			r = Mathf.PI * ht.getRotation() / 3f;
-			tiles.add(new LWJGLTileDrawable(this, ht.getType(), x, y, r,
+			tiles.add(new LWJGLTileDrawable(this, ht.getName(), x, y, r,
 					getTextureIndex(type, false), getTextureIndex(type, true)));
 		}
 

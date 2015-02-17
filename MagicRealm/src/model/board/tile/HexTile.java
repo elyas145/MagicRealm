@@ -7,6 +7,7 @@ import java.util.Map;
 import model.board.clearing.Clearing;
 import model.counter.chit.Chit;
 import model.enums.TileName;
+import model.enums.TileType;
 import model.interfaces.ClearingInterface;
 import model.interfaces.HexTileInterface;
 
@@ -19,14 +20,14 @@ import utils.math.Point;
 public class HexTile implements HexTileInterface {
 
 	public HexTile(TileName tp, int rw, int col, int rot) {
-		type = tp;
+		name = tp;
 		row = rw;
 		column = col;
 		rotation = rot;
 	}
 
 	public HexTile(TileName tile, int x, int y, int rot, JSONArray arr) {
-		type = tile;
+		name = tile;
 		row = x;
 		column = y;
 		rotation = rot;
@@ -57,8 +58,8 @@ public class HexTile implements HexTileInterface {
 		// clearings that go with this tile.
 		for (int i = 0; i < arr.size(); i++) {
 			JSONObject obj = (JSONObject) arr.get(i);
-			String name = (String) obj.get("tileName");
-			if (name.equals(type.name())) {
+			String nm = (String) obj.get("tileName");
+			if (nm.equals(name.name())) {
 				//System.out.println("-------------------------------");
 				//System.out.println("tile: " + name);
 				JSONObject numbers = (JSONObject) obj.get("numbers");
@@ -127,8 +128,8 @@ public class HexTile implements HexTileInterface {
 	}
 
 	@Override
-	public TileName getType() {
-		return type;
+	public TileName getName() {
+		return name;
 	}
 
 	@Override
@@ -142,7 +143,7 @@ public class HexTile implements HexTileInterface {
 		return false;
 	}
 
-	private TileName type;
+	private TileName name;
 	private int row;
 	private int column;
 	private ArrayList<Clearing> clearings = new ArrayList<Clearing>();

@@ -116,7 +116,7 @@ public class Board implements BoardInterface {
 		setTile(TileName.PINE_WOODS, 2, 5, 4);
 
 		setTile(TileName.CLIFF, 0, 6, 3);
-		setTile(TileName.BORDER_LAND, 1, 6, 3);
+		setTile(TileName.BORDERLAND, 1, 6, 3);
 		setTile(TileName.MOUNTAIN, 2, 6, 3);
 
 		setTile(TileName.EVIL_VALLEY, 0, 7, 0);

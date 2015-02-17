@@ -4,13 +4,14 @@ import java.util.Collection;
 
 import model.counter.chit.Chit;
 import model.enums.TileName;
+import model.enums.TileType;
 
 public interface HexTileInterface {
 
 	/**
-	 * @return type of hex tile
+	 * @return name of hex tile
 	 */
-	TileName getType();
+	TileName getName();
 
 	/**
 	 * @return type of hex tile
