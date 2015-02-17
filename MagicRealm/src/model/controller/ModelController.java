@@ -5,7 +5,6 @@ import java.util.Map;
 import model.board.Board;
 import model.enums.CharacterType;
 import model.enums.TileName;
-import model.player.Player;
 
 /*
  * Meant to be a container for the entire model
