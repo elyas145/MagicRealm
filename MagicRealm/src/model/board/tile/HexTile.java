@@ -65,7 +65,7 @@ public class HexTile implements HexTileInterface {
 				//System.out.println("OTHER TILE: " + other.getName());
 				int entr = (i + 3) % 6;
 				ClearingInterface thc = other.getEntryClearing(entr, false);
-				System.out.println("ENTRANCE: " + entr);
+				System.out.println("ENTRANCE: " + getEntryClearing(i, false));
 				if(thc != null) {
 					thc.connectTo(other, entr, false);
 					getEntryClearing(i, false).connectTo(other, i, false);
