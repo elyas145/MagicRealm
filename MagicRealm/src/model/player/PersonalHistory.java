@@ -9,6 +9,7 @@ public class PersonalHistory {
 	private int currentDay;
 	public PersonalHistory(){
 		days = new ArrayList<PersonalHistoryDay>();
+		days.add(new PersonalHistoryDay());
 		currentDay = 1;
 	}
 	
@@ -25,6 +26,7 @@ public class PersonalHistory {
 	}
 	public void newDay(){
 		currentDay++;
+		days.add(new PersonalHistoryDay());
 	}
 
 	public int getCurrentDay() {

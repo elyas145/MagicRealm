@@ -129,18 +129,6 @@ public class ControllerMain implements Controller {
 		mainView.enterBirdSong();
 	}
 
-	private class BoardRunnable implements Runnable {
-		private LWJGLGraphics gfx;
-
-		public BoardRunnable(LWJGLGraphics gfx) {
-			this.gfx = gfx;
-		}
-
-		@Override
-		public void run() {
-			gfx.start();
-		}
-	}
 
 	@Override
 	public PersonalHistory getPlayerHistory() {

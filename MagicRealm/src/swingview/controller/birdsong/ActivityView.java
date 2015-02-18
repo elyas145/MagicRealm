@@ -24,16 +24,16 @@ public class ActivityView extends JFrame implements ActionListener{
 	private BirdSongView parent;
 	private JButton go;
 	private ArrayList<MovePanel> movePanels;
-	public ActivityView(Controller controller, ArrayList<String> actions){
+	public ActivityView(BirdSongView parent,Controller controller, ArrayList<String> actions){
 		super("Set Activity");
 		getContentPane().setLayout(new BoxLayout(getContentPane(),BoxLayout.Y_AXIS));
-		
+		this.parent = parent;
 		//move panels
 		movePanels = new ArrayList<MovePanel>();
 		JPanel moveP = new JPanel();
 		moveP.setLayout(new BoxLayout(moveP, BoxLayout.X_AXIS));
 		for(int i = 0; i < actions.size(); i++){
-			if(actions.get(i).equals(ActivityType.MOVE)){
+			if(actions.get(i).equals(ActivityType.MOVE.toString())){
 				movePanels.add(new MovePanel(controller, i));	
 				moveP.add(movePanels.get(i));
 			}

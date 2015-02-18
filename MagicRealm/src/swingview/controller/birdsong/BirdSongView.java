@@ -74,9 +74,7 @@ public class BirdSongView extends JPanel implements ActionListener{
 					break;
 				}
 			}
-			ActivityView activityView = new ActivityView(parent, actions);
-			System.out.println(actions);
-			//parent.submitPhases();
+			ActivityView activityView = new ActivityView(this, parent, actions);
 		}		
 	}
 	public void sendActivities(ArrayList<Activity> moveActivities) {

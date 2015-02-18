@@ -10,6 +10,9 @@ public class PersonalHistoryDay {
 	private int notoriety;
 	private int gold;
 
+	public PersonalHistoryDay(){
+		activities = new ArrayList<Activity>();
+	}
 	public ArrayList<Activity> getActivities() {
 		return activities;
 	}
