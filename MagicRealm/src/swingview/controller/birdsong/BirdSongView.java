@@ -21,6 +21,7 @@ public class BirdSongView extends JPanel implements ActionListener{
 	private Controller parent;
 	private PersonalHistory history;
 	private JButton submit;
+	ArrayList<JComboBox> boxesArray;
 	public BirdSongView(Controller parent) {
 		this.parent = parent;
 		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
@@ -43,11 +44,11 @@ public class BirdSongView extends JPanel implements ActionListener{
 		}
 		add(lbls);
 		
-		ArrayList<JComboBox> boxesArray = new ArrayList<JComboBox>();
+		boxesArray = new ArrayList<JComboBox>();
 		JPanel boxes = new JPanel();
 		boxes.setLayout(new BoxLayout(boxes, BoxLayout.X_AXIS));
 		for(int i = 0; i < 8; i++){
-			boxesArray.add(new JComboBox(ActivityType.values()));
+			boxesArray.add(new JComboBox<Object>(ActivityType.values()));
 			boxes.add(boxesArray.get(i));
 		}
 		add(boxes);
@@ -59,6 +60,21 @@ public class BirdSongView extends JPanel implements ActionListener{
 	public void actionPerformed(ActionEvent ae) {
 		if(ae.getSource().equals(submit)){
 			//submit to controller.
+			ArrayList<String> actions = new ArrayList<String>();
+			for(JComboBox<String> b : boxesArray){
+				actions.add(b.getSelectedObjects()[0].toString());
+			}
+			
+			for(int i = actions.size(); i > 0; i--){
+				if(actions.get(i-1).equals(ActivityType.NONE.toString())){
+					actions.remove(i-1);
+				}else{
+					break;
+				}
+			}
+			
+			System.out.println(actions);
+			//parent.submitPhases();
 		}		
 	}
 	
