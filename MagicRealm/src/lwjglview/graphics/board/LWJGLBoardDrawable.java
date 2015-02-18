@@ -249,15 +249,6 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 		AMBIENT_COLOURS[idx].multiply(1f - scale)
 				.add(AMBIENT_COLOURS[nidx].multiply(scale))
 				.toFloatBuffer(ambientColour);
-		if (idx == AMBIENT_COLOURS.length / 4) {
-			for (LWJGLTileDrawable tile : tiles.values()) {
-				tile.setEnchanted(false);
-			}
-		} else if (idx == AMBIENT_COLOURS.length * 3 / 4) {
-			for (LWJGLTileDrawable tile : tiles.values()) {
-				tile.setEnchanted(true);
-			}
-		}
 	}
 
 	private int getTextureIndex(TileName type, boolean enchanted) {

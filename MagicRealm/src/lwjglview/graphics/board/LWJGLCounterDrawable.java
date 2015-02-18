@@ -36,6 +36,7 @@ public class LWJGLCounterDrawable extends CounterDrawable {
 	}
 
 	public void setCurrentClearing(ClearingInterface clear) {
+		System.out.println(getCounterType() + " changed to " + clear + " from " + current);
 		current = clear;
 		updatePosition();
 	}
