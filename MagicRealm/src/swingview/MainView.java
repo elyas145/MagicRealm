@@ -3,6 +3,7 @@ package swingview;
 import java.awt.AlphaComposite;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Toolkit;
@@ -17,7 +18,6 @@ import javax.swing.JOptionPane;
 import swingview.controller.mainmenu.MainMenu;
 import utils.time.Timing;
 import view.controller.ViewController;
-import view.controller.mainmenu.MainMenuView;
 import view.controller.splashscreen.SplashScreen;
 import config.GraphicsConfiguration;
 import controller.Controller;
@@ -32,14 +32,19 @@ public class MainView extends JFrame implements ViewController, WindowListener {
 
 	public MainView(Controller parent) {
 		super("Magic Realm");
+		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+		setPreferredSize(new Dimension(GraphicsConfiguration.INITIAL_WINDOW_WIDTH,GraphicsConfiguration.INITIAL_WINDOW_HEIGHT));
+		setLocationRelativeTo(null);
+		setLocation(xSize/2-GraphicsConfiguration.INITIAL_WINDOW_WIDTH/2,ySize/2-GraphicsConfiguration.INITIAL_WINDOW_HEIGHT/2);
 		this.addWindowListener(this);
 		this.parent = parent;
+		pack();
 	}
 
 	@Override
 	public void enterMainMenu() {
 		System.out.println("main");
-		MainMenu mainMenu = new MainMenu();
+		MainMenu mainMenu = new MainMenu(this);
 		setContentPane(mainMenu);
 		pack();
 		setVisible(true);
@@ -89,6 +94,15 @@ public class MainView extends JFrame implements ViewController, WindowListener {
 
 	@Override
 	public void windowClosing(WindowEvent arg0) {
+		exit();
+	}
+	@Override
+	public void startGameView() {
+		parent.startGameView();	
+	}
+
+	@Override
+	public void exit() {		
 		String ObjButtons[] = { "Yes", "No" };
 
 		int PromptResult = JOptionPane.showOptionDialog(null,
@@ -140,4 +154,5 @@ public class MainView extends JFrame implements ViewController, WindowListener {
 
 	}
 
+	
 }

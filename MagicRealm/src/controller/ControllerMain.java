@@ -75,4 +75,11 @@ public class ControllerMain implements Controller {
 		System.exit(0);
 		
 	}
+
+	@Override
+	public void startGameView() {
+		startBoardView();
+		mainView.startGameView();
+		
+	}
 }
