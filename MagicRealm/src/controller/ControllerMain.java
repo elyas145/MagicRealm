@@ -2,11 +2,15 @@ package controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
+
 import lwjglview.graphics.LWJGLGraphics;
 import lwjglview.graphics.board.LWJGLBoardDrawable;
 import model.board.Board;
 import model.character.Character;
 import model.character.CharacterFactory;
+import model.enums.CharacterType;
+import model.player.PersonalHistory;
+import model.player.Player;
 import swingview.MainView;
 import utils.resources.ResourceHandler;
 
@@ -15,14 +19,17 @@ public class ControllerMain implements Controller {
 	private LWJGLGraphics gfx;
 	private ResourceHandler rh;
 	private Board board; // main game board
-	private Character[] characters;
+	private ArrayList<Player> players;
 	private int numCharacters = 1;
 	private MainView mainView;
+	private Player currentPlayer;
 
 	public ControllerMain() {
 		rh = new ResourceHandler();
 		board = new Board(rh);
 		mainView = new MainView(this);
+		players.add(new Player(1, "Player One"));
+		players.get(0).setCharacter(CharacterFactory.create(CharacterType.AMAZON));
 	}
 
 	private void start() {
@@ -49,8 +56,8 @@ public class ControllerMain implements Controller {
 		return rh;
 	}
 
-	public Character[] getCharacters() {
-		return characters;
+	public ArrayList<Player> getPlayers() {
+		return players;
 	}
 
 	public int getNumCharacters() {
@@ -90,9 +97,12 @@ public class ControllerMain implements Controller {
 		}
 		@Override
 		public void run() {
-			gfx.start();
-			
-		}
-		
+			gfx.start();			
+		}		
+	}
+
+	@Override
+	public PersonalHistory getPlayerHistory() {
+		return currentPlayer.getPersonalHistory();
 	}
 }

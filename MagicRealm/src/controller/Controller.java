@@ -1,5 +1,7 @@
 package controller;
 
+import model.player.PersonalHistory;
+
 public interface Controller {
 
 	void onSplashScreenEnd();
@@ -7,5 +9,7 @@ public interface Controller {
 	void exit();
 
 	void startGameView();
+
+	PersonalHistory getPlayerHistory();
 	
 }

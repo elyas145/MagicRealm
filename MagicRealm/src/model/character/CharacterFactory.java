@@ -5,10 +5,9 @@ import java.util.ArrayList;
 import model.enums.CharacterType;
 import model.interfaces.CharacterFactoryInterface;
 
-public class CharacterFactory implements CharacterFactoryInterface{
+public class CharacterFactory{
 
-	@Override
-	public ArrayList<Character> getPossibleCharacters() {
+	public static ArrayList<Character> getPossibleCharacters() {
 		Character c = new Character(CharacterType.AMAZON);
 		Character d = new Character(CharacterType.CAPTAIN);
 		Character e = new Character(CharacterType.SWORDSMAN);
@@ -19,10 +18,9 @@ public class CharacterFactory implements CharacterFactoryInterface{
 		return a;
 	}
 
-	@Override
-	public Character getChatacter(CharacterType t) {
-		// TODO Auto-generated method stub
-		return null;
+	public static Character create(CharacterType amazon) {
+		Character c = new Character(amazon);		
+		return c;
 	}
 
 }

@@ -15,6 +15,7 @@ import java.awt.geom.Rectangle2D;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
+import swingview.controller.birdsong.BirdSongView;
 import swingview.controller.mainmenu.MainMenu;
 import utils.time.Timing;
 import view.controller.ViewController;
@@ -49,7 +50,11 @@ public class MainView extends JFrame implements ViewController, WindowListener {
 		pack();
 		setVisible(true);
 	}
-
+	public void enterBirdSong(){
+		BirdSongView birdSong = new BirdSongView(parent);
+		setContentPane(birdSong);
+		pack();
+	}
 	public void enterSplashScreen() {
 
 		final java.awt.SplashScreen splash = java.awt.SplashScreen
