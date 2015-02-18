@@ -18,9 +18,9 @@ public class LWJGLTileDrawable extends TileDrawable {
 
 	public static final ShaderType SHADER = ShaderType.TILE_SHADER;
 
-	public LWJGLTileDrawable(LWJGLBoardDrawable bd, TileName tt, float x,
+	public LWJGLTileDrawable(TileName tt, float x,
 			float y, float rot, int norm, int enchant) {
-		super(bd, tt);
+		super(tt);
 		xPosition = x;
 		yPosition = y;
 		rotation = rot;

@@ -5,9 +5,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -18,25 +16,21 @@ import lwjglview.graphics.LWJGLGraphics;
 import lwjglview.graphics.model.ModelData;
 import lwjglview.graphics.shader.GLShaderHandler;
 import lwjglview.graphics.shader.ShaderType;
-import model.board.Board;
 import model.enums.CounterType;
 import model.enums.TileName;
 import model.interfaces.ClearingInterface;
-import model.interfaces.HexTileInterface;
 import utils.images.ImageTools;
 import utils.math.Mathf;
 import utils.math.Matrix;
-import utils.random.Random;
 import utils.resources.CounterImages;
 import utils.resources.ResourceHandler;
 import utils.resources.TileImages;
 import utils.time.Timing;
+import view.controller.game.BoardView;
 import view.graphics.Drawable;
 import view.graphics.Graphics;
-import view.graphics.board.BoardDrawable;
-import view.graphics.board.CounterDrawable;
 
-public class LWJGLBoardDrawable extends BoardDrawable {
+public class LWJGLBoardDrawable implements BoardView, Drawable {
 
 	public static final Matrix[] AMBIENT_COLOURS = new Matrix[] {
 			Matrix.columnVector(new float[] { .3f, .3f, .3f, 1f // 00:00
@@ -49,8 +43,7 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 					}), Matrix.columnVector(new float[] { .4f, .4f, .5f, 1f // 21:00
 					}) };
 
-	public LWJGLBoardDrawable(Board bo, ResourceHandler rh) throws IOException {
-		super(bo);
+	public LWJGLBoardDrawable(ResourceHandler rh) throws IOException {
 		resources = rh;
 		tiles = new HashMap<TileName, LWJGLTileDrawable>();
 		clearings = new HashMap<TileName, Map<Integer, ClearingStorage>>();
@@ -84,65 +77,66 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 		roundCounter = ModelData.loadModelData(resources, "chit_circle.obj");
 		System.out.println("Finished loading chit model data");
 
-		// initialize tile and clearings info
-		FloatBuffer bufferN, bufferE, bufferT;
+		// initialize buffers for tile locations
 		bufferN = BufferUtils.createFloatBuffer(2);
 		bufferE = BufferUtils.createFloatBuffer(2);
 		bufferT = BufferUtils.createFloatBuffer(2);
-		for (HexTileInterface ht : bo.iterateTiles()) {
-			TileName type = ht.getName();
-			int row = ht.getBoardColumn();
-			int col = ht.getBoardRow();
-			float x, y, r;
-			x = row % 2 == 0 ? 0f : 1.5f;
-			x += col * 3f;
-			y = -row * 0.866025f;
-			r = Mathf.PI * ht.getRotation() / 3f;
-			TileName tn = ht.getName();
-			Map<Integer, ClearingStorage> tileClr = new HashMap<Integer, ClearingStorage>();
-			clearings.put(tn, tileClr);
-			tiles.put(tn, new LWJGLTileDrawable(this, tn, x, y, r,
-					getTextureIndex(type, false), getTextureIndex(type, true)));
-			bufferT.put(0, x);
-			bufferT.put(1, y);
-			for(ClearingInterface clr: ht.getClearings()) {
-				clr.getPosition(false, bufferN);
-				clr.getPosition(true, bufferE);
-				tileClr.put(clr.getClearingNumber(), new ClearingStorage(tn, bufferT, bufferN, bufferE));
-			}
-		}
-		
+
 		counterDrawables = new HashMap<CounterType, LWJGLCounterDrawable>();
-		for(CounterType ct: CounterType.values()) {
+		for (CounterType ct : CounterType.values()) {
 			setCounter(ct, TileName.BORDERLAND, 6);
 		}
 
 		ambientColour = BufferUtils.createFloatBuffer(4);
 	}
 	
+	private FloatBuffer bufferN, bufferE, bufferT;
+
+	@Override
+	public void setTile(TileName tile, int xPos, int yPos, int rot,
+			Iterable<ClearingInterface> clears) {
+		int row = yPos;
+		int col = xPos;
+		float x, y, r;
+		x = row % 2 == 0 ? 0f : 1.5f;
+		x += col * 3f;
+		y = -row * 0.866025f;
+		r = Mathf.PI * rot / 3f;
+		Map<Integer, ClearingStorage> tileClr = new HashMap<Integer, ClearingStorage>();
+		clearings.put(tile, tileClr);
+		tiles.put(tile, new LWJGLTileDrawable(tile, x, y, r,
+				getTextureIndex(tile, false), getTextureIndex(tile, true)));
+		bufferT.put(0, x);
+		bufferT.put(1, y);
+		for (ClearingInterface clr : clears) {
+			clr.getPosition(false, bufferN);
+			clr.getPosition(true, bufferE);
+			tileClr.put(clr.getClearingNumber(), new ClearingStorage(tile,
+					bufferT, bufferN, bufferE));
+		}
+	}
+
 	@Override
 	public void setCounter(CounterType tp, TileName tile, int clearing) {
-		
-		if(!counterDrawables.containsKey(tp)) {
-			counterDrawables.put(tp, new LWJGLCounterDrawable(
-				this, tp, roundCounter, getCounterTextureIndex(tp)));
+
+		if (!counterDrawables.containsKey(tp)) {
+			counterDrawables.put(tp, new LWJGLCounterDrawable(this, tp,
+					roundCounter, getCounterTextureIndex(tp)));
 		}
-		
-		if(!counterLocations.containsKey(tp)) {
+
+		if (!counterLocations.containsKey(tp)) {
 			counterLocations.put(tp, new CounterLocation(tile, clearing));
-		}
-		else {
+		} else {
 			CounterLocation loc = counterLocations.get(tp);
 			clearings.get(loc.tile).get(loc.clearing).remove(tp);
 			loc.tile = tile;
 			loc.clearing = clearing;
 		}
-		
+
 		clearings.get(tile).get(clearing).put(tp);
-		
+
 	}
 
-	@Override
 	public boolean isTileEnchanted(TileName name) {
 		return tiles.get(name).isEnchanted();
 	}
@@ -163,6 +157,11 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 		Map<Integer, ClearingStorage> stores = clearings.get(cl.tile);
 		ClearingStorage store = stores.get(cl.clearing);
 		store.getLocation(ct, position);
+	}
+
+	@Override
+	public void enchantTile(TileName tile) {
+		tiles.get(tile).setEnchanted(true);
 	}
 
 	@Override
@@ -232,15 +231,6 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 		// draw all chits
 		for (LWJGLCounterDrawable counter : counterDrawables.values()) {
 			counter.draw(lwgfx);
-			if(!counter.moving()) {
-				Board bd = getBoard();
-				CounterType ct = counter.getCounterType();
-				CounterLocation cl = counterLocations.get(ct);
-				HexTileInterface hti = bd.getTile(cl.tile);
-				ClearingInterface clr = hti.getClearing(cl.clearing);
-				clr = clr.getRandomConnection();
-				setCounter(ct, clr.getParentTile().getName(), clr.getClearingNumber());
-			}
 		}
 
 	}
@@ -297,11 +287,11 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 	private void relocateChit(CounterType type, float x, float y) {
 		counterDrawables.get(type).moveTo(x, y);
 	}
-	
+
 	private int getCounterTextureIndex(CounterType ct) {
 		int idx = 0;
-		for(CounterType tp: CounterType.values()) {
-			if(tp == ct) {
+		for (CounterType tp : CounterType.values()) {
+			if (tp == ct) {
 				return idx;
 			}
 			++idx;
@@ -310,12 +300,12 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 	}
 
 	private class ClearingStorage {
-		public ClearingStorage(TileName tl, FloatBuffer tc, FloatBuffer nl, FloatBuffer el) {
+		public ClearingStorage(TileName tl, FloatBuffer tc, FloatBuffer nl,
+				FloatBuffer el) {
 			tile = tl;
 			posns = new float[][] {
-					{tc.get(0) + nl.get(0), tc.get(1) + nl.get(1)},
-					{tc.get(0) + el.get(0), tc.get(1) + el.get(1)}
-			};
+					{ tc.get(0) + nl.get(0), tc.get(1) + nl.get(1) },
+					{ tc.get(0) + el.get(0), tc.get(1) + el.get(1) } };
 			chits = new ArrayList<CounterType>();
 			dim = 0;
 			buff = BufferUtils.createFloatBuffer(2);
@@ -415,15 +405,15 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 
 	private ByteBuffer rawTileData;
 	private ByteBuffer rawChitData;
-	
+
 	private ModelData roundCounter;
 
 	private Map<TileName, LWJGLTileDrawable> tiles;
 	private Map<CounterType, LWJGLCounterDrawable> counterDrawables;
-	
+
 	// stores location information for counters in a clearing
 	private Map<TileName, Map<Integer, ClearingStorage>> clearings;
-	
+
 	private Map<CounterType, CounterLocation> counterLocations;
 
 	private ResourceHandler resources;
