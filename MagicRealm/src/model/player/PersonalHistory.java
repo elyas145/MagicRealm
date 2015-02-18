@@ -26,4 +26,8 @@ public class PersonalHistory {
 	public void newDay(){
 		currentDay++;
 	}
+
+	public int getCurrentDay() {
+		return currentDay;
+	}
 }

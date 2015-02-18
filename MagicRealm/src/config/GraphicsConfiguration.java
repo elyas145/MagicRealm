@@ -5,6 +5,12 @@ public class GraphicsConfiguration {
 	public static final int INITIAL_WINDOW_WIDTH = 1000;
 	public static final int INITIAL_WINDOW_HEIGHT = 700;
 	
+	public static final int INITIAL_MAIN_WIDTH = 300;
+	public static final int INITIAL_MAIN_HEIGHT = 700;
+	
+	public static final int INITIAL_BIRD_WIDTH = 700;
+	public static final int INITIAL_BIRD_HEIGHT = 580;
+	
 	public static final int TILE_IMAGE_WIDTH = 496;
 	public static final int TILE_IMAGE_HEIGHT = 430;
 	

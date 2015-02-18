@@ -3,6 +3,7 @@ package controller;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
 import lwjglview.graphics.LWJGLGraphics;
@@ -32,7 +33,9 @@ public class ControllerMain implements Controller {
 		mainView = new MainView(this);
 		players = new ArrayList<Player>();
 		players.add(new Player(1, "Player One"));
-		players.get(0).setCharacter(CharacterFactory.create(CharacterType.AMAZON));
+		players.get(0).setCharacter(
+				CharacterFactory.create(CharacterType.AMAZON));
+		currentPlayer = players.get(0);
 	}
 
 	private void start() {
@@ -44,7 +47,7 @@ public class ControllerMain implements Controller {
 		try {
 			gfx.addDrawable(new LWJGLBoardDrawable(board, rh));
 			(new Thread(new BoardRunnable(gfx))).start();
-			
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -83,36 +86,41 @@ public class ControllerMain implements Controller {
 	@Override
 	public void exit() {
 		String ObjButtons[] = { "Yes", "No" };
-
 		int PromptResult = JOptionPane.showOptionDialog(null,
 				"Are you sure you want to exit?", "Magic Realm",
 				JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null,
 				ObjButtons, ObjButtons[1]);
 		if (PromptResult == JOptionPane.YES_OPTION) {
 			System.exit(0);
-		}	
+		}
 	}
 
 	@Override
 	public void startGameView() {
 		startBoardView();
-		//mainView.startGameView();
-		
+		mainView.enterBirdSong();
 	}
-	
-	private class BoardRunnable implements Runnable{
+
+	private class BoardRunnable implements Runnable {
 		private LWJGLGraphics gfx;
-		public BoardRunnable(LWJGLGraphics gfx){
+
+		public BoardRunnable(LWJGLGraphics gfx) {
 			this.gfx = gfx;
 		}
+
 		@Override
 		public void run() {
-			gfx.start();			
-		}		
+			gfx.start();
+		}
 	}
 
 	@Override
 	public PersonalHistory getPlayerHistory() {
 		return currentPlayer.getPersonalHistory();
+	}
+
+	@Override
+	public int getCurrentDay() {
+		return currentPlayer.getPersonalHistory().getCurrentDay();
 	}
 }

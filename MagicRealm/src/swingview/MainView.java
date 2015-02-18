@@ -34,9 +34,9 @@ public class MainView extends JFrame implements ViewController, WindowListener {
 	public MainView(Controller parent) {
 		super("Magic Realm");
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-		setPreferredSize(new Dimension(GraphicsConfiguration.INITIAL_WINDOW_WIDTH,GraphicsConfiguration.INITIAL_WINDOW_HEIGHT));
+		setPreferredSize(new Dimension(GraphicsConfiguration.INITIAL_MAIN_WIDTH,GraphicsConfiguration.INITIAL_MAIN_HEIGHT));
 		setLocationRelativeTo(null);
-		setLocation(xSize/2-GraphicsConfiguration.INITIAL_WINDOW_WIDTH/2,ySize/2-GraphicsConfiguration.INITIAL_WINDOW_HEIGHT/2);
+		setLocation(xSize/2+GraphicsConfiguration.INITIAL_WINDOW_WIDTH/2,ySize/2-GraphicsConfiguration.INITIAL_MAIN_HEIGHT/2);
 		this.addWindowListener(this);
 		this.parent = parent;
 		pack();
@@ -51,6 +51,7 @@ public class MainView extends JFrame implements ViewController, WindowListener {
 		setVisible(true);
 	}
 	public void enterBirdSong(){
+		setPreferredSize(new Dimension(GraphicsConfiguration.INITIAL_BIRD_WIDTH,GraphicsConfiguration.INITIAL_BIRD_HEIGHT));
 		BirdSongView birdSong = new BirdSongView(parent);
 		setContentPane(birdSong);
 		pack();

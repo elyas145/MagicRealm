@@ -11,5 +11,7 @@ public interface Controller {
 	void startGameView();
 
 	PersonalHistory getPlayerHistory();
+
+	int getCurrentDay();
 	
 }
