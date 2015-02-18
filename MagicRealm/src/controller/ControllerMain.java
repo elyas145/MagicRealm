@@ -28,6 +28,7 @@ public class ControllerMain implements Controller {
 		rh = new ResourceHandler();
 		board = new Board(rh);
 		mainView = new MainView(this);
+		players = new ArrayList<Player>();
 		players.add(new Player(1, "Player One"));
 		players.get(0).setCharacter(CharacterFactory.create(CharacterType.AMAZON));
 	}
@@ -48,8 +49,7 @@ public class ControllerMain implements Controller {
 	}
 
 	public ArrayList<Character> getAllCharacters() {
-		CharacterFactory cf = new CharacterFactory();
-		return cf.getPossibleCharacters();
+		return CharacterFactory.getPossibleCharacters();
 	}
 
 	public ResourceHandler getRh() {

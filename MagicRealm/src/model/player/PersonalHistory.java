@@ -17,7 +17,9 @@ public class PersonalHistory {
 		currentDay = 1;
 		return this;
 	}
-	
+	public ArrayList<PersonalHistoryDay> getDays(){
+		return new ArrayList<PersonalHistoryDay>(days);
+	}
 	public void addActivity(Activity a){
 		days.get(currentDay-1).addActivity(a);
 	}
