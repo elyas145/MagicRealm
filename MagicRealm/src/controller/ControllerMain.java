@@ -33,7 +33,8 @@ public class ControllerMain implements Controller {
 		gfx = new LWJGLGraphics(rh);
 		try {
 			gfx.addDrawable(new LWJGLBoardDrawable(board, rh));
-			gfx.start();
+			(new Thread(new BoardRunnable(gfx))).start();
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -72,14 +73,26 @@ public class ControllerMain implements Controller {
 
 	@Override
 	public void exit() {
-		System.exit(0);
-		
+		System.exit(0);		
 	}
 
 	@Override
 	public void startGameView() {
 		startBoardView();
-		mainView.startGameView();
+		//mainView.startGameView();
+		
+	}
+	
+	private class BoardRunnable implements Runnable{
+		private LWJGLGraphics gfx;
+		public BoardRunnable(LWJGLGraphics gfx){
+			this.gfx = gfx;
+		}
+		@Override
+		public void run() {
+			gfx.start();
+			
+		}
 		
 	}
 }
