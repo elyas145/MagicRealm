@@ -9,6 +9,8 @@ import javax.swing.JOptionPane;
 import lwjglview.graphics.LWJGLGraphics;
 import lwjglview.graphics.board.LWJGLBoardDrawable;
 import model.board.Board;
+import model.board.clearing.Clearing;
+import model.board.tile.HexTile;
 import model.character.Character;
 import model.character.CharacterFactory;
 import model.enums.CharacterType;
@@ -133,5 +135,17 @@ public class ControllerMain implements Controller {
 	@Override
 	public int getCurrentDay() {
 		return currentPlayer.getPersonalHistory().getCurrentDay();
+	}
+
+	@Override
+	public ArrayList<HexTile> getPossibleTiles() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ArrayList<Clearing> getPossibleClearings() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

@@ -1,5 +1,9 @@
 package controller;
 
+import java.util.ArrayList;
+
+import model.board.clearing.Clearing;
+import model.board.tile.HexTile;
 import model.player.PersonalHistory;
 
 public interface Controller {
@@ -13,5 +17,9 @@ public interface Controller {
 	PersonalHistory getPlayerHistory();
 
 	int getCurrentDay();
+
+	ArrayList<HexTile> getPossibleTiles();
+
+	ArrayList<Clearing> getPossibleClearings();
 	
 }
