@@ -5,6 +5,6 @@ import view.controller.splashscreen.SplashScreen;
 
 public interface ViewController {
 	
-	MainMenuView enterMainMenu();
-	SplashScreen enterSplashScreen();
+	void enterMainMenu();
+	void enterSplashScreen();
 }

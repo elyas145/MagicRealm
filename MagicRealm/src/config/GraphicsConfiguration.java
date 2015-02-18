@@ -18,6 +18,6 @@ public class GraphicsConfiguration {
 	
 	public static final float CHIT_SPACING = CHIT_SCALE * .2f;
 	
-	public static final int SPLASH_TIME = 3;
+	public static final int SPLASH_TIME = 1;
 
 }

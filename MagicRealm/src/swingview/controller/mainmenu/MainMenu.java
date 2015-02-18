@@ -11,6 +11,7 @@ import view.controller.mainmenu.MainMenuView;
 import view.controller.mainmenu.MenuItem;
 import view.controller.mainmenu.MenuItemListener;
 
+@SuppressWarnings("serial")
 public class MainMenu extends JPanel implements MainMenuView {
 	JButton btn = new JButton("click me.");
 	public MainMenu() {		
