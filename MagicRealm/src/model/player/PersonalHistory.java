@@ -32,4 +32,9 @@ public class PersonalHistory {
 	public int getCurrentDay() {
 		return currentDay;
 	}
+
+	public ArrayList<Activity> getCurrentActivities() {
+		
+		return days.get(currentDay-1).getActivities();
+	}
 }

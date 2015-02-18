@@ -14,6 +14,22 @@ public class Move extends Activity{
 		clearing = c;
 	}
 	
+	public TileName getTile() {
+		return tile;
+	}
+
+	public void setTile(TileName tile) {
+		this.tile = tile;
+	}
+
+	public int getClearing() {
+		return clearing;
+	}
+
+	public void setClearing(int clearing) {
+		this.clearing = clearing;
+	}
+
 	@Override
 	public void perform(ModelController mc) {
 		//mc.moveCharacter(character, tt, clearing);

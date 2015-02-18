@@ -9,11 +9,13 @@ import javax.swing.JOptionPane;
 import lwjglview.graphics.LWJGLGraphics;
 import lwjglview.graphics.board.LWJGLBoardDrawable;
 import model.activity.Activity;
+import model.activity.Move;
 import model.board.Board;
 import model.board.clearing.Clearing;
 import model.board.tile.HexTile;
 import model.character.Character;
 import model.character.CharacterFactory;
+import model.enums.ActivityType;
 import model.enums.CharacterType;
 import model.enums.CounterType;
 import model.enums.SiteType;
@@ -159,6 +161,16 @@ public class ControllerMain implements Controller {
 	@Override
 	public void setCurrentPlayerActivities(ArrayList<Activity> activities) {
 		currentPlayer.setActivities(activities);
-		
+		playCurrentActivities();
+	}
+
+	private void playCurrentActivities() {
+		ArrayList<Activity> activities = currentPlayer.getPersonalHistory().getCurrentActivities();
+		for(Activity activity : activities){
+			if(activity.getType() == ActivityType.MOVE){
+				Move move = (Move)activity;
+				boardView.setCounter(currentPlayer.getCharacter().getType().toCounter(), move.getTile(), move.getClearing());
+			}
+		}
 	}
 }
