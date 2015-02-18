@@ -7,21 +7,27 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import controller.Controller;
+import model.activity.Activity;
 import model.board.clearing.Clearing;
 import model.board.tile.HexTile;
+import model.enums.TileName;
+import model.interfaces.HexTileInterface;
 
 public class ActivityView extends JFrame{
 	private BirdSongView parent;
 	private Controller controller;
-	public ActivityView(BirdSongView parent, Controller controller){
-		super("Set Activity");
-		
-		this.parent = parent;
+	private ArrayList<String> actions;
+	public ActivityView(Controller controller, ArrayList<String> actions){
+		super("Set Activity");		
 		this.controller = controller;
+		this.actions = actions;
 				
 		JLabel lbl = new JLabel("Move To: ");
-		ArrayList<HexTile> possibleTiles = controller.getPossibleTiles();
-		ArrayList<Clearing> possibleClearings = controller.getPossibleClearings();
+		ArrayList<TileName> possibleTiles = controller.getPossibleTiles();
+		
+		//move panel
+		
+		//ArrayList<Clearing> possibleClearings = controller.getPossibleClearings();
 		
 	}
 }

@@ -21,5 +21,8 @@ public class Player {
 	public PersonalHistory getPersonalHistory() {
 		return historyPad;
 	}
+	public Character getCharacter() {
+		return character;
+	}
 	
 }

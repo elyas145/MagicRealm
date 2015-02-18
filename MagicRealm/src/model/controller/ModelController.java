@@ -5,13 +5,14 @@ import java.util.Map;
 import model.board.Board;
 import model.enums.CharacterType;
 import model.enums.TileName;
+import model.exceptions.IllegalMoveException;
 
 /*
  * Meant to be a container for the entire model
  */
 public class ModelController {
 
-	public void moveCharacter(Character character, TileName tt, int clearing) {
+	public void moveCharacter(Character character, TileName tt, int clearing) throws IllegalMoveException{
 		board.moveCharacter(character, tt, clearing);
 	}
 

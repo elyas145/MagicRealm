@@ -14,5 +14,15 @@ public enum SiteType {
 	CHAPEL,
 	GUEARD_HOUSE,
 	HOUSE,
-	INN
+	INN;
+	
+	public CounterType toCounterType(){
+		switch(this){
+		case STATUE:
+			return CounterType.SITE_STATUE;
+		case INN:
+			return CounterType.SITE_INN;
+		}
+		return CounterType.NONE;
+	}
 }

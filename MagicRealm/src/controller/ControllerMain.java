@@ -14,6 +14,10 @@ import model.board.tile.HexTile;
 import model.character.Character;
 import model.character.CharacterFactory;
 import model.enums.CharacterType;
+import model.enums.CounterType;
+import model.enums.SiteType;
+import model.enums.TileName;
+import model.interfaces.ClearingInterface;
 import model.interfaces.HexTileInterface;
 import model.player.PersonalHistory;
 import model.player.Player;
@@ -41,6 +45,8 @@ public class ControllerMain implements Controller {
 		players.get(0).setCharacter(
 				CharacterFactory.create(CharacterType.AMAZON));
 		currentPlayer = players.get(0);
+		board.setLocationOfCounter(CounterType.SITE_INN, TileName.BAD_VALLEY, 4);
+		board.setLocationOfCounter(currentPlayer.getCharacter().getType().toCounter(),SiteType.INN);
 	}
 
 	private void start() {
@@ -59,7 +65,20 @@ public class ControllerMain implements Controller {
 						hti.getBoardRow(), hti.getRotation(),
 						hti.getClearings());
 			}
+			for(CounterType ct : board.getCounters()){
+				ClearingInterface ci = board.getLocationOfCounter(ct);
+				boardView.setCounter(ct, ci.getParentTile().getName(), ci.getClearingNumber());
+			}
+			
 			gfx.start();
+			try {
+				Thread.sleep(5000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			board.setLocationOfCounter(CounterType.CHARACTER_AMAZON, TileName.BAD_VALLEY, 1);
+			boardView.setCounter(CounterType.CHARACTER_AMAZON, TileName.BAD_VALLEY, 1);
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -138,14 +157,14 @@ public class ControllerMain implements Controller {
 	}
 
 	@Override
-	public ArrayList<HexTile> getPossibleTiles() {
-		// TODO Auto-generated method stub
+	public ArrayList<Clearing> getPossibleClearings() {
+		//currentPlayer.getCharacter().
 		return null;
 	}
 
 	@Override
-	public ArrayList<Clearing> getPossibleClearings() {
+	public ArrayList<TileName> getPossibleTiles() {
 		// TODO Auto-generated method stub
-		return null;
+		return new ArrayList<TileName>(board.getAllTiles());
 	}
 }

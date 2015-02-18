@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -26,10 +27,12 @@ import utils.resources.ResourceHandler;
 import model.board.tile.HexTile;
 import model.counter.chit.Chit;
 import model.enums.ChitType;
+import model.enums.CounterType;
 import model.enums.SiteType;
 import model.enums.TileName;
 import model.interfaces.BoardInterface;
 import model.interfaces.ChitInterface;
+import model.interfaces.ClearingInterface;
 import model.interfaces.HexTileInterface;
 
 public class Board implements BoardInterface {
@@ -44,6 +47,7 @@ public class Board implements BoardInterface {
 		mapOfTileLocations = new HashMap<Integer, Map<Integer, TileName>>();
 		mapOfTiles = new HashMap<TileName, HexTile>();
 		clearingLocations = new HashMap<TileName, Map<Integer, Point[]>>();
+		counterPositions = new HashMap<CounterType, ClearingInterface>();
 		try {
 			String path = rh.getResource(
 					ResourceHandler.joinPath("data", "data.json")).getPath();
@@ -86,7 +90,7 @@ public class Board implements BoardInterface {
 		initSound();
 
 	}
-	
+
 	public HexTileInterface getTile(TileName tile) {
 		return mapOfTiles.get(tile);
 	}
@@ -118,7 +122,7 @@ public class Board implements BoardInterface {
 			sites.add(tt);
 		}
 
-		while(!possibleValues.isEmpty()) {
+		while (!possibleValues.isEmpty()) {
 			treasures.add(new Treasure(Random.choose(sites), Random
 					.remove(possibleValues)));
 		}
@@ -159,7 +163,7 @@ public class Board implements BoardInterface {
 		setTile(TileName.CAVERN, 1, 7, 5);
 
 		setTile(TileName.HIGH_PASS, 1, 8, 0);
-		
+
 	}
 
 	@Override
@@ -177,8 +181,8 @@ public class Board implements BoardInterface {
 		Map<Integer, Point[]> locs = clearingLocations.get(tile);
 		HexTile ht = new HexTile(this, tile, x, y, rot, locs, surround);
 		mapOfTiles.put(tile, ht);
-		tileLocations.put(tile, new int[] {x, y});
-		if(!mapOfTileLocations.containsKey(y)) {
+		tileLocations.put(tile, new int[] { x, y });
+		if (!mapOfTileLocations.containsKey(y)) {
 			mapOfTileLocations.put(y, new HashMap<Integer, TileName>());
 		}
 		Map<Integer, TileName> row = mapOfTileLocations.get(y);
@@ -234,6 +238,35 @@ public class Board implements BoardInterface {
 		}
 	}
 
+	public ClearingInterface getLocationOfCounter(CounterType ct) {
+		return counterPositions.get(ct);
+	}
+
+	public void setLocationOfCounter(CounterType ct, TileName tn, int clearing) {
+		HexTile ht = mapOfTiles.get(tn);
+		ClearingInterface cl = ht.getClearing(clearing);
+		setClearingOfCounter(ct, cl);
+	}
+
+	public void setLocationOfCounter(CounterType ct, SiteType site) {
+		ClearingInterface ci = getLocationOfCounter(site.toCounterType());
+		setClearingOfCounter(ct, ci);
+	}
+
+	public void setClearingOfCounter(CounterType ct, ClearingInterface cl) {
+
+		counterPositions.put(ct, cl);
+
+	}
+
+	public void removeCounter(CounterType ct) {
+		counterPositions.remove(ct);
+	}
+
+	public Iterable<CounterType> getCounters() {
+		return counterPositions.keySet();
+	}
+
 	private Map<TileName, Map<Integer, Point[]>> clearingLocations;
 	private TileName[] surround;
 	// row column
@@ -241,7 +274,12 @@ public class Board implements BoardInterface {
 	private Map<TileName, HexTile> mapOfTiles;
 	private Map<TileName, int[]> tileLocations;
 	private Collection<Chit> collectionOfChits;
-	private Map<ChitType, HexTile> mapOfChitPositions;
+	private Map<CounterType, ClearingInterface> counterPositions;
 	private ArrayList<Treasure> treasures = new ArrayList<Treasure>();
 	private JSONArray arr;
+	public Set<TileName> getAllTiles() {
+		// TODO Auto-generated method stub
+		return mapOfTiles.keySet();
+	}
+
 }
