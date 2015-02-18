@@ -12,10 +12,12 @@ import model.board.Board;
 import model.character.Character;
 import model.character.CharacterFactory;
 import model.enums.CharacterType;
+import model.interfaces.HexTileInterface;
 import model.player.PersonalHistory;
 import model.player.Player;
 import swingview.MainView;
 import utils.resources.ResourceHandler;
+import view.controller.game.BoardView;
 
 public class ControllerMain implements Controller {
 
@@ -26,6 +28,7 @@ public class ControllerMain implements Controller {
 	private int numCharacters = 1;
 	private MainView mainView;
 	private Player currentPlayer;
+	private BoardView boardView;
 
 	public ControllerMain() {
 		rh = new ResourceHandler();
@@ -44,12 +47,20 @@ public class ControllerMain implements Controller {
 
 	public void startBoardView() {
 		gfx = new LWJGLGraphics(rh, this);
+		LWJGLBoardDrawable boardDrawable;
 		try {
-			gfx.addDrawable(new LWJGLBoardDrawable(board, rh));
-			(new Thread(new BoardRunnable(gfx))).start();
-
-		} catch (IOException e) {
-			e.printStackTrace();
+			boardDrawable = new LWJGLBoardDrawable(rh);
+			boardView = boardDrawable;
+			gfx.addDrawable(boardDrawable);
+			for (HexTileInterface hti : board.iterateTiles()) {
+				boardView.setTile(hti.getName(), hti.getBoardColumn(),
+						hti.getBoardRow(), hti.getRotation(),
+						hti.getClearings());
+			}
+			gfx.start();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
 		}
 	}
 
