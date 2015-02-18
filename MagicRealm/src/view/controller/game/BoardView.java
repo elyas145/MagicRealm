@@ -6,8 +6,8 @@ import model.interfaces.ClearingInterface;
 
 public interface BoardView {
 
-	void setTile(TileName tile, int xPos, int yPos, int rot,
-			Iterable<ClearingInterface> clearings);
+	void setTile(TileName tile, int row, int col, int rot,
+			Iterable<? extends ClearingInterface> clearings);
 
 	void enchantTile(TileName tile);
 

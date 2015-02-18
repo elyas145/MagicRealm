@@ -4,6 +4,8 @@ import lwjglview.graphics.board.LWJGLBoardDrawable;
 import lwjglview.graphics.shader.GLShaderHandler;
 import lwjglview.graphics.shader.ShaderType;
 import model.board.Board;
+import model.enums.TileName;
+import model.interfaces.HexTileInterface;
 
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
@@ -37,8 +39,19 @@ public final class LWJGLGraphics implements Graphics {
 	public static void main(String[] args) throws IOException {
 		ResourceHandler rh = new ResourceHandler();
 		LWJGLGraphics gfx = new LWJGLGraphics(rh, null);
-		gfx.addDrawable(new LWJGLBoardDrawable(rh));
+		LWJGLBoardDrawable db = new LWJGLBoardDrawable(rh);
+		gfx.addDrawable(db);
 		gfx.start();
+		Board b = new Board(rh);
+		for (HexTileInterface hti : b.iterateTiles()) {
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			db.setTile(hti.getName(), hti.getBoardColumn(), hti.getBoardRow(),
+					hti.getRotation(), hti.getClearings());
+		}
 	}
 
 	public LWJGLGraphics(ResourceHandler rh) {
@@ -97,11 +110,9 @@ public final class LWJGLGraphics implements Graphics {
 	public void rotateModelZ(float ang) {
 		applyModelTransform(Matrix.rotationZ(4, ang));
 	}
-	
+
 	public void scaleModel(float f) {
-		applyModelTransform(Matrix.dilation(new float[] {
-				f, f, f, 1f
-		}));
+		applyModelTransform(Matrix.dilation(new float[] { f, f, f, 1f }));
 	}
 
 	public void applyModelTransform(Matrix mat) {
@@ -263,13 +274,19 @@ public final class LWJGLGraphics implements Graphics {
 	@Override
 	public void start() {
 		running = true;
-		initGL();
-		mainLoop();
+		runThread.start();
 	}
 
 	@Override
 	public void stop() {
 		running = false;
+		if(runThread != null) {
+			try {
+				runThread.join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	@Override
@@ -299,6 +316,13 @@ public final class LWJGLGraphics implements Graphics {
 		shaders = new GLShaderHandler(rh);
 		width = GraphicsConfiguration.INITIAL_WINDOW_WIDTH;
 		height = GraphicsConfiguration.INITIAL_WINDOW_HEIGHT;
+		runThread = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				initGL();
+				mainLoop();
+			}
+		});
 	}
 
 	private void initGL() {
@@ -349,9 +373,9 @@ public final class LWJGLGraphics implements Graphics {
 				exit();
 			}
 		};
-		
+
 		glfwSetWindowCloseCallback(window, windowCloseCallback);
-		
+
 		// Get the resolution of the primary monitor
 		ByteBuffer vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 		// Center our window
@@ -380,9 +404,9 @@ public final class LWJGLGraphics implements Graphics {
 		glClearColor(0.1f, 0.2f, 1f, 0.0f);
 
 	}
-	
+
 	private void exit() {
-		if(control != null) {
+		if (control != null) {
 			control.exit();
 		}
 	}
@@ -459,7 +483,9 @@ public final class LWJGLGraphics implements Graphics {
 	private GLFWKeyCallback keyCallback;
 	private GLFWWindowSizeCallback windowSizeCallback;
 	private GLFWWindowCloseCallback windowCloseCallback;
-	
+
 	private ControllerMain control;
+	
+	private Thread runThread;
 
 }
