@@ -9,11 +9,7 @@ import lwjglview.graphics.animator.AnimationQueue;
 import lwjglview.graphics.animator.MovementAnimator;
 import lwjglview.graphics.shader.ShaderType;
 import model.enums.CounterType;
-import model.enums.TileName;
-import model.interfaces.ClearingInterface;
-import model.interfaces.HexTileInterface;
 import config.GraphicsConfiguration;
-import utils.random.Random;
 import view.graphics.board.CounterDrawable;
 import view.graphics.Drawable;
 import view.graphics.Graphics;
@@ -23,28 +19,25 @@ public class LWJGLCounterDrawable extends CounterDrawable {
 	public static final ShaderType SHADER = ShaderType.CHIT_SHADER;
 
 	public LWJGLCounterDrawable(LWJGLBoardDrawable bd, CounterType chit,
-			Drawable chitBlock, int texid, ClearingInterface loc) {
+			Drawable chitBlock, int texid) {
 		super(bd, chit);
 		board = bd;
 		representation = chitBlock;
 		textureIndex = texid;
-		position = BufferUtils.createFloatBuffer(2);
+		position = null;
 		buffer = BufferUtils.createFloatBuffer(2);
 		movements = new AnimationQueue();
 		movements.start();
-		current = loc;
-	}
-
-	public void setCurrentClearing(ClearingInterface clear) {
-		System.out.println(getCounterType() + " changed to " + clear + " from " + current);
-		current = clear;
-		updatePosition();
 	}
 
 	public void moveTo(float x, float y) {
 		buffer.put(0, x);
 		buffer.put(1, y);
 		move();
+	}
+
+	public boolean moving() {
+		return !movements.isFinished();
 	}
 
 	@Override
@@ -68,29 +61,24 @@ public class LWJGLCounterDrawable extends CounterDrawable {
 		representation.draw(gfx);
 	}
 
-	private void updatePosition() {
-		board.setCounter(getCounterType(), current.getParentTile().getName(),
-				current.getClearingNumber());
-		move();
-	}
-
 	private void move() {
 		float xo, yo, xf, yf;
-		xo = position.get(0);
-		yo = position.get(1);
 		xf = buffer.get(0);
 		yf = buffer.get(1);
-		movements.push(new MovementAnimator(1f, xo, yo, xf, yf) {
-			@Override
-			public void finish() {
-				setCurrentClearing(current.getRandomConnection());
-			}
-		});
+		if(position == null) {
+			position = BufferUtils.createFloatBuffer(2);
+		}
+		else {
+			xo = position.get(0);
+			yo = position.get(1);
+			movements.push(new MovementAnimator(GraphicsConfiguration.ANIMATION_SPEED, xo, yo, xf, yf) {
+				@Override
+				public void finish() { }
+			});
+		}
 		position.put(0, xf);
 		position.put(1, yf);
 	}
-
-	private ClearingInterface current;
 
 	private AnimationQueue movements;
 

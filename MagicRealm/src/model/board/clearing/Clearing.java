@@ -34,7 +34,6 @@ public class Clearing implements ClearingInterface {
 
 	@Override
 	public void connectTo(ClearingInterface other, boolean ench, PathType pt) {
-		System.out.println("Connecting " + this + " to " + other + ", ENCHANTED: " + ench + ", PATH: " + pt);
 		if (!internalConnections.containsKey(other)) {
 			PathType[] conns = new PathType[2];
 			internalConnections.put(other, conns);
@@ -44,7 +43,6 @@ public class Clearing implements ClearingInterface {
 
 	@Override
 	public void connectTo(HexTileInterface other, int entr, boolean ench) {
-		System.out.println("Connecting " + this + " to " + other.getName() + ": " + entr + ", ENCHANTED: " + ench);
 		if (other == getParent()) {
 			connectTo(other.getEntryClearing(entr, ench), ench, PathType.NORMAL);
 		} else {
