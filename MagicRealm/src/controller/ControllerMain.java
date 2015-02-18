@@ -169,8 +169,23 @@ public class ControllerMain implements Controller {
 		for(Activity activity : activities){
 			if(activity.getType() == ActivityType.MOVE){
 				Move move = (Move)activity;
-				boardView.setCounter(currentPlayer.getCharacter().getType().toCounter(), move.getTile(), move.getClearing());
+				if(checkMoveLegality(move)){
+					boardView.setCounter(currentPlayer.getCharacter().getType().toCounter(), move.getTile(), move.getClearing());
+				}else{
+					JOptionPane.showMessageDialog(null, "Illegal move cancelled.");
+				}				
 			}
 		}
+	}
+
+	private boolean checkMoveLegality(Move move) {
+		//return true if current character clearing is connected to move clearing
+		ArrayList<ClearingInterface> clearings = board.getConntectedClearings(board.getLocationOfCounter(currentPlayer.getCharacter().getType().toCounter()));
+		for(ClearingInterface clearing : clearings){
+			if(clearing.getClearingNumber() == move.getClearing() && clearing.getParentTile().getName().equals(move.getTile())){
+				return true;
+			}
+		}
+		return false;
 	}
 }

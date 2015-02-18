@@ -277,9 +277,23 @@ public class Board implements BoardInterface {
 	private Map<CounterType, ClearingInterface> counterPositions;
 	private ArrayList<Treasure> treasures = new ArrayList<Treasure>();
 	private JSONArray arr;
+
 	public Set<TileName> getAllTiles() {
 		// TODO Auto-generated method stub
 		return mapOfTiles.keySet();
+	}
+
+	public ArrayList<ClearingInterface> getConntectedClearings(
+			ClearingInterface clearing) {
+		ArrayList<ClearingInterface> clearings = new ArrayList<ClearingInterface>();
+		for (HexTile tile : mapOfTiles.values()) {
+			for (ClearingInterface c : tile.getClearings()) {
+				if (clearing.isConnectedTo(c)) {
+					clearings.add(c);
+				}
+			}
+		}
+		return clearings;
 	}
 
 }
