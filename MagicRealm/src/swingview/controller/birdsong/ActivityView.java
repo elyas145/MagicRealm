@@ -1,33 +1,59 @@
 package swingview.controller.birdsong;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import controller.Controller;
 import model.activity.Activity;
+import model.activity.Move;
 import model.board.clearing.Clearing;
 import model.board.tile.HexTile;
+import model.enums.ActivityType;
 import model.enums.TileName;
 import model.interfaces.HexTileInterface;
 
-public class ActivityView extends JFrame{
+@SuppressWarnings("serial")
+public class ActivityView extends JFrame implements ActionListener{
 	private BirdSongView parent;
-	private Controller controller;
-	private ArrayList<String> actions;
+	private JButton go;
+	private ArrayList<MovePanel> movePanels;
 	public ActivityView(Controller controller, ArrayList<String> actions){
-		super("Set Activity");		
-		this.controller = controller;
-		this.actions = actions;
-				
-		JLabel lbl = new JLabel("Move To: ");
-		ArrayList<TileName> possibleTiles = controller.getPossibleTiles();
+		super("Set Activity");
+		getContentPane().setLayout(new BoxLayout(getContentPane(),BoxLayout.Y_AXIS));
 		
-		//move panel
-		
-		//ArrayList<Clearing> possibleClearings = controller.getPossibleClearings();
-		
+		//move panels
+		movePanels = new ArrayList<MovePanel>();
+		JPanel moveP = new JPanel();
+		moveP.setLayout(new BoxLayout(moveP, BoxLayout.X_AXIS));
+		for(int i = 0; i < actions.size(); i++){
+			if(actions.get(i).equals(ActivityType.MOVE)){
+				movePanels.add(new MovePanel(controller, i));	
+				moveP.add(movePanels.get(i));
+			}
+		}
+		go = new JButton("Go");
+		go.addActionListener(this);
+		getContentPane().add(moveP);
+		getContentPane().add(go);
+		setVisible(true);
 	}
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		//go is pressed.
+		//get all the activities.
+		ArrayList<Activity> activities = new ArrayList<Activity>();
+		
+		for(MovePanel panel: movePanels){
+			activities.add(new Move(ActivityType.MOVE, panel.getSelectedTile(), panel.getSelectedClearing()));
+		}
+		parent.sendActivities(activities);
+	}
+
 }

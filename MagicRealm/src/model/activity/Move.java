@@ -2,14 +2,15 @@ package model.activity;
 
 import model.controller.ModelController;
 import model.enums.ActivityType;
+import model.enums.TileName;
 import model.enums.TileType;
 
 public class Move extends Activity{
-	private TileType tile;
+	private TileName tile;
 	private int clearing;
-	public Move(ActivityType act, TileType tt, int c) {
+	public Move(ActivityType act, TileName tileName, int c) {
 		super(act);
-		tile = tt;
+		tile = tileName;
 		clearing = c;
 	}
 	

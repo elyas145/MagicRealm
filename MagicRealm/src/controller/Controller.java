@@ -2,8 +2,10 @@ package controller;
 
 import java.util.ArrayList;
 
+import model.activity.Activity;
 import model.board.clearing.Clearing;
 import model.enums.TileName;
+import model.interfaces.ClearingInterface;
 import model.player.PersonalHistory;
 
 public interface Controller {
@@ -20,6 +22,8 @@ public interface Controller {
 
 	ArrayList<TileName> getPossibleTiles();
 
-	ArrayList<Clearing> getPossibleClearings();
+	ArrayList<Integer> getPossibleClearings(TileName selectedTile);
+	
+	void setCurrentPlayerActivities(ArrayList<Activity> activities);
 	
 }

@@ -8,6 +8,7 @@ import javax.swing.JOptionPane;
 
 import lwjglview.graphics.LWJGLGraphics;
 import lwjglview.graphics.board.LWJGLBoardDrawable;
+import model.activity.Activity;
 import model.board.Board;
 import model.board.clearing.Clearing;
 import model.board.tile.HexTile;
@@ -71,12 +72,7 @@ public class ControllerMain implements Controller {
 			}
 			
 			gfx.start();
-			try {
-				Thread.sleep(5000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			
 			board.setLocationOfCounter(CounterType.CHARACTER_AMAZON, TileName.BAD_VALLEY, 1);
 			boardView.setCounter(CounterType.CHARACTER_AMAZON, TileName.BAD_VALLEY, 1);
 		} catch (IOException e1) {
@@ -157,14 +153,24 @@ public class ControllerMain implements Controller {
 	}
 
 	@Override
-	public ArrayList<Clearing> getPossibleClearings() {
-		//currentPlayer.getCharacter().
-		return null;
+	public ArrayList<Integer> getPossibleClearings(TileName tile) {
+		ArrayList<ClearingInterface> clearings = new ArrayList<ClearingInterface>(board.getTile(tile).getClearings());
+		ArrayList<Integer> ints = new ArrayList<Integer>();
+		for(ClearingInterface ci : clearings){
+			ints.add(ci.getClearingNumber());
+		}
+		return ints;
 	}
 
 	@Override
 	public ArrayList<TileName> getPossibleTiles() {
 		// TODO Auto-generated method stub
 		return new ArrayList<TileName>(board.getAllTiles());
+	}
+
+	@Override
+	public void setCurrentPlayerActivities(ArrayList<Activity> activities) {
+		currentPlayer.setActivities(activities);
+		
 	}
 }

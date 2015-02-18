@@ -12,6 +12,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import swingview.controller.HistoryView;
+import model.activity.Activity;
+import model.activity.Empty;
 import model.enums.ActivityType;
 import model.player.PersonalHistory;
 import controller.Controller;
@@ -22,6 +24,7 @@ public class BirdSongView extends JPanel implements ActionListener{
 	private PersonalHistory history;
 	private JButton submit;
 	ArrayList<JComboBox> boxesArray;
+	private ArrayList<String> actions = new ArrayList<String>();
 	public BirdSongView(Controller parent) {
 		this.parent = parent;
 		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
@@ -60,9 +63,8 @@ public class BirdSongView extends JPanel implements ActionListener{
 	public void actionPerformed(ActionEvent ae) {
 		if(ae.getSource().equals(submit)){
 			//submit to controller.
-			ArrayList<String> actions = new ArrayList<String>();
 			for(JComboBox<String> b : boxesArray){
-				actions.add(b.getSelectedObjects()[0].toString());
+				actions.add(b.getSelectedItem().toString());
 			}
 			
 			for(int i = actions.size(); i > 0; i--){
@@ -76,6 +78,20 @@ public class BirdSongView extends JPanel implements ActionListener{
 			System.out.println(actions);
 			//parent.submitPhases();
 		}		
+	}
+	public void sendActivities(ArrayList<Activity> moveActivities) {
+		int moveCounter = 0;
+		ArrayList<Activity> activities = new ArrayList<Activity>();
+		for (String action : actions){
+			if(action.equals(ActivityType.MOVE.toString())){
+				activities.add(moveActivities.get(moveCounter));
+				moveCounter++;
+			}else{
+				activities.add(new Empty(ActivityType.NONE));
+			}
+		}
+		parent.setCurrentPlayerActivities(activities);
+		
 	}
 	
 }
