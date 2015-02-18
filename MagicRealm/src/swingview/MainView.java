@@ -108,15 +108,7 @@ public class MainView extends JFrame implements ViewController, WindowListener {
 
 	@Override
 	public void exit() {		
-		String ObjButtons[] = { "Yes", "No" };
-
-		int PromptResult = JOptionPane.showOptionDialog(null,
-				"Are you sure you want to exit?", "Magic Realm",
-				JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null,
-				ObjButtons, ObjButtons[1]);
-		if (PromptResult == JOptionPane.YES_OPTION) {
-			parent.exit();
-		}
+	parent.exit();
 	}
 
 	

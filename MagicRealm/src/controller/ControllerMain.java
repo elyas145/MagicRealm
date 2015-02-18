@@ -3,6 +3,8 @@ package controller;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.swing.JOptionPane;
+
 import lwjglview.graphics.LWJGLGraphics;
 import lwjglview.graphics.board.LWJGLBoardDrawable;
 import model.board.Board;
@@ -80,7 +82,15 @@ public class ControllerMain implements Controller {
 
 	@Override
 	public void exit() {
-		System.exit(0);		
+		String ObjButtons[] = { "Yes", "No" };
+
+		int PromptResult = JOptionPane.showOptionDialog(null,
+				"Are you sure you want to exit?", "Magic Realm",
+				JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null,
+				ObjButtons, ObjButtons[1]);
+		if (PromptResult == JOptionPane.YES_OPTION) {
+			System.exit(0);
+		}	
 	}
 
 	@Override

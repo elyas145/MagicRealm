@@ -17,5 +17,6 @@ public class HistoryView extends JPanel {
 		this.history = history;
 		
 		
+		//arrayList = history.getDays()
 	}
 }
