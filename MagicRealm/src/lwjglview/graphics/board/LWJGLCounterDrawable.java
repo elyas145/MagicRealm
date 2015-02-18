@@ -20,7 +20,7 @@ public class LWJGLCounterDrawable extends CounterDrawable {
 
 	public LWJGLCounterDrawable(LWJGLBoardDrawable bd, CounterType chit,
 			Drawable chitBlock, int texid) {
-		super(bd, chit);
+		super(chit);
 		board = bd;
 		representation = chitBlock;
 		textureIndex = texid;

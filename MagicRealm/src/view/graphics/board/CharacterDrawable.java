@@ -8,8 +8,8 @@ public abstract class CharacterDrawable extends CounterDrawable {
 		return character;
 	}
 
-	protected CharacterDrawable(BoardDrawable bd, CharacterType ct) {
-		super(bd, ct.toCounter());
+	protected CharacterDrawable(CharacterType ct) {
+		super(ct.toCounter());
 		character = ct;
 	}
 

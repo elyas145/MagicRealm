@@ -37,7 +37,7 @@ public final class LWJGLGraphics implements Graphics {
 	public static void main(String[] args) throws IOException {
 		ResourceHandler rh = new ResourceHandler();
 		LWJGLGraphics gfx = new LWJGLGraphics(rh, null);
-		gfx.addDrawable(new LWJGLBoardDrawable(new Board(rh), rh));
+		gfx.addDrawable(new LWJGLBoardDrawable(rh));
 		gfx.start();
 	}
 
