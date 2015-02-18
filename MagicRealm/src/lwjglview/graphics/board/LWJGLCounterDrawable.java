@@ -36,8 +36,8 @@ public class LWJGLCounterDrawable extends CounterDrawable {
 	}
 
 	public void setCurrentClearing(ClearingInterface clear) {
-		board.getCounterPosition(this, position);
-		move();
+		current = clear;
+		updatePosition();
 	}
 
 	public void moveTo(float x, float y) {

@@ -9,6 +9,7 @@ import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 
 import config.GraphicsConfiguration;
+import controller.ControllerMain;
 
 import utils.math.Mathf;
 import utils.math.Matrix;
@@ -35,13 +36,19 @@ public final class LWJGLGraphics implements Graphics {
 
 	public static void main(String[] args) throws IOException {
 		ResourceHandler rh = new ResourceHandler();
-		LWJGLGraphics gfx = new LWJGLGraphics(rh);
+		LWJGLGraphics gfx = new LWJGLGraphics(rh, null);
 		gfx.addDrawable(new LWJGLBoardDrawable(new Board(rh), rh));
 		gfx.start();
 	}
 
 	public LWJGLGraphics(ResourceHandler rh) {
 		init(rh);
+		control = null;
+	}
+
+	public LWJGLGraphics(ResourceHandler rh, ControllerMain cm) {
+		init(rh);
+		control = cm;
 	}
 
 	public GLPrimitives getPrimitiveTool() {
@@ -326,15 +333,26 @@ public final class LWJGLGraphics implements Graphics {
 		};
 		glfwSetKeyCallback(window, keyCallback);
 
-		windowCallback = new GLFWWindowSizeCallback() {
+		windowSizeCallback = new GLFWWindowSizeCallback() {
 			@Override
 			public void invoke(long window, int width, int height) {
 				onResize(width, height);
 			}
 		};
 
-		glfwSetWindowSizeCallback(window, windowCallback);
+		glfwSetWindowSizeCallback(window, windowSizeCallback);
 
+		windowCloseCallback = new GLFWWindowCloseCallback() {
+			@Override
+			public void invoke(long window) {
+				if(control != null) {
+					control.exit();
+				}
+			}
+		};
+		
+		glfwSetWindowCloseCallback(window, windowCloseCallback);
+		
 		// Get the resolution of the primary monitor
 		ByteBuffer vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 		// Center our window
@@ -434,6 +452,9 @@ public final class LWJGLGraphics implements Graphics {
 
 	private GLFWErrorCallback errorCallback;
 	private GLFWKeyCallback keyCallback;
-	private GLFWWindowSizeCallback windowCallback;
+	private GLFWWindowSizeCallback windowSizeCallback;
+	private GLFWWindowCloseCallback windowCloseCallback;
+	
+	private ControllerMain control;
 
 }
