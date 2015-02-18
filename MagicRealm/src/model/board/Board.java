@@ -296,4 +296,10 @@ public class Board implements BoardInterface {
 		return clearings;
 	}
 
+	public ClearingInterface getClearing(TileName tile, int clearing) {
+		HexTile hexTile = mapOfTiles.get(tile);
+		
+		return hexTile.getClearing(clearing);
+	}
+
 }

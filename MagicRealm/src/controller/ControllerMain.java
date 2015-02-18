@@ -49,7 +49,8 @@ public class ControllerMain implements Controller {
 				CharacterFactory.create(CharacterType.AMAZON));
 		currentPlayer = players.get(0);
 		board.setLocationOfCounter(CounterType.SITE_INN, TileName.BAD_VALLEY, 4);
-		board.setLocationOfCounter(currentPlayer.getCharacter().getType().toCounter(),SiteType.INN);
+		board.setLocationOfCounter(currentPlayer.getCharacter().getType()
+				.toCounter(), SiteType.INN);
 	}
 
 	private void start() {
@@ -68,15 +69,13 @@ public class ControllerMain implements Controller {
 						hti.getBoardRow(), hti.getRotation(),
 						hti.getClearings());
 			}
-			for(CounterType ct : board.getCounters()){
+			for (CounterType ct : board.getCounters()) {
 				ClearingInterface ci = board.getLocationOfCounter(ct);
-				boardView.setCounter(ct, ci.getParentTile().getName(), ci.getClearingNumber());
+				boardView.setCounter(ct, ci.getParentTile().getName(),
+						ci.getClearingNumber());
 			}
-			
+
 			gfx.start();
-			
-			board.setLocationOfCounter(CounterType.CHARACTER_AMAZON, TileName.BAD_VALLEY, 1);
-			boardView.setCounter(CounterType.CHARACTER_AMAZON, TileName.BAD_VALLEY, 1);
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -131,7 +130,6 @@ public class ControllerMain implements Controller {
 		mainView.enterBirdSong();
 	}
 
-
 	@Override
 	public PersonalHistory getPlayerHistory() {
 		return currentPlayer.getPersonalHistory();
@@ -144,9 +142,10 @@ public class ControllerMain implements Controller {
 
 	@Override
 	public ArrayList<Integer> getPossibleClearings(TileName tile) {
-		ArrayList<ClearingInterface> clearings = new ArrayList<ClearingInterface>(board.getTile(tile).getClearings());
+		ArrayList<ClearingInterface> clearings = new ArrayList<ClearingInterface>(
+				board.getTile(tile).getClearings());
 		ArrayList<Integer> ints = new ArrayList<Integer>();
-		for(ClearingInterface ci : clearings){
+		for (ClearingInterface ci : clearings) {
 			ints.add(ci.getClearingNumber());
 		}
 		return ints;
@@ -165,27 +164,36 @@ public class ControllerMain implements Controller {
 	}
 
 	private void playCurrentActivities() {
-		ArrayList<Activity> activities = currentPlayer.getPersonalHistory().getCurrentActivities();
-		for(Activity activity : activities){
-			if(activity.getType() == ActivityType.MOVE){
-				Move move = (Move)activity;
-				if(checkMoveLegality(move)){
-					boardView.setCounter(currentPlayer.getCharacter().getType().toCounter(), move.getTile(), move.getClearing());
-				}else{
-					JOptionPane.showMessageDialog(null, "Illegal move cancelled.");
-				}				
+		ArrayList<Activity> activities = currentPlayer.getPersonalHistory()
+				.getCurrentActivities();
+		for (Activity activity : activities) {
+			if (activity.getType() == ActivityType.MOVE) {
+				Move move = (Move) activity;
+				if (checkMoveLegality(move)) {
+					boardView.setCounter(currentPlayer.getCharacter().getType()
+							.toCounter(), move.getTile(), move.getClearing());
+				} else {
+					JOptionPane.showMessageDialog(null,
+							"Illegal move cancelled.");
+				}
 			}
 		}
 	}
 
 	private boolean checkMoveLegality(Move move) {
-		//return true if current character clearing is connected to move clearing
-		ArrayList<ClearingInterface> clearings = board.getConntectedClearings(board.getLocationOfCounter(currentPlayer.getCharacter().getType().toCounter()));
-		for(ClearingInterface clearing : clearings){
-			if(clearing.getClearingNumber() == move.getClearing() && clearing.getParentTile().getName().equals(move.getTile())){
-				return true;
-			}
-		}
-		return false;
+		// return true if current character clearing is connected to move
+		// clearing
+		/*
+		 * ArrayList<ClearingInterface> clearings =
+		 * board.getConntectedClearings(
+		 * board.getLocationOfCounter(currentPlayer.
+		 * getCharacter().getType().toCounter())); ClearingInterface c =
+		 * board.getClearing(move.getTile(), move.getClearing());
+		 * for(ClearingInterface clearing : clearings){
+		 * if(clearing.getClearingNumber() == move.getClearing() &&
+		 * clearing.getParentTile().getName().equals(move.getTile())){ return
+		 * true; } }
+		 */
+		return true;
 	}
 }
