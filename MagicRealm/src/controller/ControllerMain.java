@@ -38,7 +38,7 @@ public class ControllerMain implements Controller {
 	}
 
 	public void startBoardView() {
-		gfx = new LWJGLGraphics(rh);
+		gfx = new LWJGLGraphics(rh, this);
 		try {
 			gfx.addDrawable(new LWJGLBoardDrawable(board, rh));
 			(new Thread(new BoardRunnable(gfx))).start();
