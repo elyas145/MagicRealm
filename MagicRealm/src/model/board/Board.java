@@ -159,7 +159,7 @@ public class Board implements BoardInterface {
 		setTile(TileName.CAVERN, 1, 7, 5);
 
 		setTile(TileName.HIGH_PASS, 1, 8, 0);
-
+		
 	}
 
 	@Override
@@ -195,10 +195,6 @@ public class Board implements BoardInterface {
 		clearSurround();
 		for (int i = 0; i < surround.length; ++i) {
 			setSurround(x, y, i);
-		}
-		System.out.println("TILES SURROUNDING " + name);
-		for(TileName tn: surround) {
-			System.out.println(tn);
 		}
 	}
 

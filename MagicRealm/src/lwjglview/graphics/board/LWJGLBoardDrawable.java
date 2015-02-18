@@ -113,25 +113,20 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 		}
 		
 		counterDrawables = new HashMap<CounterType, LWJGLCounterDrawable>();
-		bland = bo.getTile(TileName.BORDERLAND);
-		setCounter(CounterType.CHARACTER_AMAZON, TileName.BORDERLAND, 1);
-		setCounter(CounterType.CHARACTER_CAPTAIN, TileName.BORDERLAND, 2);
-		setCounter(CounterType.CHARACTER_SWORDSMAN, TileName.BORDERLAND, 3);
+		for(CounterType ct: CounterType.values()) {
+			setCounter(ct, TileName.BORDERLAND, 6);
+		}
 
 		ambientColour = BufferUtils.createFloatBuffer(4);
 	}
-	
-	private HexTileInterface bland;
 	
 	@Override
 	public void setCounter(CounterType tp, TileName tile, int clearing) {
 		
 		if(!counterDrawables.containsKey(tp)) {
 			counterDrawables.put(tp, new LWJGLCounterDrawable(
-				this, tp, roundCounter, getCounterTextureIndex(tp), bland.getClearing(clearing)));
+				this, tp, roundCounter, getCounterTextureIndex(tp)));
 		}
-		
-		LWJGLCounterDrawable drw = counterDrawables.get(tp);
 		
 		if(!counterLocations.containsKey(tp)) {
 			counterLocations.put(tp, new CounterLocation(tile, clearing));
@@ -178,7 +173,7 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 		lwgfx.resetViewMatrix();
 		float time = Timing.getSeconds() * .1f;
 		Matrix tmp = Matrix.rotationX(4, Mathf.PI / 5f);
-		float k = (Mathf.sin(time * .6f) + 3f) / 3f;
+		float k = (Mathf.sin(time * .6f) + 6f) / 12f;
 		tmp = Matrix.translation(new float[] { 0f, -4f * k, 3f * k }).multiply(
 				tmp);
 		tmp = Matrix.rotationZ(4, time * .3f).multiply(tmp);
@@ -235,8 +230,17 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 		shaders.setUniformFloatArrayValue(st, "ambientColour", 4, ambientColour);
 
 		// draw all chits
-		for (Drawable chit : counterDrawables.values()) {
-			chit.draw(lwgfx);
+		for (LWJGLCounterDrawable counter : counterDrawables.values()) {
+			counter.draw(lwgfx);
+			if(!counter.moving()) {
+				Board bd = getBoard();
+				CounterType ct = counter.getCounterType();
+				CounterLocation cl = counterLocations.get(ct);
+				HexTileInterface hti = bd.getTile(cl.tile);
+				ClearingInterface clr = hti.getClearing(cl.clearing);
+				clr = clr.getRandomConnection();
+				setCounter(ct, clr.getParentTile().getName(), clr.getClearingNumber());
+			}
 		}
 
 	}
@@ -249,15 +253,6 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 		AMBIENT_COLOURS[idx].multiply(1f - scale)
 				.add(AMBIENT_COLOURS[nidx].multiply(scale))
 				.toFloatBuffer(ambientColour);
-		if (idx == AMBIENT_COLOURS.length / 4) {
-			for (LWJGLTileDrawable tile : tiles.values()) {
-				tile.setEnchanted(false);
-			}
-		} else if (idx == AMBIENT_COLOURS.length * 3 / 4) {
-			for (LWJGLTileDrawable tile : tiles.values()) {
-				tile.setEnchanted(true);
-			}
-		}
 	}
 
 	private int getTextureIndex(TileName type, boolean enchanted) {
@@ -331,6 +326,8 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 				chits.add(ct);
 				if (changeDim()) {
 					relocateAllChits();
+				} else {
+					moveChit(ct);
 				}
 			}
 		}
@@ -343,8 +340,7 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 					relocateAllChits();
 				} else {
 					for (; idx < chits.size(); ++idx) {
-						getLocation(chits.get(idx), buff);
-						relocateChit(chits.get(idx), buff.get(0), buff.get(1));
+						moveChit(chits.get(idx));
 					}
 				}
 			}
@@ -360,17 +356,17 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 			float offs = spacing * gaps * .5f;
 			boolean ench = isTileEnchanted(tile);
 			float[] pos = posns[ench ? 1 : 0];
-			loc.put(0, col * spacing + offs + pos[0]);
+			loc.put(0, col * spacing - offs + pos[0]);
 			loc.put(1, row * spacing - offs + pos[1]);
 		}
 
 		private boolean changeDim() {
 			double sqrt = Math.sqrt(chits.size());
 			int tmp = (int) sqrt;
-			if (sqrt % 1. != 0.) {
+			if (sqrt % 1. > .0001) {
 				tmp += 1;
 			}
-			if (tmp > dim) {
+			if (tmp != dim) {
 				dim = tmp;
 				return true;
 			}
@@ -379,9 +375,13 @@ public class LWJGLBoardDrawable extends BoardDrawable {
 
 		private void relocateAllChits() {
 			for (CounterType type : chits) {
-				getLocation(type, buff);
-				relocateChit(type, buff.get(0), buff.get(1));
+				moveChit(type);
 			}
+		}
+
+		private void moveChit(CounterType ct) {
+			getLocation(ct, buff);
+			relocateChit(ct, buff.get(0), buff.get(1));
 		}
 
 		private TileName tile;

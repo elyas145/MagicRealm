@@ -62,18 +62,18 @@ public class HexTile implements HexTileInterface {
 		for (int i = 0; i < surrounding.length; ++i) {
 			HexTileInterface other = getParent().getTile(surrounding[i]);
 			if (other != null) {
-				//System.out.println("OTHER TILE: " + other.getName());
 				int entr = (i + 3) % 6;
-				ClearingInterface thc = other.getEntryClearing(entr, false);
-				System.out.println("ENTRANCE: " + getEntryClearing(i, false));
-				if(thc != null) {
-					thc.connectTo(other, entr, false);
-					getEntryClearing(i, false).connectTo(other, i, false);
+				ClearingInterface ocl = other.getEntryClearing(entr, false);
+				ClearingInterface tcl = getEntryClearing(i, false);
+				if(ocl != null && tcl != null) {
+					ocl.connectTo(this, i, false);
+					tcl.connectTo(other, entr, false);
 				}
-				thc = other.getEntryClearing(entr, true);
-				if(thc != null) {
-					thc.connectTo(other, entr, true);
-					getEntryClearing(i, true).connectTo(other, i, true);
+				ocl = other.getEntryClearing(entr, true);
+				tcl = getEntryClearing(i, true);
+				if(ocl != null && tcl != null) {
+					ocl.connectTo(this, i, true);
+					tcl.connectTo(other, entr, true);
 				}
 			}
 		}
@@ -87,7 +87,6 @@ public class HexTile implements HexTileInterface {
 	@Override
 	public Clearing getEntryClearing(int rot, boolean enchant) {
 		int entr = exits[enchant ? 1 : 0][rot % 6];
-		System.out.println(entr);
 		return clearings.get(entr);
 	}
 
@@ -139,33 +138,6 @@ public class HexTile implements HexTileInterface {
 		return parent;
 	}
 
-	/**
-	 * reads the data provided by the JSONArray "arr" locates the tile, and
-	 * reads the clearings and their corresponding locations
-	 */
-	/*
-	 * private void setClearings() { // TODO get clearing location from external
-	 * file, and create the // clearings that go with this tile. for (int i = 0;
-	 * i < arr.size(); i++) { JSONObject obj = (JSONObject) arr.get(i); String
-	 * nm = (String) obj.get("tileName"); if (nm.equals(name.name())) { //
-	 * System.out.println("-------------------------------"); //
-	 * System.out.println("tile: " + name); JSONObject numbers = (JSONObject)
-	 * obj.get("numbers"); Boolean enchanted = (Boolean) obj.get("enchanted");
-	 * // System.out.println("enchanted: " + enchanted); for (int j = 0; j <=
-	 * BoardConfiguration.MAX_CLEARINGS_IN_TILE; j++) { JSONObject n =
-	 * (JSONObject) numbers.get("" + j); if (n != null) { // create a point
-	 * instance // System.out.println("setting clearing: " + j); Point p = new
-	 * Point(); p.setX((Long) n.get("x")); p.setY((Long) n.get("y")); if
-	 * (!containsClearing(j)) { // create the clearing //
-	 * System.out.println("creating the clearing: " + // j); Clearing c = new
-	 * Clearing(); if (enchanted) c.setLocation_e(p); else c.setLocation(p);
-	 * c.setNumber(j); // clearings.add(c); } else { //
-	 * System.out.println("clearing already exists: " + // j);
-	 * setClearingLocation(j, p, true); } } }
-	 * 
-	 * } } }
-	 */
-
 	private void clearExits() {
 		for (int i = 0; i < exits.length; ++i) {
 			int[] tmp = exits[i];
@@ -202,6 +174,7 @@ public class HexTile implements HexTileInterface {
 		case BORDERLAND:
 			connectAlways(1, 6);
 			connectAlways(2, 3);
+			connectAlways(3, 6);
 			connectAlways(4, 5, s);
 			connectAlways(4, 6);
 			exitAlways(1, 0);
@@ -452,8 +425,9 @@ public class HexTile implements HexTileInterface {
 
 	private void exit(int clear, int rot, boolean ench) {
 		rot += getRotation();
-		rot %= exits.length;
-		exits[ench ? 1 : 0][rot] = clear;
+		int[] exit = exits[ench ? 1 : 0];
+		rot %= exit.length;
+		exit[rot] = clear;
 	}
 
 	private Point transform(Point point) {
@@ -461,7 +435,7 @@ public class HexTile implements HexTileInterface {
 				.columnVector(new float[] { point.getX(), point.getY() });
 		p = p.multiply(2f)
 				.subtract(Matrix.columnVector(new float[] { 1f, 1f }));
-		p = Matrix.dilation(new float[] { 1f, 0.866025f }).multiply(p);
+		p = Matrix.dilation(new float[] { 1f, -0.866025f }).multiply(p);
 		p = Matrix.rotation(-Mathf.PI * getRotation() / 3f).multiply(p);
 		return new Point(p.get(0, 0), p.get(1, 0));
 	}

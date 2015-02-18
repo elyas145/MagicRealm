@@ -327,6 +327,7 @@ public final class LWJGLGraphics implements Graphics {
 			public void invoke(long window, int key, int scancode, int action,
 					int mods) {
 				if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) {
+					exit();
 					glfwSetWindowShouldClose(window, GL_TRUE);
 				}
 			}
@@ -345,9 +346,7 @@ public final class LWJGLGraphics implements Graphics {
 		windowCloseCallback = new GLFWWindowCloseCallback() {
 			@Override
 			public void invoke(long window) {
-				if(control != null) {
-					control.exit();
-				}
+				exit();
 			}
 		};
 		
@@ -380,6 +379,12 @@ public final class LWJGLGraphics implements Graphics {
 		// Set the clear color
 		glClearColor(0.1f, 0.2f, 1f, 0.0f);
 
+	}
+	
+	private void exit() {
+		if(control != null) {
+			control.exit();
+		}
 	}
 
 	private void updateMVP() {
