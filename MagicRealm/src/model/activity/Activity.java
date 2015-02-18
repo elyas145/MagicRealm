@@ -13,5 +13,9 @@ public abstract class Activity {
 	public abstract void perform(ModelController mc);
 	
 	private ActivityType type;
+
+	public ActivityType getType() {
+		return type;
+	}
 	
 }

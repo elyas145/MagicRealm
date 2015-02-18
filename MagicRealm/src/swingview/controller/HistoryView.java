@@ -1,10 +1,14 @@
 package swingview.controller;
 
+import java.util.ArrayList;
+
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 
+import model.activity.Activity;
 import model.player.PersonalHistory;
+import model.player.PersonalHistoryDay;
 
 @SuppressWarnings("serial")
 public class HistoryView extends JPanel {
@@ -16,7 +20,16 @@ public class HistoryView extends JPanel {
 		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 		this.history = history;
 		
-		
-		//arrayList = history.getDays()
+		actions = new JTable(8,28);
+		ArrayList<PersonalHistoryDay> days = history.getDays();
+		int daynum = 0;
+		for(PersonalHistoryDay d : days){
+			ArrayList<Activity> activities = d.getActivities();
+			for (int i = 0; i < activities.size(); i++){
+				actions.setValueAt(activities.get(i).getType().toString(), daynum, i);
+			}
+			
+			daynum++;
+		}
 	}
 }
