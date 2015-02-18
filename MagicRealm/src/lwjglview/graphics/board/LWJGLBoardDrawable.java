@@ -83,20 +83,17 @@ public class LWJGLBoardDrawable implements BoardView, Drawable {
 		bufferT = BufferUtils.createFloatBuffer(2);
 
 		counterDrawables = new HashMap<CounterType, LWJGLCounterDrawable>();
-		for (CounterType ct : CounterType.values()) {
-			setCounter(ct, TileName.BORDERLAND, 6);
-		}
 
 		ambientColour = BufferUtils.createFloatBuffer(4);
 	}
-	
+
 	private FloatBuffer bufferN, bufferE, bufferT;
 
 	@Override
-	public void setTile(TileName tile, int xPos, int yPos, int rot,
-			Iterable<ClearingInterface> clears) {
-		int row = yPos;
-		int col = xPos;
+	public void setTile(TileName tile, int rw, int cl, int rot,
+			Iterable<? extends ClearingInterface> clears) {
+		int row = rw;
+		int col = cl;
 		float x, y, r;
 		x = row % 2 == 0 ? 0f : 1.5f;
 		x += col * 3f;
@@ -104,8 +101,10 @@ public class LWJGLBoardDrawable implements BoardView, Drawable {
 		r = Mathf.PI * rot / 3f;
 		Map<Integer, ClearingStorage> tileClr = new HashMap<Integer, ClearingStorage>();
 		clearings.put(tile, tileClr);
-		tiles.put(tile, new LWJGLTileDrawable(tile, x, y, r,
-				getTextureIndex(tile, false), getTextureIndex(tile, true)));
+		synchronized (tiles) {
+			tiles.put(tile, new LWJGLTileDrawable(tile, x, y, r,
+					getTextureIndex(tile, false), getTextureIndex(tile, true)));
+		}
 		bufferT.put(0, x);
 		bufferT.put(1, y);
 		for (ClearingInterface clr : clears) {
@@ -145,7 +144,9 @@ public class LWJGLBoardDrawable implements BoardView, Drawable {
 	 * Tiles can request their position from the board
 	 */
 	public void getTilePosition(TileName tt, FloatBuffer position) {
-		tiles.get(tt).getPosition(position);
+		synchronized (tiles) {
+			tiles.get(tt).getPosition(position);
+		}
 	}
 
 	/*
@@ -161,11 +162,13 @@ public class LWJGLBoardDrawable implements BoardView, Drawable {
 
 	@Override
 	public void enchantTile(TileName tile) {
-		tiles.get(tile).setEnchanted(true);
+		synchronized (tiles) {
+			tiles.get(tile).setEnchanted(true);
+		}
 	}
 
 	@Override
-	public void draw(Graphics gfx) {
+	public synchronized void draw(Graphics gfx) {
 		LWJGLGraphics lwgfx = (LWJGLGraphics) gfx;
 
 		// reset the view matrix
@@ -200,9 +203,11 @@ public class LWJGLBoardDrawable implements BoardView, Drawable {
 		updateAmbientColour();
 		shaders.setUniformFloatArrayValue(st, "ambientColour", 4, ambientColour);
 
-		// draw all tiles
-		for (Drawable tile : tiles.values()) {
-			tile.draw(lwgfx);
+		synchronized (tiles) {
+			// draw all tiles
+			for (Drawable tile : tiles.values()) {
+				tile.draw(lwgfx);
+			}
 		}
 
 		// load chit textures
@@ -228,9 +233,11 @@ public class LWJGLBoardDrawable implements BoardView, Drawable {
 		// update shader colour
 		shaders.setUniformFloatArrayValue(st, "ambientColour", 4, ambientColour);
 
-		// draw all chits
-		for (LWJGLCounterDrawable counter : counterDrawables.values()) {
-			counter.draw(lwgfx);
+		synchronized (counterDrawables) {
+			// draw all chits
+			for (LWJGLCounterDrawable counter : counterDrawables.values()) {
+				counter.draw(lwgfx);
+			}
 		}
 
 	}
@@ -284,7 +291,7 @@ public class LWJGLBoardDrawable implements BoardView, Drawable {
 		}
 	}
 
-	private void relocateChit(CounterType type, float x, float y) {
+	private synchronized void relocateChit(CounterType type, float x, float y) {
 		counterDrawables.get(type).moveTo(x, y);
 	}
 
