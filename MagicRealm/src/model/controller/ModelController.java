@@ -1,6 +1,7 @@
 package model.controller;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
 
 import config.GameConfiguration;
@@ -8,14 +9,17 @@ import utils.resources.ResourceHandler;
 import model.activity.Activity;
 import model.activity.Move;
 import model.board.Board;
+import model.enums.ActivityType;
 import model.enums.CharacterType;
 import model.enums.CounterType;
+import model.enums.PhaseType;
 import model.enums.SiteType;
 import model.enums.TileName;
 import model.exceptions.IllegalMoveException;
 import model.player.Player;
 import model.character.CharacterFactory;
 import model.character.Character;
+import model.character.Phase;
 
 /*
  * Meant to be a container for the entire model
@@ -161,13 +165,40 @@ public class ModelController {
 
 	public void newDayTime() {
 		currentPlayer = 0;
-		
+
 	}
 
 	public void newDay() {
-		for(Player player : players){
+		for (Player player : players) {
 			player.getPersonalHistory().newDay();
 		}
-		
+
 	}
+
+	public ArrayList<Phase> getAllowedPhases() {
+		ArrayList<Phase> phases = new ArrayList<Phase>();
+		phases.addAll(getInitialPhases());
+		phases.addAll(characters.get(currentPlayer).getSpecialPhases());
+		phases.addAll(getSunlightPhases());
+		return phases;
+	}
+
+	private Collection<? extends Phase> getSunlightPhases() {
+		ArrayList<Phase> init = new ArrayList<Phase>();
+		for (int i = 0; i < GameConfiguration.SUNLIGHT_PHASES; i++) {
+			init.add(new Phase(PhaseType.SUNLIGHT));
+			init.get(i).setPossibleActivities(ActivityType.values());
+		}
+		return init;
+	}
+
+	private Collection<? extends Phase> getInitialPhases() {
+		ArrayList<Phase> init = new ArrayList<Phase>();
+		for (int i = 0; i < GameConfiguration.INITIAL_PHASES; i++) {
+			init.add(new Phase(PhaseType.DEFAULT));
+			init.get(i).setPossibleActivities(ActivityType.values());
+		}
+		return init;
+	}
+
 }

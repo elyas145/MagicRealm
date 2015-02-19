@@ -14,7 +14,9 @@ import javax.swing.JPanel;
 import swingview.controller.HistoryView;
 import model.activity.Activity;
 import model.activity.Empty;
+import model.character.Phase;
 import model.enums.ActivityType;
+import model.enums.PhaseType;
 import model.player.PersonalHistory;
 import model.player.Player;
 import controller.Controller;
@@ -24,10 +26,10 @@ public class BirdSongView extends JPanel implements ActionListener {
 	private Controller parent;
 	private PersonalHistory history;
 	private JButton submit;
-	ArrayList<JComboBox<String>> boxesArray;
+	ArrayList<JComboBox<Object>> boxesArray;
 	private ArrayList<String> actions = new ArrayList<String>();
 
-	public BirdSongView(Controller parent, String player) {
+	public BirdSongView(Controller parent, String player, ArrayList<Phase> phases) {
 		this.parent = parent;
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		JLabel lblPlayer = new JLabel(player);
@@ -37,32 +39,31 @@ public class BirdSongView extends JPanel implements ActionListener {
 		historyView.setAlignmentX(Component.CENTER_ALIGNMENT);
 		add(historyView);
 
-		JLabel lbl = new JLabel("CurrentDay: " + parent.getCurrentDay());
+		JLabel lbl = new JLabel("CurrentDay: " + parent.getCurrentDay());		
 		add(lbl);
+		
 		JPanel lbls = new JPanel();
-		lbls.setLayout(new BoxLayout(lbls, BoxLayout.X_AXIS));
-
-		ArrayList<JLabel> lblArray = new ArrayList<JLabel>();
-		for (int i = 0; i < 8; i++) {
-			lblArray.add(new JLabel("Phase: " + (i + 1) + "          "));
-			lblArray.get(i).setAlignmentX(LEFT_ALIGNMENT);
-			lbls.add(lblArray.get(i));
-		}
-		add(lbls);
-
-		boxesArray = new ArrayList<JComboBox<String>>();
 		JPanel boxes = new JPanel();
+		lbls.setLayout(new BoxLayout(lbls, BoxLayout.X_AXIS));
 		boxes.setLayout(new BoxLayout(boxes, BoxLayout.X_AXIS));
-		ActivityType[] arr = ActivityType.values();
-		String[] strarr = new String[arr.length];
-		for (int i = 0; i < arr.length; i++) {
-			strarr[i] = arr[i].toString();
-		}
-
-		for (int i = 0; i < 8; i++) {
-			boxesArray.add(new JComboBox<String>(strarr));
+		
+		ArrayList<JLabel> lblArray = new ArrayList<JLabel>();
+		boxesArray = new ArrayList<JComboBox<Object>>();
+		for (int i = 0; i < phases.size(); i++) {
+			if(phases.get(i).getType() == PhaseType.DEFAULT){
+				lblArray.add(new JLabel("Default Phase: " + (i + 1) + "           "));
+			}else if(phases.get(i).getType() == PhaseType.SPECIAL){
+				lblArray.add(new JLabel("Special Phase: " + (i + 1) + "           "));
+			}else{
+				lblArray.add(new JLabel("Sunlight Phase: " + (i + 1) + "          "));
+			}			
+			lblArray.get(i).setAlignmentX(BOTTOM_ALIGNMENT);
+			lbls.add(lblArray.get(i));
+			
+			boxesArray.add(new JComboBox<Object>(phases.get(i).getPossibleActivities().toArray()));
 			boxes.add(boxesArray.get(i));
 		}
+		add(lbls);
 		add(boxes);
 		submit = new JButton("Submit");
 		submit.addActionListener(this);
@@ -73,7 +74,7 @@ public class BirdSongView extends JPanel implements ActionListener {
 	public void actionPerformed(ActionEvent ae) {
 		if (ae.getSource().equals(submit)) {
 			// submit to controller.
-			for (JComboBox<String> b : boxesArray) {
+			for (JComboBox<Object> b : boxesArray) {
 				actions.add(b.getSelectedItem().toString());
 			}
 

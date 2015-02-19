@@ -40,7 +40,6 @@ public class ControllerMain implements Controller {
 	private BoardView boardView;
 	private ModelController model;
 	private Controller thisController = this;
-	private Thread gameLoop;
 
 	public ControllerMain() {
 		rh = new ResourceHandler();
@@ -238,6 +237,6 @@ public class ControllerMain implements Controller {
 	}
 
 	private void startBirdSong(Player player) {
-		mainView.enterBirdSong(player.getCharacter().getType().toString());
+		mainView.enterBirdSong(player.getCharacter().getType().toString(), model.getAllowedPhases());
 	}
 }

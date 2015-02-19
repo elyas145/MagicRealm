@@ -1,6 +1,7 @@
 package model.character;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 import model.counter.chit.Chit;
 import model.enums.CharacterType;
@@ -12,11 +13,15 @@ public class Character implements CharacterInterface {
 	private SiteType initialLocation;
 	private boolean hiding;
 	private ArrayList<Chit> belongings;
+	private ArrayList<Phase> specialPhases;
 
-	public Character(CharacterType t){
+	public Character(CharacterType t) {
+		System.out.println("WARNING: only use the CharacterFactory class to create characters, this inssures full initialization. ");
 		type = t;
 		initialLocation = SiteType.INN;
+		hiding = false;
 	}
+
 	public CharacterType getType() {
 		return type;
 	}
@@ -43,5 +48,14 @@ public class Character implements CharacterInterface {
 
 	public SiteType getInitialLocation() {
 		return initialLocation;
+	}
+
+	public void setSpecialPhases(ArrayList<Phase> specialPhases) {
+		this.specialPhases = specialPhases;
+	}
+
+	public ArrayList<Phase> getSpecialPhases() {
+
+		return specialPhases;
 	}
 }

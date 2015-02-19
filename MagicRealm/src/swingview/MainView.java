@@ -11,10 +11,12 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
+import model.character.Phase;
 import model.player.Player;
 import swingview.controller.birdsong.BirdSongView;
 import swingview.controller.mainmenu.MainMenu;
@@ -60,11 +62,11 @@ public class MainView extends JFrame implements ViewController, WindowListener,
 		setVisible(true);
 	}
 
-	public void enterBirdSong(String player) {
+	public void enterBirdSong(String player, ArrayList<Phase> phases) {
 		setPreferredSize(new Dimension(
 				GraphicsConfiguration.INITIAL_BIRD_WIDTH,
 				GraphicsConfiguration.INITIAL_BIRD_HEIGHT));
-		BirdSongView birdSong = new BirdSongView(parent, player);
+		BirdSongView birdSong = new BirdSongView(parent, player, phases);
 		setContentPane(birdSong);
 		pack();
 	}
