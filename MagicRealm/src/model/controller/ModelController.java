@@ -28,6 +28,7 @@ public class ModelController {
 	private ArrayList<Character> characters = null;
 	private ArrayList<Player> players = null;
 	private int currentPlayer = 0;
+	private boolean currentPlayerDone = false;
 	
 	public ModelController(ResourceHandler rh) {
 		this.rh = rh;
@@ -120,5 +121,17 @@ public class ModelController {
 	public CounterType getCurrentCounter() {
 		return characters.get(currentPlayer).getType().toCounter();
 	}
-
+	public boolean isPlayerDone(){
+		return currentPlayerDone;
+	}
+	public void setPlayerDone(){
+		currentPlayerDone = true;
+	}
+	public Player nextPlayer(){
+		if(currentPlayer < 2){
+			currentPlayer++;
+		}else
+			currentPlayer = 0;
+		return players.get(currentPlayer);
+	}
 }
