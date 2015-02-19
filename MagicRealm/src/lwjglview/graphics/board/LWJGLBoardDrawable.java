@@ -102,6 +102,7 @@ public class LWJGLBoardDrawable implements BoardView, Drawable {
 		counterDrawables = new HashMap<CounterType, LWJGLCounterDrawable>();
 
 		ambientColour = new AnimationQueue();
+		ambientColour.start();
 		timeOfDay = TimeOfDay.DUSK;
 		setTimeOfDay(timeOfDay);
 	}
