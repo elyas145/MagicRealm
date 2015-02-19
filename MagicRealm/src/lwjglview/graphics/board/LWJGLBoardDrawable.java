@@ -64,8 +64,8 @@ public class LWJGLBoardDrawable implements BoardView, Drawable {
 
 		// initialize chits
 		numChits = CounterType.values().length;
-		chitWidth = GraphicsConfiguration.CHIT_IMAGE_WIDTH;
-		chitHeight = GraphicsConfiguration.CHIT_IMAGE_HEIGHT;
+		chitWidth = GraphicsConfiguration.IMAGE_SCALE_WIDTH;
+		chitHeight = GraphicsConfiguration.IMAGE_SCALE_HEIGHT;
 		rawChitData = ByteBuffer.allocateDirect(numChits * chitHeight
 				* chitWidth * 4);
 		chitIndex = 0;
@@ -74,7 +74,8 @@ public class LWJGLBoardDrawable implements BoardView, Drawable {
 		loadChitImages();
 		System.out.println("Finished loading chit images");
 		System.out.println("Loading chit model data");
-		roundCounter = ModelData.loadModelData(resources, "chit_circle.obj");
+		roundCounter = ModelData.loadModelData(resources, "circle_counter.obj");
+		squareCounter = ModelData.loadModelData(resources, "square_counter.obj");
 		System.out.println("Finished loading chit model data");
 
 		// initialize buffers for tile locations
@@ -120,7 +121,7 @@ public class LWJGLBoardDrawable implements BoardView, Drawable {
 
 		if (!counterDrawables.containsKey(tp)) {
 			counterDrawables.put(tp, new LWJGLCounterDrawable(this, tp,
-					roundCounter, getCounterTextureIndex(tp)));
+					getCounterRepresentation(tp), getCounterTextureIndex(tp)));
 		}
 
 		if (!counterLocations.containsKey(tp)) {
@@ -240,6 +241,16 @@ public class LWJGLBoardDrawable implements BoardView, Drawable {
 			}
 		}
 
+	}
+
+	private Drawable getCounterRepresentation(CounterType tp) {
+		if(tp.isCharacter()) {
+			return roundCounter;
+		}
+		else if(tp.isSite()) {
+			return squareCounter;
+		}
+		return squareCounter;
 	}
 
 	private void updateAmbientColour() {
@@ -414,6 +425,7 @@ public class LWJGLBoardDrawable implements BoardView, Drawable {
 	private ByteBuffer rawChitData;
 
 	private ModelData roundCounter;
+	private ModelData squareCounter;
 
 	private Map<TileName, LWJGLTileDrawable> tiles;
 	private Map<CounterType, LWJGLCounterDrawable> counterDrawables;

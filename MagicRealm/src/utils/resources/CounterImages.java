@@ -1,16 +1,31 @@
 package utils.resources;
 
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
+import config.GraphicsConfiguration;
 import model.enums.CounterType;
 
 public class CounterImages {
 
-	public static BufferedImage getCounterImage(ResourceHandler rh, CounterType type)
-			throws IOException {
-		return rh.readImage(ResourceHandler.joinPath("images", "counters",
-				getSubDir(type), getName(type) + ".png"));
+	public static BufferedImage getCounterImage(ResourceHandler rh,
+			CounterType type) throws IOException {
+		BufferedImage before = rh.readImage(ResourceHandler.joinPath("images",
+				"counters", getSubDir(type), getName(type)));
+		BufferedImage newImage = new BufferedImage(
+				GraphicsConfiguration.IMAGE_SCALE_WIDTH,
+				GraphicsConfiguration.IMAGE_SCALE_HEIGHT,
+				BufferedImage.TYPE_INT_ARGB);
+
+		Graphics g = newImage.createGraphics();
+		g.drawImage(before, 0, 0, GraphicsConfiguration.IMAGE_SCALE_WIDTH,
+				GraphicsConfiguration.IMAGE_SCALE_HEIGHT, null);
+		g.dispose();
+		return newImage;
 	}
 
 	private static String getSubDir(CounterType tile) {
@@ -19,6 +34,14 @@ public class CounterImages {
 		case CHARACTER_CAPTAIN:
 		case CHARACTER_SWORDSMAN:
 			return "characters";
+		case SITE_CHAPEL:
+		case SITE_GUARD_HOUSE:
+		case SITE_HOUSE:
+		case SITE_HUT:
+		case SITE_INN:
+		case SITE_LARGE_FIRE:
+		case SITE_SMALL_FIRE:
+			return "sites";
 		default:
 			return ".";
 		}
@@ -27,13 +50,27 @@ public class CounterImages {
 	private static String getName(CounterType tile) {
 		switch (tile) {
 		case CHARACTER_AMAZON:
-			return "amazon";
+			return "amazon.png";
 		case CHARACTER_CAPTAIN:
-			return "captain";
+			return "captain.png";
 		case CHARACTER_SWORDSMAN:
-			return "swordsman";
+			return "swordsman.png";
+		case SITE_CHAPEL:
+			return "chapel.gif";
+		case SITE_GUARD_HOUSE:
+			return "guard.gif";
+		case SITE_HOUSE:
+			return "house.gif";
+		case SITE_HUT:
+			return "hut.gif";
+		case SITE_INN:
+			return "inn.gif";
+		case SITE_LARGE_FIRE:
+			return "large_fire.gif";
+		case SITE_SMALL_FIRE:
+			return "small_fire.gif";
 		default:
-			return "penguin";
+			return "penguin.png";
 		}
 	}
 

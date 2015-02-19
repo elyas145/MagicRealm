@@ -7,11 +7,13 @@ uniform sampler2DArray texture;
 uniform vec4 ambientColour;
 
 in vec3 position;
+in vec3 eye;
 in vec3 normal;
 in vec2 textureCoordinate;
 
 void main() {
-	float scale = dot(position, normal) / length(position) / length(normal);
+	vec3 diff = position - eye;
+	float scale = dot(diff, normal) / length(diff) / length(normal);
 	//scale = pow(scale, 3.);
 	vec4 color = texture2DArray(texture, vec3(textureCoordinate, float(index)));
 	if(color.r < .5) {
