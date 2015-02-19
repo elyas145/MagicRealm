@@ -23,10 +23,17 @@ public class ModelController {
 	private int numPlayers = 0;
 	private ArrayList<SiteType> sites;
 	private int currentDay = 0;
+
+	private Board board = null;
+	private ArrayList<Character> characters = null;
+	private ArrayList<Player> players = null;
+	private int currentPlayer = 0;
+	
 	public ModelController(ResourceHandler rh) {
 		this.rh = rh;
 		currentDay = 1;
 		sites = new ArrayList<SiteType>();
+		players = new ArrayList<Player>();
 		for(SiteType t : SiteType.values()){
 			sites.add(t);
 		}
@@ -41,12 +48,8 @@ public class ModelController {
 		board.removeCharacter(character);
 	}
 
-	private Board board = null;
-	private ArrayList<Character> characters = null;
-	private ArrayList<Player> players = null;
-	private int currentPlayer = 0;
 	
-	public Board getBoard() {
+	public Board setBoard() {
 		if (board == null) {
 			board = new Board(rh);
 		}
@@ -58,13 +61,13 @@ public class ModelController {
 	}
 
 	public ArrayList<Player> getPlayers() {
-		if (players == null) {
+		if (players != null) {
 			for (int i = 0; i < numPlayers; i++) {
 				players.add(new Player(i, "player: " + i));
 				players.get(i).setCharacter(characters.get(i));
 			}
 		}
-		return null;
+		return players;
 	}
 
 	public void setCharacters() {

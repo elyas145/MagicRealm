@@ -25,5 +25,7 @@ public interface Controller {
 	ArrayList<Integer> getPossibleClearings(TileName selectedTile);
 	
 	void setCurrentPlayerActivities(ArrayList<Activity> activities);
+
+	void startGame();
 	
 }

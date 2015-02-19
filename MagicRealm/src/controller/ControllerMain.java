@@ -43,6 +43,7 @@ public class ControllerMain implements Controller {
 		rh = new ResourceHandler();
 		model = new ModelController(rh);
 		mainView = new MainView(this);
+		model.setBoard();
 		model.setNumberPlayers(GameConfiguration.MAX_PLAYERS);
 		model.setCharacters();
 		model.setPlayersInitialLocations();
@@ -122,9 +123,6 @@ public class ControllerMain implements Controller {
 	@Override
 	public void startGameView() {
 		startBoardView();
-		
-		mainView.enterBirdSong();
-		
 	}
 
 
@@ -184,5 +182,20 @@ public class ControllerMain implements Controller {
 			}
 		}
 		return false;
+	}
+
+	@Override
+	public void startGame() {
+		while (model.getCurrentDay() <= GameConfiguration.LUNAR_MONTH){
+			startBirdSong();
+			
+		}
+	}
+
+	private void startBirdSong() {
+		for(Player player : model.getPlayers()){
+			mainView.enterBirdSong(player);
+		}
+		
 	}
 }

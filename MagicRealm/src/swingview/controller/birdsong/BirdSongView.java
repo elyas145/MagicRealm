@@ -16,6 +16,7 @@ import model.activity.Activity;
 import model.activity.Empty;
 import model.enums.ActivityType;
 import model.player.PersonalHistory;
+import model.player.Player;
 import controller.Controller;
 
 @SuppressWarnings("serial")
@@ -25,11 +26,12 @@ public class BirdSongView extends JPanel implements ActionListener{
 	private JButton submit;
 	ArrayList<JComboBox> boxesArray;
 	private ArrayList<String> actions = new ArrayList<String>();
-	public BirdSongView(Controller parent) {
+	public BirdSongView(Controller parent, Player player) {
 		this.parent = parent;
 		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
-		
-		history = parent.getPlayerHistory();
+		JLabel lblPlayer = new JLabel(player.getCharacter().getType().toString());
+		add(lblPlayer);
+		history = player.getPersonalHistory();
 		HistoryView historyView = new HistoryView(history);
 		historyView.setAlignmentX(Component.CENTER_ALIGNMENT);
 		add(historyView);

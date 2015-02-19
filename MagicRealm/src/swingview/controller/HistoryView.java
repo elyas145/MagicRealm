@@ -19,7 +19,6 @@ public class HistoryView extends JPanel {
 	public HistoryView(PersonalHistory history) {
 		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 		this.history = history;
-
 		actions = new JTable(28, 8);
 		ArrayList<PersonalHistoryDay> days = history.getDays();
 		int daynum = 0;

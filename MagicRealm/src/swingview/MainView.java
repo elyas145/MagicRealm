@@ -15,6 +15,7 @@ import java.awt.geom.Rectangle2D;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
+import model.player.Player;
 import swingview.controller.birdsong.BirdSongView;
 import swingview.controller.mainmenu.MainMenu;
 import utils.time.Timing;
@@ -50,9 +51,9 @@ public class MainView extends JFrame implements ViewController, WindowListener {
 		pack();
 		setVisible(true);
 	}
-	public void enterBirdSong(){
+	public void enterBirdSong(Player player){
 		setPreferredSize(new Dimension(GraphicsConfiguration.INITIAL_BIRD_WIDTH,GraphicsConfiguration.INITIAL_BIRD_HEIGHT));
-		BirdSongView birdSong = new BirdSongView(parent);
+		BirdSongView birdSong = new BirdSongView(parent, player);
 		setContentPane(birdSong);
 		pack();
 	}
@@ -104,7 +105,7 @@ public class MainView extends JFrame implements ViewController, WindowListener {
 	}
 	@Override
 	public void startGameView() {
-		parent.startGameView();	
+		parent.startGame();	
 	}
 
 	@Override
