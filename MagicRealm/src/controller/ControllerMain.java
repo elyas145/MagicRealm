@@ -23,6 +23,7 @@ import model.enums.CharacterType;
 import model.enums.CounterType;
 import model.enums.SiteType;
 import model.enums.TileName;
+import model.enums.TimeOfDay;
 import model.interfaces.ClearingInterface;
 import model.interfaces.HexTileInterface;
 import model.player.PersonalHistory;
@@ -190,9 +191,12 @@ public class ControllerMain implements Controller {
 	@Override
 	public void startGame() {
 		this.startBoardView();
+		TimeOfDay tod = TimeOfDay.MIDNIGHT;
 		while (model.getCurrentDay() <= GameConfiguration.LUNAR_MONTH) {
 			model.newDay();
 			model.newDayTime();
+			tod = tod.next();
+			boardView.setTimeOfDay(tod);
 			Player plr;
 			for (int i = 0; i < model.getNumPlayers(); i++) {
 				synchronized (model) {
@@ -211,6 +215,8 @@ public class ControllerMain implements Controller {
 				}
 			}
 			model.newDayTime();
+			tod = tod.next();
+			boardView.setTimeOfDay(tod);
 			for (int i = 0; i < model.getNumPlayers(); i++) {
 				synchronized (model) {
 					plr = model.getCurrentPlayer();
