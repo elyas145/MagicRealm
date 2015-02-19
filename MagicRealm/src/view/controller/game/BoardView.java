@@ -12,5 +12,13 @@ public interface BoardView {
 	void enchantTile(TileName tile);
 
 	void setCounter(CounterType counter, TileName tile, int clearing);
+	
+	void focusOn(TileName tile);
+	
+	void focusOn(CounterType counter);
+	
+	void focusOn(TileName tile, int clearing);
+	
+	boolean isAnimationFinished(CounterType ct);
 
 }

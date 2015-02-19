@@ -32,7 +32,7 @@ public class Matrix {
 		return rot;
 	}
 	
-	public static Matrix translation(float[] data) {
+	public static Matrix translation(float... data) {
 		int sz = data.length + 1;
 		Matrix trans = new Matrix(sz, sz);
 		trans.translate(data);
@@ -52,7 +52,7 @@ public class Matrix {
 		return ret;
 	}
 	
-	public static Matrix columnVector(float[] fs) {
+	public static Matrix columnVector(float... fs) {
 		Matrix ret = new Matrix(fs.length, 1);
 		for(int i = 0; i < fs.length; ++i) {
 			ret.set(i, 0, fs[i]);
@@ -289,6 +289,16 @@ public class Matrix {
 			}
 		}
 		return ret;
+	}
+	
+	public float length() {
+		float v = 0f;
+		for(int i = 0; i < rowCount(); ++i) {
+			for(int j = 0; j < columnCount(); ++j) {
+				v += Mathf.sqr(get(i, j));
+			}
+		}
+		return Mathf.sqrt(v);
 	}
 	
 	public int rowCount() {

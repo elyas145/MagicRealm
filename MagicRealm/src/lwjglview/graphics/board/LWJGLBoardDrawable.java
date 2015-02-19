@@ -13,6 +13,12 @@ import org.lwjgl.BufferUtils;
 
 import config.GraphicsConfiguration;
 import lwjglview.graphics.LWJGLGraphics;
+import lwjglview.graphics.animator.Animator;
+import lwjglview.graphics.animator.FollowAnimator;
+import lwjglview.graphics.animator.MatrixCalculator;
+import lwjglview.graphics.animator.StaticAnimator;
+import lwjglview.graphics.animator.StaticMatrixCalculator;
+import lwjglview.graphics.animator.StaticTranslationCalculator;
 import lwjglview.graphics.model.ModelData;
 import lwjglview.graphics.shader.GLShaderHandler;
 import lwjglview.graphics.shader.ShaderType;
@@ -48,6 +54,11 @@ public class LWJGLBoardDrawable implements BoardView, Drawable {
 		tiles = new HashMap<TileName, LWJGLTileDrawable>();
 		clearings = new HashMap<TileName, Map<Integer, ClearingStorage>>();
 		counterLocations = new HashMap<CounterType, CounterLocation>();
+		Matrix pos = Matrix.columnVector(3.5f, -3.5f, 0f);
+		cameraFocus = new FollowAnimator(pos, new StaticMatrixCalculator(pos),
+				GraphicsConfiguration.CAMERA_SPEED);
+		buffer4 = BufferUtils.createFloatBuffer(4);
+		basis4 = Matrix.columnVector(0f, 0f, 0f, 1f);
 
 		// initialize tiles
 		numTiles = TileName.values().length * 2;
@@ -75,7 +86,8 @@ public class LWJGLBoardDrawable implements BoardView, Drawable {
 		System.out.println("Finished loading chit images");
 		System.out.println("Loading chit model data");
 		roundCounter = ModelData.loadModelData(resources, "circle_counter.obj");
-		squareCounter = ModelData.loadModelData(resources, "square_counter.obj");
+		squareCounter = ModelData
+				.loadModelData(resources, "square_counter.obj");
 		System.out.println("Finished loading chit model data");
 
 		// initialize buffers for tile locations
@@ -175,13 +187,13 @@ public class LWJGLBoardDrawable implements BoardView, Drawable {
 		// reset the view matrix
 		lwgfx.resetViewMatrix();
 		float time = Timing.getSeconds() * .1f;
-		Matrix tmp = Matrix.rotationX(4, Mathf.PI / 5f);
-		float k = (Mathf.sin(time * .6f) + 6f) / 12f;
-		tmp = Matrix.translation(new float[] { 0f, -4f * k, 3f * k }).multiply(
+		Matrix tmp = Matrix.rotationX(4, Mathf.PI / 4f);
+		float k = (Mathf.sin(time * .6f) + 6f) / 4f;
+		tmp = Matrix.translation(new float[] { 0f, -1f * k, 1f * k }).multiply(
 				tmp);
 		tmp = Matrix.rotationZ(4, time * .3f).multiply(tmp);
 		lwgfx.applyCameraTransform(tmp);
-		lwgfx.translateCamera(3.5f, -3.5f, 0f);
+		lwgfx.applyCameraTransform(cameraFocus.apply());
 
 		// load all textures to GPU
 		loadTextures(lwgfx);
@@ -243,11 +255,33 @@ public class LWJGLBoardDrawable implements BoardView, Drawable {
 
 	}
 
+	@Override
+	public void focusOn(TileName tile) {
+		Matrix vector = tiles.get(tile)
+				.getVector();
+		MatrixCalculator calc = new StaticMatrixCalculator(vector);
+		cameraFocus.changeFocus(calc);
+	}
+
+	@Override
+	public void focusOn(CounterType counter) {
+		cameraFocus.changeFocus(new CounterFocus(counter));
+	}
+
+	@Override
+	public void focusOn(TileName tile, int clearing) {
+		cameraFocus.changeFocus(new ClearingFocus(tile, clearing));
+	}
+
+	@Override
+	public boolean isAnimationFinished(CounterType ct) {
+		return counterDrawables.get(ct).isAnimationFinished();
+	}
+
 	private Drawable getCounterRepresentation(CounterType tp) {
-		if(tp.isCharacter()) {
+		if (tp.isCharacter()) {
 			return roundCounter;
-		}
-		else if(tp.isSite()) {
+		} else if (tp.isSite()) {
 			return squareCounter;
 		}
 		return squareCounter;
@@ -317,6 +351,10 @@ public class LWJGLBoardDrawable implements BoardView, Drawable {
 		return idx;
 	}
 
+	private Matrix getCounterVector(CounterType counter) {
+		return counterDrawables.get(counter).getVector();
+	}
+
 	private class ClearingStorage {
 		public ClearingStorage(TileName tl, FloatBuffer tc, FloatBuffer nl,
 				FloatBuffer el) {
@@ -352,6 +390,13 @@ public class LWJGLBoardDrawable implements BoardView, Drawable {
 					}
 				}
 			}
+		}
+
+		public void getLocation(FloatBuffer loc) {
+			boolean ench = isTileEnchanted(tile);
+			float[] pos = posns[ench ? 1 : 0];
+			loc.put(0, pos[0]);
+			loc.put(1, pos[1]);
 		}
 
 		public void getLocation(CounterType chit, FloatBuffer loc) {
@@ -409,6 +454,45 @@ public class LWJGLBoardDrawable implements BoardView, Drawable {
 		public int clearing;
 	}
 
+	private class CounterFocus implements MatrixCalculator {
+		public CounterFocus(CounterType ct) {
+			counter = ct;
+		}
+
+		@Override
+		public Matrix calculateMatrix() {
+			return getCounterVector(counter);
+		}
+
+		private CounterType counter;
+	}
+
+	private class ClearingFocus implements MatrixCalculator {
+		public ClearingFocus(TileName tl, int clr) {
+			tile = tl;
+			store = clearings.get(tl).get(clr);
+			updateMatrix();
+		}
+
+		@Override
+		public Matrix calculateMatrix() {
+			if (!enchanted && isTileEnchanted(tile)) {
+				updateMatrix();
+			}
+			return position;
+		}
+
+		private void updateMatrix() {
+			store.getLocation(buffer4);
+			position = Matrix.columnVector(buffer4.get(0), buffer4.get(1), 0f);
+		}
+
+		private ClearingStorage store;
+		private Matrix position;
+		private boolean enchanted;
+		private TileName tile;
+	}
+
 	private int tileIndex;
 	private int numTiles;
 	private int tileHeight;
@@ -438,5 +522,12 @@ public class LWJGLBoardDrawable implements BoardView, Drawable {
 	private ResourceHandler resources;
 
 	private FloatBuffer ambientColour;
+
+	private FloatBuffer buffer4;
+	private Matrix basis4;
+
+	private Matrix cameraLocation;
+
+	private FollowAnimator cameraFocus;
 
 }

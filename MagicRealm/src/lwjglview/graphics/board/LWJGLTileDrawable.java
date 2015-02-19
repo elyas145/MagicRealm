@@ -23,6 +23,8 @@ public class LWJGLTileDrawable extends TileDrawable {
 		super(tt);
 		xPosition = x;
 		yPosition = y;
+		vector = Matrix.columnVector(xPosition, yPosition, 0f);
+		translation = Matrix.translation(vector);
 		rotation = rot;
 		normalTex = norm;
 		enchantedTex = enchant;
@@ -56,6 +58,10 @@ public class LWJGLTileDrawable extends TileDrawable {
 
 	public boolean isEnchanted() {
 		return enchanted;
+	}
+	
+	public Matrix getVector() {
+		return vector;
 	}
 
 	@Override
@@ -128,7 +134,7 @@ public class LWJGLTileDrawable extends TileDrawable {
 
 			lwgfx.applyModelTransform(mat);
 
-			lwgfx.translateModel(xPosition, yPosition, 0f);
+			lwgfx.applyModelTransform(translation);
 
 			lwgfx.updateModelViewUniform(SHADER, "modelViewMatrix");
 			lwgfx.updateMVPUniform(SHADER, "mvpMatrix");
@@ -161,6 +167,8 @@ public class LWJGLTileDrawable extends TileDrawable {
 
 	private float xPosition;
 	private float yPosition;
+	private Matrix vector;
+	private Matrix translation;
 	private float rotation;
 	private int normalTex;
 	private int enchantedTex;

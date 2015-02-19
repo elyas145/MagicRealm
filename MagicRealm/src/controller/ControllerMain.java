@@ -193,9 +193,12 @@ public class ControllerMain implements Controller {
 		while (model.getCurrentDay() <= GameConfiguration.LUNAR_MONTH) {
 			model.newDay();
 			model.newDayTime();
+			Player plr;
 			for (int i = 0; i < model.getNumPlayers(); i++) {
 				synchronized (model) {
-					startBirdSong(model.getCurrentPlayer());
+					plr = model.getCurrentPlayer();
+					boardView.focusOn(plr.getCharacter().getType().toCounter());
+					startBirdSong(plr);
 					while (!model.isPlayerDone()) {
 						try {
 							model.wait();
@@ -210,6 +213,8 @@ public class ControllerMain implements Controller {
 			model.newDayTime();
 			for (int i = 0; i < model.getNumPlayers(); i++) {
 				synchronized (model) {
+					plr = model.getCurrentPlayer();
+					boardView.focusOn(model.getCurrentCounter());
 					playCurrentActivities();
 					while (!model.isPlayerDone()) {
 						try {
@@ -219,6 +224,7 @@ public class ControllerMain implements Controller {
 							// e.printStackTrace();
 						}
 					}
+					while(!boardView.isAnimationFinished(model.getCurrentCounter()));
 					model.nextPlayer();
 				}
 			}

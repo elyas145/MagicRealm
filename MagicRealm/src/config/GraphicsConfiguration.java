@@ -30,6 +30,8 @@ public class GraphicsConfiguration {
 	public static final int SPLASH_TIME = 1;
 	
 	public static final float ANIMATION_SPEED = 1f;
+	public static final float CAMERA_SPEED = 5f;
+	
 	public static final int INITIAL_ACTION_WIDTH = 200;
 	public static final int INITIAL_ACTION_HEIGHT = 150;
 

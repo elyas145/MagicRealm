@@ -4,6 +4,10 @@ public class Mathf {
 	
 	public static final float PI = (float) Math.PI;
 	
+	public static float sqr(float val) {
+		return val * val;
+	}
+	
 	public static float sqrt(float val) {
 		return (float) Math.sqrt(val);
 	}
