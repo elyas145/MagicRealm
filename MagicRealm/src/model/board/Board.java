@@ -99,13 +99,14 @@ public class Board implements BoardInterface {
 
 	}
 
-	public void moveCharacter(Character character, TileName tt, int clearing) {
+	public void moveCharacter(model.character.Character character, TileName tt,
+			int clearing) {
 		// TODO move character
 		// HexTile loc = mapOfChitPositions.get(character);
 		// Clearing clr = loc.getClearing(character);
 	}
 
-	public void removeCharacter(Character character) {
+	public void removeCharacter(model.character.Character character) {
 		// TODO Auto-generated method stub
 
 	}
@@ -245,7 +246,6 @@ public class Board implements BoardInterface {
 	public void setLocationOfCounter(CounterType ct, TileName tn, int clearing) {
 		HexTile ht = mapOfTiles.get(tn);
 		ClearingInterface cl = ht.getClearing(clearing);
-		setClearingOfCounter(ct, cl);
 	}
 
 	public void setLocationOfCounter(CounterType ct, SiteType site) {
@@ -279,7 +279,6 @@ public class Board implements BoardInterface {
 	private JSONArray arr;
 
 	public Set<TileName> getAllTiles() {
-		// TODO Auto-generated method stub
 		return mapOfTiles.keySet();
 	}
 
@@ -298,7 +297,7 @@ public class Board implements BoardInterface {
 
 	public ClearingInterface getClearing(TileName tile, int clearing) {
 		HexTile hexTile = mapOfTiles.get(tile);
-		
+
 		return hexTile.getClearing(clearing);
 	}
 

@@ -29,7 +29,6 @@ public class Player {
 	public void setActivities(ArrayList<Activity> activities) {
 		for(Activity a : activities){
 			historyPad.addActivity(a);
-			System.out.println("added Activity: " + a.getType());
 		}		
 		
 	}

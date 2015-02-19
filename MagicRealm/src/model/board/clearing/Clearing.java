@@ -58,11 +58,14 @@ public class Clearing implements ClearingInterface {
 	public boolean isConnectedTo(ClearingInterface other) {
 		PathType[] res = internalConnections.get(other);
 		int ench = isEnchanted() ? 1 : 0;
-		if(res[ench] != null) {
+		if(res != null && res[ench] != null) {
 			return true;
 		}
 		ClearingResolver[] reslvrs = externalConnections.get(other.getParentTile());
-		ClearingResolver rsv = reslvrs[ench];
+		ClearingResolver rsv = null;
+		if(reslvrs != null){
+			rsv = reslvrs[ench];
+		}
 		if (rsv != null) {
 			if (rsv.getClearing() == other) {
 				return true;
