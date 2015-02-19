@@ -98,15 +98,19 @@ public class ModelController {
 			case CHAPEL:
 				board.setLocationOfCounter(t.toCounterType(),
 						TileName.AWFUL_VALLEY, 5);
+				break;
 			case GUARD_HOUSE:
 				board.setLocationOfCounter(t.toCounterType(),
 						TileName.DARK_VALLEY, 5);
+				break;
 			case HOUSE:
 				board.setLocationOfCounter(t.toCounterType(),
 						TileName.CURST_VALLEY, 5);
+				break;
 			case INN:
 				board.setLocationOfCounter(t.toCounterType(),
 						TileName.BAD_VALLEY, 5);
+				break;
 			}
 		}
 	}
