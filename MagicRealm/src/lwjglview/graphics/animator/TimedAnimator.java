@@ -45,6 +45,9 @@ public abstract class TimedAnimator extends Animator {
 		if(paused) {
 			return 1f - (endTime - pauseTime) / length;
 		}
+		if(isFinished()) {
+			return 1f;
+		}
 		return 1f - (endTime - currentTime) / length;
 	}
 	

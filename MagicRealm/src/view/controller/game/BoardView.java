@@ -2,6 +2,7 @@ package view.controller.game;
 
 import model.enums.CounterType;
 import model.enums.TileName;
+import model.enums.TimeOfDay;
 import model.interfaces.ClearingInterface;
 
 public interface BoardView {
@@ -20,5 +21,7 @@ public interface BoardView {
 	void focusOn(TileName tile, int clearing);
 	
 	boolean isAnimationFinished(CounterType ct);
+	
+	void setTimeOfDay(TimeOfDay time);
 
 }

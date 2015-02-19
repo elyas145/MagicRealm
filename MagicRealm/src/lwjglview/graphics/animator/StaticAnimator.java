@@ -1,5 +1,6 @@
 package lwjglview.graphics.animator;
 
+import lwjglview.graphics.animator.matrixcalculator.MatrixCalculator;
 import utils.math.Matrix;
 
 public abstract class StaticAnimator extends Animator {

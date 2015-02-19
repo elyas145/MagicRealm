@@ -1,31 +1,21 @@
 package lwjglview.graphics.animator;
 
-import utils.math.Mathf;
 import utils.math.Matrix;
 
-public abstract class MovementAnimator extends TimedAnimator {
+public abstract class MovementAnimator extends FadeAnimator {
 
-	public MovementAnimator(float vel, float xinit, float yinit, float xfin,
-			float yfin) {
-		super(getTime(vel, xinit, yinit, xfin, yfin));
-		initialPosition = Matrix.columnVector(new float[] { xinit, yinit, 0f });
-		finalPosition = Matrix.columnVector(new float[] { xfin, yfin, 0f });
+	public MovementAnimator(float vel, Matrix init, Matrix fin) {
+		super(getTime(vel, init, fin), init, fin);
 	}
-
+	
 	@Override
-	protected Matrix calculateTransform() {
-		float scale = getInterval();
-		Matrix a = initialPosition.multiply(1f - scale);
-		Matrix b = finalPosition.multiply(scale);
-		return Matrix.translation(a.add(b));
+	public Matrix calculateTransform() {
+		return Matrix.translation(super.calculateTransform());
 	}
 
-	private static float getTime(float vel, float xinit, float yinit,
-			float xfin, float yfin) {
-		return Mathf.length(xfin - xinit, yfin - yinit) / vel;
+	private static float getTime(float vel, Matrix init,
+			Matrix fin) {
+		return init.subtract(fin).length() / vel;
 	}
-
-	private Matrix initialPosition;
-	private Matrix finalPosition;
 
 }

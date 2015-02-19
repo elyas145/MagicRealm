@@ -13,17 +13,21 @@ import org.lwjgl.BufferUtils;
 
 import config.GraphicsConfiguration;
 import lwjglview.graphics.LWJGLGraphics;
+import lwjglview.graphics.animator.AnimationQueue;
 import lwjglview.graphics.animator.Animator;
+import lwjglview.graphics.animator.FadeAnimator;
 import lwjglview.graphics.animator.FollowAnimator;
-import lwjglview.graphics.animator.MatrixCalculator;
+import lwjglview.graphics.animator.MovementAnimator;
 import lwjglview.graphics.animator.StaticAnimator;
-import lwjglview.graphics.animator.StaticMatrixCalculator;
-import lwjglview.graphics.animator.StaticTranslationCalculator;
+import lwjglview.graphics.animator.matrixcalculator.MatrixCalculator;
+import lwjglview.graphics.animator.matrixcalculator.StaticMatrixCalculator;
+import lwjglview.graphics.animator.matrixcalculator.StaticTranslationCalculator;
 import lwjglview.graphics.model.ModelData;
 import lwjglview.graphics.shader.GLShaderHandler;
 import lwjglview.graphics.shader.ShaderType;
 import model.enums.CounterType;
 import model.enums.TileName;
+import model.enums.TimeOfDay;
 import model.interfaces.ClearingInterface;
 import utils.images.ImageTools;
 import utils.math.Mathf;
@@ -97,10 +101,20 @@ public class LWJGLBoardDrawable implements BoardView, Drawable {
 
 		counterDrawables = new HashMap<CounterType, LWJGLCounterDrawable>();
 
-		ambientColour = BufferUtils.createFloatBuffer(4);
+		ambientColour = new AnimationQueue();
+		timeOfDay = TimeOfDay.DUSK;
+		setTimeOfDay(timeOfDay);
 	}
 
 	private FloatBuffer bufferN, bufferE, bufferT;
+
+	@Override
+	public void setTimeOfDay(TimeOfDay time) {
+		ambientColour.push(new FadeAnimator(
+				GraphicsConfiguration.DAY_CHANGE_TIME,
+				getColourOfDay(timeOfDay), getColourOfDay(time)));
+		timeOfDay = time;
+	}
 
 	@Override
 	public void setTile(TileName tile, int rw, int cl, int rot,
@@ -213,8 +227,9 @@ public class LWJGLBoardDrawable implements BoardView, Drawable {
 		}
 		shaders.useShaderProgram(st);
 
-		updateAmbientColour();
-		shaders.setUniformFloatArrayValue(st, "ambientColour", 4, ambientColour);
+		buffer4.clear();
+		ambientColour.apply().toFloatBuffer(buffer4);
+		shaders.setUniformFloatArrayValue(st, "ambientColour", 4, buffer4);
 
 		synchronized (tiles) {
 			// draw all tiles
@@ -244,7 +259,9 @@ public class LWJGLBoardDrawable implements BoardView, Drawable {
 		 */
 
 		// update shader colour
-		shaders.setUniformFloatArrayValue(st, "ambientColour", 4, ambientColour);
+
+		ambientColour.apply().toFloatBuffer(buffer4);
+		shaders.setUniformFloatArrayValue(st, "ambientColour", 4, buffer4);
 
 		synchronized (counterDrawables) {
 			// draw all chits
@@ -257,8 +274,7 @@ public class LWJGLBoardDrawable implements BoardView, Drawable {
 
 	@Override
 	public void focusOn(TileName tile) {
-		Matrix vector = tiles.get(tile)
-				.getVector();
+		Matrix vector = tiles.get(tile).getVector();
 		MatrixCalculator calc = new StaticMatrixCalculator(vector);
 		cameraFocus.changeFocus(calc);
 	}
@@ -278,6 +294,21 @@ public class LWJGLBoardDrawable implements BoardView, Drawable {
 		return counterDrawables.get(ct).isAnimationFinished();
 	}
 
+	private Matrix getColourOfDay(TimeOfDay tod) {
+		switch(tod) {
+		case MIDNIGHT:
+			return AMBIENT_COLOURS[0];
+		case DUSK:
+			return AMBIENT_COLOURS[2];
+		case NOON:
+			return AMBIENT_COLOURS[4];
+		case DAWN:
+			return AMBIENT_COLOURS[6];
+		default:
+			return getColourOfDay(TimeOfDay.MIDNIGHT);
+		}
+	}
+
 	private Drawable getCounterRepresentation(CounterType tp) {
 		if (tp.isCharacter()) {
 			return roundCounter;
@@ -285,16 +316,6 @@ public class LWJGLBoardDrawable implements BoardView, Drawable {
 			return squareCounter;
 		}
 		return squareCounter;
-	}
-
-	private void updateAmbientColour() {
-		float time = Timing.getSeconds() * .3f;
-		int idx = (int) time % AMBIENT_COLOURS.length;
-		int nidx = (idx + 1) % AMBIENT_COLOURS.length;
-		float scale = time % 1f;
-		AMBIENT_COLOURS[idx].multiply(1f - scale)
-				.add(AMBIENT_COLOURS[nidx].multiply(scale))
-				.toFloatBuffer(ambientColour);
 	}
 
 	private int getTextureIndex(TileName type, boolean enchanted) {
@@ -521,7 +542,7 @@ public class LWJGLBoardDrawable implements BoardView, Drawable {
 
 	private ResourceHandler resources;
 
-	private FloatBuffer ambientColour;
+	private AnimationQueue ambientColour;
 
 	private FloatBuffer buffer4;
 	private Matrix basis4;
@@ -529,5 +550,7 @@ public class LWJGLBoardDrawable implements BoardView, Drawable {
 	private Matrix cameraLocation;
 
 	private FollowAnimator cameraFocus;
+
+	private TimeOfDay timeOfDay;
 
 }

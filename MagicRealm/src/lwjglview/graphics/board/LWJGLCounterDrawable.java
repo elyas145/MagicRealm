@@ -79,16 +79,17 @@ public class LWJGLCounterDrawable extends CounterDrawable {
 	}
 
 	private void move() {
-		float xo, yo, xf, yf;
+		float xf, yf;
 		xf = buffer.get(0);
 		yf = buffer.get(1);
+		Matrix fin = Matrix.columnVector(xf, yf, 0f);
 		if (position == null) {
 			position = BufferUtils.createFloatBuffer(2);
 		} else {
-			xo = position.get(0);
-			yo = position.get(1);
+			Matrix init = Matrix.columnVector(position.get(0), position.get(1),
+					0f);
 			movements.push(new MovementAnimator(
-					GraphicsConfiguration.ANIMATION_SPEED, xo, yo, xf, yf) {
+					GraphicsConfiguration.ANIMATION_SPEED, init, fin) {
 				@Override
 				public void finish() {
 				}

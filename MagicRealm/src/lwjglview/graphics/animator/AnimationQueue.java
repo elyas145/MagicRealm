@@ -43,11 +43,9 @@ public class AnimationQueue extends Animator {
 	protected Matrix calculateTransform() {
 		Matrix ret = top().apply();
 		if(!paused) {
-			while(!isEmpty() && top().isFinished()) {
+			while(head != tail && top().isFinished()) {
 				pop();
-				if(!isEmpty()) {
-					top().start();
-				}
+				top().start();
 			}
 		}
 		return ret;

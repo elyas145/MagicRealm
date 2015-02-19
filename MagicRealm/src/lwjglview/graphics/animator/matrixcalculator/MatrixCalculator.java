@@ -1,4 +1,4 @@
-package lwjglview.graphics.animator;
+package lwjglview.graphics.animator.matrixcalculator;
 
 import utils.math.Matrix;
 

@@ -1,5 +1,6 @@
 package lwjglview.graphics.animator;
 
+import lwjglview.graphics.animator.matrixcalculator.MatrixCalculator;
 import utils.math.Matrix;
 import utils.time.Timing;
 
@@ -18,7 +19,7 @@ public class FollowAnimator extends Animator {
 
 	@Override
 	public boolean isFinished() {
-		return false;
+		return currentPosition.equals(calculator.calculateMatrix());
 	}
 
 	@Override
@@ -53,9 +54,8 @@ public class FollowAnimator extends Animator {
 		} else {
 			delt = diff;
 		}
-		Matrix tmp = currentPosition;
-		currentPosition = tmp.add(delt);
-		return Matrix.translation(tmp);
+		currentPosition = currentPosition.add(delt);
+		return Matrix.translation(currentPosition);
 	}
 
 	private Matrix currentPosition;
