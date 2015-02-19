@@ -51,7 +51,7 @@ public class ControllerMain implements Controller {
 		model.setCharacters();
 		model.setPlayers();
 		model.setSiteLocations();
-		model.setPlayersInitialLocations();		
+		model.setPlayersInitialLocations();
 	}
 
 	private void start() {
@@ -161,7 +161,7 @@ public class ControllerMain implements Controller {
 	@Override
 	public void setCurrentPlayerActivities(ArrayList<Activity> activities) {
 		model.setCurrentPlayerActivities(activities);
-		playCurrentActivities();
+		model.setPlayerDone();
 	}
 
 	private void playCurrentActivities() {
@@ -203,13 +203,27 @@ public class ControllerMain implements Controller {
 	public void startGame() {
 		this.startBoardView();
 		while (model.getCurrentDay() <= GameConfiguration.LUNAR_MONTH) {
+			model.newDayTime();
 			for (int i = 0; i < model.getNumPlayers(); i++) {
 				synchronized (model) {
 					startBirdSong(model.getCurrentPlayer());
 					while (!model.isPlayerDone()) {
 						try {
-							boolean locked = Thread.holdsLock(model);
-							System.out.println(locked);
+							model.wait();
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							// e.printStackTrace();
+						}
+					}
+					model.nextPlayer();
+				}
+			}
+			model.newDayTime();
+			for (int i = 0; i < model.getNumPlayers(); i++) {
+				synchronized (model) {
+					playCurrentActivities();
+					while (!model.isPlayerDone()) {
+						try {
 							model.wait();
 						} catch (InterruptedException e) {
 							// TODO Auto-generated catch block
@@ -222,6 +236,6 @@ public class ControllerMain implements Controller {
 	}
 
 	private void startBirdSong(Player player) {
-		mainView.enterBirdSong(player);
+		mainView.enterBirdSong(player.getCharacter().getType().toString());
 	}
 }
