@@ -268,17 +268,6 @@ public class Board implements BoardInterface {
 		return counterPositions.keySet();
 	}
 
-	private Map<TileName, Map<Integer, Point[]>> clearingLocations;
-	private TileName[] surround;
-	// row column
-	private Map<Integer, Map<Integer, TileName>> mapOfTileLocations;
-	private Map<TileName, HexTile> mapOfTiles;
-	private Map<TileName, int[]> tileLocations;
-	private Collection<Chit> collectionOfChits;
-	private Map<CounterType, ClearingInterface> counterPositions;
-	private ArrayList<Treasure> treasures = new ArrayList<Treasure>();
-	private JSONArray arr;
-
 	public Set<TileName> getAllTiles() {
 		return mapOfTiles.keySet();
 	}
@@ -295,11 +284,25 @@ public class Board implements BoardInterface {
 		}
 		return clearings;
 	}
+	
+	public boolean isValidMove(CounterType ct, TileName destTile, int destClearing) {
+		return getLocationOfCounter(ct).isConnectedTo(getClearing(destTile, destClearing));
+	}
 
 	public ClearingInterface getClearing(TileName tile, int clearing) {
 		HexTile hexTile = mapOfTiles.get(tile);
-
 		return hexTile.getClearing(clearing);
 	}
+
+	private Map<TileName, Map<Integer, Point[]>> clearingLocations;
+	private TileName[] surround;
+	// row column
+	private Map<Integer, Map<Integer, TileName>> mapOfTileLocations;
+	private Map<TileName, HexTile> mapOfTiles;
+	private Map<TileName, int[]> tileLocations;
+	private Collection<Chit> collectionOfChits;
+	private Map<CounterType, ClearingInterface> counterPositions;
+	private ArrayList<Treasure> treasures = new ArrayList<Treasure>();
+	private JSONArray arr;
 
 }
