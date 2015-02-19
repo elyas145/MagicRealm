@@ -19,6 +19,7 @@ public class MainMenu extends JPanel implements ActionListener {
 	private JButton start;
 	private JButton exit;
 	private ViewController parent;
+	private Object clickSource = null;
 	public MainMenu(ViewController parent) {
 		this.parent = parent;
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -31,16 +32,38 @@ public class MainMenu extends JPanel implements ActionListener {
 		exit.setAlignmentX(Component.CENTER_ALIGNMENT);
 		add(start);
 		add(exit);
+		Thread t = new Thread(new Runnable(){
+			@Override
+			public void run() {
+				synchronized(MainMenu.this){
+					while(clickSource == null){
+						try {
+							MainMenu.this.wait();
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+					if(clickSource.equals(start)){
+						//start game
+						MainMenu.this.parent.startGameView();
+					}else if(clickSource.equals(exit)){
+						//exit game.
+						MainMenu.this.parent.exit();
+					}
+				}
+				
+			}
+			
+		});
+		t.start();
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if(e.getSource().equals(start)){
-			//start game
-			parent.startGameView();
-		}else if(e.getSource().equals(exit)){
-			//exit game.
-			parent.exit();
-		}
+		synchronized(this){
+			clickSource = e.getSource();
+			notify();
+		}		
 	}
 }

@@ -24,13 +24,13 @@ public class BirdSongView extends JPanel implements ActionListener{
 	private Controller parent;
 	private PersonalHistory history;
 	private JButton submit;
-	ArrayList<JComboBox> boxesArray;
+	ArrayList<JComboBox<String>> boxesArray;
 	private ArrayList<String> actions = new ArrayList<String>();
 	public BirdSongView(Controller parent, Player player) {
 		this.parent = parent;
 		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
-		JLabel lblPlayer = new JLabel(player.getCharacter().getType().toString());
-		add(lblPlayer);
+		//JLabel lblPlayer = new JLabel(player.getCharacter().getType().toString());
+		//add(lblPlayer);
 		history = player.getPersonalHistory();
 		HistoryView historyView = new HistoryView(history);
 		historyView.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -49,11 +49,17 @@ public class BirdSongView extends JPanel implements ActionListener{
 		}
 		add(lbls);
 		
-		boxesArray = new ArrayList<JComboBox>();
+		boxesArray = new ArrayList<JComboBox<String>>();
 		JPanel boxes = new JPanel();
 		boxes.setLayout(new BoxLayout(boxes, BoxLayout.X_AXIS));
+		ActivityType[] arr = ActivityType.values();
+		String[] strarr = new String[arr.length];
+		for(int i = 0; i < arr.length; i++){
+			strarr[i] = arr[i].toString();
+		}
+		
 		for(int i = 0; i < 8; i++){
-			boxesArray.add(new JComboBox<Object>(ActivityType.values()));
+			boxesArray.add(new JComboBox<String>(strarr));
 			boxes.add(boxesArray.get(i));
 		}
 		add(boxes);

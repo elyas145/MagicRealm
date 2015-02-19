@@ -25,7 +25,8 @@ import config.GraphicsConfiguration;
 import controller.Controller;
 
 @SuppressWarnings("serial")
-public class MainView extends JFrame implements ViewController, WindowListener {
+public class MainView extends JFrame implements ViewController, WindowListener,
+		Runnable {
 	private Controller parent;
 
 	private static Toolkit tk = Toolkit.getDefaultToolkit();
@@ -35,12 +36,19 @@ public class MainView extends JFrame implements ViewController, WindowListener {
 	public MainView(Controller parent) {
 		super("Magic Realm");
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-		setPreferredSize(new Dimension(GraphicsConfiguration.INITIAL_MAIN_WIDTH,GraphicsConfiguration.INITIAL_MAIN_HEIGHT));
+		setPreferredSize(new Dimension(
+				GraphicsConfiguration.INITIAL_MAIN_WIDTH,
+				GraphicsConfiguration.INITIAL_MAIN_HEIGHT));
 		setLocationRelativeTo(null);
-		setLocation(xSize/2+GraphicsConfiguration.INITIAL_WINDOW_WIDTH/2,ySize/2-GraphicsConfiguration.INITIAL_MAIN_HEIGHT/2);
+		setLocation(xSize / 2 + GraphicsConfiguration.INITIAL_WINDOW_WIDTH / 2,
+				ySize / 2 - GraphicsConfiguration.INITIAL_MAIN_HEIGHT / 2);
 		this.addWindowListener(this);
 		this.parent = parent;
 		pack();
+	}
+
+	@Override
+	public void run() {
 	}
 
 	@Override
@@ -51,12 +59,17 @@ public class MainView extends JFrame implements ViewController, WindowListener {
 		pack();
 		setVisible(true);
 	}
-	public void enterBirdSong(Player player){
-		setPreferredSize(new Dimension(GraphicsConfiguration.INITIAL_BIRD_WIDTH,GraphicsConfiguration.INITIAL_BIRD_HEIGHT));
+
+	public void enterBirdSong(Player player) {
+		setPreferredSize(new Dimension(
+				GraphicsConfiguration.INITIAL_BIRD_WIDTH,
+				GraphicsConfiguration.INITIAL_BIRD_HEIGHT));
+		System.out.println("setting birdsong view");
 		BirdSongView birdSong = new BirdSongView(parent, player);
 		setContentPane(birdSong);
 		pack();
 	}
+
 	public void enterSplashScreen() {
 
 		final java.awt.SplashScreen splash = java.awt.SplashScreen
@@ -103,21 +116,17 @@ public class MainView extends JFrame implements ViewController, WindowListener {
 	public void windowClosing(WindowEvent arg0) {
 		exit();
 	}
+
 	@Override
 	public void startGameView() {
-		parent.startGame();	
+		parent.startGame();
 	}
 
 	@Override
-	public void exit() {		
-	parent.exit();
+	public void exit() {
+		parent.exit();
 	}
 
-	
-	
-	
-	
-	
 	// don't worry about these.
 	@Override
 	public void windowClosed(WindowEvent ae) {
@@ -153,5 +162,4 @@ public class MainView extends JFrame implements ViewController, WindowListener {
 
 	}
 
-	
 }

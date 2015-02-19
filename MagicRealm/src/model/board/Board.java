@@ -246,6 +246,7 @@ public class Board implements BoardInterface {
 	public void setLocationOfCounter(CounterType ct, TileName tn, int clearing) {
 		HexTile ht = mapOfTiles.get(tn);
 		ClearingInterface cl = ht.getClearing(clearing);
+		setClearingOfCounter(ct,cl);
 	}
 
 	public void setLocationOfCounter(CounterType ct, SiteType site) {

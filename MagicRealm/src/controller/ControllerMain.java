@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 import config.GameConfiguration;
 import lwjglview.graphics.LWJGLGraphics;
@@ -34,20 +35,23 @@ public class ControllerMain implements Controller {
 
 	private LWJGLGraphics gfx;
 	private ResourceHandler rh;
-	private Board board; // main game board
-	private MainView mainView;
+	private MainView mainView = null;
 	private BoardView boardView;
 	private ModelController model;
-	
+	private Controller thisController = this;
+	private Thread gameLoop;
+
 	public ControllerMain() {
 		rh = new ResourceHandler();
 		model = new ModelController(rh);
-		mainView = new MainView(this);
+		mainView = new MainView(thisController);
+		new Thread(mainView).start();
 		model.setBoard();
 		model.setNumberPlayers(GameConfiguration.MAX_PLAYERS);
 		model.setCharacters();
-		model.setPlayersInitialLocations();
+		model.setPlayers();
 		model.setSiteLocations();
+		model.setPlayersInitialLocations();		
 	}
 
 	private void start() {
@@ -61,16 +65,18 @@ public class ControllerMain implements Controller {
 			boardDrawable = new LWJGLBoardDrawable(rh);
 			boardView = boardDrawable;
 			gfx.addDrawable(boardDrawable);
-			for (HexTileInterface hti : board.iterateTiles()) {
+			for (HexTileInterface hti : model.getBoard().iterateTiles()) {
 				boardView.setTile(hti.getName(), hti.getBoardColumn(),
 						hti.getBoardRow(), hti.getRotation(),
 						hti.getClearings());
 			}
-			for(CounterType ct : board.getCounters()){
-				ClearingInterface ci = board.getLocationOfCounter(ct);
-				boardView.setCounter(ct, ci.getParentTile().getName(), ci.getClearingNumber());
+			for (CounterType ct : model.getBoard().getCounters()) {
+				ClearingInterface ci = model.getBoard()
+						.getLocationOfCounter(ct);
+				boardView.setCounter(ct, ci.getParentTile().getName(),
+						ci.getClearingNumber());
 			}
-			
+
 			gfx.start();
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
@@ -125,7 +131,6 @@ public class ControllerMain implements Controller {
 		startBoardView();
 	}
 
-
 	@Override
 	public PersonalHistory getPlayerHistory() {
 		return model.getCurrentPlayer().getPersonalHistory();
@@ -138,9 +143,10 @@ public class ControllerMain implements Controller {
 
 	@Override
 	public ArrayList<Integer> getPossibleClearings(TileName tile) {
-		ArrayList<ClearingInterface> clearings = new ArrayList<ClearingInterface>(board.getTile(tile).getClearings());
+		ArrayList<ClearingInterface> clearings = new ArrayList<ClearingInterface>(
+				model.getBoard().getTile(tile).getClearings());
 		ArrayList<Integer> ints = new ArrayList<Integer>();
-		for(ClearingInterface ci : clearings){
+		for (ClearingInterface ci : clearings) {
 			ints.add(ci.getClearingNumber());
 		}
 		return ints;
@@ -149,7 +155,7 @@ public class ControllerMain implements Controller {
 	@Override
 	public ArrayList<TileName> getPossibleTiles() {
 		// TODO Auto-generated method stub
-		return new ArrayList<TileName>(board.getAllTiles());
+		return new ArrayList<TileName>(model.getBoard().getAllTiles());
 	}
 
 	@Override
@@ -160,24 +166,33 @@ public class ControllerMain implements Controller {
 
 	private void playCurrentActivities() {
 		ArrayList<Activity> activities = model.getCurrentActivities();
-		for(Activity activity : activities){
-			if(activity.getType() == ActivityType.MOVE){
-				Move move = (Move)activity;
-				if(checkMoveLegality(move)){
-					boardView.setCounter(model.getCurrentCounter(), move.getTile(), move.getClearing());
-				}else{
-					JOptionPane.showMessageDialog(null, "Illegal move cancelled.");
-				}				
+		for (Activity activity : activities) {
+			if (activity.getType() == ActivityType.MOVE) {
+				Move move = (Move) activity;
+				if (checkMoveLegality(move)) {
+					boardView.setCounter(model.getCurrentCounter(),
+							move.getTile(), move.getClearing());
+				} else {
+					JOptionPane.showMessageDialog(null,
+							"Illegal move cancelled.");
+				}
 			}
 		}
 	}
 
 	private boolean checkMoveLegality(Move move) {
-		//return true if current character clearing is connected to move clearing
-		ArrayList<ClearingInterface> clearings = board.getConntectedClearings(board.getLocationOfCounter(model.getCurrentCounter()));
-		ClearingInterface c = board.getClearing(move.getTile(), move.getClearing());
-		for(ClearingInterface clearing : clearings){
-			if(clearing.getClearingNumber() == move.getClearing() && clearing.getParentTile().getName().equals(move.getTile())){
+		// return true if current character clearing is connected to move
+		// clearing
+		ArrayList<ClearingInterface> clearings = model.getBoard()
+				.getConntectedClearings(
+						model.getBoard().getLocationOfCounter(
+								model.getCurrentCounter()));
+		ClearingInterface c = model.getBoard().getClearing(move.getTile(),
+				move.getClearing());
+		for (ClearingInterface clearing : clearings) {
+			if (clearing.getClearingNumber() == move.getClearing()
+					&& clearing.getParentTile().getName()
+							.equals(move.getTile())) {
 				return true;
 			}
 		}
@@ -186,16 +201,27 @@ public class ControllerMain implements Controller {
 
 	@Override
 	public void startGame() {
-		while (model.getCurrentDay() <= GameConfiguration.LUNAR_MONTH){
-			startBirdSong();
-			
+		this.startBoardView();
+		while (model.getCurrentDay() <= GameConfiguration.LUNAR_MONTH) {
+			for (int i = 0; i < model.getNumPlayers(); i++) {
+				synchronized (model) {
+					startBirdSong(model.getCurrentPlayer());
+					while (!model.isPlayerDone()) {
+						try {
+							boolean locked = Thread.holdsLock(model);
+							System.out.println(locked);
+							model.wait();
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							// e.printStackTrace();
+						}
+					}
+				}
+			}
 		}
 	}
 
-	private void startBirdSong() {
-		for(Player player : model.getPlayers()){
-			mainView.enterBirdSong(player);
-		}
-		
+	private void startBirdSong(Player player) {
+		mainView.enterBirdSong(player);
 	}
 }

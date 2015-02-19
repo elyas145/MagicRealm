@@ -3,6 +3,7 @@ package model.controller;
 import java.util.ArrayList;
 import java.util.Map;
 
+import config.GameConfiguration;
 import utils.resources.ResourceHandler;
 import model.activity.Activity;
 import model.board.Board;
@@ -29,13 +30,14 @@ public class ModelController {
 	private ArrayList<Player> players = null;
 	private int currentPlayer = 0;
 	private boolean currentPlayerDone = false;
-	
+
 	public ModelController(ResourceHandler rh) {
 		this.rh = rh;
 		currentDay = 1;
 		sites = new ArrayList<SiteType>();
 		players = new ArrayList<Player>();
-		for(SiteType t : SiteType.values()){
+		numPlayers = GameConfiguration.MAX_PLAYERS;
+		for (SiteType t : SiteType.values()) {
 			sites.add(t);
 		}
 	}
@@ -49,7 +51,6 @@ public class ModelController {
 		board.removeCharacter(character);
 	}
 
-	
 	public Board setBoard() {
 		if (board == null) {
 			board = new Board(rh);
@@ -62,13 +63,16 @@ public class ModelController {
 	}
 
 	public ArrayList<Player> getPlayers() {
+		return players;
+	}
+
+	public void setPlayers() {
 		if (players != null) {
 			for (int i = 0; i < numPlayers; i++) {
 				players.add(new Player(i, "player: " + i));
 				players.get(i).setCharacter(characters.get(i));
 			}
 		}
-		return players;
 	}
 
 	public void setCharacters() {
@@ -76,62 +80,75 @@ public class ModelController {
 			characters = CharacterFactory.getPossibleCharacters();
 		}
 	}
-	
-	public Player getCurrentPlayer(){
+
+	public Player getCurrentPlayer() {
 		return players.get(currentPlayer);
 	}
 
 	public void setPlayersInitialLocations() {
-		for(Character c : characters){
+		for (Character c : characters) {
 			board.setLocationOfCounter(c.getType().toCounter(), SiteType.INN);
 		}
-		
+
 	}
 
 	public void setSiteLocations() {
-		for(SiteType t : sites){
-			switch(t){
+		for (SiteType t : sites) {
+			switch (t) {
 			case CHAPEL:
-				board.setLocationOfCounter(t.toCounterType(), TileName.AWFUL_VALLEY, 5);
+				board.setLocationOfCounter(t.toCounterType(),
+						TileName.AWFUL_VALLEY, 5);
 			case GUARD_HOUSE:
-				board.setLocationOfCounter(t.toCounterType(), TileName.DARK_VALLEY, 5);
+				board.setLocationOfCounter(t.toCounterType(),
+						TileName.DARK_VALLEY, 5);
 			case HOUSE:
-				board.setLocationOfCounter(t.toCounterType(), TileName.CURST_VALLEY, 5);
+				board.setLocationOfCounter(t.toCounterType(),
+						TileName.CURST_VALLEY, 5);
 			case INN:
-				board.setLocationOfCounter(t.toCounterType(), TileName.BAD_VALLEY, 5);
-			}			
-		}		
+				board.setLocationOfCounter(t.toCounterType(),
+						TileName.BAD_VALLEY, 5);
+			}
+		}
 	}
 
 	public int getNumPlayers() {
 		return numPlayers;
 	}
-	public int getCurrentDay(){
+
+	public int getCurrentDay() {
 		return currentDay;
 	}
 
 	public void setCurrentPlayerActivities(ArrayList<Activity> activities) {
-		players.get(currentPlayer).setActivities(activities);		
+		players.get(currentPlayer).setActivities(activities);
 	}
 
 	public ArrayList<Activity> getCurrentActivities() {
-		return players.get(currentPlayer).getPersonalHistory().getCurrentActivities();
+		return players.get(currentPlayer).getPersonalHistory()
+				.getCurrentActivities();
 	}
 
 	public CounterType getCurrentCounter() {
 		return characters.get(currentPlayer).getType().toCounter();
 	}
-	public boolean isPlayerDone(){
+
+	public boolean isPlayerDone() {
 		return currentPlayerDone;
 	}
-	public void setPlayerDone(){
+
+	synchronized public void setPlayerDone() {
 		currentPlayerDone = true;
 	}
-	public Player nextPlayer(){
-		if(currentPlayer < 2){
+
+	public Player nextPlayer() {
+		if (currentPlayer < 2) {
 			currentPlayer++;
-		}else
+		} else
 			currentPlayer = 0;
 		return players.get(currentPlayer);
+	}
+
+	public Board getBoard() {
+		return board;
 	}
 }
