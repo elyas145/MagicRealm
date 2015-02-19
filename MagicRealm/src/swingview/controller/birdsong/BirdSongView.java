@@ -26,12 +26,12 @@ public class BirdSongView extends JPanel implements ActionListener{
 	private JButton submit;
 	ArrayList<JComboBox<String>> boxesArray;
 	private ArrayList<String> actions = new ArrayList<String>();
-	public BirdSongView(Controller parent, Player player) {
+	public BirdSongView(Controller parent, String player) {
 		this.parent = parent;
 		setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
-		//JLabel lblPlayer = new JLabel(player.getCharacter().getType().toString());
-		//add(lblPlayer);
-		history = player.getPersonalHistory();
+		JLabel lblPlayer = new JLabel(player);
+		add(lblPlayer);
+		history = parent.getPlayerHistory();
 		HistoryView historyView = new HistoryView(history);
 		historyView.setAlignmentX(Component.CENTER_ALIGNMENT);
 		add(historyView);

@@ -142,6 +142,7 @@ public class ModelController {
 
 	synchronized public void setPlayerDone() {
 		currentPlayerDone = true;
+		this.notify();
 	}
 
 	public Player nextPlayer() {
@@ -149,10 +150,16 @@ public class ModelController {
 			currentPlayer++;
 		} else
 			currentPlayer = 0;
+		currentPlayerDone = false;
 		return players.get(currentPlayer);
 	}
 
 	public Board getBoard() {
 		return board;
+	}
+
+	public void newDayTime() {
+		currentPlayer = 0;
+		
 	}
 }

@@ -60,11 +60,10 @@ public class MainView extends JFrame implements ViewController, WindowListener,
 		setVisible(true);
 	}
 
-	public void enterBirdSong(Player player) {
+	public void enterBirdSong(String player) {
 		setPreferredSize(new Dimension(
 				GraphicsConfiguration.INITIAL_BIRD_WIDTH,
 				GraphicsConfiguration.INITIAL_BIRD_HEIGHT));
-		System.out.println("setting birdsong view");
 		BirdSongView birdSong = new BirdSongView(parent, player);
 		setContentPane(birdSong);
 		pack();
