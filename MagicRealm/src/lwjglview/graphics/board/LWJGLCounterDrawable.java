@@ -55,6 +55,7 @@ public class LWJGLCounterDrawable extends CounterDrawable {
 				+ GraphicsConfiguration.TILE_THICKNESS * .5f);
 
 		lwgfx.updateModelViewUniform(SHADER, "modelViewMatrix");
+		lwgfx.updateModelViewUniform(SHADER, "modelViewInverseMatrix");
 		lwgfx.updateMVPUniform(SHADER, "mvpMatrix");
 		lwgfx.getShaders().setUniformIntValue(SHADER, "index", textureIndex);
 

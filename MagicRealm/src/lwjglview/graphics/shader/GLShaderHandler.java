@@ -105,7 +105,7 @@ public class GLShaderHandler {
 		case TILE_SHADER:
 			return "tile.glsl";
 		case CHIT_SHADER:
-			return "chit.glsl";
+			return "counter.glsl";
 		}
 		return "flat.glsl";
 	}
