@@ -19,7 +19,7 @@ public class HistoryView extends JPanel {
 	public HistoryView(PersonalHistory history) {
 		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 		this.history = history;
-		actions = new JTable(28, 8);
+		actions = new JTable(28, 9);
 		ArrayList<PersonalHistoryDay> days = history.getDays();
 		int daynum = 0;
 		for (int i = 0; i < 28; i++) {
@@ -31,10 +31,9 @@ public class HistoryView extends JPanel {
 				for (int i = 0; i < activities.size(); i++) {
 
 					actions.setValueAt(activities.get(i).getType().toString(),
-							daynum, i);
+							daynum-1, i+1);
 				}
 			}
-
 			daynum++;
 		}
 		add(actions);

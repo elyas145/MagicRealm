@@ -170,6 +170,7 @@ public class ControllerMain implements Controller {
 			if (activity.getType() == ActivityType.MOVE) {
 				Move move = (Move) activity;
 				if (checkMoveLegality(move)) {
+					model.getBoard().setLocationOfCounter(model.getCurrentCounter(), move.getTile(), move.getClearing());
 					boardView.setCounter(model.getCurrentCounter(),
 							move.getTile(), move.getClearing());
 				} else {
@@ -178,31 +179,19 @@ public class ControllerMain implements Controller {
 				}
 			}
 		}
+		model.setPlayerDone();
 	}
 
 	private boolean checkMoveLegality(Move move) {
-		// return true if current character clearing is connected to move
-		// clearing
-		ArrayList<ClearingInterface> clearings = model.getBoard()
-				.getConntectedClearings(
-						model.getBoard().getLocationOfCounter(
-								model.getCurrentCounter()));
-		ClearingInterface c = model.getBoard().getClearing(move.getTile(),
-				move.getClearing());
-		for (ClearingInterface clearing : clearings) {
-			if (clearing.getClearingNumber() == move.getClearing()
-					&& clearing.getParentTile().getName()
-							.equals(move.getTile())) {
-				return true;
-			}
-		}
-		return false;
+		// return true if current character clearing is connected to moveg
+		return model.getBoard().isValidMove(model.getCurrentCounter(), move.getTile(), move.getClearing());
 	}
 
 	@Override
 	public void startGame() {
 		this.startBoardView();
 		while (model.getCurrentDay() <= GameConfiguration.LUNAR_MONTH) {
+			model.newDay();
 			model.newDayTime();
 			for (int i = 0; i < model.getNumPlayers(); i++) {
 				synchronized (model) {
@@ -230,6 +219,7 @@ public class ControllerMain implements Controller {
 							// e.printStackTrace();
 						}
 					}
+					model.nextPlayer();
 				}
 			}
 		}

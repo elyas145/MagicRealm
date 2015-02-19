@@ -29,10 +29,9 @@ public class MovePanel extends JPanel implements ActionListener {
 		JLabel lblClearing = new JLabel("Clearing: ");
 		tilePanel.add(lblTile);
 
-		System.out.println(controller
-				.getPossibleTiles());
-		TileName[] tileArray= new TileName[controller.getPossibleTiles().size()];
-		for(int j = 0; j < tileArray.length; j++){
+		TileName[] tileArray = new TileName[controller.getPossibleTiles()
+				.size()];
+		for (int j = 0; j < tileArray.length; j++) {
 			tileArray[j] = controller.getPossibleTiles().get(j);
 		}
 		tiles = new JComboBox<TileName>(tileArray);
@@ -58,10 +57,9 @@ public class MovePanel extends JPanel implements ActionListener {
 		ArrayList<Integer> clearingsArray = controller
 				.getPossibleClearings(selectedTile);
 		Integer[] ca = new Integer[clearingsArray.size()];
-		for(int j = 0; j < ca.length; j++){
+		for (int j = 0; j < ca.length; j++) {
 			ca[j] = clearingsArray.get(j);
 		}
-		System.out.println(clearingsArray);
 		clearings.setModel(new JComboBox<Integer>(ca).getModel());
 	}
 
@@ -69,11 +67,12 @@ public class MovePanel extends JPanel implements ActionListener {
 	public void actionPerformed(ActionEvent ae) {
 		setClearings();
 	}
-	
-	public TileName getSelectedTile(){
+
+	public TileName getSelectedTile() {
 		return (TileName) tiles.getSelectedItem();
 	}
-	public Integer getSelectedClearing(){
+
+	public Integer getSelectedClearing() {
 		return (Integer) clearings.getSelectedItem();
 	}
 }

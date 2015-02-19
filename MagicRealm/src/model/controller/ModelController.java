@@ -6,6 +6,7 @@ import java.util.Map;
 import config.GameConfiguration;
 import utils.resources.ResourceHandler;
 import model.activity.Activity;
+import model.activity.Move;
 import model.board.Board;
 import model.enums.CharacterType;
 import model.enums.CounterType;
@@ -160,6 +161,13 @@ public class ModelController {
 
 	public void newDayTime() {
 		currentPlayer = 0;
+		
+	}
+
+	public void newDay() {
+		for(Player player : players){
+			player.getPersonalHistory().newDay();
+		}
 		
 	}
 }
