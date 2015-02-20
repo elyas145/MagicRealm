@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import lwjglview.graphics.LWJGLDrawable;
 import lwjglview.graphics.LWJGLGraphics;
 
 import org.lwjgl.BufferUtils;
@@ -15,7 +16,7 @@ import utils.resources.ResourceHandler;
 import view.graphics.Drawable;
 import view.graphics.Graphics;
 
-public class ModelData implements Drawable {
+public class ModelData extends LWJGLDrawable {
 	
 	public static ModelData loadModelData(ResourceHandler rh, String file)
 			throws IOException {
@@ -41,7 +42,7 @@ public class ModelData implements Drawable {
 	
 	private void parseLine(String line) {
 		String[] split = line.split(" +");
-		if(split.length > 0) {
+		if(split.length > 0 && split[0].length() > 0) {
 			String nm = split[0];
 			char f = nm.charAt(0);
 			switch(nm.length()) {
@@ -70,16 +71,29 @@ public class ModelData implements Drawable {
 			}
 		}
 	}
+	
+	@Override
+	public void applyTransformation(LWJGLGraphics gfx) {
+		gfx.resetModelMatrix();
+	}
 
 	@Override
-	public void draw(Graphics gfx) {
-		LWJGLGraphics lwgfx = (LWJGLGraphics) gfx;
+	public void updateUniforms(LWJGLGraphics gfx) { }
+
+	@Override
+	public void draw(LWJGLGraphics lwgfx) {
 		if(!inGPU) {
 			uploadToGPU(lwgfx);
 		}
 		else {
 			lwgfx.callList(verticesLocation);
 		}
+	}
+
+	@Override
+	public void draw(Graphics gfx) {
+		LWJGLGraphics lwgfx = (LWJGLGraphics) gfx;
+		draw(lwgfx);
 	}
 	
 	private void parseVertex(String[] line) {

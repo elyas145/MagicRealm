@@ -1,7 +1,6 @@
 package lwjglview.graphics.animator;
 
 import utils.math.Matrix;
-import view.graphics.Drawable;
 
 public abstract class Animator {
 	
