@@ -201,4 +201,18 @@ public class ModelController {
 		return init;
 	}
 
+	public boolean isCurrentHidden() {		
+		return characters.get(currentPlayer).isHiding();
+	}
+
+	public void setCurrentHiding() {
+		characters.get(currentPlayer).setHiding(true);
+		System.out.println("current is now hiding.");
+	}
+
+	public void unhideCurrent() {
+		characters.get(currentPlayer).setHiding(false);
+		
+	}
+
 }

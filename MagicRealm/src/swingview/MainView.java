@@ -113,6 +113,11 @@ public class MainView extends JFrame implements ViewController, WindowListener,
 				(xSize / 2) - 300, ySize / 2);
 	}
 
+	public void displayMessage(String string) {
+		JOptionPane.showMessageDialog(this, "Illegal move cancelled.");
+
+	}
+
 	@Override
 	public void windowClosing(WindowEvent arg0) {
 		exit();

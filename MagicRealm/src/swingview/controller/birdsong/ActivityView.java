@@ -8,18 +8,13 @@ import java.util.ArrayList;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import config.GraphicsConfiguration;
 import controller.Controller;
 import model.activity.Activity;
 import model.activity.Move;
-import model.board.clearing.Clearing;
-import model.board.tile.HexTile;
 import model.enums.ActivityType;
-import model.enums.TileName;
-import model.interfaces.HexTileInterface;
 
 @SuppressWarnings("serial")
 public class ActivityView extends JFrame implements ActionListener {
@@ -39,6 +34,9 @@ public class ActivityView extends JFrame implements ActionListener {
 		getContentPane().setLayout(
 				new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
 		this.parent = parent;
+
+		go = new JButton("Go");
+		go.addActionListener(this);
 		// move panels
 		movePanels = new ArrayList<MovePanel>();
 		JPanel moveP = new JPanel();
@@ -47,10 +45,11 @@ public class ActivityView extends JFrame implements ActionListener {
 			if (actions.get(i).equals(ActivityType.MOVE.toString())) {
 				movePanels.add(new MovePanel(controller, i));
 				moveP.add(movePanels.get(i));
+			} else if (actions.get(i).equals(ActivityType.HIDE.toString())) {
+
 			}
 		}
-		go = new JButton("Go");
-		go.addActionListener(this);
+
 		getContentPane().add(moveP);
 		getContentPane().add(go);
 		pack();
@@ -59,16 +58,17 @@ public class ActivityView extends JFrame implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		// go is pressed.
-		// get all the activities.
-		ArrayList<Activity> activities = new ArrayList<Activity>();
+		if (e.getSource().equals(go)) {
+			// go is pressed.
+			// get all the activities.
+			ArrayList<Activity> activities = new ArrayList<Activity>();
 
-		for (MovePanel panel : movePanels) {
-			activities.add(new Move(ActivityType.MOVE, panel.getSelectedTile(),
-					panel.getSelectedClearing()));
+			for (MovePanel panel : movePanels) {
+				activities.add(new Move(ActivityType.MOVE, panel
+						.getSelectedTile(), panel.getSelectedClearing()));
+			}
+			parent.sendActivities(activities);
+			this.setVisible(false);
 		}
-		parent.sendActivities(activities);
-		this.setVisible(false);
 	}
-
 }

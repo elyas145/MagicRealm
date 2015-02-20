@@ -166,25 +166,18 @@ public class ControllerMain implements Controller {
 
 	private void playCurrentActivities() {
 		ArrayList<Activity> activities = model.getCurrentActivities();
+		//unhide player.
+		model.unhideCurrent();
 		for (Activity activity : activities) {
-			if (activity.getType() == ActivityType.MOVE) {
-				Move move = (Move) activity;
-				if (checkMoveLegality(move)) {
-					model.getBoard().setLocationOfCounter(model.getCurrentCounter(), move.getTile(), move.getClearing());
-					boardView.setCounter(model.getCurrentCounter(),
-							move.getTile(), move.getClearing());
-				} else {
-					JOptionPane.showMessageDialog(null,
-							"Illegal move cancelled.");
-				}
-			}
+			activity.perform(this);
 		}
 		model.setPlayerDone();
 	}
 
-	private boolean checkMoveLegality(Move move) {
+	public boolean checkMoveLegality(Move move) {
 		// return true if current character clearing is connected to moveg
-		return model.getBoard().isValidMove(model.getCurrentCounter(), move.getTile(), move.getClearing());
+		return model.getBoard().isValidMove(model.getCurrentCounter(),
+				move.getTile(), move.getClearing());
 	}
 
 	@Override
@@ -197,6 +190,7 @@ public class ControllerMain implements Controller {
 			tod = tod.next();
 			boardView.setTimeOfDay(tod);
 			Player plr;
+			// birdsong
 			for (int i = 0; i < model.getNumPlayers(); i++) {
 				synchronized (model) {
 					plr = model.getCurrentPlayer();
@@ -216,10 +210,14 @@ public class ControllerMain implements Controller {
 			model.newDayTime();
 			tod = tod.next();
 			boardView.setTimeOfDay(tod);
+			// dayLight
 			for (int i = 0; i < model.getNumPlayers(); i++) {
 				synchronized (model) {
 					plr = model.getCurrentPlayer();
 					boardView.focusOn(model.getCurrentCounter());
+					if (plr.getCharacter().isHiding()) {
+						// TODO boardView.flipCharacterCounter(model.getCurrentCounter());
+					}
 					playCurrentActivities();
 					while (!model.isPlayerDone()) {
 						try {
@@ -229,7 +227,9 @@ public class ControllerMain implements Controller {
 							// e.printStackTrace();
 						}
 					}
-					while(!boardView.isAnimationFinished(model.getCurrentCounter()));
+					while (!boardView.isAnimationFinished(model
+							.getCurrentCounter()))
+						;
 					model.nextPlayer();
 				}
 			}
@@ -237,6 +237,24 @@ public class ControllerMain implements Controller {
 	}
 
 	private void startBirdSong(Player player) {
-		mainView.enterBirdSong(player.getCharacter().getType().toString(), model.getAllowedPhases());
+		mainView.enterBirdSong(player.getCharacter().getType().toString(),
+				model.getAllowedPhases());
+	}
+
+	@Override
+	public MainView getMainView() {
+		
+		return mainView;
+	}
+
+	@Override
+	public ModelController getModel() {
+		return model;
+	}
+
+	@Override
+	public BoardView getBoardView() {
+		
+		return boardView;
 	}
 }

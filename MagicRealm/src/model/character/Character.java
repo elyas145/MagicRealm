@@ -19,7 +19,7 @@ public class Character implements CharacterInterface {
 		System.out.println("WARNING: only use the CharacterFactory class to create characters, this inssures full initialization. ");
 		type = t;
 		initialLocation = SiteType.INN;
-		hiding = false;
+		hiding = true;
 	}
 
 	public CharacterType getType() {

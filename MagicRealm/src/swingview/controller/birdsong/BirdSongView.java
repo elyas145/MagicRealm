@@ -14,6 +14,7 @@ import javax.swing.JPanel;
 import swingview.controller.HistoryView;
 import model.activity.Activity;
 import model.activity.Empty;
+import model.activity.Hide;
 import model.character.Phase;
 import model.enums.ActivityType;
 import model.enums.PhaseType;
@@ -73,11 +74,11 @@ public class BirdSongView extends JPanel implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent ae) {
 		if (ae.getSource().equals(submit)) {
-			// submit to controller.
+			// get activities to array
 			for (JComboBox<Object> b : boxesArray) {
 				actions.add(b.getSelectedItem().toString());
 			}
-
+			//trim none activities from end.
 			for (int i = actions.size(); i > 0; i--) {
 				if (actions.get(i - 1).equals(ActivityType.NONE.toString())) {
 					actions.remove(i - 1);
@@ -85,15 +86,23 @@ public class BirdSongView extends JPanel implements ActionListener {
 					break;
 				}
 			}
+			
+			//check if no activities were set.
 			if (!actions.isEmpty()) {
-				ActivityView activityView = new ActivityView(this, parent,
-						actions);
-			} else {
-				String[] arr = new String[actions.size()];
-				for(int i = 0; i < arr.length; i++){
-					arr[i] = actions.get(i);
+				if(actions.contains(ActivityType.MOVE.toString())){
+					//setup move activities if needed.
+					ActivityView activityView = new ActivityView(this, parent,
+							actions);
+				}else{
+					String[] arr = new String[actions.size()];
+					for(int i = 0; i < arr.length; i++){
+						arr[i] = actions.get(i);
+					}
+					sendActivities(arr);
 				}
-				sendActivities(arr);
+				
+			} else {
+				sendActivities(new String[0]);
 			}
 		}
 	}
@@ -105,8 +114,8 @@ public class BirdSongView extends JPanel implements ActionListener {
 			if (action.equals(ActivityType.MOVE.toString())) {
 				activities.add(moveActivities.get(moveCounter));
 				moveCounter++;
-			} else {
-				activities.add(new Empty(ActivityType.NONE));
+			} else if(action.equals(ActivityType.HIDE.toString())){
+				activities.add(new Hide(ActivityType.HIDE));
 			}
 		}
 		parent.setCurrentPlayerActivities(activities);
@@ -115,8 +124,11 @@ public class BirdSongView extends JPanel implements ActionListener {
 	public void sendActivities(String[] activitiesArr) {
 		ArrayList<Activity> activities = new ArrayList<Activity>();
 		for (String action : activitiesArr) {
-			activities.add(new Empty(ActivityType.NONE));
-
+			if(action.equals(ActivityType.HIDE.toString())){
+				activities.add(new Hide(ActivityType.HIDE));
+			}else{
+				activities.add(new Empty(ActivityType.NONE));
+			}
 		}
 		parent.setCurrentPlayerActivities(activities);
 	}
