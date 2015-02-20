@@ -268,6 +268,7 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 		}
 		bufferT.put(0, x);
 		bufferT.put(1, y);
+		tileClr.put(0, new ClearingStorage(tile, bufferT));
 		for (ClearingInterface clr : clears) {
 			clr.getPosition(false, bufferN);
 			clr.getPosition(true, bufferE);
@@ -295,6 +296,11 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 
 		clearings.get(tile).get(clearing).put(tp);
 
+	}
+
+	@Override
+	public void setCounter(CounterType counter, TileName tile) {
+		setCounter(counter, tile, 0);
 	}
 
 	/*
@@ -410,6 +416,16 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 			posns = new float[][] {
 					{ tc.get(0) + nl.get(0), tc.get(1) + nl.get(1) },
 					{ tc.get(0) + el.get(0), tc.get(1) + el.get(1) } };
+			chits = new ArrayList<CounterType>();
+			dim = 0;
+			buff = BufferUtils.createFloatBuffer(2);
+		}
+		
+		public ClearingStorage(TileName tl, FloatBuffer tc) {
+			tile = tl;
+			posns = new float[][] {
+					{ tc.get(0), tc.get(1) },
+					{ tc.get(0), tc.get(1) } };
 			chits = new ArrayList<CounterType>();
 			dim = 0;
 			buff = BufferUtils.createFloatBuffer(2);
