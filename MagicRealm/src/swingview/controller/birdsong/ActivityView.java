@@ -21,10 +21,12 @@ public class ActivityView extends JFrame implements ActionListener {
 	private BirdSongView parent;
 	private JButton go;
 	private ArrayList<MovePanel> movePanels;
+	private Controller control;
 
 	public ActivityView(BirdSongView parent, Controller controller,
 			ArrayList<String> actions) {
 		super("Set Activity");
+		control = controller;
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		setPreferredSize(new Dimension(
 				GraphicsConfiguration.INITIAL_ACTION_WIDTH * actions.size(),
@@ -64,7 +66,7 @@ public class ActivityView extends JFrame implements ActionListener {
 			ArrayList<Activity> activities = new ArrayList<Activity>();
 
 			for (MovePanel panel : movePanels) {
-				activities.add(new Move(ActivityType.MOVE, panel
+				activities.add(new Move(control.getCurrentCharacter(), panel
 						.getSelectedTile(), panel.getSelectedClearing()));
 			}
 			parent.sendActivities(activities);

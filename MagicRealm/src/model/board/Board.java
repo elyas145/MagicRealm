@@ -26,6 +26,7 @@ import utils.random.Random;
 import utils.resources.ResourceHandler;
 import model.board.tile.HexTile;
 import model.counter.chit.Chit;
+import model.enums.CharacterType;
 import model.enums.ChitType;
 import model.enums.CounterType;
 import model.enums.SiteType;
@@ -99,16 +100,14 @@ public class Board implements BoardInterface {
 
 	}
 
-	public void moveCharacter(model.character.Character character, TileName tt,
+	public void moveCharacter(CharacterType character, TileName tt,
 			int clearing) {
-		// TODO move character
-		// HexTile loc = mapOfChitPositions.get(character);
-		// Clearing clr = loc.getClearing(character);
+		removeCharacter(character);
+		counterPositions.put(character.toCounter(), getClearing(tt, clearing));
 	}
 
-	public void removeCharacter(model.character.Character character) {
-		// TODO Auto-generated method stub
-
+	public void removeCharacter(CharacterType character) {
+		counterPositions.remove(character.toCounter());
 	}
 
 	private void initTreasures() {

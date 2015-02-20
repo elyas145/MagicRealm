@@ -8,9 +8,12 @@ import model.activity.Activity;
 import model.activity.Move;
 import model.board.clearing.Clearing;
 import model.controller.ModelController;
+import model.enums.CharacterType;
+import model.enums.CounterType;
 import model.enums.TileName;
 import model.interfaces.ClearingInterface;
 import model.player.PersonalHistory;
+import model.player.Player;
 
 public interface Controller {
 
@@ -32,11 +35,20 @@ public interface Controller {
 
 	void startGame();
 
-	boolean checkMoveLegality(Move move);
 	MainView getMainView();
 
 	ModelController getModel();
 
 	BoardView getBoardView();
+
+	CharacterType getCurrentCharacter();
+
+	void displayMessage(String string);
+
+	void setHiding(CharacterType character);
+
+	void setCurrentCharacter(CharacterType character);
+
+	void moveCounter(CounterType counter, TileName tt, int clearing);
 	
 }

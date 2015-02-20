@@ -2,6 +2,7 @@ package controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
@@ -43,7 +44,7 @@ public class ControllerMain implements Controller {
 
 	public ControllerMain() {
 		rh = new ResourceHandler();
-		model = new ModelController(rh);
+		model = new ModelController(rh, this);
 		mainView = new MainView(thisController);
 		new Thread(mainView).start();
 		model.setBoard();
@@ -92,7 +93,7 @@ public class ControllerMain implements Controller {
 		return rh;
 	}
 
-	public ArrayList<Player> getPlayers() {
+	public Iterable<Player> getPlayers() {
 		return model.getPlayers();
 	}
 
@@ -165,19 +166,13 @@ public class ControllerMain implements Controller {
 	}
 
 	private void playCurrentActivities() {
-		ArrayList<Activity> activities = model.getCurrentActivities();
-		//unhide player.
+		List<Activity> activities = model.getCurrentActivities();
+		// unhide player.
 		model.unhideCurrent();
 		for (Activity activity : activities) {
-			activity.perform(this);
+			activity.perform(model);
 		}
 		model.setPlayerDone();
-	}
-
-	public boolean checkMoveLegality(Move move) {
-		// return true if current character clearing is connected to moveg
-		return model.getBoard().isValidMove(model.getCurrentCounter(),
-				move.getTile(), move.getClearing());
 	}
 
 	@Override
@@ -214,21 +209,19 @@ public class ControllerMain implements Controller {
 			for (int i = 0; i < model.getNumPlayers(); i++) {
 				synchronized (model) {
 					plr = model.getCurrentPlayer();
-					boardView.focusOn(model.getCurrentCounter());
+					boardView.focusOn(getCurrentCharacter().toCounter());
 					if (plr.getCharacter().isHiding()) {
-						// TODO boardView.flipCharacterCounter(model.getCurrentCounter());
+						System.out.println(plr);
 					}
 					playCurrentActivities();
 					while (!model.isPlayerDone()) {
 						try {
 							model.wait();
 						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
 							// e.printStackTrace();
 						}
 					}
-					while (!boardView.isAnimationFinished(model
-							.getCurrentCounter()))
+					while (!boardView.isAnimationFinished(getCurrentCharacter().toCounter()))
 						;
 					model.nextPlayer();
 				}
@@ -243,7 +236,7 @@ public class ControllerMain implements Controller {
 
 	@Override
 	public MainView getMainView() {
-		
+
 		return mainView;
 	}
 
@@ -254,7 +247,34 @@ public class ControllerMain implements Controller {
 
 	@Override
 	public BoardView getBoardView() {
-		
+
 		return boardView;
 	}
+
+	@Override
+	public CharacterType getCurrentCharacter() {
+		return model.getCurrentCharacterType();
+	}
+
+	@Override
+	public void displayMessage(String string) {
+		getMainView().displayMessage("Illegal move cancelled.");
+	}
+
+	@Override
+	public void setHiding(CharacterType character) {
+		boardView.hideCounter(character.toCounter());
+	}
+
+	@Override
+	public void setCurrentCharacter(CharacterType character) {
+		boardView.focusOn(character.toCounter());
+	}
+
+	@Override
+	public void moveCounter(CounterType counter, TileName tt,
+			int clearing) {
+		boardView.setCounter(counter, tt, clearing);
+	}
+	
 }

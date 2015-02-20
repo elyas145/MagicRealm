@@ -8,13 +8,12 @@ public class PersonalHistory {
 	private ArrayList<PersonalHistoryDay> days;
 	private int currentDay;
 	public PersonalHistory(){
-		days = new ArrayList<PersonalHistoryDay>();
-		days.add(new PersonalHistoryDay());
-		currentDay = 1;
+		reset();
 	}
 	
 	public PersonalHistory reset(){
 		days = new ArrayList<PersonalHistoryDay>();
+		days.add(new PersonalHistoryDay());
 		currentDay = 1;
 		return this;
 	}
@@ -34,7 +33,6 @@ public class PersonalHistory {
 	}
 
 	public ArrayList<Activity> getCurrentActivities() {
-		
 		return days.get(currentDay-1).getActivities();
 	}
 }

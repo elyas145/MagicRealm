@@ -1,33 +1,36 @@
 package model.activity;
 
-import controller.Controller;
 import model.controller.ModelController;
 import model.enums.ActivityType;
 import model.enums.CharacterType;
 
 public abstract class Activity {
-	
-	public Activity(ActivityType act) {
-		type = act;
-	}
-	
+
 	// perform the action on the model controller
-	public abstract void perform(Controller controller);
-	private CharacterType character;
-	public CharacterType getCharacter() {
-		return character;
+	public abstract void perform(ModelController controller);
+
+	public ActivityType getType() {
+		return type;
 	}
 
-	public void setCharacter(CharacterType character) {
-		this.character = character;
+	public CharacterType getActor() {
+		return character;
 	}
 
 	public void setType(ActivityType type) {
 		this.type = type;
 	}
-	private ActivityType type;
 
-	public ActivityType getType() {
-		return type;
+	protected Activity(ActivityType act, CharacterType actor) {
+		type = act;
+		setActor(actor);
 	}
+
+	protected void setActor(CharacterType character) {
+		this.character = character;
+	}
+
+	private ActivityType type;
+	private CharacterType character;
+
 }

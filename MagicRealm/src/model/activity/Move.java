@@ -1,17 +1,17 @@
 package model.activity;
 
-import controller.Controller;
 import model.controller.ModelController;
 import model.enums.ActivityType;
+import model.enums.CharacterType;
 import model.enums.TileName;
-import model.enums.TileType;
+import model.exceptions.IllegalMoveException;
 
 public class Move extends Activity {
 	private TileName tile;
 	private int clearing;
 
-	public Move(ActivityType act, TileName tileName, int c) {
-		super(act);
+	public Move(CharacterType actor, TileName tileName, int c) {
+		super(ActivityType.MOVE, actor);
 		tile = tileName;
 		clearing = c;
 	}
@@ -33,23 +33,12 @@ public class Move extends Activity {
 	}
 
 	@Override
-	public void perform(Controller controller) {
-		boolean isLegal = controller.checkMoveLegality(this);
-		if (isLegal) {
-			// set location on the board.
-			controller
-					.getModel()
-					.getBoard()
-					.setLocationOfCounter(
-							controller.getModel().getCurrentCounter(),
-							getTile(), getClearing());
-			// move counter on the view.
-			controller.getBoardView().setCounter(
-					controller.getModel().getCurrentCounter(), getTile(),
-					getClearing());
-		} else {
-			controller.getMainView().displayMessage("Illegal move cancelled.");
-			return;
+	public void perform(ModelController controller) {
+		// set location on the board.
+		try {
+			controller.moveCharacter(getActor(), getTile(), getClearing());
+		} catch (IllegalMoveException e) {
+			controller.raiseMessage(getActor(), "Illegal move cancelled");
 		}
 	}
 

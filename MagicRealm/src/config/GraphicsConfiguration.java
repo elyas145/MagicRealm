@@ -32,6 +32,8 @@ public class GraphicsConfiguration {
 	public static final float ANIMATION_SPEED = 1f;
 	public static final float CAMERA_SPEED = 5f;
 	
+	public static final float COUNTER_FLIP_TIME = 1f;
+	
 	public static final float DAY_CHANGE_TIME = 3f;
 	
 	public static final int INITIAL_ACTION_WIDTH = 200;

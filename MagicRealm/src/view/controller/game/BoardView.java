@@ -24,4 +24,6 @@ public interface BoardView {
 	
 	void setTimeOfDay(TimeOfDay time);
 
+	void hideCounter(CounterType currentCounter);
+
 }

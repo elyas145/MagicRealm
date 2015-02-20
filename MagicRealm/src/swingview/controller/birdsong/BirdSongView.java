@@ -6,10 +6,12 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 import javax.swing.BoxLayout;
+import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 
 import swingview.controller.HistoryView;
 import model.activity.Activity;
@@ -43,29 +45,31 @@ public class BirdSongView extends JPanel implements ActionListener {
 		JLabel lbl = new JLabel("CurrentDay: " + parent.getCurrentDay());		
 		add(lbl);
 		
-		JPanel lbls = new JPanel();
-		JPanel boxes = new JPanel();
-		lbls.setLayout(new BoxLayout(lbls, BoxLayout.X_AXIS));
-		boxes.setLayout(new BoxLayout(boxes, BoxLayout.X_AXIS));
+		JPanel wrapper = new JPanel();
+		wrapper.setLayout(new BoxLayout(wrapper, BoxLayout.X_AXIS));
 		
-		ArrayList<JLabel> lblArray = new ArrayList<JLabel>();
 		boxesArray = new ArrayList<JComboBox<Object>>();
 		for (int i = 0; i < phases.size(); i++) {
-			if(phases.get(i).getType() == PhaseType.DEFAULT){
-				lblArray.add(new JLabel("Default Phase: " + (i + 1) + "           "));
-			}else if(phases.get(i).getType() == PhaseType.SPECIAL){
-				lblArray.add(new JLabel("Special Phase: " + (i + 1) + "           "));
-			}else{
-				lblArray.add(new JLabel("Sunlight Phase: " + (i + 1) + "          "));
-			}			
-			lblArray.get(i).setAlignmentX(BOTTOM_ALIGNMENT);
-			lbls.add(lblArray.get(i));
-			
+			JPanel pane = new JPanel();
+			pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
+			switch(phases.get(i).getType()) {
+			case SUNLIGHT:
+				lbl = new JLabel("Sunlight Phase: " + (i + 1));
+				break;
+			case SPECIAL:
+				lbl = new JLabel("Special Phase: " + (i + 1));
+				break;
+			default:
+				lbl = new JLabel("Default Phase: " + (i + 1));
+				break;
+			}
+			pane.setAlignmentX(Component.LEFT_ALIGNMENT);
+			pane.add(lbl);
 			boxesArray.add(new JComboBox<Object>(phases.get(i).getPossibleActivities().toArray()));
-			boxes.add(boxesArray.get(i));
+			pane.add(boxesArray.get(i));
+			wrapper.add(pane);
 		}
-		add(lbls);
-		add(boxes);
+		add(wrapper);
 		submit = new JButton("Submit");
 		submit.addActionListener(this);
 		add(submit);
@@ -79,12 +83,8 @@ public class BirdSongView extends JPanel implements ActionListener {
 				actions.add(b.getSelectedItem().toString());
 			}
 			//trim none activities from end.
-			for (int i = actions.size(); i > 0; i--) {
-				if (actions.get(i - 1).equals(ActivityType.NONE.toString())) {
-					actions.remove(i - 1);
-				} else {
-					break;
-				}
+			while(actions.size() > 0 && actions.get(actions.size() - 1).equals(ActivityType.NONE.toString())) {
+				actions.remove(actions.size() - 1);
 			}
 			
 			//check if no activities were set.
@@ -111,11 +111,17 @@ public class BirdSongView extends JPanel implements ActionListener {
 		int moveCounter = 0;
 		ArrayList<Activity> activities = new ArrayList<Activity>();
 		for (String action : actions) {
-			if (action.equals(ActivityType.MOVE.toString())) {
+			ActivityType act = ActivityType.valueOf(action);
+			switch(act) {
+			case MOVE:
 				activities.add(moveActivities.get(moveCounter));
 				moveCounter++;
-			} else if(action.equals(ActivityType.HIDE.toString())){
-				activities.add(new Hide(ActivityType.HIDE));
+				break;
+			case HIDE:
+				activities.add(new Hide(parent.getCurrentCharacter()));
+				break;
+			default:
+				break;
 			}
 		}
 		parent.setCurrentPlayerActivities(activities);
@@ -125,9 +131,9 @@ public class BirdSongView extends JPanel implements ActionListener {
 		ArrayList<Activity> activities = new ArrayList<Activity>();
 		for (String action : activitiesArr) {
 			if(action.equals(ActivityType.HIDE.toString())){
-				activities.add(new Hide(ActivityType.HIDE));
+				activities.add(new Hide(parent.getCurrentCharacter()));
 			}else{
-				activities.add(new Empty(ActivityType.NONE));
+				activities.add(new Empty(parent.getCurrentCharacter()));
 			}
 		}
 		parent.setCurrentPlayerActivities(activities);

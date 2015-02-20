@@ -1,19 +1,16 @@
 package model.activity;
 
-import controller.Controller;
 import model.controller.ModelController;
 import model.enums.ActivityType;
+import model.enums.CharacterType;
 
 public class Empty extends Activity{
 
-	public Empty(ActivityType act) {
-		super(act);
+	public Empty(CharacterType actor) {
+		super(ActivityType.NONE, actor);
 	}
 
 	@Override
-	public void perform(Controller controller) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void perform(ModelController controller) { }
 
 }

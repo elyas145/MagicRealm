@@ -1,5 +1,6 @@
 package lwjglview.graphics.board;
 
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -107,63 +108,6 @@ public class LWJGLBoardDrawable implements BoardView, Drawable {
 		setTimeOfDay(timeOfDay);
 	}
 
-	private FloatBuffer bufferN, bufferE, bufferT;
-
-	@Override
-	public void setTimeOfDay(TimeOfDay time) {
-		ambientColour.push(new FadeAnimator(
-				GraphicsConfiguration.DAY_CHANGE_TIME,
-				getColourOfDay(timeOfDay), getColourOfDay(time)));
-		timeOfDay = time;
-	}
-
-	@Override
-	public void setTile(TileName tile, int rw, int cl, int rot,
-			Iterable<? extends ClearingInterface> clears) {
-		int row = rw;
-		int col = cl;
-		float x, y, r;
-		x = row % 2 == 0 ? 0f : 1.5f;
-		x += col * 3f;
-		y = -row * 0.866025f;
-		r = Mathf.PI * rot / 3f;
-		Map<Integer, ClearingStorage> tileClr = new HashMap<Integer, ClearingStorage>();
-		clearings.put(tile, tileClr);
-		synchronized (tiles) {
-			tiles.put(tile, new LWJGLTileDrawable(tile, x, y, r,
-					getTextureIndex(tile, false), getTextureIndex(tile, true)));
-		}
-		bufferT.put(0, x);
-		bufferT.put(1, y);
-		for (ClearingInterface clr : clears) {
-			clr.getPosition(false, bufferN);
-			clr.getPosition(true, bufferE);
-			tileClr.put(clr.getClearingNumber(), new ClearingStorage(tile,
-					bufferT, bufferN, bufferE));
-		}
-	}
-
-	@Override
-	public void setCounter(CounterType tp, TileName tile, int clearing) {
-
-		if (!counterDrawables.containsKey(tp)) {
-			counterDrawables.put(tp, new LWJGLCounterDrawable(this, tp,
-					getCounterRepresentation(tp), getCounterTextureIndex(tp)));
-		}
-
-		if (!counterLocations.containsKey(tp)) {
-			counterLocations.put(tp, new CounterLocation(tile, clearing));
-		} else {
-			CounterLocation loc = counterLocations.get(tp);
-			clearings.get(loc.tile).get(loc.clearing).remove(tp);
-			loc.tile = tile;
-			loc.clearing = clearing;
-		}
-
-		clearings.get(tile).get(clearing).put(tp);
-
-	}
-
 	public boolean isTileEnchanted(TileName name) {
 		return tiles.get(name).isEnchanted();
 	}
@@ -187,6 +131,13 @@ public class LWJGLBoardDrawable implements BoardView, Drawable {
 		ClearingStorage store = stores.get(cl.clearing);
 		store.getLocation(ct, position);
 	}
+	
+	
+	/*
+	 * ***********************************************************************
+	 *                          OVERRIDE METHODS
+	 * ***********************************************************************
+	 */
 
 	@Override
 	public void enchantTile(TileName tile) {
@@ -294,6 +245,73 @@ public class LWJGLBoardDrawable implements BoardView, Drawable {
 	public boolean isAnimationFinished(CounterType ct) {
 		return counterDrawables.get(ct).isAnimationFinished();
 	}
+
+	@Override
+	public void hideCounter(CounterType ct) {
+		counterDrawables.get(ct).changeColour(Color.GREEN);
+	}
+
+	@Override
+	public void setTimeOfDay(TimeOfDay time) {
+		ambientColour.push(new FadeAnimator(
+				GraphicsConfiguration.DAY_CHANGE_TIME,
+				getColourOfDay(timeOfDay), getColourOfDay(time)));
+		timeOfDay = time;
+	}
+
+	@Override
+	public void setTile(TileName tile, int rw, int cl, int rot,
+			Iterable<? extends ClearingInterface> clears) {
+		int row = rw;
+		int col = cl;
+		float x, y, r;
+		x = row % 2 == 0 ? 0f : 1.5f;
+		x += col * 3f;
+		y = -row * 0.866025f;
+		r = Mathf.PI * rot / 3f;
+		Map<Integer, ClearingStorage> tileClr = new HashMap<Integer, ClearingStorage>();
+		clearings.put(tile, tileClr);
+		synchronized (tiles) {
+			tiles.put(tile, new LWJGLTileDrawable(tile, x, y, r,
+					getTextureIndex(tile, false), getTextureIndex(tile, true)));
+		}
+		bufferT.put(0, x);
+		bufferT.put(1, y);
+		for (ClearingInterface clr : clears) {
+			clr.getPosition(false, bufferN);
+			clr.getPosition(true, bufferE);
+			tileClr.put(clr.getClearingNumber(), new ClearingStorage(tile,
+					bufferT, bufferN, bufferE));
+		}
+	}
+
+	@Override
+	public void setCounter(CounterType tp, TileName tile, int clearing) {
+
+		if (!counterDrawables.containsKey(tp)) {
+			counterDrawables.put(tp, new LWJGLCounterDrawable(this, tp,
+					getCounterRepresentation(tp), getCounterTextureIndex(tp)));
+		}
+
+		if (!counterLocations.containsKey(tp)) {
+			counterLocations.put(tp, new CounterLocation(tile, clearing));
+		} else {
+			CounterLocation loc = counterLocations.get(tp);
+			clearings.get(loc.tile).get(loc.clearing).remove(tp);
+			loc.tile = tile;
+			loc.clearing = clearing;
+		}
+
+		clearings.get(tile).get(clearing).put(tp);
+
+	}
+	
+	
+	/*
+	 * ***********************************************************************
+	 *                          PRIVATE METHODS
+	 * ***********************************************************************
+	 */
 
 	private Matrix getColourOfDay(TimeOfDay tod) {
 		switch(tod) {
@@ -553,5 +571,7 @@ public class LWJGLBoardDrawable implements BoardView, Drawable {
 	private FollowAnimator cameraFocus;
 
 	private TimeOfDay timeOfDay;
+
+	private FloatBuffer bufferN, bufferE, bufferT;
 
 }

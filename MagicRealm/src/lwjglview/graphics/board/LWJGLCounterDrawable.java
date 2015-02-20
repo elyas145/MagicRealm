@@ -1,11 +1,13 @@
 package lwjglview.graphics.board;
 
+import java.awt.Color;
 import java.nio.FloatBuffer;
 
 import org.lwjgl.BufferUtils;
 
 import lwjglview.graphics.LWJGLGraphics;
 import lwjglview.graphics.animator.AnimationQueue;
+import lwjglview.graphics.animator.FadeAnimator;
 import lwjglview.graphics.animator.MovementAnimator;
 import lwjglview.graphics.shader.ShaderType;
 import model.enums.CounterType;
@@ -28,8 +30,23 @@ public class LWJGLCounterDrawable extends CounterDrawable {
 		position = null;
 		buffer = BufferUtils.createFloatBuffer(4);
 		basis4 = Matrix.columnVector(0f, 0f, 0f, 1f);
+		colours = new AnimationQueue();
+		colours.start();
+		colourBuffer = new float[4];
+		currentColour = null;
+		changeColour(Color.WHITE);
 		movements = new AnimationQueue();
 		movements.start();
+	}
+	
+	public void changeColour(Color col) {
+		col.getRGBComponents(colourBuffer);
+		Matrix newCol = Matrix.columnVector(colourBuffer);
+		if(currentColour == null) {
+			currentColour = newCol;
+		}
+		colours.push(new FadeAnimator(GraphicsConfiguration.COUNTER_FLIP_TIME, currentColour, newCol));
+		currentColour = newCol;
 	}
 
 	public void moveTo(float x, float y) {
@@ -71,9 +88,11 @@ public class LWJGLCounterDrawable extends CounterDrawable {
 				+ GraphicsConfiguration.TILE_THICKNESS * .5f);
 
 		lwgfx.updateModelViewUniform(SHADER, "modelViewMatrix");
-		lwgfx.updateModelViewUniform(SHADER, "modelViewInverseMatrix");
 		lwgfx.updateMVPUniform(SHADER, "mvpMatrix");
 		lwgfx.getShaders().setUniformIntValue(SHADER, "index", textureIndex);
+		buffer.rewind();
+		colours.apply().toFloatBuffer(buffer);
+		lwgfx.getShaders().setUniformFloatArrayValue(SHADER, "counterColour", 4, buffer);
 
 		representation.draw(gfx);
 	}
@@ -98,10 +117,15 @@ public class LWJGLCounterDrawable extends CounterDrawable {
 		position.put(0, xf);
 		position.put(1, yf);
 	}
+	
+	private float[] colourBuffer;
+	
+	private Matrix currentColour;
 
 	private Matrix basis4;
 
 	private AnimationQueue movements;
+	private AnimationQueue colours;
 
 	private LWJGLBoardDrawable board;
 

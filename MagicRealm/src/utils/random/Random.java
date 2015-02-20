@@ -21,6 +21,10 @@ public class Random {
 			lst.set(swp, tmp);
 		}
 	}
+	
+	public static int dieRoll() {
+		return randomInteger(1, 7);
+	}
 
 	public static int randomInteger(int size) {
 		return randomInteger(0, size);

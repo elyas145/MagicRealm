@@ -2,16 +2,22 @@ package model.controller;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import config.BoardConfiguration;
 import config.GameConfiguration;
+import controller.Controller;
+import utils.random.Random;
 import utils.resources.ResourceHandler;
+import utils.structures.LinkedQueue;
+import utils.structures.Queue;
+import utils.structures.QueueEmptyException;
 import model.activity.Activity;
-import model.activity.Move;
 import model.board.Board;
 import model.enums.ActivityType;
 import model.enums.CharacterType;
-import model.enums.CounterType;
 import model.enums.PhaseType;
 import model.enums.SiteType;
 import model.enums.TileName;
@@ -31,29 +37,48 @@ public class ModelController {
 	private int currentDay = 0;
 
 	private Board board = null;
-	private ArrayList<Character> characters = null;
-	private ArrayList<Player> players = null;
-	private int currentPlayer = 0;
+	//private ArrayList<Character> characters = null;
+	private Map<CharacterType, Character> characters;
+	//private ArrayList<Player> players = null;
+	private Map<CharacterType, Player> players;
+	private List<CharacterType> randomOrder;
+	private Queue<CharacterType> orderOfPlay;
 	private boolean currentPlayerDone = false;
+	
+	private Controller client;
+	
+	private static final RuntimeException noPlayersException = new RuntimeException("There are no players in the queue");
 
-	public ModelController(ResourceHandler rh) {
+	public ModelController(ResourceHandler rh, Controller cln) {
+		client = cln;
 		this.rh = rh;
 		currentDay = 1;
 		sites = new ArrayList<SiteType>();
-		players = new ArrayList<Player>();
+		players = new HashMap<CharacterType, Player>();
 		numPlayers = GameConfiguration.MAX_PLAYERS;
+		orderOfPlay = new LinkedQueue<CharacterType>();
 		for (SiteType t : SiteType.values()) {
 			sites.add(t);
 		}
 	}
+	
+	public void raiseMessage(CharacterType plr, String msg) {
+		client.displayMessage("Illegal move cancelled.");
+	}
 
-	public void moveCharacter(Character character, TileName tt, int clearing)
+	public void moveCharacter(CharacterType characterType, TileName tt, int clearing)
 			throws IllegalMoveException {
-		board.moveCharacter(character, tt, clearing);
+		if(board.isValidMove(characterType.toCounter(), tt, clearing)) {
+			board.moveCharacter(characterType, tt, clearing);
+			client.moveCounter(characterType.toCounter(), tt, clearing);
+		}
+		else {
+			throw new IllegalMoveException(tt, clearing, characterType);
+		}
 	}
 
 	public void killCharacter(Character character) {
-		board.removeCharacter(character);
+		board.removeCharacter(character.getType());
 	}
 
 	public Board setBoard() {
@@ -67,32 +92,47 @@ public class ModelController {
 		numPlayers = maxPlayers;
 	}
 
-	public ArrayList<Player> getPlayers() {
-		return players;
+	public Collection<Player> getPlayers() {
+		return players.values();
 	}
 
 	public void setPlayers() {
 		if (players != null) {
+			List<CharacterType> possible = new ArrayList<CharacterType>();
+			randomOrder = new ArrayList<CharacterType>();
+			for(CharacterType ct: CharacterType.values()) {
+				possible.add(ct);
+			}
 			for (int i = 0; i < numPlayers; i++) {
-				players.add(new Player(i, "player: " + i));
-				players.get(i).setCharacter(characters.get(i));
+				Player plr = new Player(i, "player: " + i);
+				CharacterType rnd = Random.remove(possible);
+				players.put(rnd, plr);
+				plr.setCharacter(characters.get(rnd));
+				randomOrder.add(rnd);
 			}
 		}
 	}
 
 	public void setCharacters() {
 		if (characters == null) {
-			characters = CharacterFactory.getPossibleCharacters();
+			characters = new HashMap<CharacterType, Character>();
+			for(Character cr: CharacterFactory.getPossibleCharacters()) {
+				characters.put(cr.getType(), cr);
+			}
 		}
 	}
 
 	public Player getCurrentPlayer() {
-		return players.get(currentPlayer);
+		try {
+			return players.get(orderOfPlay.top());
+		} catch (QueueEmptyException e) {
+			throw noPlayersException;
+		}
 	}
 
 	public void setPlayersInitialLocations() {
-		for (Character c : characters) {
-			board.setLocationOfCounter(c.getType().toCounter(), SiteType.INN);
+		for (Character c : characters.values()) {
+			board.setLocationOfCounter(c.getType().toCounter(), BoardConfiguration.INITIAL_SITE);
 		}
 
 	}
@@ -116,6 +156,8 @@ public class ModelController {
 				board.setLocationOfCounter(t.toCounterType(),
 						TileName.BAD_VALLEY, 5);
 				break;
+			default:
+				break;
 			}
 		}
 	}
@@ -129,16 +171,28 @@ public class ModelController {
 	}
 
 	public void setCurrentPlayerActivities(ArrayList<Activity> activities) {
-		players.get(currentPlayer).setActivities(activities);
+		try {
+			players.get(orderOfPlay.top()).setActivities(activities);
+		} catch (QueueEmptyException e) {
+			throw noPlayersException;
+		}
 	}
 
-	public ArrayList<Activity> getCurrentActivities() {
-		return players.get(currentPlayer).getPersonalHistory()
-				.getCurrentActivities();
+	public List<Activity> getCurrentActivities() {
+		try {
+			return players.get(orderOfPlay.top()).getPersonalHistory()
+					.getCurrentActivities();
+		} catch (QueueEmptyException e) {
+			throw noPlayersException;
+		}
 	}
 
-	public CounterType getCurrentCounter() {
-		return characters.get(currentPlayer).getType().toCounter();
+	public Character getCurrentCharacter() {
+		return getCurrentPlayer().getCharacter();
+	}
+	
+	public CharacterType getCurrentCharacterType() {
+		return getCurrentCharacter().getType();
 	}
 
 	public boolean isPlayerDone() {
@@ -151,25 +205,29 @@ public class ModelController {
 	}
 
 	public Player nextPlayer() {
-		if (currentPlayer < 2) {
-			currentPlayer++;
-		} else
-			currentPlayer = 0;
+		if(orderOfPlay.isEmpty()) {
+			resetOrderOfPlay();
+		}
 		currentPlayerDone = false;
-		return players.get(currentPlayer);
+		client.setCurrentCharacter(getCurrentCharacterType());
+		try {
+			return players.get(orderOfPlay.pop());
+		} catch (QueueEmptyException e) {
+			throw noPlayersException;
+		}
 	}
+
 
 	public Board getBoard() {
 		return board;
 	}
 
 	public void newDayTime() {
-		currentPlayer = 0;
-
+		resetOrderOfPlay();
 	}
 
 	public void newDay() {
-		for (Player player : players) {
+		for (Player player : players.values()) {
 			player.getPersonalHistory().newDay();
 		}
 
@@ -178,9 +236,45 @@ public class ModelController {
 	public ArrayList<Phase> getAllowedPhases() {
 		ArrayList<Phase> phases = new ArrayList<Phase>();
 		phases.addAll(getInitialPhases());
-		phases.addAll(characters.get(currentPlayer).getSpecialPhases());
+		phases.addAll(getCurrentCharacter().getSpecialPhases());
 		phases.addAll(getSunlightPhases());
 		return phases;
+	}
+
+	public boolean isCharacterHidden(CharacterType ct) {		
+		return getCharacter(ct).isHiding();
+	}
+
+	public Character getCharacter(CharacterType ct) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public boolean isCurrentHidden() {		
+		return getCurrentCharacter().isHiding();
+	}
+
+	public void setCurrentHiding() {
+		getCurrentCharacter().setHiding(true);
+		client.setHiding(getCurrentCharacterType());
+		System.out.println("current is now hiding.");
+	}
+
+	public void unhideCurrent() {
+		getCurrentCharacter().setHiding(false);
+	}
+
+	public boolean isCharacterHiding(CharacterType actor) {
+		return characters.get(actor).isHiding();
+	}
+	
+	private void resetOrderOfPlay() {
+		Random.shuffle(randomOrder);
+		orderOfPlay.clear();
+		for(CharacterType ct: randomOrder) {
+			orderOfPlay.push(ct);
+		}
+		System.out.println(orderOfPlay);
 	}
 
 	private Collection<? extends Phase> getSunlightPhases() {
@@ -199,20 +293,6 @@ public class ModelController {
 			init.get(i).setPossibleActivities(ActivityType.values());
 		}
 		return init;
-	}
-
-	public boolean isCurrentHidden() {		
-		return characters.get(currentPlayer).isHiding();
-	}
-
-	public void setCurrentHiding() {
-		characters.get(currentPlayer).setHiding(true);
-		System.out.println("current is now hiding.");
-	}
-
-	public void unhideCurrent() {
-		characters.get(currentPlayer).setHiding(false);
-		
 	}
 
 }

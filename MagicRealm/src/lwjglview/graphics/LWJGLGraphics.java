@@ -187,10 +187,6 @@ public final class LWJGLGraphics implements Graphics {
 		shaders.setUniformMatrixValue(st, name, modelViewMatrix);
 	}
 
-	public void updateModelViewInverseUniform(ShaderType st, String name) {
-		shaders.setUniformMatrixValue(st, name, modelViewInverseMatrix);
-	}
-
 	public void updateProjectionUniform(ShaderType st, String name) {
 		shaders.setUniformMatrixValue(st, name, viewInverseMatrix);
 	}
@@ -430,7 +426,6 @@ public final class LWJGLGraphics implements Graphics {
 
 	private void updateModelViewMatrix() {
 		modelViewMatrix = viewInverseMatrix.multiply(modelMatrix);
-		modelViewInverseMatrix = modelViewMatrix.inverse();
 		updateMVP();
 	}
 
@@ -477,7 +472,6 @@ public final class LWJGLGraphics implements Graphics {
 	private Matrix viewInverseMatrix;
 	private Matrix modelMatrix;
 	private Matrix modelViewMatrix;
-	private Matrix modelViewInverseMatrix;
 	private Matrix modelViewProjectionMatrix;
 
 	private int width;

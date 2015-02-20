@@ -27,9 +27,7 @@ public class LinkedQueue<T> implements Queue<T> {
 	// public constructor
 	
 	public LinkedQueue() {
-		head = null;
-		tail = null;
-		count = 0;
+		clear();
 	}
 	
 	
@@ -64,6 +62,14 @@ public class LinkedQueue<T> implements Queue<T> {
 	}
 	
 	@Override
+	public T top() throws QueueEmptyException {
+		if(isEmpty()) {
+			throw new QueueEmptyException();
+		}
+		return head.data;
+	}
+	
+	@Override
 	public int size() {
 		return count;
 	}
@@ -71,6 +77,27 @@ public class LinkedQueue<T> implements Queue<T> {
 	@Override
 	public boolean isEmpty() {
 		return head == null;
+	}
+	
+	@Override
+	public void clear() {
+		head = tail = null;
+		count = 0;
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder str = new StringBuilder();
+		str.append("LinkedQueue: ");
+		Link cur = head;
+		while(cur != null) {
+			str.append(cur.data);
+			if(cur.next != null) {
+				str.append(" -> ");
+			}
+			cur = cur.next;
+		}
+		return str.toString();
 	}
 	
 	

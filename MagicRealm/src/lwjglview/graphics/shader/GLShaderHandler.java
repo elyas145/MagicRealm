@@ -62,8 +62,6 @@ public class GLShaderHandler {
 	public void setUniformFloatArrayValue(ShaderType st, String name, int sz,
 			FloatBuffer values) {
 		int loc = initUniform(st, name);
-		values.limit(sz);
-		//glUniform1ARB(loc, values);
 		glUniform4f(loc, values.get(0), values.get(1), values.get(2), values.get(3));
 	}
 	
