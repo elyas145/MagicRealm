@@ -1,10 +1,16 @@
 package lwjglview.graphics.board;
 
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import config.GraphicsConfiguration;
+import lwjglview.graphics.LWJGLDrawable;
+import lwjglview.graphics.LWJGLDrawableNode;
 import lwjglview.graphics.LWJGLGraphics;
 import lwjglview.graphics.animator.AnimationQueue;
+import lwjglview.graphics.animator.FillerAnimator;
+import lwjglview.graphics.animator.StaticAnimator;
 import lwjglview.graphics.animator.TimedAnimator;
 import lwjglview.graphics.shader.GLShaderHandler;
 import lwjglview.graphics.shader.ShaderType;
@@ -14,24 +20,26 @@ import utils.math.Matrix;
 import view.graphics.Graphics;
 import view.graphics.board.TileDrawable;
 
-public class LWJGLTileDrawable extends TileDrawable {
+public class LWJGLTileDrawable extends LWJGLDrawableNode {
 
 	public static final ShaderType SHADER = ShaderType.TILE_SHADER;
 
-	public LWJGLTileDrawable(TileName tt, float x,
-			float y, float rot, int norm, int enchant) {
-		super(tt);
+	public LWJGLTileDrawable(float x, float y, float rot, int norm, int enchant) {
 		xPosition = x;
 		yPosition = y;
 		vector = Matrix.columnVector(xPosition, yPosition, 0f);
 		translation = Matrix.translation(vector);
-		rotation = rot;
+		rotation = Matrix.rotationZ(4, -rot);
+		transformation = translation.multiply(rotation);
 		normalTex = norm;
 		enchantedTex = enchant;
 		enchanted = false;
 		showEnchanted = enchanted;
+		faces = new ArrayList<TileFace>();
+		initFaces();
 		flipper = new AnimationQueue();
 		flipper.start();
+		flipper.push(new FillerAnimator(Matrix.identityMatrix(4)));
 	}
 
 	public void setTextures(int norm, int ench) {
@@ -59,88 +67,51 @@ public class LWJGLTileDrawable extends TileDrawable {
 	public boolean isEnchanted() {
 		return enchanted;
 	}
-	
+
 	public Matrix getVector() {
 		return vector;
 	}
 
 	@Override
-	public void draw(Graphics gfx) {
-		draw((LWJGLGraphics) gfx);
+	public void applyTransformation(LWJGLGraphics lwgfx) {
+		Matrix mat = flipper.apply();
+		transformation = translation.multiply(mat).multiply(rotation);
+		lwgfx.applyModelTransform(transformation);
+	}
+
+	@Override
+	public void updateUniforms(LWJGLGraphics lwgfx) {
+	}
+
+	@Override
+	public void draw(LWJGLGraphics lwgfx) {
+
+		for (TileFace tf : faces) {
+			drawChild(lwgfx, tf);
+		}
+
+	}
+
+	private void initFaces() {
+		float halfThick = GraphicsConfiguration.TILE_THICKNESS * .5f;
+		Matrix mat = Matrix.translation(0f, 0f, halfThick);
+		faces.add(new HexTileFace(mat, false));
+		mat = Matrix.rotationX(4, Mathf.PI).multiply(mat);
+		faces.add(new HexTileFace(mat, true));
+		// scale square
+		mat = Matrix.dilation(.5f, halfThick, 1f, 1f);
+		// rotate rectangle
+		mat = Matrix.rotationX(4, Mathf.PI * .5f).multiply(mat);
+		// move rectange to top
+		mat = Matrix.translation(0f, 0.866025f, 0f).multiply(mat);
+		for (int i = 0; i < 6; ++i) {
+			Matrix tmp = Matrix.rotationZ(4, i * Mathf.PI / 3f).multiply(mat);
+			faces.add(new SideFace(tmp));
+		}
 	}
 
 	private void setShowEnchanted(boolean set) {
 		showEnchanted = set;
-	}
-
-	private void draw(LWJGLGraphics lwgfx) {
-
-		Matrix mat;
-		if (flipper.isFinished()) {
-			mat = Matrix.identityMatrix(4);
-		} else {
-			mat = flipper.apply();
-		}
-
-		GLShaderHandler sh = lwgfx.getShaders();
-		sh.setUniformIntValue(SHADER, "index", showEnchanted ? enchantedTex
-				: normalTex);
-
-		float halfThick = GraphicsConfiguration.TILE_THICKNESS * .5f;
-
-		lwgfx.resetModelMatrix();
-		lwgfx.rotateModelZ(-rotation);
-		lwgfx.translateModel(0f, 0f, halfThick);
-
-		lwgfx.applyModelTransform(mat);
-
-		lwgfx.translateModel(xPosition, yPosition, 0f);
-
-		lwgfx.updateModelViewUniform(SHADER, "modelViewMatrix");
-		lwgfx.updateMVPUniform(SHADER, "mvpMatrix");
-		lwgfx.getPrimitiveTool().drawHexagon();
-
-		sh.setUniformIntValue(SHADER, "index", showEnchanted ? normalTex
-				: enchantedTex);
-
-		lwgfx.resetModelMatrix();
-		lwgfx.rotateModelX(Mathf.PI);
-		lwgfx.rotateModelZ(rotation);
-		lwgfx.translateModel(0f, 0f, -halfThick);
-
-		lwgfx.applyModelTransform(mat);
-
-		lwgfx.translateModel(xPosition, yPosition, 0f);
-
-		lwgfx.updateModelViewUniform(SHADER, "modelViewMatrix");
-		lwgfx.updateMVPUniform(SHADER, "mvpMatrix");
-		lwgfx.getPrimitiveTool().drawHexagon();
-
-		// draw sides of tile
-		sh.setUniformIntValue(SHADER, "index", -1);
-
-		// scale square
-		Matrix transform = Matrix
-				.dilation(new float[] { .5f, halfThick, 1f, 1f });
-		// rotate rectangle
-		transform = Matrix.rotationX(4, Mathf.PI * .5f).multiply(transform);
-		// move rectange to top
-		transform = Matrix.translation(new float[] { 0f, 0.866025f, 0f })
-				.multiply(transform);
-		for (int i = 0; i < 6; ++i) {
-			lwgfx.resetModelMatrix();
-			lwgfx.applyModelTransform(transform);
-			lwgfx.rotateModelZ(i * Mathf.PI / 3f);
-
-			lwgfx.applyModelTransform(mat);
-
-			lwgfx.applyModelTransform(translation);
-
-			lwgfx.updateModelViewUniform(SHADER, "modelViewMatrix");
-			lwgfx.updateMVPUniform(SHADER, "mvpMatrix");
-
-			lwgfx.getPrimitiveTool().drawSquare();
-		}
 	}
 
 	private class TileFlipper extends TimedAnimator {
@@ -165,11 +136,76 @@ public class LWJGLTileDrawable extends TileDrawable {
 
 	}
 
+	private abstract class TileFace extends LWJGLDrawable {
+
+		public TileFace(Matrix mat) {
+			transform = mat;
+		}
+
+		@Override
+		public void updateUniforms(LWJGLGraphics lwgfx) {
+			lwgfx.updateModelViewUniform(SHADER, "modelViewMatrix");
+			lwgfx.updateMVPUniform(SHADER, "mvpMatrix");
+		}
+
+		@Override
+		public void applyTransformation(LWJGLGraphics gfx) {
+			gfx.resetModelMatrix();
+			gfx.applyModelTransform(transform);
+		}
+
+		private Matrix transform;
+
+	}
+
+	private class HexTileFace extends TileFace {
+
+		public HexTileFace(Matrix mat, boolean ench) {
+			super(mat);
+			tex = ench ? enchantedTex : normalTex;
+		}
+
+		@Override
+		public void updateUniforms(LWJGLGraphics lwgfx) {
+			super.updateUniforms(lwgfx);
+			lwgfx.getShaders().setUniformIntValue(SHADER, "index", tex);
+		}
+
+		@Override
+		public void draw(LWJGLGraphics lwgfx) {
+			lwgfx.getPrimitiveTool().drawHexagon();
+		}
+
+		private int tex;
+
+	}
+
+	private class SideFace extends TileFace {
+
+		public SideFace(Matrix mat) {
+			super(mat);
+		}
+
+		@Override
+		public void updateUniforms(LWJGLGraphics lwgfx) {
+			super.updateUniforms(lwgfx);
+			lwgfx.getShaders().setUniformIntValue(SHADER, "index", -1);
+		}
+
+		@Override
+		public void draw(LWJGLGraphics lwgfx) {
+			lwgfx.getPrimitiveTool().drawSquare();
+		}
+
+	}
+
+	private Collection<TileFace> faces;
+	private Matrix transformation;
+	private Matrix rotation;
 	private float xPosition;
 	private float yPosition;
 	private Matrix vector;
 	private Matrix translation;
-	private float rotation;
 	private int normalTex;
 	private int enchantedTex;
 	private boolean enchanted;

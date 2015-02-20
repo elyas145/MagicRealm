@@ -22,6 +22,7 @@ public class GLShaderHandler {
 	
 	public GLShaderHandler(ResourceHandler rh) {
 		resources = rh;
+		current = null;
 		vertShaders = new HashMap<String, Integer>();
 		fragShaders = new HashMap<String, Integer>();
 		programs = new HashMap<ShaderType, Integer>();
@@ -74,10 +75,15 @@ public class GLShaderHandler {
 	
 	public void useShaderProgram(ShaderType shader) {
 		glUseProgramObjectARB(programs.get(shader));
+		current = shader;
 	}
 	
 	public boolean hasProgram(ShaderType shader) {
 		return programs.containsKey(shader);
+	}
+
+	public ShaderType getType() {
+		return current;
 	}
 	
 	private int initUniform(ShaderType st, String name) {
@@ -134,6 +140,8 @@ public class GLShaderHandler {
 	private Map<String, Integer> fragShaders;
 	private Map<ShaderType, Integer> programs;
 	private Map<ShaderType, Map<String, Integer>> uniforms;
+	
+	private ShaderType current;
 	
 	private FloatBuffer matrixBuffer;
 

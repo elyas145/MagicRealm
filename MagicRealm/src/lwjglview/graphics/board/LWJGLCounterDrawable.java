@@ -5,6 +5,8 @@ import java.nio.FloatBuffer;
 
 import org.lwjgl.BufferUtils;
 
+import lwjglview.graphics.LWJGLDrawable;
+import lwjglview.graphics.LWJGLDrawableNode;
 import lwjglview.graphics.LWJGLGraphics;
 import lwjglview.graphics.animator.AnimationQueue;
 import lwjglview.graphics.animator.FadeAnimator;
@@ -17,13 +19,13 @@ import view.graphics.board.CounterDrawable;
 import view.graphics.Drawable;
 import view.graphics.Graphics;
 
-public class LWJGLCounterDrawable extends CounterDrawable {
+public class LWJGLCounterDrawable extends LWJGLDrawableNode {
 
 	public static final ShaderType SHADER = ShaderType.CHIT_SHADER;
 
-	public LWJGLCounterDrawable(LWJGLBoardDrawable bd, CounterType chit,
-			Drawable chitBlock, int texid) {
-		super(chit);
+	public LWJGLCounterDrawable(LWJGLBoardDrawable bd, CounterType ctr, LWJGLDrawable chitBlock,
+			int texid) {
+		counter = ctr;
 		board = bd;
 		representation = chitBlock;
 		textureIndex = texid;
@@ -38,14 +40,19 @@ public class LWJGLCounterDrawable extends CounterDrawable {
 		movements = new AnimationQueue();
 		movements.start();
 	}
-	
+
+	public CounterType getCounterType() {
+		return counter;
+	}
+
 	public void changeColour(Color col) {
 		col.getRGBComponents(colourBuffer);
 		Matrix newCol = Matrix.columnVector(colourBuffer);
-		if(currentColour == null) {
+		if (currentColour == null) {
 			currentColour = newCol;
 		}
-		colours.push(new FadeAnimator(GraphicsConfiguration.COUNTER_FLIP_TIME, currentColour, newCol));
+		colours.push(new FadeAnimator(GraphicsConfiguration.COUNTER_FLIP_TIME,
+				currentColour, newCol));
 		currentColour = newCol;
 	}
 
@@ -78,23 +85,29 @@ public class LWJGLCounterDrawable extends CounterDrawable {
 	}
 
 	@Override
-	public void draw(Graphics gfx) {
-		LWJGLGraphics lwgfx = (LWJGLGraphics) gfx;
-
-		lwgfx.resetModelMatrix();
+	public void applyTransformation(LWJGLGraphics lwgfx) {
 		lwgfx.scaleModel(GraphicsConfiguration.CHIT_SCALE);
 		lwgfx.applyModelTransform(getTransform());
 		lwgfx.translateModel(0f, 0f, GraphicsConfiguration.CHIT_HOVER
 				+ GraphicsConfiguration.TILE_THICKNESS * .5f);
+	}
 
+	@Override
+	public void updateUniforms(LWJGLGraphics lwgfx) {
 		lwgfx.updateModelViewUniform(SHADER, "modelViewMatrix");
 		lwgfx.updateMVPUniform(SHADER, "mvpMatrix");
 		lwgfx.getShaders().setUniformIntValue(SHADER, "index", textureIndex);
 		buffer.rewind();
 		colours.apply().toFloatBuffer(buffer);
-		lwgfx.getShaders().setUniformFloatArrayValue(SHADER, "counterColour", 4, buffer);
+		lwgfx.getShaders().setUniformFloatArrayValue(SHADER, "counterColour",
+				4, buffer);
+	}
 
-		representation.draw(gfx);
+	@Override
+	public void draw(LWJGLGraphics lwgfx) {
+
+		drawChild(lwgfx, representation);
+		
 	}
 
 	private void move() {
@@ -117,9 +130,9 @@ public class LWJGLCounterDrawable extends CounterDrawable {
 		position.put(0, xf);
 		position.put(1, yf);
 	}
-	
+
 	private float[] colourBuffer;
-	
+
 	private Matrix currentColour;
 
 	private Matrix basis4;
@@ -132,8 +145,10 @@ public class LWJGLCounterDrawable extends CounterDrawable {
 	private FloatBuffer position;
 	private FloatBuffer buffer;
 
-	private Drawable representation;
+	private LWJGLDrawable representation;
 
 	private int textureIndex;
+	
+	private CounterType counter;
 
 }

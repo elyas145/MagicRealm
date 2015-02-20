@@ -13,7 +13,10 @@ import java.util.Map;
 import org.lwjgl.BufferUtils;
 
 import config.GraphicsConfiguration;
+import lwjglview.graphics.LWJGLDrawable;
+import lwjglview.graphics.LWJGLDrawableNode;
 import lwjglview.graphics.LWJGLGraphics;
+import lwjglview.graphics.TransformationDrawable;
 import lwjglview.graphics.animator.AnimationQueue;
 import lwjglview.graphics.animator.Animator;
 import lwjglview.graphics.animator.FadeAnimator;
@@ -41,7 +44,7 @@ import view.controller.game.BoardView;
 import view.graphics.Drawable;
 import view.graphics.Graphics;
 
-public class LWJGLBoardDrawable implements BoardView, Drawable {
+public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 
 	public static final Matrix[] AMBIENT_COLOURS = new Matrix[] {
 			Matrix.columnVector(new float[] { .3f, .3f, .3f, 1f // 00:00
@@ -93,6 +96,9 @@ public class LWJGLBoardDrawable implements BoardView, Drawable {
 		roundCounter = ModelData.loadModelData(resources, "circle_counter.obj");
 		squareCounter = ModelData
 				.loadModelData(resources, "square_counter.obj");
+		knightCounter = ModelData.loadModelData(resources, "knight.obj");
+		//knightCounter = new TransformationDrawable(knightCounter,
+		//		Matrix.identityMatrix(4));
 		System.out.println("Finished loading chit model data");
 
 		// initialize buffers for tile locations
@@ -131,11 +137,10 @@ public class LWJGLBoardDrawable implements BoardView, Drawable {
 		ClearingStorage store = stores.get(cl.clearing);
 		store.getLocation(ct, position);
 	}
-	
-	
+
 	/*
 	 * ***********************************************************************
-	 *                          OVERRIDE METHODS
+	 * OVERRIDE METHODS
 	 * ***********************************************************************
 	 */
 
@@ -147,19 +152,21 @@ public class LWJGLBoardDrawable implements BoardView, Drawable {
 	}
 
 	@Override
-	public synchronized void draw(Graphics gfx) {
-		LWJGLGraphics lwgfx = (LWJGLGraphics) gfx;
+	public void updateUniforms(LWJGLGraphics gfx) {
+		GLShaderHandler shaders = gfx.getShaders();
+		buffer4.clear();
+		ambientColour.apply().toFloatBuffer(buffer4);
+		shaders.setUniformFloatArrayValue(currentShader, "ambientColour", 4, buffer4);
+	}
 
-		// reset the view matrix
-		lwgfx.resetViewMatrix();
-		float time = Timing.getSeconds() * .1f;
-		Matrix tmp = Matrix.rotationX(4, Mathf.PI / 4f);
-		float k = (Mathf.sin(time * .6f) + 6f) / 4f;
-		tmp = Matrix.translation(new float[] { 0f, -1f * k, 1f * k }).multiply(
-				tmp);
-		tmp = Matrix.rotationZ(4, time * .3f).multiply(tmp);
-		lwgfx.applyCameraTransform(tmp);
-		lwgfx.applyCameraTransform(cameraFocus.apply());
+	@Override
+	public void applyTransformation(LWJGLGraphics lwgfx) {
+	}
+
+	@Override
+	public void draw(LWJGLGraphics lwgfx) {
+		
+		resetView(lwgfx);
 
 		// load all textures to GPU
 		loadTextures(lwgfx);
@@ -169,24 +176,20 @@ public class LWJGLBoardDrawable implements BoardView, Drawable {
 
 		// load tile shader program
 		GLShaderHandler shaders = lwgfx.getShaders();
-		ShaderType st = ShaderType.TILE_SHADER;
-		if (!shaders.hasProgram(st)) {
+		currentShader = ShaderType.TILE_SHADER;
+		if (!shaders.hasProgram(currentShader)) {
 			try {
-				shaders.loadShaderProgram(st);
+				shaders.loadShaderProgram(currentShader);
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
 		}
-		shaders.useShaderProgram(st);
-
-		buffer4.clear();
-		ambientColour.apply().toFloatBuffer(buffer4);
-		shaders.setUniformFloatArrayValue(st, "ambientColour", 4, buffer4);
+		shaders.useShaderProgram(currentShader);
 
 		synchronized (tiles) {
 			// draw all tiles
-			for (Drawable tile : tiles.values()) {
-				tile.draw(lwgfx);
+			for (LWJGLDrawable tile : tiles.values()) {
+				drawChild(lwgfx, tile);
 			}
 		}
 
@@ -194,34 +197,22 @@ public class LWJGLBoardDrawable implements BoardView, Drawable {
 		lwgfx.bindTextureArray(chitTextureLocation);
 
 		// load chit shader program
-		st = ShaderType.CHIT_SHADER;
-		if (!shaders.hasProgram(st)) {
+		currentShader = ShaderType.CHIT_SHADER;
+		if (!shaders.hasProgram(currentShader)) {
 			try {
-				shaders.loadShaderProgram(st);
+				shaders.loadShaderProgram(currentShader);
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
 		}
-		shaders.useShaderProgram(st);
-		/*
-		 * again, for fisheye shaders.setUniformFloatValue(st, "xScale", 1f /
-		 * fovScale / ar); shaders.setUniformFloatValue(st, "yScale", 1f /
-		 * fovScale); shaders.setUniformFloatValue(st, "nearRadius", .1f);
-		 * shaders.setUniformFloatValue(st, "oneOverRadiusDifference", 1f/20f);
-		 */
-
-		// update shader colour
-
-		ambientColour.apply().toFloatBuffer(buffer4);
-		shaders.setUniformFloatArrayValue(st, "ambientColour", 4, buffer4);
+		shaders.useShaderProgram(currentShader);
 
 		synchronized (counterDrawables) {
 			// draw all chits
 			for (LWJGLCounterDrawable counter : counterDrawables.values()) {
-				counter.draw(lwgfx);
+				drawChild(lwgfx, counter);
 			}
 		}
-
 	}
 
 	@Override
@@ -272,11 +263,12 @@ public class LWJGLBoardDrawable implements BoardView, Drawable {
 		Map<Integer, ClearingStorage> tileClr = new HashMap<Integer, ClearingStorage>();
 		clearings.put(tile, tileClr);
 		synchronized (tiles) {
-			tiles.put(tile, new LWJGLTileDrawable(tile, x, y, r,
+			tiles.put(tile, new LWJGLTileDrawable(x, y, r,
 					getTextureIndex(tile, false), getTextureIndex(tile, true)));
 		}
 		bufferT.put(0, x);
 		bufferT.put(1, y);
+		tileClr.put(0, new ClearingStorage(tile, bufferT));
 		for (ClearingInterface clr : clears) {
 			clr.getPosition(false, bufferN);
 			clr.getPosition(true, bufferE);
@@ -305,16 +297,35 @@ public class LWJGLBoardDrawable implements BoardView, Drawable {
 		clearings.get(tile).get(clearing).put(tp);
 
 	}
-	
-	
+
+	@Override
+	public void setCounter(CounterType counter, TileName tile) {
+		setCounter(counter, tile, 0);
+	}
+
 	/*
 	 * ***********************************************************************
-	 *                          PRIVATE METHODS
+	 * PRIVATE METHODS
 	 * ***********************************************************************
 	 */
+	
+	private void resetView(LWJGLGraphics lwgfx) {
+
+		// reset the view matrix
+		lwgfx.resetViewMatrix();
+		float time = Timing.getSeconds() * .1f;
+		Matrix tmp = Matrix.rotationX(4, Mathf.PI / 4f);
+		float k = (Mathf.sin(time * .6f) + 6f) / 4f;
+		tmp = Matrix.translation(new float[] { 0f, -1f * k, 1f * k }).multiply(
+				tmp);
+		tmp = Matrix.rotationZ(4, time * .3f).multiply(tmp);
+		lwgfx.applyCameraTransform(tmp);
+		lwgfx.applyCameraTransform(cameraFocus.apply());
+
+	}
 
 	private Matrix getColourOfDay(TimeOfDay tod) {
-		switch(tod) {
+		switch (tod) {
 		case MIDNIGHT:
 			return AMBIENT_COLOURS[0];
 		case DUSK:
@@ -328,8 +339,11 @@ public class LWJGLBoardDrawable implements BoardView, Drawable {
 		}
 	}
 
-	private Drawable getCounterRepresentation(CounterType tp) {
+	private LWJGLDrawable getCounterRepresentation(CounterType tp) {
 		if (tp.isCharacter()) {
+			if (tp == CounterType.CHARACTER_SWORDSMAN) {
+				return knightCounter;
+			}
 			return roundCounter;
 		} else if (tp.isSite()) {
 			return squareCounter;
@@ -402,6 +416,16 @@ public class LWJGLBoardDrawable implements BoardView, Drawable {
 			posns = new float[][] {
 					{ tc.get(0) + nl.get(0), tc.get(1) + nl.get(1) },
 					{ tc.get(0) + el.get(0), tc.get(1) + el.get(1) } };
+			chits = new ArrayList<CounterType>();
+			dim = 0;
+			buff = BufferUtils.createFloatBuffer(2);
+		}
+		
+		public ClearingStorage(TileName tl, FloatBuffer tc) {
+			tile = tl;
+			posns = new float[][] {
+					{ tc.get(0), tc.get(1) },
+					{ tc.get(0), tc.get(1) } };
 			chits = new ArrayList<CounterType>();
 			dim = 0;
 			buff = BufferUtils.createFloatBuffer(2);
@@ -550,6 +574,7 @@ public class LWJGLBoardDrawable implements BoardView, Drawable {
 
 	private ModelData roundCounter;
 	private ModelData squareCounter;
+	private LWJGLDrawable knightCounter;
 
 	private Map<TileName, LWJGLTileDrawable> tiles;
 	private Map<CounterType, LWJGLCounterDrawable> counterDrawables;
@@ -573,5 +598,7 @@ public class LWJGLBoardDrawable implements BoardView, Drawable {
 	private TimeOfDay timeOfDay;
 
 	private FloatBuffer bufferN, bufferE, bufferT;
+	
+	private ShaderType currentShader;
 
 }
