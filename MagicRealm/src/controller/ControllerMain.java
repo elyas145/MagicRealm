@@ -79,7 +79,7 @@ public class ControllerMain implements Controller {
 						ci.getClearingNumber());
 			}
 			for(WarningChit chit : model.getWarningChits()){
-				//boardView.setMapChit(chit);
+				//boardView.setMapChit(chit); asdf
 			}
 			gfx.start();
 		} catch (IOException e1) {
