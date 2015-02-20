@@ -48,6 +48,10 @@ public abstract class Chit extends ChitInterface {
 		clearing = clear;
 	}
 	
+	public void setTile(TileName name){
+		this.tile = name;
+	}
+	
 	private boolean flipped;	//unflipped chits, mean they are face down.
 	private TileName tile;
 	private int clearing;

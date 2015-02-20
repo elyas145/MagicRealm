@@ -19,6 +19,7 @@ import model.board.tile.HexTile;
 import model.character.Character;
 import model.character.CharacterFactory;
 import model.controller.ModelController;
+import model.counter.chit.WarningChit;
 import model.enums.ActivityType;
 import model.enums.CharacterType;
 import model.enums.CounterType;
@@ -77,7 +78,9 @@ public class ControllerMain implements Controller {
 				boardView.setCounter(ct, ci.getParentTile().getName(),
 						ci.getClearingNumber());
 			}
-
+			for(WarningChit chit : model.getWarningChits()){
+				//boardView.setMapChit(chit);
+			}
 			gfx.start();
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
