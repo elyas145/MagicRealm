@@ -98,8 +98,8 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 		squareCounter = ModelData
 				.loadModelData(resources, "square_counter.obj");
 		knightCounter = ModelData.loadModelData(resources, "knight.obj");
-		knightCounter = new TransformationDrawable(this, knightCounter,
-				Matrix.rotationX(4, Mathf.PI * .5f));
+		//knightCounter = new TransformationDrawable(this, knightCounter,
+		//		Matrix.identityMatrix(4));//Matrix.rotationX(4, Mathf.PI * .5f));
 		System.out.println("Finished loading chit model data");
 
 		// initialize buffers for tile locations
