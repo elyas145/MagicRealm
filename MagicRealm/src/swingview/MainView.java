@@ -17,9 +17,11 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import model.character.Phase;
+import model.enums.CharacterType;
 import model.player.Player;
 import swingview.controller.birdsong.BirdSongView;
 import swingview.controller.mainmenu.MainMenu;
+import swingview.controller.search.SearchView;
 import utils.time.Timing;
 import view.controller.ViewController;
 import view.controller.splashscreen.SplashScreen;
@@ -116,6 +118,14 @@ public class MainView extends JFrame implements ViewController, WindowListener,
 	public void displayMessage(String string) {
 		JOptionPane.showMessageDialog(this, "Illegal move cancelled.");
 
+	}
+
+	@Override
+	public view.controller.search.SearchView enterSearchView(CharacterType character) {
+		SearchView search = new SearchView(character);
+		setContentPane(search);
+		pack();
+		return search;
 	}
 
 	@Override

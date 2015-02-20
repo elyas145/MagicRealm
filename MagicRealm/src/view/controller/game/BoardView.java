@@ -14,6 +14,8 @@ public interface BoardView {
 
 	void setCounter(CounterType counter, TileName tile, int clearing);
 	
+	void setCounter(CounterType counter, TileName tile);
+	
 	void focusOn(TileName tile);
 	
 	void focusOn(CounterType counter);
