@@ -58,6 +58,7 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 					}) };
 
 	public LWJGLBoardDrawable(ResourceHandler rh) throws IOException {
+		super(null);
 		resources = rh;
 		tiles = new HashMap<TileName, LWJGLTileDrawable>();
 		clearings = new HashMap<TileName, Map<Integer, ClearingStorage>>();
@@ -97,8 +98,8 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 		squareCounter = ModelData
 				.loadModelData(resources, "square_counter.obj");
 		knightCounter = ModelData.loadModelData(resources, "knight.obj");
-		//knightCounter = new TransformationDrawable(knightCounter,
-		//		Matrix.identityMatrix(4));
+		knightCounter = new TransformationDrawable(this, knightCounter,
+				Matrix.rotationX(4, Mathf.PI * .5f));
 		System.out.println("Finished loading chit model data");
 
 		// initialize buffers for tile locations
@@ -152,7 +153,7 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 	}
 
 	@Override
-	public void updateUniforms(LWJGLGraphics gfx) {
+	public void updateNodeUniforms(LWJGLGraphics gfx) {
 		GLShaderHandler shaders = gfx.getShaders();
 		buffer4.clear();
 		ambientColour.apply().toFloatBuffer(buffer4);
@@ -160,7 +161,7 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 	}
 
 	@Override
-	public void applyTransformation(LWJGLGraphics lwgfx) {
+	public void applyNodeTransformation(LWJGLGraphics lwgfx) {
 	}
 
 	@Override
@@ -263,7 +264,7 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 		Map<Integer, ClearingStorage> tileClr = new HashMap<Integer, ClearingStorage>();
 		clearings.put(tile, tileClr);
 		synchronized (tiles) {
-			tiles.put(tile, new LWJGLTileDrawable(x, y, r,
+			tiles.put(tile, new LWJGLTileDrawable(this, x, y, r,
 					getTextureIndex(tile, false), getTextureIndex(tile, true)));
 		}
 		bufferT.put(0, x);
