@@ -1,6 +1,7 @@
 package view.controller;
 
-import view.controller.splashscreen.SplashScreen;
+import model.enums.CharacterType;
+import view.controller.search.SearchView;
 
 public interface ViewController {
 	
@@ -8,4 +9,5 @@ public interface ViewController {
 	void enterSplashScreen();
 	void startGameView();
 	void exit();
+	SearchView enterSearchView(CharacterType character);
 }

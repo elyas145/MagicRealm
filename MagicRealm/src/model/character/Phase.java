@@ -1,13 +1,14 @@
 package model.character;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import model.enums.ActivityType;
 import model.enums.CharacterType;
 import model.enums.PhaseType;
 
 public class Phase {
-	private ArrayList<ActivityType> possibleActivities;
+	private List<ActivityType> possibleActivities;
 	private PhaseType type;
 	private CharacterType character;
 
@@ -27,11 +28,11 @@ public class Phase {
 		type = t;
 	}
 
-	public ArrayList<ActivityType> getPossibleActivities() {
+	public List<ActivityType> getPossibleActivities() {
 		return possibleActivities;
 	}
 
-	public void setPossibleActivities(ArrayList<ActivityType> possibleActivities) {
+	public void setPossibleActivities(List<ActivityType> possibleActivities) {
 		this.possibleActivities = possibleActivities;
 	}
 
