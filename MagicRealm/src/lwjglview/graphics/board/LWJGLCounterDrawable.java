@@ -25,6 +25,7 @@ public class LWJGLCounterDrawable extends LWJGLDrawableNode {
 
 	public LWJGLCounterDrawable(LWJGLBoardDrawable bd, CounterType ctr, LWJGLDrawable chitBlock,
 			int texid) {
+		super(bd);
 		counter = ctr;
 		board = bd;
 		representation = chitBlock;
@@ -85,7 +86,7 @@ public class LWJGLCounterDrawable extends LWJGLDrawableNode {
 	}
 
 	@Override
-	public void applyTransformation(LWJGLGraphics lwgfx) {
+	public void applyNodeTransformation(LWJGLGraphics lwgfx) {
 		lwgfx.scaleModel(GraphicsConfiguration.CHIT_SCALE);
 		lwgfx.applyModelTransform(getTransform());
 		lwgfx.translateModel(0f, 0f, GraphicsConfiguration.CHIT_HOVER
@@ -93,7 +94,7 @@ public class LWJGLCounterDrawable extends LWJGLDrawableNode {
 	}
 
 	@Override
-	public void updateUniforms(LWJGLGraphics lwgfx) {
+	public void updateNodeUniforms(LWJGLGraphics lwgfx) {
 		lwgfx.updateModelViewUniform(SHADER, "modelViewMatrix");
 		lwgfx.updateMVPUniform(SHADER, "mvpMatrix");
 		lwgfx.getShaders().setUniformIntValue(SHADER, "index", textureIndex);

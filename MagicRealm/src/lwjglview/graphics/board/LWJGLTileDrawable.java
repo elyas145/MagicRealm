@@ -24,7 +24,8 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode {
 
 	public static final ShaderType SHADER = ShaderType.TILE_SHADER;
 
-	public LWJGLTileDrawable(float x, float y, float rot, int norm, int enchant) {
+	public LWJGLTileDrawable(LWJGLDrawable parent, float x, float y, float rot, int norm, int enchant) {
+		super(parent);
 		xPosition = x;
 		yPosition = y;
 		vector = Matrix.columnVector(xPosition, yPosition, 0f);
@@ -73,14 +74,14 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode {
 	}
 
 	@Override
-	public void applyTransformation(LWJGLGraphics lwgfx) {
+	public void applyNodeTransformation(LWJGLGraphics lwgfx) {
 		Matrix mat = flipper.apply();
 		transformation = translation.multiply(mat).multiply(rotation);
 		lwgfx.applyModelTransform(transformation);
 	}
 
 	@Override
-	public void updateUniforms(LWJGLGraphics lwgfx) {
+	public void updateNodeUniforms(LWJGLGraphics lwgfx) {
 	}
 
 	@Override

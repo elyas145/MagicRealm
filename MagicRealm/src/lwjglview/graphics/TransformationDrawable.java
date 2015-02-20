@@ -6,18 +6,19 @@ import view.graphics.Graphics;
 
 public class TransformationDrawable extends LWJGLDrawableNode {
 
-	public TransformationDrawable(LWJGLDrawable draw, Matrix transform) {
+	public TransformationDrawable(LWJGLDrawable parent, LWJGLDrawable draw, Matrix transform) {
+		super(parent);
 		drawable = draw;
 		transformation = transform;
 	}
 	
 	@Override
-	public void applyTransformation(LWJGLGraphics gfx) {
+	public void applyNodeTransformation(LWJGLGraphics gfx) {
 		gfx.applyModelTransform(transformation);
 	}
 
 	@Override
-	public void updateUniforms(LWJGLGraphics gfx) {
+	public void updateNodeUniforms(LWJGLGraphics gfx) {
 	}
 
 	@Override
