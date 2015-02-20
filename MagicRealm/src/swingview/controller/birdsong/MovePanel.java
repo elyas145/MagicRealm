@@ -3,6 +3,7 @@ package swingview.controller.birdsong;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
@@ -54,7 +55,7 @@ public class MovePanel extends JPanel implements ActionListener {
 
 	private void setClearings() {
 		TileName selectedTile = (TileName) tiles.getSelectedItem();
-		ArrayList<Integer> clearingsArray = controller
+		List<Integer> clearingsArray = controller
 				.getPossibleClearings(selectedTile);
 		Integer[] ca = new Integer[clearingsArray.size()];
 		for (int j = 0; j < ca.length; j++) {

@@ -46,7 +46,7 @@ public class Matrix {
 		return trans;
 	}
 	
-	public static Matrix dilation(float[] fs) {
+	public static Matrix dilation(float... fs) {
 		Matrix ret = new Matrix(fs.length, fs.length);
 		ret.scale(fs);
 		return ret;

@@ -45,10 +45,9 @@ public class ActivityView extends JFrame implements ActionListener {
 		moveP.setLayout(new BoxLayout(moveP, BoxLayout.X_AXIS));
 		for (int i = 0; i < actions.size(); i++) {
 			if (actions.get(i).equals(ActivityType.MOVE.toString())) {
-				movePanels.add(new MovePanel(controller, i));
-				moveP.add(movePanels.get(i));
-			} else if (actions.get(i).equals(ActivityType.HIDE.toString())) {
-
+				MovePanel tmp = new MovePanel(controller, i);
+				movePanels.add(tmp);
+				moveP.add(tmp);
 			}
 		}
 

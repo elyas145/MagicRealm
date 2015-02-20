@@ -32,6 +32,7 @@ import model.player.Player;
 import swingview.MainView;
 import utils.resources.ResourceHandler;
 import view.controller.game.BoardView;
+import view.controller.search.SearchView;
 
 public class ControllerMain implements Controller {
 
@@ -160,7 +161,7 @@ public class ControllerMain implements Controller {
 	}
 
 	@Override
-	public void setCurrentPlayerActivities(ArrayList<Activity> activities) {
+	public void setCurrentPlayerActivities(List<Activity> activities) {
 		model.setCurrentPlayerActivities(activities);
 		model.setPlayerDone();
 	}
@@ -221,7 +222,8 @@ public class ControllerMain implements Controller {
 							// e.printStackTrace();
 						}
 					}
-					while (!boardView.isAnimationFinished(getCurrentCharacter().toCounter()))
+					while (!boardView.isAnimationFinished(getCurrentCharacter()
+							.toCounter()))
 						;
 					model.nextPlayer();
 				}
@@ -272,9 +274,21 @@ public class ControllerMain implements Controller {
 	}
 
 	@Override
-	public void moveCounter(CounterType counter, TileName tt,
-			int clearing) {
+	public void moveCounter(CounterType counter, TileName tt, int clearing) {
 		boardView.setCounter(counter, tt, clearing);
 	}
-	
+
+	@Override
+	public void startSearch(CharacterType searcher) {
+		SearchView sv = mainView.enterSearchView(searcher);
+		synchronized (sv) {
+			while (!sv.doneSearching()) {
+				try {
+					sv.wait();
+				} catch (InterruptedException e) {
+				}
+			}
+		}
+	}
+
 }

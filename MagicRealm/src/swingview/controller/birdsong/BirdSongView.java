@@ -4,6 +4,7 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -17,8 +18,10 @@ import swingview.controller.HistoryView;
 import model.activity.Activity;
 import model.activity.Empty;
 import model.activity.Hide;
+import model.activity.Search;
 import model.character.Phase;
 import model.enums.ActivityType;
+import model.enums.CharacterType;
 import model.enums.PhaseType;
 import model.player.PersonalHistory;
 import model.player.Player;
@@ -107,7 +110,7 @@ public class BirdSongView extends JPanel implements ActionListener {
 		}
 	}
 
-	public void sendActivities(ArrayList<Activity> moveActivities) {
+	public void sendActivities(List<Activity> moveActivities) {
 		int moveCounter = 0;
 		ArrayList<Activity> activities = new ArrayList<Activity>();
 		for (String action : actions) {
@@ -120,6 +123,9 @@ public class BirdSongView extends JPanel implements ActionListener {
 			case HIDE:
 				activities.add(new Hide(parent.getCurrentCharacter()));
 				break;
+			case SEARCH:
+				activities.add(new Search(parent.getCurrentCharacter()));
+				break;
 			default:
 				break;
 			}
@@ -128,12 +134,21 @@ public class BirdSongView extends JPanel implements ActionListener {
 	}
 
 	public void sendActivities(String[] activitiesArr) {
-		ArrayList<Activity> activities = new ArrayList<Activity>();
+		List<Activity> activities = new ArrayList<Activity>();
+		CharacterType chr = parent.getCurrentCharacter();
 		for (String action : activitiesArr) {
-			if(action.equals(ActivityType.HIDE.toString())){
-				activities.add(new Hide(parent.getCurrentCharacter()));
-			}else{
-				activities.add(new Empty(parent.getCurrentCharacter()));
+			switch(ActivityType.valueOf(action)) {
+			case HIDE:
+				activities.add(new Hide(chr));
+				break;
+			case SEARCH:
+				activities.add(new Search(chr));
+				break;
+			case NONE:
+				activities.add(new Empty(chr));
+				break;
+			default:
+				break;
 			}
 		}
 		parent.setCurrentPlayerActivities(activities);

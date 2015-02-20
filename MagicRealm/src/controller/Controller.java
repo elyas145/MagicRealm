@@ -1,6 +1,7 @@
 package controller;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import swingview.MainView;
 import view.controller.game.BoardView;
@@ -27,11 +28,11 @@ public interface Controller {
 
 	int getCurrentDay();
 
-	ArrayList<TileName> getPossibleTiles();
+	List<TileName> getPossibleTiles();
 
-	ArrayList<Integer> getPossibleClearings(TileName selectedTile);
+	List<Integer> getPossibleClearings(TileName selectedTile);
 	
-	void setCurrentPlayerActivities(ArrayList<Activity> activities);
+	void setCurrentPlayerActivities(List<Activity> activities);
 
 	void startGame();
 
@@ -50,5 +51,7 @@ public interface Controller {
 	void setCurrentCharacter(CharacterType character);
 
 	void moveCounter(CounterType counter, TileName tt, int clearing);
+
+	void startSearch(CharacterType actor);
 	
 }

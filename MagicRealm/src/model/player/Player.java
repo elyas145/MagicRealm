@@ -1,6 +1,7 @@
 package model.player;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import model.activity.Activity;
 import model.character.Character;
@@ -26,7 +27,7 @@ public class Player {
 	public Character getCharacter() {
 		return character;
 	}
-	public void setActivities(ArrayList<Activity> activities) {
+	public void setActivities(List<Activity> activities) {
 		for(Activity a : activities){
 			historyPad.addActivity(a);
 		}		

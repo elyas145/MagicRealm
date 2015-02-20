@@ -19,5 +19,7 @@ public abstract class LWJGLDrawableNode extends LWJGLDrawable {
 		child.draw(gfx);
 		gfx.loadState(state);
 	}
+	
+	private LWJGLDrawable parent;
 
 }

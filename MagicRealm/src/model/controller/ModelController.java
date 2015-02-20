@@ -170,7 +170,7 @@ public class ModelController {
 		return currentDay;
 	}
 
-	public void setCurrentPlayerActivities(ArrayList<Activity> activities) {
+	public void setCurrentPlayerActivities(List<Activity> activities) {
 		try {
 			players.get(orderOfPlay.top()).setActivities(activities);
 		} catch (QueueEmptyException e) {
@@ -266,6 +266,10 @@ public class ModelController {
 
 	public boolean isCharacterHiding(CharacterType actor) {
 		return characters.get(actor).isHiding();
+	}
+
+	public void startSearching(CharacterType actor) {
+		client.startSearch(actor);
 	}
 	
 	private void resetOrderOfPlay() {
