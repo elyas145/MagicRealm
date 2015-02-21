@@ -179,6 +179,9 @@ public class ControllerMain implements Controller {
 	public void startGame() {
 		this.startBoardView();
 		TimeOfDay tod = TimeOfDay.MIDNIGHT;
+		for(Player plr : model.getPlayers()){
+			boardView.hideCounter(plr.getCharacter().getType().toCounter());
+		}
 		while (model.getCurrentDay() <= GameConfiguration.LUNAR_MONTH) {
 			model.newDay();
 			model.newDayTime();
@@ -211,7 +214,8 @@ public class ControllerMain implements Controller {
 					plr = model.getCurrentPlayer();
 					boardView.focusOn(getCurrentCharacter().toCounter());
 					if (plr.getCharacter().isHiding()) {
-						System.out.println(plr);
+						model.unhideCurrent();
+						boardView.unHideCounter(model.getCurrentCharacterType().toCounter());
 					}
 					playCurrentActivities();
 					while (!model.isPlayerDone()) {

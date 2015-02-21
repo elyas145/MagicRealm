@@ -1,5 +1,6 @@
 package view.controller.game;
 
+import model.counter.chit.MapChit;
 import model.enums.CounterType;
 import model.enums.TileName;
 import model.enums.TimeOfDay;
@@ -27,5 +28,9 @@ public interface BoardView {
 	void setTimeOfDay(TimeOfDay time);
 
 	void hideCounter(CounterType currentCounter);
+	
+	void unHideCounter(CounterType currentCounter);
+	
+	void setMapChits(Iterable<MapChit> chits);
 
 }
