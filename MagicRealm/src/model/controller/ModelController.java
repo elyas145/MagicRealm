@@ -343,22 +343,37 @@ public class ModelController {
 		Random.shuffle(cave);
 		// set the tiles
 		cave.get(0).setTile(TileName.CAVERN);
+		board.setLocationOfMapChit(cave.get(0).getType(), TileName.CAVERN);
 		cave.get(1).setTile(TileName.CAVES);
+		board.setLocationOfMapChit(cave.get(1).getType(), TileName.CAVES);
 		cave.get(2).setTile(TileName.HIGH_PASS);
+		board.setLocationOfMapChit(cave.get(2).getType(), TileName.HIGH_PASS);
 		cave.get(3).setTile(TileName.BORDERLAND);
+		board.setLocationOfMapChit(cave.get(3).getType(), TileName.BORDERLAND);
 		cave.get(4).setTile(TileName.RUINS);
+		board.setLocationOfMapChit(cave.get(4).getType(), TileName.RUINS);
 
 		woods.get(0).setTile(TileName.LINDEN_WOODS);
+		board.setLocationOfMapChit(cave.get(0).getType(), TileName.LINDEN_WOODS);
 		woods.get(1).setTile(TileName.MAPLE_WOODS);
+		board.setLocationOfMapChit(cave.get(1).getType(), TileName.MAPLE_WOODS);
 		woods.get(2).setTile(TileName.NUT_WOODS);
+		board.setLocationOfMapChit(cave.get(2).getType(), TileName.NUT_WOODS);
 		woods.get(3).setTile(TileName.OAK_WOODS);
+		board.setLocationOfMapChit(cave.get(3).getType(), TileName.OAK_WOODS);
 		woods.get(4).setTile(TileName.PINE_WOODS);
+		board.setLocationOfMapChit(cave.get(4).getType(), TileName.PINE_WOODS);
 
 		mountain.get(0).setTile(TileName.CLIFF);
+		board.setLocationOfMapChit(cave.get(0).getType(), TileName.CLIFF);
 		mountain.get(1).setTile(TileName.CRAG);
+		board.setLocationOfMapChit(cave.get(1).getType(), TileName.CRAG);
 		mountain.get(2).setTile(TileName.DEEP_WOODS);
+		board.setLocationOfMapChit(cave.get(2).getType(), TileName.DEEP_WOODS);
 		mountain.get(3).setTile(TileName.LEDGES);
+		board.setLocationOfMapChit(cave.get(3).getType(), TileName.LEDGES);
 		mountain.get(4).setTile(TileName.MOUNTAIN);
+		board.setLocationOfMapChit(cave.get(4).getType(), TileName.MOUNTAIN);
 	}
 
 	private void setUpSoundAndSite() {
@@ -434,7 +449,7 @@ public class ModelController {
 		castleList.get(4).setTile(TileName.MOUNTAIN);
 		
 		//add all chits to one array list
-		
+		mapChits.addAll(chits);
 		
 	}
 
