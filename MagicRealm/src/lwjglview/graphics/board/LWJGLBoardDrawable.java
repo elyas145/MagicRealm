@@ -19,18 +19,16 @@ import lwjglview.graphics.LWJGLDrawableNode;
 import lwjglview.graphics.LWJGLGraphics;
 import lwjglview.graphics.TransformationDrawable;
 import lwjglview.graphics.animator.AnimationQueue;
-import lwjglview.graphics.animator.Animator;
 import lwjglview.graphics.animator.FadeAnimator;
 import lwjglview.graphics.animator.FollowAnimator;
-import lwjglview.graphics.animator.MovementAnimator;
-import lwjglview.graphics.animator.StaticAnimator;
 import lwjglview.graphics.animator.matrixcalculator.MatrixCalculator;
 import lwjglview.graphics.animator.matrixcalculator.StaticMatrixCalculator;
-import lwjglview.graphics.animator.matrixcalculator.StaticTranslationCalculator;
 import lwjglview.graphics.model.ModelData;
 import lwjglview.graphics.shader.GLShaderHandler;
 import lwjglview.graphics.shader.ShaderType;
+import model.counter.chit.MapChit;
 import model.enums.CounterType;
+import model.enums.MapChitType;
 import model.enums.TileName;
 import model.enums.TimeOfDay;
 import model.interfaces.ClearingInterface;
@@ -42,8 +40,6 @@ import utils.resources.ResourceHandler;
 import utils.resources.TileImages;
 import utils.time.Timing;
 import view.controller.game.BoardView;
-import view.graphics.Drawable;
-import view.graphics.Graphics;
 
 public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 
@@ -68,14 +64,14 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 		cameraFocus = new FollowAnimator(pos, new StaticMatrixCalculator(pos),
 				GraphicsConfiguration.CAMERA_SPEED);
 		buffer4 = BufferUtils.createFloatBuffer(4);
-		basis4 = Matrix.columnVector(0f, 0f, 0f, 1f);
+		
+		textureWidth = GraphicsConfiguration.IMAGE_SCALE_WIDTH;
+		textureHeight = GraphicsConfiguration.IMAGE_SCALE_HEIGHT;
 
 		// initialize tiles
 		numTiles = TileName.values().length * 2;
-		tileHeight = GraphicsConfiguration.IMAGE_SCALE_WIDTH;
-		tileWidth = GraphicsConfiguration.IMAGE_SCALE_HEIGHT;
-		rawTileData = ByteBuffer.allocateDirect(numTiles * tileHeight
-				* tileWidth * 4);
+		rawTileData = ByteBuffer.allocateDirect(numTiles * textureHeight
+				* textureWidth * 4);
 		tileIndex = 0;
 		tileTextureLocation = -1;
 		System.out.println("Loading tile images");
@@ -85,10 +81,8 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 
 		// initialize chits
 		numChits = CounterType.values().length;
-		chitWidth = GraphicsConfiguration.IMAGE_SCALE_WIDTH;
-		chitHeight = GraphicsConfiguration.IMAGE_SCALE_HEIGHT;
-		rawChitData = ByteBuffer.allocateDirect(numChits * chitHeight
-				* chitWidth * 4);
+		rawChitData = ByteBuffer.allocateDirect(numChits * textureHeight
+				* textureWidth * 4);
 		chitIndex = 0;
 		chitTextureLocation = -1;
 		System.out.println("Loading chit images");
@@ -103,6 +97,8 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 				Matrix.dilation(2f, 2f, 2f, 1f).multiply(Matrix.rotationX(4, Mathf.PI * .5f)));
 		knight.setParent(knightCounter);
 		System.out.println("Finished loading chit model data");
+		
+		mapChitIndex = -1;
 
 		// initialize buffers for tile locations
 		bufferN = BufferUtils.createFloatBuffer(2);
@@ -140,12 +136,37 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 		ClearingStorage store = stores.get(cl.clearing);
 		store.getLocation(ct, position);
 	}
+	
+	public void changeColour(CounterType ct, Color col) {
+		counterDrawables.get(ct).changeColour(col);
+	}
 
 	/*
 	 * ***********************************************************************
 	 * OVERRIDE METHODS
 	 * ***********************************************************************
 	 */
+
+	@Override
+	public void loadMapChits(Iterable<MapChit> chits) {
+		System.out.println("Generating map chits");
+		List<BufferedImage> mapChitImages = new ArrayList<BufferedImage>();
+		int i = 0;
+		for(MapChit mc: chits) {
+			//mapChitImages.addAll(generateImage)
+		}
+		System.out.println("Finished generating map chits");
+	}
+	
+	@Override
+	public void setMapChit(MapChit mc) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	private Map<MapChitType, LWJGLCounterDrawable> mapChits;
+	private ByteBuffer rawMapChitData;
+	private int mapChitIndex;
 
 	@Override
 	public void enchantTile(TileName tile) {
@@ -242,7 +263,12 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 
 	@Override
 	public void hideCounter(CounterType ct) {
-		counterDrawables.get(ct).changeColour(Color.GREEN);
+		changeColour(ct, Color.GREEN);
+	}
+
+	@Override
+	public void unHideCounter(CounterType ct) {
+		changeColour(ct, Color.WHITE);
 	}
 
 	@Override
@@ -368,11 +394,11 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 	private void loadTextures(LWJGLGraphics gfx) {
 		if (tileTextureLocation < 0) {
 			tileTextureLocation = gfx.loadTextureArray(rawTileData, numTiles,
-					tileHeight, tileWidth);
+					textureHeight, textureWidth);
 		}
 		if (chitTextureLocation < 0) {
 			chitTextureLocation = gfx.loadTextureArray(rawChitData, numChits,
-					chitHeight, chitWidth);
+					textureHeight, textureWidth);
 		}
 	}
 
@@ -380,16 +406,16 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 		for (TileName type : TileName.values()) {
 			BufferedImage img = TileImages.getTileImage(resources, type,
 					enchanted);
-			tileIndex = ImageTools.loadRawImage(img, tileIndex, tileWidth,
-					tileHeight, rawTileData);
+			tileIndex = ImageTools.loadRawImage(img, tileIndex, img.getWidth(),
+					img.getHeight(), rawTileData);
 		}
 	}
 
 	private void loadChitImages() throws IOException {
 		for (CounterType type : CounterType.values()) {
 			BufferedImage img = CounterImages.getCounterImage(resources, type);
-			chitIndex = ImageTools.loadRawImage(img, chitIndex, chitWidth,
-					chitHeight, rawChitData);
+			chitIndex = ImageTools.loadRawImage(img, chitIndex, img.getWidth(),
+					img.getHeight(), rawChitData);
 		}
 	}
 
@@ -563,16 +589,15 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 		private TileName tile;
 	}
 
+	private int textureWidth;
+	private int textureHeight;
+	
 	private int tileIndex;
 	private int numTiles;
-	private int tileHeight;
-	private int tileWidth;
 	private int tileTextureLocation;
 
 	private int chitIndex;
 	private int numChits;
-	private int chitHeight;
-	private int chitWidth;
 	private int chitTextureLocation;
 
 	private ByteBuffer rawTileData;
@@ -595,9 +620,6 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 	private AnimationQueue ambientColour;
 
 	private FloatBuffer buffer4;
-	private Matrix basis4;
-
-	private Matrix cameraLocation;
 
 	private FollowAnimator cameraFocus;
 

@@ -52,4 +52,18 @@ public class MapChit extends Chit{
 	public ArrayList<MapChit> getWarningAndSite() {
 		return new ArrayList<MapChit>();
 	}
+	
+	@Override
+	public void setClearing(int clear) {
+		super.setClearing(clear);
+		switch(type.type()) {
+		case SITE:
+		case LOST_CITY:
+		case LOST_CASTLE:
+		case SOUND:
+			setIdentifier((char) ('0' + clear));
+		default:
+			break;
+		}
+	}
 }

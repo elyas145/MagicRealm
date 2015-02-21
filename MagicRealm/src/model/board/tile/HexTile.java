@@ -17,7 +17,7 @@ import org.json.simple.JSONArray;
 import utils.math.Mathf;
 import utils.math.Matrix;
 import utils.math.Point;
-import utils.tools.ItarationTools;
+import utils.tools.IterationTools;
 
 public class HexTile implements HexTileInterface {
 
@@ -459,6 +459,6 @@ public class HexTile implements HexTileInterface {
 
 	@Override
 	public Iterable<TileName> getSurrounding() {
-		return ItarationTools.notNull(surroundings);
+		return IterationTools.notNull(surroundings);
 	}
 }
