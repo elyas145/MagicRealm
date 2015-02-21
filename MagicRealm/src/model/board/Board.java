@@ -29,8 +29,8 @@ import model.counter.chit.Chit;
 import model.enums.CharacterType;
 import model.enums.ChitType;
 import model.enums.CounterType;
-import model.enums.SiteType;
 import model.enums.TileName;
+import model.enums.ValleyChit;
 import model.interfaces.BoardInterface;
 import model.interfaces.ChitInterface;
 import model.interfaces.ClearingInterface;
@@ -117,8 +117,8 @@ public class Board implements BoardInterface {
 			possibleValues.add(i * 10);
 		}
 
-		ArrayList<SiteType> sites = new ArrayList<SiteType>();
-		for (SiteType tt : SiteType.values()) {
+		ArrayList<ValleyChit> sites = new ArrayList<ValleyChit>();
+		for (ValleyChit tt : ValleyChit.values()) {
 			sites.add(tt);
 		}
 
@@ -248,7 +248,7 @@ public class Board implements BoardInterface {
 		setClearingOfCounter(ct,cl);
 	}
 
-	public void setLocationOfCounter(CounterType ct, SiteType site) {
+	public void setLocationOfCounter(CounterType ct, ValleyChit site) {
 		ClearingInterface ci = getLocationOfCounter(site.toCounterType());
 		setClearingOfCounter(ct, ci);
 	}

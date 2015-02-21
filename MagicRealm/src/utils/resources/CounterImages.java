@@ -37,10 +37,7 @@ public class CounterImages {
 		case SITE_CHAPEL:
 		case SITE_GUARD_HOUSE:
 		case SITE_HOUSE:
-		case SITE_HUT:
 		case SITE_INN:
-		case SITE_LARGE_FIRE:
-		case SITE_SMALL_FIRE:
 			return "sites";
 		default:
 			return ".";
@@ -61,14 +58,8 @@ public class CounterImages {
 			return "guard.gif";
 		case SITE_HOUSE:
 			return "house.gif";
-		case SITE_HUT:
-			return "hut.gif";
 		case SITE_INN:
 			return "inn.gif";
-		case SITE_LARGE_FIRE:
-			return "large_fire.gif";
-		case SITE_SMALL_FIRE:
-			return "small_fire.gif";
 		default:
 			return "penguin.png";
 		}

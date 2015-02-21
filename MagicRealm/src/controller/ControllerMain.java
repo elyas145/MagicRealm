@@ -22,7 +22,6 @@ import model.controller.ModelController;
 import model.enums.ActivityType;
 import model.enums.CharacterType;
 import model.enums.CounterType;
-import model.enums.SiteType;
 import model.enums.TileName;
 import model.enums.TimeOfDay;
 import model.interfaces.ClearingInterface;

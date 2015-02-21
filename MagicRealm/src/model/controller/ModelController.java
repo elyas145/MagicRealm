@@ -19,8 +19,8 @@ import model.board.Board;
 import model.enums.ActivityType;
 import model.enums.CharacterType;
 import model.enums.PhaseType;
-import model.enums.SiteType;
 import model.enums.TileName;
+import model.enums.ValleyChit;
 import model.enums.WarningType;
 import model.exceptions.IllegalMoveException;
 import model.player.Player;
@@ -35,7 +35,7 @@ import model.counter.chit.WarningChit;
 public class ModelController {
 	private ResourceHandler rh;
 	private int numPlayers = 0;
-	private ArrayList<SiteType> sites;
+	private ArrayList<ValleyChit> sites;
 	private int currentDay = 0;
 
 	private Board board = null;
@@ -56,11 +56,11 @@ public class ModelController {
 		client = cln;
 		this.rh = rh;
 		currentDay = 1;
-		sites = new ArrayList<SiteType>();
+		sites = new ArrayList<ValleyChit>();
 		players = new HashMap<CharacterType, Player>();
 		numPlayers = GameConfiguration.MAX_PLAYERS;
 		orderOfPlay = new LinkedQueue<CharacterType>();
-		for (SiteType t : SiteType.values()) {
+		for (ValleyChit t : ValleyChit.values()) {
 			sites.add(t);
 		}
 
@@ -144,13 +144,13 @@ public class ModelController {
 	public void setPlayersInitialLocations() {
 		for (Character c : characters.values()) {
 			board.setLocationOfCounter(c.getType().toCounter(),
-					BoardConfiguration.INITIAL_SITE);
+					GameConfiguration.INITIAL_SITE);
 		}
 
 	}
 
 	public void setSiteLocations() {
-		for (SiteType t : sites) {
+		for (ValleyChit t : sites) {
 			switch (t) {
 			case CHAPEL:
 				board.setLocationOfCounter(t.toCounterType(),

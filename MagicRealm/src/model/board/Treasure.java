@@ -13,11 +13,11 @@
 package model.board;
 
 import model.counter.chit.Chit;
-import model.enums.SiteType;
+import model.enums.ValleyChit;
 
 public class Treasure extends Chit {
 	private int goldValue;
-	private SiteType site;
+	private ValleyChit site;
 
 	/*
 	private boolean enchanted = false;
@@ -47,16 +47,16 @@ public class Treasure extends Chit {
 	}
 	*/
 
-	public Treasure(SiteType siteType, Integer gv) {
+	public Treasure(ValleyChit siteType, Integer gv) {
 		goldValue = gv;
 		site = siteType;
 	}
 
-	public SiteType getSite() {
+	public ValleyChit getSite() {
 		return site;
 	}
 
-	public void setSite(SiteType site) {
+	public void setSite(ValleyChit site) {
 		this.site = site;
 	}
 
