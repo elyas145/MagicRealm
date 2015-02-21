@@ -1,7 +1,7 @@
 package utils.tools;
 
-public interface ForEach<T, V> {
+public interface ForEach<T> {
 	
-	V apply(T value);
-	
+	void apply(T item);
+
 }

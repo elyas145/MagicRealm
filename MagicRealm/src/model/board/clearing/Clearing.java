@@ -11,9 +11,10 @@ import model.counter.chit.Chit;
 import model.enums.PathType;
 import model.interfaces.ClearingInterface;
 import model.interfaces.HexTileInterface;
-
 import utils.math.Point;
 import utils.random.Random;
+import utils.tools.Function;
+import utils.tools.IterationTools;
 
 public class Clearing implements ClearingInterface {
 
@@ -26,7 +27,7 @@ public class Clearing implements ClearingInterface {
 		externalConnections = new HashMap<HexTileInterface, ClearingResolver[]>();
 		number = num;
 	}
-	
+
 	@Override
 	public HexTileInterface getParentTile() {
 		return getParent();
@@ -46,7 +47,7 @@ public class Clearing implements ClearingInterface {
 		if (other == getParent()) {
 			connectTo(other.getEntryClearing(entr, ench), ench, PathType.NORMAL);
 		} else {
-			if(!externalConnections.containsKey(other)) {
+			if (!externalConnections.containsKey(other)) {
 				externalConnections.put(other, new ClearingResolver[2]);
 			}
 			ClearingResolver[] resv = externalConnections.get(other);
@@ -56,14 +57,30 @@ public class Clearing implements ClearingInterface {
 
 	@Override
 	public boolean isConnectedTo(ClearingInterface other) {
+		for (PathType pt : PathType.values()) {
+			if (isConnectedTo(other, pt)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public boolean isConnectedTo(ClearingInterface other, PathType pt) {
 		PathType[] res = internalConnections.get(other);
 		int ench = isEnchanted() ? 1 : 0;
-		if(res != null && res[ench] != null) {
-			return true;
+		if (res != null) {
+			if (res[ench] == pt) {
+				return true;
+			}
 		}
-		ClearingResolver[] reslvrs = externalConnections.get(other.getParentTile());
+		if (pt != PathType.NORMAL) {
+			return false;
+		}
+		ClearingResolver[] reslvrs = externalConnections.get(other
+				.getParentTile());
 		ClearingResolver rsv = null;
-		if(reslvrs != null){
+		if (reslvrs != null) {
 			rsv = reslvrs[ench];
 		}
 		if (rsv != null) {
@@ -72,6 +89,46 @@ public class Clearing implements ClearingInterface {
 			}
 		}
 		return false;
+	}
+
+	@Override
+	public Iterable<ClearingInterface> getSurrounding() {
+		ArrayList<ClearingInterface> surround = new ArrayList<ClearingInterface>();
+		int ench = isEnchanted() ? 1 : 0;
+		for (Map.Entry<ClearingInterface, PathType[]> entr : internalConnections
+				.entrySet()) {
+			ClearingInterface clr = entr.getKey();
+			PathType[] val = entr.getValue();
+			if(val[ench] != null) {
+				surround.add(clr);
+			}
+		}
+		for(ClearingResolver[] rslv: externalConnections.values()) {
+			if(rslv[ench] != null) {
+				surround.add(rslv[ench].getClearing());
+			}
+		}
+		return surround;
+	}
+	
+	@Override
+	public Iterable<ClearingInterface> getSurrounding(PathType pt) {
+		return IterationTools.filter(getSurrounding(), new FilterFunction(pt));
+	}
+	
+	private class FilterFunction implements Function<ClearingInterface, Boolean> {
+
+		public FilterFunction(PathType pt) {
+			path = pt;
+		}
+
+		@Override
+		public Boolean apply(ClearingInterface other) {
+			return isConnectedTo(other, path);
+		}
+		
+		private PathType path;
+		
 	}
 
 	public Object getLocation_e() {
@@ -123,17 +180,18 @@ public class Clearing implements ClearingInterface {
 			dest.put(1, location.getY());
 		}
 	}
-	
+
 	@Override
 	public ClearingInterface getRandomConnection() {
 		List<ClearingInterface> possible = new ArrayList<ClearingInterface>();
-		for(Map.Entry<ClearingInterface, PathType[]> ent: internalConnections.entrySet()) {
-			if(ent.getValue()[0] != null) {
+		for (Map.Entry<ClearingInterface, PathType[]> ent : internalConnections
+				.entrySet()) {
+			if (ent.getValue()[0] != null) {
 				possible.add(ent.getKey());
 			}
 		}
-		for(ClearingResolver[] cr: externalConnections.values()) {
-			if(cr[0] != null) {
+		for (ClearingResolver[] cr : externalConnections.values()) {
+			if (cr[0] != null) {
 				possible.add(cr[0].getClearing());
 			}
 		}
@@ -143,10 +201,11 @@ public class Clearing implements ClearingInterface {
 	public boolean isEnchanted() {
 		return getParent().isEnchanted();
 	}
-	
+
 	@Override
 	public String toString() {
-		return "Clearing: Tile: " + getParent().getName() + ", Number: " + getNumber();
+		return "Clearing: Tile: " + getParent().getName() + ", Number: "
+				+ getNumber();
 	}
 
 	protected HexTileInterface getParent() {

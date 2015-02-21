@@ -33,4 +33,10 @@ public interface ClearingInterface {
 
 	boolean isConnectedTo(ClearingInterface other);
 
+	boolean isConnectedTo(ClearingInterface other, PathType pt);
+
+	Iterable<ClearingInterface> getSurrounding();
+	
+	Iterable<ClearingInterface> getSurrounding(PathType pt);
+
 }
