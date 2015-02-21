@@ -23,7 +23,7 @@ public class TransformationDrawable extends LWJGLDrawableNode {
 
 	@Override
 	public void draw(LWJGLGraphics gfx) {
-		drawChild(gfx, drawable);
+		drawable.draw(gfx);
 	}
 
 	private LWJGLDrawable drawable;

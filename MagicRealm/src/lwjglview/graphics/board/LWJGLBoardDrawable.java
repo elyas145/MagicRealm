@@ -14,6 +14,7 @@ import org.lwjgl.BufferUtils;
 
 import config.GraphicsConfiguration;
 import lwjglview.graphics.LWJGLDrawable;
+import lwjglview.graphics.LWJGLDrawableLeaf;
 import lwjglview.graphics.LWJGLDrawableNode;
 import lwjglview.graphics.LWJGLGraphics;
 import lwjglview.graphics.TransformationDrawable;
@@ -71,8 +72,8 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 
 		// initialize tiles
 		numTiles = TileName.values().length * 2;
-		tileHeight = GraphicsConfiguration.TILE_IMAGE_HEIGHT;
-		tileWidth = GraphicsConfiguration.TILE_IMAGE_WIDTH;
+		tileHeight = GraphicsConfiguration.IMAGE_SCALE_WIDTH;
+		tileWidth = GraphicsConfiguration.IMAGE_SCALE_HEIGHT;
 		rawTileData = ByteBuffer.allocateDirect(numTiles * tileHeight
 				* tileWidth * 4);
 		tileIndex = 0;
@@ -94,12 +95,13 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 		loadChitImages();
 		System.out.println("Finished loading chit images");
 		System.out.println("Loading chit model data");
-		roundCounter = ModelData.loadModelData(resources, "circle_counter.obj");
-		squareCounter = ModelData
-				.loadModelData(resources, "square_counter.obj");
-		knightCounter = ModelData.loadModelData(resources, "knight.obj");
-		//knightCounter = new TransformationDrawable(this, knightCounter,
-		//		Matrix.identityMatrix(4));//Matrix.rotationX(4, Mathf.PI * .5f));
+		roundCounter = new LWJGLDrawableLeaf(this, ModelData.loadModelData(resources, "circle_counter.obj"));
+		squareCounter = new LWJGLDrawableLeaf(this, ModelData
+				.loadModelData(resources, "square_counter.obj"));
+		LWJGLDrawableNode knight = new LWJGLDrawableLeaf(null, ModelData.loadModelData(resources, "knight5.obj"));
+		knightCounter = new TransformationDrawable(this, knight,
+				Matrix.dilation(3f, 3f, 3f, 1f).multiply(Matrix.rotationX(4, Mathf.PI * .5f)));
+		knight.setParent(knightCounter);
 		System.out.println("Finished loading chit model data");
 
 		// initialize buffers for tile locations
@@ -190,7 +192,7 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 		synchronized (tiles) {
 			// draw all tiles
 			for (LWJGLDrawable tile : tiles.values()) {
-				drawChild(lwgfx, tile);
+				tile.draw(lwgfx);
 			}
 		}
 
@@ -211,7 +213,7 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 		synchronized (counterDrawables) {
 			// draw all chits
 			for (LWJGLCounterDrawable counter : counterDrawables.values()) {
-				drawChild(lwgfx, counter);
+				counter.draw(lwgfx);
 			}
 		}
 	}
@@ -340,7 +342,7 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 		}
 	}
 
-	private LWJGLDrawable getCounterRepresentation(CounterType tp) {
+	private LWJGLDrawableNode getCounterRepresentation(CounterType tp) {
 		if (tp.isCharacter()) {
 			if (tp == CounterType.CHARACTER_SWORDSMAN) {
 				return knightCounter;
@@ -397,6 +399,9 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 
 	private int getCounterTextureIndex(CounterType ct) {
 		int idx = 0;
+		if(ct == CounterType.CHARACTER_SWORDSMAN) {
+			return -1;
+		}
 		for (CounterType tp : CounterType.values()) {
 			if (tp == ct) {
 				return idx;
@@ -573,9 +578,9 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 	private ByteBuffer rawTileData;
 	private ByteBuffer rawChitData;
 
-	private ModelData roundCounter;
-	private ModelData squareCounter;
-	private LWJGLDrawable knightCounter;
+	private LWJGLDrawableNode roundCounter;
+	private LWJGLDrawableNode squareCounter;
+	private LWJGLDrawableNode knightCounter;
 
 	private Map<TileName, LWJGLTileDrawable> tiles;
 	private Map<CounterType, LWJGLCounterDrawable> counterDrawables;

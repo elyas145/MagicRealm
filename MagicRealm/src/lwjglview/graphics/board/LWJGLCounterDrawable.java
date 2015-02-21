@@ -23,7 +23,7 @@ public class LWJGLCounterDrawable extends LWJGLDrawableNode {
 
 	public static final ShaderType SHADER = ShaderType.CHIT_SHADER;
 
-	public LWJGLCounterDrawable(LWJGLBoardDrawable bd, CounterType ctr, LWJGLDrawable chitBlock,
+	public LWJGLCounterDrawable(LWJGLBoardDrawable bd, CounterType ctr, LWJGLDrawableNode chitBlock,
 			int texid) {
 		super(bd);
 		counter = ctr;
@@ -107,7 +107,8 @@ public class LWJGLCounterDrawable extends LWJGLDrawableNode {
 	@Override
 	public void draw(LWJGLGraphics lwgfx) {
 
-		drawChild(lwgfx, representation);
+		representation.setParent(this);
+		representation.draw(lwgfx);
 		
 	}
 
@@ -146,7 +147,7 @@ public class LWJGLCounterDrawable extends LWJGLDrawableNode {
 	private FloatBuffer position;
 	private FloatBuffer buffer;
 
-	private LWJGLDrawable representation;
+	private LWJGLDrawableNode representation;
 
 	private int textureIndex;
 	
