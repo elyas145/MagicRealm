@@ -23,6 +23,7 @@ import model.enums.CharacterType;
 import model.enums.ChitType;
 import model.enums.MapChitType;
 import model.enums.PhaseType;
+import model.enums.TableType;
 import model.enums.TileName;
 import model.enums.ValleyChit;
 import model.enums.WarningType;
@@ -454,6 +455,11 @@ public class ModelController {
 
 	public ArrayList<MapChit> getMapChits() {
 		return mapChits;
+	}
+
+	public void performSearch(TableType selectedTable) {
+		
+		
 	}
 
 }

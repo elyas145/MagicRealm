@@ -292,6 +292,7 @@ public class ControllerMain implements Controller {
 				} catch (InterruptedException e) {
 				}
 			}
+			model.performSearch(sv.getSelectedTable());
 		}
 	}
 
