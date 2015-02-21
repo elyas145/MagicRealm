@@ -29,6 +29,7 @@ import model.counter.chit.Chit;
 import model.enums.CharacterType;
 import model.enums.ChitType;
 import model.enums.CounterType;
+import model.enums.MapChitType;
 import model.enums.TileName;
 import model.enums.ValleyChit;
 import model.interfaces.BoardInterface;
@@ -100,8 +101,7 @@ public class Board implements BoardInterface {
 
 	}
 
-	public void moveCharacter(CharacterType character, TileName tt,
-			int clearing) {
+	public void moveCharacter(CharacterType character, TileName tt, int clearing) {
 		removeCharacter(character);
 		counterPositions.put(character.toCounter(), getClearing(tt, clearing));
 	}
@@ -169,11 +169,6 @@ public class Board implements BoardInterface {
 	@Override
 	public Iterable<? extends HexTileInterface> iterateTiles() {
 		return mapOfTiles.values();
-	}
-
-	@Override
-	public Iterable<? extends ChitInterface> iterateChits() {
-		return collectionOfChits;
 	}
 
 	private void setTile(TileName tile, int x, int y, int rot) {
@@ -245,7 +240,7 @@ public class Board implements BoardInterface {
 	public void setLocationOfCounter(CounterType ct, TileName tn, int clearing) {
 		HexTile ht = mapOfTiles.get(tn);
 		ClearingInterface cl = ht.getClearing(clearing);
-		setClearingOfCounter(ct,cl);
+		setClearingOfCounter(ct, cl);
 	}
 
 	public void setLocationOfCounter(CounterType ct, ValleyChit site) {
@@ -283,14 +278,21 @@ public class Board implements BoardInterface {
 		}
 		return clearings;
 	}
-	
-	public boolean isValidMove(CounterType ct, TileName destTile, int destClearing) {
-		return getLocationOfCounter(ct).isConnectedTo(getClearing(destTile, destClearing));
+
+	public boolean isValidMove(CounterType ct, TileName destTile,
+			int destClearing) {
+		return getLocationOfCounter(ct).isConnectedTo(
+				getClearing(destTile, destClearing));
 	}
 
 	public ClearingInterface getClearing(TileName tile, int clearing) {
 		HexTile hexTile = mapOfTiles.get(tile);
 		return hexTile.getClearing(clearing);
+	}
+
+	public void setLocationOfMapChit(MapChitType type, TileName tile) {
+		mapChitLocations.put(type, tile);
+
 	}
 
 	private Map<TileName, Map<Integer, Point[]>> clearingLocations;
@@ -299,7 +301,7 @@ public class Board implements BoardInterface {
 	private Map<Integer, Map<Integer, TileName>> mapOfTileLocations;
 	private Map<TileName, HexTile> mapOfTiles;
 	private Map<TileName, int[]> tileLocations;
-	private Collection<Chit> collectionOfChits;
+	private Map<MapChitType, TileName> mapChitLocations;
 	private Map<CounterType, ClearingInterface> counterPositions;
 	private ArrayList<Treasure> treasures = new ArrayList<Treasure>();
 	private JSONArray arr;

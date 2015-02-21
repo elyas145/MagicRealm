@@ -2,20 +2,18 @@ package model.counter.chit;
 
 import java.util.ArrayList;
 
-import model.enums.MapChitType;
-import model.enums.TileName;
+import model.enums.MapChitType;;
 
 public class LostSite extends MapChit{
-	private ArrayList<MapChitType> WarningAndSite;
-	public ArrayList<MapChitType> getWarningAndSite() {
+	private ArrayList<MapChit> WarningAndSite;
+	public ArrayList<MapChit> getWarningAndSite() {
 		return WarningAndSite;
 	}
-	public void setWarningAndSite(ArrayList<MapChitType> warningAndSite) {
-		WarningAndSite = warningAndSite;
+	public void setWarningAndSite(ArrayList<MapChit> lostCastleChits) {
+		WarningAndSite = lostCastleChits;
 	}
-	public LostSite(TileName tt, MapChitType type) {
-		super(tt, type);
-		WarningAndSite = new ArrayList<MapChitType>();
+	public LostSite(MapChitType type) {
+		super(type);
 	}
 	
 }

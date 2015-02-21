@@ -24,9 +24,4 @@ public interface BoardInterface {
 	 */
 	public Iterable<? extends HexTileInterface> iterateTiles();
 	
-	/**
-	 * @return iterator over the board tiles
-	 */
-	public Iterable<? extends ChitInterface> iterateChits();
-	
 }
