@@ -22,12 +22,15 @@ import model.enums.ActivityType;
 import model.enums.CharacterType;
 import model.enums.ChitType;
 import model.enums.MapChitType;
+import model.enums.PathType;
+import model.enums.PeerType;
 import model.enums.PhaseType;
 import model.enums.TableType;
 import model.enums.TileName;
 import model.enums.ValleyChit;
 import model.enums.WarningType;
 import model.exceptions.IllegalMoveException;
+import model.interfaces.ClearingInterface;
 import model.player.Player;
 import model.character.CharacterFactory;
 import model.character.Character;
@@ -458,7 +461,71 @@ public class ModelController {
 	}
 
 	public void performSearch(TableType selectedTable) {
+		switch (selectedTable){
+		default:
+			//peer table.
+			peerTableSearch();		
+		}
 		
+	}
+
+	private void peerTableSearch() {
+		int roll = Random.dieRoll();
+		switch (roll){
+		case 1:
+			peerChoice();
+			break;
+		case 2:
+			peerCP();
+			break;
+		case 3:
+			peerHP();
+			break;
+		case 4:
+			peerH();
+			break;
+		case 5:
+			peerC();
+			break;
+		default:
+			break;
+		}
+	}
+
+	private void peerC() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void peerH() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void peerHP() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	// PEER SEARCH: clues and paths search
+	private void peerCP() {
+		ClearingInterface clearing = board.getLocationOfCounter(getCurrentPlayer().getCharacter().getType().toCounter());
+		for(ClearingInterface cl : clearing.getSurrounding(PathType.HIDDEN)){
+			
+		}
+		
+	}
+
+	private void peerChoice() {
+		PeerType choice = client.getPeerChoice();
+		switch (choice){
+		case CLUES_AND_PATHS:
+		case CLUES:
+			peerCP();
+			break;
+		default:
+			break;
+		}
 		
 	}
 

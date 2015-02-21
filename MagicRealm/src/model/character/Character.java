@@ -2,12 +2,18 @@ package model.character;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import config.GameConfiguration;
 import model.counter.chit.Chit;
 import model.enums.CharacterType;
+import model.enums.PathType;
 import model.enums.ValleyChit;
 import model.interfaces.CharacterInterface;
+import model.interfaces.ClearingInterface;
 
 public class Character implements CharacterInterface {
 	private CharacterType type;
@@ -15,9 +21,11 @@ public class Character implements CharacterInterface {
 	private boolean hiding;
 	private ArrayList<Chit> belongings;
 	private ArrayList<Phase> specialPhases;
+	private Map<ClearingInterface, Set<ClearingInterface>[]> discoveredPaths;
 
 	public Character(CharacterType t) {
-		System.out.println("WARNING: only use the CharacterFactory class to create characters, this inssures full initialization. ");
+		System.out
+				.println("WARNING: only use the CharacterFactory class to create characters, this inssures full initialization. ");
 		type = t;
 		initialLocation = GameConfiguration.INITIAL_SITE;
 		hiding = true;
@@ -58,5 +66,20 @@ public class Character implements CharacterInterface {
 	public ArrayList<Phase> getSpecialPhases() {
 
 		return specialPhases;
+	}
+private void connectClearings(ClearingInterface cl1, ClearingInterface cl2, boolean ench){
+	int index = ench? 1 : 0;
+	if(!discoveredPaths.containsKey(cl1)){
+		discoveredPaths.put(cl1, new HashSet<ClearingInterface>[2]);
+	}
+}
+	public void addDiscoveredPath(ClearingInterface cl1, ClearingInterface cl2, PathType type, boolean ench) {
+		int index = ench? 1 : 0;
+		
+		if (!discoveredPaths.containsKey(type)) {
+			discoveredPaths.put(cl, new HashSet<PathType>());
+		}
+		discoveredPaths.get(cl).add(type);
+
 	}
 }

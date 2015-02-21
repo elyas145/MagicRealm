@@ -11,6 +11,7 @@ import model.board.clearing.Clearing;
 import model.controller.ModelController;
 import model.enums.CharacterType;
 import model.enums.CounterType;
+import model.enums.PeerType;
 import model.enums.TileName;
 import model.interfaces.ClearingInterface;
 import model.player.PersonalHistory;
@@ -53,5 +54,7 @@ public interface Controller {
 	void moveCounter(CounterType counter, TileName tt, int clearing);
 
 	void startSearch(CharacterType actor);
+
+	PeerType getPeerChoice();
 	
 }
