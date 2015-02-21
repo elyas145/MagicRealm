@@ -1,5 +1,7 @@
 package model.counter.chit;
 
+import java.util.ArrayList;
+
 import model.enums.ChitType;
 import model.enums.MapChitType;
 import model.enums.TileName;
@@ -45,5 +47,9 @@ public class MapChit extends Chit{
 	public MapChit(MapChitType type, char identifier) {
 		this.type = type;
 		this.identifier = identifier;
+	}
+	
+	public ArrayList<MapChit> getWarningAndSite() {
+		return new ArrayList<MapChit>();
 	}
 }

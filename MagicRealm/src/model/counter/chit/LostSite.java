@@ -6,6 +6,8 @@ import model.enums.MapChitType;;
 
 public class LostSite extends MapChit{
 	private ArrayList<MapChit> WarningAndSite;
+	
+	@Override
 	public ArrayList<MapChit> getWarningAndSite() {
 		return WarningAndSite;
 	}

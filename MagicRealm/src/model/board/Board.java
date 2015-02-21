@@ -44,6 +44,7 @@ public class Board implements BoardInterface {
 	}
 
 	public Board(ResourceHandler rh) {
+		mapChitLocations = new HashMap<MapChitType, TileName>();
 		surround = new TileName[6];
 		tileLocations = new HashMap<TileName, int[]>();
 		mapOfTileLocations = new HashMap<Integer, Map<Integer, TileName>>();

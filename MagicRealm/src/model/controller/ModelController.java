@@ -73,11 +73,11 @@ public class ModelController {
 
 		mapChits = new ArrayList<MapChit>();
 		for (MapChitType type : MapChitType.values()) {
-			if(type.type() == ChitType.WARNING){
+			if (type.type() == ChitType.WARNING) {
 				mapChits.add(new MapChit(type, 'C'));
 				mapChits.add(new MapChit(type, 'W'));
 				mapChits.add(new MapChit(type, 'M'));
-			}			
+			}
 		}
 
 		lostCity = new LostSite(MapChitType.LOST_CITY);
@@ -327,7 +327,7 @@ public class ModelController {
 		ArrayList<MapChit> woods = new ArrayList<MapChit>();
 		ArrayList<MapChit> mountain = new ArrayList<MapChit>();
 		for (MapChit chit : mapChits) {
-			if(chit.getType().type() == ChitType.WARNING){
+			if (chit.getType().type() == ChitType.WARNING) {
 				switch (chit.getIdentifier()) {
 				case 'C':
 					cave.add(chit);
@@ -338,7 +338,7 @@ public class ModelController {
 				case 'M':
 					mountain.add(chit);
 				}
-			}			
+			}
 		}
 		Random.shuffle(cave);
 		// set the tiles
@@ -383,19 +383,20 @@ public class ModelController {
 		for (MapChitType chit : MapChitType.values()) {
 			if (chit.type() == ChitType.SOUND || chit.type() == ChitType.SITE) {
 				chits.add(new MapChit(chit));
+				if (chit.type() == ChitType.SOUND) {
+					chits.add(new MapChit(chit));
+				}
 			}
 		}
-		Random.shuffle(chits);
 		ArrayList<MapChit> lostCityChits = new ArrayList<MapChit>();
 		ArrayList<MapChit> lostCastleChits = new ArrayList<MapChit>();
-
+		System.out.println("size: " + chits.size());
+		System.out.println("List: " + chits);
 		for (int i = 0; i < 5; i++) {
 			// add 5 chits to lost city.
-			lostCityChits.add(chits.get(0));
-			chits.remove(0);
+			lostCityChits.add(Random.remove(chits));
 			// add 5 chits to lost castle.
-			lostCastleChits.add(chits.get(0));
-			chits.remove(0);
+			lostCastleChits.add(Random.remove(chits));
 		}
 		lostCastle.setWarningAndSite(lostCastleChits);
 		lostCity.setWarningAndSite(lostCityChits);
@@ -407,10 +408,8 @@ public class ModelController {
 		ArrayList<MapChit> castleList = new ArrayList<MapChit>();
 
 		for (int i = 0; i < 4; i++) {
-			cityList.add(chits.get(0));
-			chits.remove(0);
-			castleList.add(chits.get(0));
-			chits.remove(0);
+			cityList.add(Random.remove(chits));
+			castleList.add(Random.remove(chits));
 		}
 
 		// add corresponding chits.
@@ -433,7 +432,7 @@ public class ModelController {
 		cityList.get(3).setTile(TileName.HIGH_PASS);
 		board.setLocationOfMapChit(cityList.get(4).getType(), TileName.RUINS);
 		cityList.get(4).setTile(TileName.RUINS);
-		
+
 		// each chit in castle list goes on mountain tile
 		board.setLocationOfMapChit(castleList.get(0).getType(), TileName.CLIFF);
 		castleList.get(0).setTile(TileName.CLIFF);
@@ -447,10 +446,10 @@ public class ModelController {
 		board.setLocationOfMapChit(castleList.get(4).getType(),
 				TileName.MOUNTAIN);
 		castleList.get(4).setTile(TileName.MOUNTAIN);
-		
-		//add all chits to one array list
+
+		// add all chits to one array list
 		mapChits.addAll(chits);
-		
+
 	}
 
 	public ArrayList<MapChit> getMapChits() {
