@@ -100,7 +100,7 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 				.loadModelData(resources, "square_counter.obj"));
 		LWJGLDrawableNode knight = new LWJGLDrawableLeaf(null, ModelData.loadModelData(resources, "knight5.obj"));
 		knightCounter = new TransformationDrawable(this, knight,
-				Matrix.dilation(3f, 3f, 3f, 1f).multiply(Matrix.rotationX(4, Mathf.PI * .5f)));
+				Matrix.dilation(2f, 2f, 2f, 1f).multiply(Matrix.rotationX(4, Mathf.PI * .5f)));
 		knight.setParent(knightCounter);
 		System.out.println("Finished loading chit model data");
 
