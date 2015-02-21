@@ -4,10 +4,10 @@ public enum CounterType {
 	CHARACTER_AMAZON,
 	CHARACTER_CAPTAIN,
 	CHARACTER_SWORDSMAN,
-	SITE_CHAPEL,
-	SITE_GUARD_HOUSE,
-	SITE_HOUSE,
-	SITE_INN,
+	VALLEY_CHAPEL,
+	VALLEY_GUARD_HOUSE,
+	VALLEY_HOUSE,
+	VALLEY_INN,
 	NONE;
 	public boolean isCharacter() {
 		switch(this) {
@@ -19,12 +19,12 @@ public enum CounterType {
 			return false;
 		}
 	}
-	public boolean isSite() {
+	public boolean isValley() {
 		switch(this) {
-		case SITE_CHAPEL:
-		case SITE_GUARD_HOUSE:
-		case SITE_HOUSE:
-		case SITE_INN:
+		case VALLEY_CHAPEL:
+		case VALLEY_GUARD_HOUSE:
+		case VALLEY_HOUSE:
+		case VALLEY_INN:
 			return true;
 		default:
 			return false;

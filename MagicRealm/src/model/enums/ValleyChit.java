@@ -9,13 +9,13 @@ public enum ValleyChit {
 	public CounterType toCounterType(){
 		switch(this){
 		case CHAPEL:
-			return CounterType.SITE_CHAPEL;
+			return CounterType.VALLEY_CHAPEL;
 		case GUARD_HOUSE:
-			return CounterType.SITE_GUARD_HOUSE;
+			return CounterType.VALLEY_GUARD_HOUSE;
 		case HOUSE:
-			return CounterType.SITE_HOUSE;
+			return CounterType.VALLEY_HOUSE;
 		case INN:
-			return CounterType.SITE_INN;
+			return CounterType.VALLEY_INN;
 		default:
 			return CounterType.NONE;
 		}

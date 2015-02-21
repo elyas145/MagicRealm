@@ -18,10 +18,10 @@ public class CounterImages {
 		case CHARACTER_CAPTAIN:
 		case CHARACTER_SWORDSMAN:
 			return "characters";
-		case SITE_CHAPEL:
-		case SITE_GUARD_HOUSE:
-		case SITE_HOUSE:
-		case SITE_INN:
+		case VALLEY_CHAPEL:
+		case VALLEY_GUARD_HOUSE:
+		case VALLEY_HOUSE:
+		case VALLEY_INN:
 			return "sites";
 		default:
 			return ".";
@@ -36,13 +36,13 @@ public class CounterImages {
 			return "captain.png";
 		case CHARACTER_SWORDSMAN:
 			return "swordsman.png";
-		case SITE_CHAPEL:
+		case VALLEY_CHAPEL:
 			return "chapel.gif";
-		case SITE_GUARD_HOUSE:
+		case VALLEY_GUARD_HOUSE:
 			return "guard.gif";
-		case SITE_HOUSE:
+		case VALLEY_HOUSE:
 			return "house.gif";
-		case SITE_INN:
+		case VALLEY_INN:
 			return "inn.gif";
 		default:
 			return "penguin.png";

@@ -348,7 +348,7 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 				return knightCounter;
 			}
 			return roundCounter;
-		} else if (tp.isSite()) {
+		} else if (tp.isValley()) {
 			return squareCounter;
 		}
 		return squareCounter;
