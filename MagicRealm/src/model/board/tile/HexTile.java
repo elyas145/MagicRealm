@@ -17,6 +17,7 @@ import org.json.simple.JSONArray;
 import utils.math.Mathf;
 import utils.math.Matrix;
 import utils.math.Point;
+import utils.tools.ItarationTools;
 
 public class HexTile implements HexTileInterface {
 
@@ -448,4 +449,16 @@ public class HexTile implements HexTileInterface {
 	private Map<Integer, Clearing> clearings;
 	private Map<Chit, Clearing> chitMap;
 	private int rotation;
+	private TileName[] surroundings;
+	
+	@Override
+	public void connectTo(TileName otherTile, int exit) {
+		surroundings[exit % 6] = otherTile;
+		
+	}
+
+	@Override
+	public Iterable<TileName> getSurrounding() {
+		return ItarationTools.notNull(surroundings);
+	}
 }

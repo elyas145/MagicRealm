@@ -49,5 +49,7 @@ public interface HexTileInterface {
 	 */
 	Clearing getEntryClearing(int rot);
 	Clearing getEntryClearing(int rot, boolean enchant);
-
+	
+	void connectTo(TileName tile, int exit);
+	Iterable<TileName> getSurrounding();
 }
