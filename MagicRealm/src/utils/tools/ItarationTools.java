@@ -12,5 +12,15 @@ public class ItarationTools {
 		}
 		return ret;
 	}
+	
+	public static <T> Iterable<T> notNull(T[] items) {
+		ArrayList<T> ret = new ArrayList<T>(items.length);
+		for(T it: items) {
+			if(it != null) {
+				ret.add(it);
+			}
+		}
+		return ret;
+	}
 
 }
