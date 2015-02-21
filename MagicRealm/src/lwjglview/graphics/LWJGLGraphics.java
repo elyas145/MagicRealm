@@ -211,19 +211,40 @@ public final class LWJGLGraphics implements Graphics {
 	public void callList(int lst) {
 		glCallList(lst);
 	}
-
-	public int startQuadList() {
+	
+	public int startList() {
 		int lst = glGenLists(1);
 		glNewList(lst, GL_COMPILE);
-		glBegin(GL_QUADS);
+		return lst;
+	}
+
+	public int startQuadList() {
+		int lst = startList();
+		startQuads();
 		return lst;
 	}
 
 	public int startTriangleList() {
-		int lst = glGenLists(1);
-		glNewList(lst, GL_COMPILE);
-		glBegin(GL_TRIANGLES);
+		int lst = startList();
+		startTriangles();
 		return lst;
+	}
+	
+	public void startTriangles() {
+		glBegin(GL_TRIANGLES);
+	}
+	
+	public void startQuads() {
+		glBegin(GL_QUADS);
+	}
+	
+	public void endPrimitives() {
+		glEnd();
+	}
+
+	public void endList() {
+		endPrimitives();
+		glEndList();
 	}
 
 	public void setVertex(int vertLen, FloatBuffer verts) {
@@ -273,11 +294,6 @@ public final class LWJGLGraphics implements Graphics {
 			glNormal3f(normal.get(0), normal.get(1), normal.get(2));
 			break;
 		}
-	}
-
-	public void endList() {
-		glEnd();
-		glEndList();
 	}
 
 	@Override

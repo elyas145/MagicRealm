@@ -3,14 +3,15 @@ package utils.resources;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
+import model.enums.CounterType;
 import model.enums.TileName;
 
 public class TileImages {
 
 	public static BufferedImage getTileImage(ResourceHandler rh, TileName type,
 			boolean enchanted) throws IOException {
-		return rh.readImage(ResourceHandler.joinPath("images", "tiles",
-				getName(type) + (enchanted ? "-e1.gif" : "1.gif")));
+		return Images.getImage(rh, ResourceHandler.joinPath("tiles",
+			getName(type) + (enchanted ? "-e1.gif" : "1.gif")));
 	}
 
 	private static String getName(TileName tile) {

@@ -14,10 +14,16 @@ in vec2 textureCoordinate;
 
 void main() {
 	vec3 diff = position - eye;
-	float scale = -dot(diff, normal) / length(diff) / length(normal);
-	//scale = pow(scale, 3.);
+	float scale = abs(dot(diff, normal) / length(diff) / length(normal));
+	scale = pow(scale, 3.) + .5;
 	vec3 color;
-	vec4 raw = texture2DArray(texture, vec3(textureCoordinate, float(index)));
+	vec4 raw;
+	if(index < 0) {
+		raw = vec4(1.);
+	}
+	else {
+		raw = texture2DArray(texture, vec3(textureCoordinate, float(index)));
+	}
 	if(raw.r < .5) {
 		color = vec3(1.);
 	}

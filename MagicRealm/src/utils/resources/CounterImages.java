@@ -1,31 +1,15 @@
 package utils.resources;
 
-import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
-import config.GraphicsConfiguration;
 import model.enums.CounterType;
 
 public class CounterImages {
 
 	public static BufferedImage getCounterImage(ResourceHandler rh,
 			CounterType type) throws IOException {
-		BufferedImage before = rh.readImage(ResourceHandler.joinPath("images",
-				"counters", getSubDir(type), getName(type)));
-		BufferedImage newImage = new BufferedImage(
-				GraphicsConfiguration.IMAGE_SCALE_WIDTH,
-				GraphicsConfiguration.IMAGE_SCALE_HEIGHT,
-				BufferedImage.TYPE_INT_ARGB);
-
-		Graphics g = newImage.createGraphics();
-		g.drawImage(before, 0, 0, GraphicsConfiguration.IMAGE_SCALE_WIDTH,
-				GraphicsConfiguration.IMAGE_SCALE_HEIGHT, null);
-		g.dispose();
-		return newImage;
+		return Images.getImage(rh, ResourceHandler.joinPath("counters", getSubDir(type), getName(type)));
 	}
 
 	private static String getSubDir(CounterType tile) {

@@ -6,6 +6,7 @@ import java.util.Collection;
 
 import config.GraphicsConfiguration;
 import lwjglview.graphics.LWJGLDrawable;
+import lwjglview.graphics.LWJGLDrawableLeaf;
 import lwjglview.graphics.LWJGLDrawableNode;
 import lwjglview.graphics.LWJGLGraphics;
 import lwjglview.graphics.animator.AnimationQueue;
@@ -36,7 +37,7 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode {
 		enchantedTex = enchant;
 		enchanted = false;
 		showEnchanted = enchanted;
-		faces = new ArrayList<TileFace>();
+		faces = new ArrayList<LWJGLDrawableLeaf>();
 		initFaces();
 		flipper = new AnimationQueue();
 		flipper.start();
@@ -87,8 +88,8 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode {
 	@Override
 	public void draw(LWJGLGraphics lwgfx) {
 
-		for (TileFace tf : faces) {
-			drawChild(lwgfx, tf);
+		for (LWJGLDrawable tf : faces) {
+			tf.draw(lwgfx);
 		}
 
 	}
@@ -96,9 +97,9 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode {
 	private void initFaces() {
 		float halfThick = GraphicsConfiguration.TILE_THICKNESS * .5f;
 		Matrix mat = Matrix.translation(0f, 0f, halfThick);
-		faces.add(new HexTileFace(mat, false));
+		faces.add(new LWJGLDrawableLeaf(this, new HexTileFace(mat, false)));
 		mat = Matrix.rotationX(4, Mathf.PI).multiply(mat);
-		faces.add(new HexTileFace(mat, true));
+		faces.add(new LWJGLDrawableLeaf(this, new HexTileFace(mat, true)));
 		// scale square
 		mat = Matrix.dilation(.5f, halfThick, 1f, 1f);
 		// rotate rectangle
@@ -107,7 +108,7 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode {
 		mat = Matrix.translation(0f, 0.866025f, 0f).multiply(mat);
 		for (int i = 0; i < 6; ++i) {
 			Matrix tmp = Matrix.rotationZ(4, i * Mathf.PI / 3f).multiply(mat);
-			faces.add(new SideFace(tmp));
+			faces.add(new LWJGLDrawableLeaf(this, new SideFace(tmp)));
 		}
 	}
 
@@ -200,7 +201,7 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode {
 
 	}
 
-	private Collection<TileFace> faces;
+	private Collection<LWJGLDrawableLeaf> faces;
 	private Matrix transformation;
 	private Matrix rotation;
 	private float xPosition;
