@@ -1,6 +1,6 @@
 package model.enums;
 
-public enum MapChit {
+public enum MapChitType {
 	// sound
 	HOWL,
 	FLUTTER,

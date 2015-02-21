@@ -30,6 +30,10 @@ public abstract class Chit extends ChitInterface {
 		return clearing;
 	}
 	
+	protected void setClearing(int c) {
+		clearing = c;
+	}
+	
 	protected Chit() {
 		flipped = false;
 		tile = null;
