@@ -28,6 +28,11 @@ public class EnchantedHolder <T> {
 		return ench ? enchanted != null : normal != null;
 	}
 	
+	@Override
+	public String toString() {
+		return "Normal: " + normal + ", Enchanted: " + enchanted;
+	}
+	
 	private T normal;
 	private T enchanted;
 }

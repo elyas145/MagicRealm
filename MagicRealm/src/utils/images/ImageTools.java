@@ -1,9 +1,30 @@
 package utils.images;
 
+import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
 
+import config.GraphicsConfiguration;
+
 public class ImageTools {
+
+	public static interface GraphicsHandler {
+		void draw(Graphics g);
+	}
+
+	public static BufferedImage createImage(int width, int height,
+			GraphicsHandler gh) {
+
+		BufferedImage newImage = new BufferedImage(
+				GraphicsConfiguration.IMAGE_SCALE_WIDTH,
+				GraphicsConfiguration.IMAGE_SCALE_HEIGHT,
+				BufferedImage.TYPE_INT_ARGB);
+
+		Graphics g = newImage.createGraphics();
+		gh.draw(g);
+		g.dispose();
+		return newImage;
+	}
 
 	public static int loadRawImage(BufferedImage img, int offset, int width, int height,
 			ByteBuffer dest) {
@@ -23,6 +44,12 @@ public class ImageTools {
 			offset = loadRawImage(img, offset, width, height, dest);
 		}
 		return offset;
+	}
+
+	public static BufferedImage scaleImage(BufferedImage bi, int width,
+			int height) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

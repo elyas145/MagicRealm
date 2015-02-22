@@ -34,24 +34,6 @@ import static org.lwjgl.system.MemoryUtil.*;
 
 public final class LWJGLGraphics implements Graphics {
 
-	public static void main(String[] args) throws IOException {
-		ResourceHandler rh = new ResourceHandler();
-		LWJGLGraphics gfx = new LWJGLGraphics(rh, null);
-		LWJGLBoardDrawable db = new LWJGLBoardDrawable(rh);
-		gfx.addDrawable(db);
-		gfx.start();
-		Board b = new Board(rh);
-		for (HexTileInterface hti : b.iterateTiles()) {
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			db.setTile(hti.getName(), hti.getBoardColumn(), hti.getBoardRow(),
-					hti.getRotation(), hti.getClearings());
-		}
-	}
-
 	public LWJGLGraphics(ResourceHandler rh) {
 		init(rh);
 		control = null;
@@ -61,13 +43,13 @@ public final class LWJGLGraphics implements Graphics {
 		init(rh);
 		control = cm;
 	}
-	
+
 	public MVPState saveState() {
 		return state.copy();
 	}
-	
+
 	public void loadState(MVPState st) {
-		if(st != null) {
+		if (st != null) {
 			state = st;
 		}
 	}
@@ -208,7 +190,7 @@ public final class LWJGLGraphics implements Graphics {
 	public void callList(int lst) {
 		glCallList(lst);
 	}
-	
+
 	public int startList() {
 		int lst = glGenLists(1);
 		glNewList(lst, GL_COMPILE);
@@ -226,15 +208,15 @@ public final class LWJGLGraphics implements Graphics {
 		startTriangles();
 		return lst;
 	}
-	
+
 	public void startTriangles() {
 		glBegin(GL_TRIANGLES);
 	}
-	
+
 	public void startQuads() {
 		glBegin(GL_QUADS);
 	}
-	
+
 	public void endPrimitives() {
 		glEnd();
 	}
@@ -425,6 +407,19 @@ public final class LWJGLGraphics implements Graphics {
 		// Set the clear color
 		glClearColor(0.1f, 0.2f, 1f, 0.0f);
 
+		System.out.println("Loading shaders");
+		GLShaderHandler shaders = getShaders();
+		try {
+			synchronized (shaders) {
+				for (ShaderType st : ShaderType.values()) {
+					shaders.loadShaderProgram(st);
+				}
+			}
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		System.out.println("Done loading shaders");
+
 	}
 
 	private void exit() {
@@ -438,7 +433,8 @@ public final class LWJGLGraphics implements Graphics {
 	}
 
 	private void updateMVP() {
-		state.modelViewProjectionMatrix = state.projectionMatrix.multiply(state.modelViewMatrix);
+		state.modelViewProjectionMatrix = state.projectionMatrix
+				.multiply(state.modelViewMatrix);
 	}
 
 	private void updateViewMatrix() {
@@ -447,7 +443,8 @@ public final class LWJGLGraphics implements Graphics {
 	}
 
 	private void updateModelViewMatrix() {
-		state.modelViewMatrix = state.viewInverseMatrix.multiply(state.modelMatrix);
+		state.modelViewMatrix = state.viewInverseMatrix
+				.multiply(state.modelMatrix);
 		updateMVP();
 	}
 
@@ -486,26 +483,28 @@ public final class LWJGLGraphics implements Graphics {
 		}
 		running = false;
 	}
-	
+
 	public class MVPState {
 		protected MVPState copy() {
 			MVPState state = new MVPState();
 			state.projectionMatrix = projectionMatrix;
-			state.viewMatrix= viewMatrix;
+			state.viewMatrix = viewMatrix;
 			state.viewInverseMatrix = viewInverseMatrix;
 			state.modelMatrix = modelMatrix;
 			state.modelViewMatrix = modelViewMatrix;
 			state.modelViewProjectionMatrix = modelViewProjectionMatrix;
 			return state;
 		}
+
 		protected void load(MVPState other) {
 			projectionMatrix = other.projectionMatrix;
-			viewMatrix= other.viewMatrix;
+			viewMatrix = other.viewMatrix;
 			viewInverseMatrix = other.viewInverseMatrix;
 			modelMatrix = other.modelMatrix;
 			modelViewMatrix = other.modelViewMatrix;
 			modelViewProjectionMatrix = other.modelViewProjectionMatrix;
 		}
+
 		protected Matrix projectionMatrix;
 		protected Matrix viewMatrix;
 		protected Matrix viewInverseMatrix;

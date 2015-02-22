@@ -4,27 +4,10 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
+import utils.images.ImageTools;
 import config.GraphicsConfiguration;
 
 public class Images {
-
-	public static interface GraphicsHandler {
-		void draw(Graphics g);
-	}
-
-	public static BufferedImage createImage(int width, int height,
-			GraphicsHandler gh) {
-
-		BufferedImage newImage = new BufferedImage(
-				GraphicsConfiguration.IMAGE_SCALE_WIDTH,
-				GraphicsConfiguration.IMAGE_SCALE_HEIGHT,
-				BufferedImage.TYPE_INT_ARGB);
-
-		Graphics g = newImage.createGraphics();
-		gh.draw(g);
-		g.dispose();
-		return newImage;
-	}
 
 	public static BufferedImage getImage(ResourceHandler rh, String path)
 			throws IOException {
@@ -33,11 +16,11 @@ public class Images {
 		int width, height;
 		width = GraphicsConfiguration.IMAGE_SCALE_WIDTH;
 		height = GraphicsConfiguration.IMAGE_SCALE_HEIGHT;
-		return createImage(width, height,
+		return ImageTools.createImage(width, height,
 				new ImageScaler(before, width, height));
 	}
 
-	private static class ImageScaler implements GraphicsHandler {
+	private static class ImageScaler implements ImageTools.GraphicsHandler {
 
 		public ImageScaler(BufferedImage before, int w, int h) {
 			img = before;

@@ -3,7 +3,7 @@ package lwjglview.graphics.shader;
 import static org.lwjgl.opengl.ARBFragmentShader.*;
 import static org.lwjgl.opengl.ARBShaderObjects.*;
 import static org.lwjgl.opengl.ARBVertexShader.*;
- 
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
@@ -14,7 +14,6 @@ import org.lwjgl.BufferUtils;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.*;
-
 import utils.math.Matrix;
 import utils.resources.ResourceHandler;
 
@@ -30,7 +29,7 @@ public class GLShaderHandler {
 		matrixBuffer = BufferUtils.createFloatBuffer(16);
 	}
 	
-	public void loadShaderProgram(ShaderType shader) throws IOException {
+	public synchronized void loadShaderProgram(ShaderType shader) throws IOException {
 		if(!hasProgram(shader)) {
 			String vsfn = getShaderPath("vertex",
 					GLShaderHandler.getVSFname(shader));
@@ -49,31 +48,40 @@ public class GLShaderHandler {
 	        programs.put(shader, program);
 		}
 	}
+
+	public void setUniformIntValue(String string, int integer) {
+		setUniformIntValue(getType(), string, integer);
+	}
 	
-	public void setUniformIntValue(ShaderType st, String name, int value) {
+	public synchronized void setUniformIntValue(ShaderType st, String name, int value) {
 		int loc = initUniform(st, name);
 		glUniform1i(loc, value);
 	}
 	
-	public void setUniformFloatValue(ShaderType st, String name, float value) {
+	public synchronized void setUniformFloatValue(ShaderType st, String name, float value) {
 		int loc = initUniform(st, name);
 		glUniform1f(loc, value);
 	}
 
-	public void setUniformFloatArrayValue(ShaderType st, String name, int sz,
+	public void setUniformFloatArrayValue(String string, int i,
+			FloatBuffer buffer4) {
+		setUniformFloatArrayValue(getType(), string, i, buffer4);
+	}
+
+	public synchronized void setUniformFloatArrayValue(ShaderType st, String name, int sz,
 			FloatBuffer values) {
 		int loc = initUniform(st, name);
 		glUniform4f(loc, values.get(0), values.get(1), values.get(2), values.get(3));
 	}
 	
-	public void setUniformMatrixValue(ShaderType st, String name,
+	public synchronized void setUniformMatrixValue(ShaderType st, String name,
 			Matrix mat) {
 		int loc = initUniform(st, name);
 		mat.toFloatBuffer(matrixBuffer);
 		glUniformMatrix4(loc, true, matrixBuffer);
 	}
 	
-	public void useShaderProgram(ShaderType shader) {
+	public synchronized void useShaderProgram(ShaderType shader) {
 		glUseProgramObjectARB(programs.get(shader));
 		current = shader;
 	}

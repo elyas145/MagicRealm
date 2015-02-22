@@ -7,7 +7,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
 import config.GraphicsConfiguration;
-import utils.resources.Images.GraphicsHandler;
+import utils.images.ImageTools;
 import model.counter.chit.MapChit;
 
 public class ChitGenerator {
@@ -16,11 +16,11 @@ public class ChitGenerator {
 		int width, height;
 		width = GraphicsConfiguration.IMAGE_SCALE_WIDTH;
 		height = GraphicsConfiguration.IMAGE_SCALE_HEIGHT;
-		return Images.createImage(width, height, new MapChitDrawer(chit
+		return ImageTools.createImage(width, height, new MapChitDrawer(chit
 				.getType().toString(), chit.getIdentifier(), width, height));
 	}
 
-	private static class MapChitDrawer implements GraphicsHandler {
+	private static class MapChitDrawer implements ImageTools.GraphicsHandler {
 		public MapChitDrawer(String nm, char id, int w, int h) {
 			name = nm;
 			identifier = id;

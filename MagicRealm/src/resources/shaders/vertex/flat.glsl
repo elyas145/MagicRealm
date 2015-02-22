@@ -3,6 +3,7 @@
 
 uniform mat4 modelViewMatrix;
 uniform mat4 mvpMatrix;
+uniform int index;
 
 out vec3 position;
 out vec3 eye;

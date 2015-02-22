@@ -1,23 +1,20 @@
-package lwjglview.graphics.board;
+package lwjglview.graphics.board.counter;
 
 import java.awt.Color;
 import java.nio.FloatBuffer;
 
 import org.lwjgl.BufferUtils;
 
-import lwjglview.graphics.LWJGLDrawable;
 import lwjglview.graphics.LWJGLDrawableNode;
 import lwjglview.graphics.LWJGLGraphics;
 import lwjglview.graphics.animator.AnimationQueue;
 import lwjglview.graphics.animator.FadeAnimator;
 import lwjglview.graphics.animator.MovementAnimator;
+import lwjglview.graphics.board.LWJGLBoardDrawable;
 import lwjglview.graphics.shader.ShaderType;
 import model.enums.CounterType;
 import config.GraphicsConfiguration;
 import utils.math.Matrix;
-import view.graphics.board.CounterDrawable;
-import view.graphics.Drawable;
-import view.graphics.Graphics;
 
 public class LWJGLCounterDrawable extends LWJGLDrawableNode {
 
@@ -26,8 +23,8 @@ public class LWJGLCounterDrawable extends LWJGLDrawableNode {
 	public LWJGLCounterDrawable(LWJGLBoardDrawable bd, CounterType ctr, LWJGLDrawableNode chitBlock,
 			int texid) {
 		super(bd);
+		textureIndex = texid;
 		counter = ctr;
-		board = bd;
 		representation = chitBlock;
 		textureIndex = texid;
 		position = null;
@@ -82,7 +79,7 @@ public class LWJGLCounterDrawable extends LWJGLDrawableNode {
 	}
 
 	public boolean isAnimationFinished() {
-		return movements.isFinished();
+		return movements.isFinished() && colours.isFinished();
 	}
 
 	@Override
@@ -97,7 +94,7 @@ public class LWJGLCounterDrawable extends LWJGLDrawableNode {
 	public void updateNodeUniforms(LWJGLGraphics lwgfx) {
 		lwgfx.updateModelViewUniform(SHADER, "modelViewMatrix");
 		lwgfx.updateMVPUniform(SHADER, "mvpMatrix");
-		lwgfx.getShaders().setUniformIntValue(SHADER, "index", textureIndex);
+		lwgfx.getShaders().setUniformIntValue("index", textureIndex);
 		buffer.rewind();
 		colours.apply().toFloatBuffer(buffer);
 		lwgfx.getShaders().setUniformFloatArrayValue(SHADER, "counterColour",
@@ -141,8 +138,6 @@ public class LWJGLCounterDrawable extends LWJGLDrawableNode {
 
 	private AnimationQueue movements;
 	private AnimationQueue colours;
-
-	private LWJGLBoardDrawable board;
 
 	private FloatBuffer position;
 	private FloatBuffer buffer;

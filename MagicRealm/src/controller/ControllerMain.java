@@ -65,7 +65,7 @@ public class ControllerMain implements Controller {
 		gfx = new LWJGLGraphics(rh, this);
 		LWJGLBoardDrawable boardDrawable;
 		try {
-			boardDrawable = new LWJGLBoardDrawable(rh);
+			boardDrawable = new LWJGLBoardDrawable(rh, model.getMapChits());
 			boardView = boardDrawable;
 			gfx.addDrawable(boardDrawable);
 			for (HexTileInterface hti : model.getBoard().iterateTiles()) {

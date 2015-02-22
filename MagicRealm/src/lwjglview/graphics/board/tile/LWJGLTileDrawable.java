@@ -1,8 +1,12 @@
-package lwjglview.graphics.board;
+package lwjglview.graphics.board.tile;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.lwjgl.BufferUtils;
 
 import config.GraphicsConfiguration;
 import lwjglview.graphics.LWJGLDrawable;
@@ -11,42 +15,49 @@ import lwjglview.graphics.LWJGLDrawableNode;
 import lwjglview.graphics.LWJGLGraphics;
 import lwjglview.graphics.animator.AnimationQueue;
 import lwjglview.graphics.animator.FillerAnimator;
-import lwjglview.graphics.animator.StaticAnimator;
 import lwjglview.graphics.animator.TimedAnimator;
-import lwjglview.graphics.shader.GLShaderHandler;
+import lwjglview.graphics.board.tile.clearing.LWJGLClearingStorage;
 import lwjglview.graphics.shader.ShaderType;
-import model.enums.TileName;
+import model.EnchantedHolder;
+import model.enums.CounterType;
+import model.interfaces.ClearingInterface;
 import utils.math.Mathf;
 import utils.math.Matrix;
-import view.graphics.Graphics;
-import view.graphics.board.TileDrawable;
 
 public class LWJGLTileDrawable extends LWJGLDrawableNode {
 
 	public static final ShaderType SHADER = ShaderType.TILE_SHADER;
 
-	public LWJGLTileDrawable(LWJGLDrawable parent, float x, float y, float rot, int norm, int enchant) {
+	public LWJGLTileDrawable(LWJGLTileCollection parent, float x, float y,
+			float rot, int norm, int enchant,
+			Iterable<? extends ClearingInterface> clears) {
 		super(parent);
+		tiles = parent;
 		xPosition = x;
 		yPosition = y;
 		vector = Matrix.columnVector(xPosition, yPosition, 0f);
 		translation = Matrix.translation(vector);
 		rotation = Matrix.rotationZ(4, -rot);
 		transformation = translation.multiply(rotation);
-		normalTex = norm;
-		enchantedTex = enchant;
+		textureLocation = new EnchantedHolder<Integer>(norm, enchant);
+		System.out.println(textureLocation);
 		enchanted = false;
 		showEnchanted = enchanted;
 		faces = new ArrayList<LWJGLDrawableLeaf>();
+		bufferN = BufferUtils.createFloatBuffer(2);
+		bufferE = BufferUtils.createFloatBuffer(2);
+		bufferT = BufferUtils.createFloatBuffer(2);
 		initFaces();
 		flipper = new AnimationQueue();
 		flipper.start();
 		flipper.push(new FillerAnimator(Matrix.identityMatrix(4)));
+		clearings = new HashMap<Integer, LWJGLClearingStorage>();
+		initClearings(clears);
 	}
 
 	public void setTextures(int norm, int ench) {
-		normalTex = norm;
-		enchantedTex = ench;
+		textureLocation.set(false, norm);
+		textureLocation.set(true, ench);
 	}
 
 	public void setEnchanted(boolean ench) {
@@ -74,6 +85,14 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode {
 		return vector;
 	}
 
+	public void relocateChit(CounterType ct, float f, float g) {
+		tiles.relocateChit(ct, f, g);
+	}
+
+	public LWJGLClearingStorage getClearing(int clr) {
+		return clearings.get(clr);
+	}
+
 	@Override
 	public void applyNodeTransformation(LWJGLGraphics lwgfx) {
 		Matrix mat = flipper.apply();
@@ -93,6 +112,19 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode {
 		}
 
 	}
+
+	private void initClearings(Iterable<? extends ClearingInterface> clears) {
+		getPosition(bufferT);
+		clearings.put(0, new LWJGLClearingStorage(this, bufferT));
+		for (ClearingInterface clr : clears) {
+			clr.getPosition(false, bufferN);
+			clr.getPosition(true, bufferE);
+			clearings.put(clr.getClearingNumber(), new LWJGLClearingStorage(
+					this, bufferT, bufferN, bufferE));
+		}
+	}
+
+	private FloatBuffer bufferN, bufferE, bufferT;
 
 	private void initFaces() {
 		float halfThick = GraphicsConfiguration.TILE_THICKNESS * .5f;
@@ -139,6 +171,8 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode {
 	}
 
 	private abstract class TileFace extends LWJGLDrawable {
+		
+		public abstract int getIndex();
 
 		public TileFace(Matrix mat) {
 			transform = mat;
@@ -148,6 +182,7 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode {
 		public void updateUniforms(LWJGLGraphics lwgfx) {
 			lwgfx.updateModelViewUniform(SHADER, "modelViewMatrix");
 			lwgfx.updateMVPUniform(SHADER, "mvpMatrix");
+			lwgfx.getShaders().setUniformIntValue("index", getIndex());
 		}
 
 		@Override
@@ -164,13 +199,12 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode {
 
 		public HexTileFace(Matrix mat, boolean ench) {
 			super(mat);
-			tex = ench ? enchantedTex : normalTex;
+			tex = textureLocation.get(ench);
 		}
 
 		@Override
-		public void updateUniforms(LWJGLGraphics lwgfx) {
-			super.updateUniforms(lwgfx);
-			lwgfx.getShaders().setUniformIntValue(SHADER, "index", tex);
+		public int getIndex() {
+			return tex;
 		}
 
 		@Override
@@ -189,9 +223,8 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode {
 		}
 
 		@Override
-		public void updateUniforms(LWJGLGraphics lwgfx) {
-			super.updateUniforms(lwgfx);
-			lwgfx.getShaders().setUniformIntValue(SHADER, "index", -1);
+		public int getIndex() {
+			return -1;
 		}
 
 		@Override
@@ -201,6 +234,8 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode {
 
 	}
 
+	private Map<Integer, LWJGLClearingStorage> clearings;
+	private LWJGLTileCollection tiles;
 	private Collection<LWJGLDrawableLeaf> faces;
 	private Matrix transformation;
 	private Matrix rotation;
@@ -208,8 +243,7 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode {
 	private float yPosition;
 	private Matrix vector;
 	private Matrix translation;
-	private int normalTex;
-	private int enchantedTex;
+	private EnchantedHolder<Integer> textureLocation;
 	private boolean enchanted;
 	private boolean showEnchanted;
 	private AnimationQueue flipper;
