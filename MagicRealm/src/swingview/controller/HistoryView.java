@@ -12,13 +12,10 @@ import model.player.PersonalHistoryDay;
 
 @SuppressWarnings("serial")
 public class HistoryView extends JPanel {
-	private PersonalHistory history;
 	private JTable actions;
-	private JTable points;
 
 	public HistoryView(PersonalHistory history) {
 		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-		this.history = history;
 		actions = new JTable(28, 9);
 		ArrayList<PersonalHistoryDay> days = history.getDays();
 		int daynum = 0;

@@ -7,6 +7,16 @@ import model.activity.Activity;
 public class PersonalHistory {
 	private ArrayList<PersonalHistoryDay> days;
 	private int currentDay;
+	private ArrayList<HistoryPath> paths;
+	
+	public ArrayList<HistoryPath> getPaths() {
+		return paths;
+	}
+
+	public void addPath(HistoryPath path) {
+		this.paths.add(path);
+	}
+
 	public PersonalHistory(){
 		reset();
 	}
@@ -14,6 +24,7 @@ public class PersonalHistory {
 	public PersonalHistory reset(){
 		days = new ArrayList<PersonalHistoryDay>();
 		days.add(new PersonalHistoryDay());
+		paths = new ArrayList<HistoryPath>();
 		currentDay = 1;
 		return this;
 	}
@@ -35,4 +46,6 @@ public class PersonalHistory {
 	public ArrayList<Activity> getCurrentActivities() {
 		return days.get(currentDay-1).getActivities();
 	}
+	
+	
 }

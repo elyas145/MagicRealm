@@ -95,7 +95,7 @@ public class ModelController {
 
 	public void moveCharacter(CharacterType characterType, TileName tt,
 			int clearing) throws IllegalMoveException {
-		Character ct = characters.get(characterType);
+		Player ct = players.get(characterType);
 		ClearingInterface cl1 = board.getLocationOfCounter(characterType
 				.toCounter());
 		ClearingInterface cl2 = board.getClearing(tt, clearing);
@@ -477,7 +477,7 @@ public class ModelController {
 	}
 
 	private void peerTableSearch() {
-		int roll = Random.dieRoll();
+		int roll = 2;//Random.dieRoll();
 		TileName ct = getCurrentTile();
 		switch (roll) {
 		case 1:
@@ -531,11 +531,10 @@ public class ModelController {
 		ClearingInterface clearing = board
 				.getLocationOfCounter(getCurrentPlayer().getCharacter()
 						.getType().toCounter());
-		Character chr = getCurrentCharacter();
-		ClearingInterface source = board.getLocationOfCounter(chr.getType()
+		ClearingInterface source = board.getLocationOfCounter(getCurrentPlayer().getCharacter().getType()
 				.toCounter());
 		for (ClearingInterface cl : clearing.getSurrounding(PathType.HIDDEN)) {
-			chr.addDiscoveredPath(source, cl);
+			getCurrentPlayer().addDiscoveredPath(source, cl);
 		}
 	}
 

@@ -22,7 +22,6 @@ public class Character implements CharacterInterface {
 	private boolean hiding;
 	private ArrayList<Chit> belongings;
 	private ArrayList<Phase> specialPhases;
-	private Map<ClearingInterface, EnchantedHolder<Set<ClearingInterface>>> discoveredPaths;
 
 	public Character(CharacterType t) {
 		System.out
@@ -30,7 +29,6 @@ public class Character implements CharacterInterface {
 		type = t;
 		initialLocation = GameConfiguration.INITIAL_SITE;
 		hiding = true;
-		discoveredPaths = new HashMap<ClearingInterface, EnchantedHolder<Set<ClearingInterface>>>();
 	}
 
 	public CharacterType getType() {
@@ -68,32 +66,6 @@ public class Character implements CharacterInterface {
 	public ArrayList<Phase> getSpecialPhases() {
 
 		return specialPhases;
-	}
-
-	public void addDiscoveredPath(ClearingInterface cl1, ClearingInterface cl2) {
-		System.out.println("Adding path for character " + getType());
-		System.out.println("between " + cl1 + " and " + cl2);
-		connectClearings(cl1, cl2, cl1.isEnchanted());
-		connectClearings(cl2, cl1, cl1.isEnchanted());
-	}
-
-	public boolean hasDiscoveredPath(ClearingInterface cl1,
-			ClearingInterface cl2) {
-		if (!discoveredPaths.containsKey(cl1)) {
-			return false;
-		}
-		return discoveredPaths.get(cl1).get(cl1.isEnchanted()).contains(cl2);
-	}
-
-	private void connectClearings(ClearingInterface cl1, ClearingInterface cl2,
-			boolean ench) {
-		if (!discoveredPaths.containsKey(cl1)) {
-			discoveredPaths.put(cl1,
-					new EnchantedHolder<Set<ClearingInterface>>(
-							new HashSet<ClearingInterface>(),
-							new HashSet<ClearingInterface>()));
-		}
-		discoveredPaths.get(cl1).get(ench).add(cl2);
 	}
 
 }
