@@ -26,7 +26,7 @@ public class ResourceHandler {
 	}
 
 	public String getResource(String fname) throws IOException {
-		String path = ResourceHandler.class.getProtectionDomain()
+		/*String path = ResourceHandler.class.getProtectionDomain()
 				.getCodeSource().getLocation().getPath();
 		String decodedPath = URLDecoder.decode(path, "UTF-8");
 		System.out.println(ResourceHandler.joinPath(decodedPath, "resources", fname).toString());
@@ -37,7 +37,10 @@ public class ResourceHandler {
 			throw new IOException("The file " + fname + " could not be found, "
 					+ "try refreshing the project (F5)");
 		}
-		return ret;
+		return ret;*/
+		URL ur = getClass().getClassLoader().getResource(ResourceHandler.joinPath("resources", fname));
+		System.out.println(ur);
+		return ur.toString();
 	}
 
 	public String readFile(String fname) throws IOException {
