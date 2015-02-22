@@ -28,7 +28,6 @@ public class ResourceHandler {
 	public String getResource(String fname) throws IOException {
 		/*String path = ResourceHandler.class.getProtectionDomain()
 				.getCodeSource().getLocation().getPath();
-		String decodedPath = URLDecoder.decode(path, "UTF-8");
 		System.out.println(ResourceHandler.joinPath(decodedPath, "resources", fname).toString());
 		
 		String ret = ResourceHandler.joinPath(decodedPath, "resources", fname);
@@ -39,8 +38,9 @@ public class ResourceHandler {
 		}
 		return ret;*/
 		URL ur = getClass().getClassLoader().getResource(ResourceHandler.joinPath("resources", fname));
-		System.out.println(ur);
-		return ur.toString();
+		String decodedPath = URLDecoder.decode(ur.getPath(), "UTF-8");
+		System.out.println(decodedPath);
+		return decodedPath;
 	}
 
 	public String readFile(String fname) throws IOException {
