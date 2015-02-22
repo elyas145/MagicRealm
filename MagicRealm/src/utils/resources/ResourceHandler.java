@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,9 +25,14 @@ public class ResourceHandler {
 		images = new HashMap<String, BufferedImage>();
 	}
 
-	public URL getResource(String fname) throws IOException {
-		URL ret = getClass().getResource(
-				ResourceHandler.joinPath("..", "..", "resources", fname));
+	public String getResource(String fname) throws IOException {
+		String path = ResourceHandler.class.getProtectionDomain()
+				.getCodeSource().getLocation().getPath();
+		String decodedPath = URLDecoder.decode(path, "UTF-8");
+		System.out.println(ResourceHandler.joinPath(decodedPath, "resources", fname).toString());
+		
+		String ret = ResourceHandler.joinPath(decodedPath, "resources", fname);
+		
 		if (ret == null) {
 			throw new IOException("The file " + fname + " could not be found, "
 					+ "try refreshing the project (F5)");
@@ -35,47 +41,40 @@ public class ResourceHandler {
 	}
 
 	public String readFile(String fname) throws IOException {
-		URL ur = getResource(fname);
-		String rep = ur.toString();
-		if (!files.containsKey(rep)) {
-			//System.out.println("Reading file: " + rep);
+		String ur = getResource(fname);
+			// System.out.println("Reading file: " + rep);
 			BufferedReader br;
-			try {
-				br = new BufferedReader(new FileReader(ur.toURI().getPath()));
-			} catch (URISyntaxException e) {
-				throw new RuntimeException(e);
-			}
+			br = new BufferedReader(new FileReader(ur));
 			char[] charbuf = new char[1024];
 			int read = 0;
 			StringBuilder sb = new StringBuilder();
 			while ((read = br.read(charbuf)) > 0) {
 				sb.append(charbuf, 0, read);
 			}
-			files.put(rep, sb.toString());
+			files.put(ur, sb.toString());
 			br.close();
-		}
-		String loaded = files.get(rep);
-		//System.out.println("Retreived file: " + rep);
-		//System.out.println(loaded);
+		String loaded = files.get(ur);
+		// System.out.println("Retreived file: " + rep);
+		// System.out.println(loaded);
 		return loaded;
 	}
 
 	public BufferedImage readImage(String fname) throws IOException {
-		URL ur = getResource(fname);
+		String ur = getResource(fname);
 		String rep = ur.toString();
 		if (!images.containsKey(rep)) {
-			//System.out.println("Reading image: " + rep);
-			images.put(rep, ImageIO.read(ur));
+			// System.out.println("Reading image: " + rep);
+			images.put(rep, ImageIO.read(new File(ur)));
 		}
-		//System.out.println("Retreived image: " + rep);
+		// System.out.println("Retreived image: " + rep);
 		BufferedImage bi = images.get(rep);
-		//System.out.println("Dimensions: " + bi.getWidth() + ", "
-		//		+ bi.getHeight());
+		// System.out.println("Dimensions: " + bi.getWidth() + ", "
+		// + bi.getHeight());
 		return bi;
 	}
-	
+
 	public static String joinPath(String... paths) {
-		if(paths.length == 0) {
+		if (paths.length == 0) {
 			throw new RuntimeException("The number of paths must not be 0");
 		}
 		if (paths.length == 1) {
@@ -92,7 +91,7 @@ public class ResourceHandler {
 		if (paths.isEmpty()) {
 			return path;
 		}
-		return path + "/" + joinPath(paths.remove(0), paths);
+		return new File(path , joinPath(paths.remove(0), paths)).toString();
 	}
 
 	private Map<String, String> files;
