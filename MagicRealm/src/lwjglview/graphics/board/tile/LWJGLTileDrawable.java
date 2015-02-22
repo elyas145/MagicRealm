@@ -85,8 +85,8 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode {
 		return vector;
 	}
 
-	public void relocateChit(CounterType ct, float f, float g) {
-		tiles.relocateChit(ct, f, g);
+	public void relocateChit(int id, float f, float g) {
+		tiles.relocateChit(id, f, g);
 	}
 
 	public LWJGLClearingStorage getClearing(int clr) {

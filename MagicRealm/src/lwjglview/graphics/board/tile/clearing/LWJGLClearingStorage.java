@@ -22,24 +22,24 @@ public class LWJGLClearingStorage {
 		init(td, tc.get(0), tc.get(1), tc.get(0), tc.get(1));
 	}
 
-	public void put(CounterType ct) {
+	public void put(int id) {
 		synchronized (chits) {
-			if (!chits.contains(ct)) {
-				chits.add(ct);
+			if (!chits.contains(id)) {
+				chits.add(id);
 				if (changeDim()) {
 					relocateAllChits();
 				} else {
-					moveChit(ct);
+					moveChit(id);
 				}
 			}
 		}
 	}
 
-	public void remove(CounterType ct) {
+	public void remove(int id) {
 		synchronized (chits) {
-			if (chits.contains(ct)) {
-				int idx = chits.indexOf(ct);
-				chits.remove(ct);
+			if (chits.contains(id)) {
+				int idx = chits.indexOf(id);
+				chits.remove((Integer) id);
 				if (changeDim()) {
 					relocateAllChits();
 				} else {
@@ -61,8 +61,8 @@ public class LWJGLClearingStorage {
 		getLocation(loc, tile.isEnchanted());
 	}
 
-	public void getLocation(CounterType chit, FloatBuffer loc) {
-		int idx = chits.indexOf(chit);
+	public void getLocation(int id, FloatBuffer loc) {
+		int idx = chits.indexOf(id);
 		int row = dim - idx / dim - 1;
 		int col = idx % dim;
 		int gaps = dim - 1;
@@ -80,7 +80,7 @@ public class LWJGLClearingStorage {
 		tile = td;
 		posns = new EnchantedHolder<float[]>(new float[] { f, g }, new float[] {
 				h, i });
-		chits = new ArrayList<CounterType>();
+		chits = new ArrayList<Integer>();
 		dim = 0;
 		buff = BufferUtils.createFloatBuffer(2);
 	}
@@ -100,22 +100,22 @@ public class LWJGLClearingStorage {
 
 	private void relocateAllChits() {
 		synchronized (chits) {
-			for (CounterType type : chits) {
-				moveChit(type);
+			for (Integer id : chits) {
+				moveChit(id);
 			}
 		}
 	}
 
-	private void moveChit(CounterType ct) {
+	private void moveChit(int id) {
 		synchronized (buff) {
-			getLocation(ct, buff);
-			tile.relocateChit(ct, buff.get(0), buff.get(1));
+			getLocation(id, buff);
+			tile.relocateChit(id, buff.get(0), buff.get(1));
 		}
 	}
 
 	private LWJGLTileDrawable tile;
 	private EnchantedHolder<float[]> posns;
 	private int dim;
-	private List<CounterType> chits;
+	private List<Integer> chits;
 	private FloatBuffer buff;
 }

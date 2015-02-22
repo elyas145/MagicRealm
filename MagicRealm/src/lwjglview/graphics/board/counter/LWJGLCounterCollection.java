@@ -44,7 +44,7 @@ public class LWJGLCounterCollection extends LWJGLDrawableNode {
 	}
 
 	public LWJGLCounterDrawable create(CounterType tp, LWJGLDrawableNode repr) {
-		counters.put(tp, new LWJGLCounterDrawable(board, tp, repr, textureLocations.get(tp)));
+		counters.put(tp, new LWJGLCounterDrawable(board, repr, textureLocations.get(tp)));
 		return get(tp);
 	}
 
@@ -60,8 +60,8 @@ public class LWJGLCounterCollection extends LWJGLDrawableNode {
 		return get(ct).isAnimationFinished();
 	}
 
-	public void moveTo(CounterType type, float x, float y) {
-		get(type).moveTo(x, y);
+	public void moveTo(CounterType ct, float x, float y) {
+		get(ct).moveTo(x, y);
 	}
 
 	public void changeColour(CounterType ct, Color col) {

@@ -63,8 +63,8 @@ public class LWJGLTileCollection extends LWJGLDrawableNode {
 				loc.get(false), loc.get(true), clears));
 	}
 
-	public void relocateChit(CounterType ct, float f, float g) {
-		board.relocateChit(ct, f, g);
+	public void relocateChit(int id, float f, float g) {
+		board.relocateChit(id, f, g);
 	}
 	
 	public LWJGLTileDrawable get(TileName tl) {

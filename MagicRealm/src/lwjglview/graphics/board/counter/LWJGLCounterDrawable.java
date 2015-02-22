@@ -20,11 +20,11 @@ public class LWJGLCounterDrawable extends LWJGLDrawableNode {
 
 	public static final ShaderType SHADER = ShaderType.CHIT_SHADER;
 
-	public LWJGLCounterDrawable(LWJGLBoardDrawable bd, CounterType ctr, LWJGLDrawableNode chitBlock,
+	public LWJGLCounterDrawable(LWJGLBoardDrawable bd, LWJGLDrawableNode chitBlock,
 			int texid) {
 		super(bd);
 		textureIndex = texid;
-		counter = ctr;
+		identifier = bd.addCounterDrawable(this);
 		representation = chitBlock;
 		textureIndex = texid;
 		position = null;
@@ -39,8 +39,8 @@ public class LWJGLCounterDrawable extends LWJGLDrawableNode {
 		movements.start();
 	}
 
-	public CounterType getCounterType() {
-		return counter;
+	public int getID() {
+		return identifier;
 	}
 
 	public void changeColour(Color col) {
@@ -146,6 +146,6 @@ public class LWJGLCounterDrawable extends LWJGLDrawableNode {
 
 	private int textureIndex;
 	
-	private CounterType counter;
+	private int identifier;
 
 }
