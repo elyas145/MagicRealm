@@ -37,21 +37,22 @@ public class HistoryPath {
 		this.cl1 = cl1;
 	}
 
-	public int getClearing2() {
+	public int getClearingTwo() {
 		return cl2;
 	}
 
-	public void setClearing2(int cl2) {
+	public void setClearingTwo(int cl2) {
 		this.cl2 = cl2;
 	}
 
 	private int cl1;
 	private int cl2;
 	
-	public HistoryPath(TileName tile, int cl1, int cl2, boolean ench){
+	public HistoryPath(TileName tile, int cl1, int cl2, boolean ench, PathType type){
 		this.tile = tile;
 		this.cl1 = cl1;
 		this.cl2 = cl2;
 		enchanted = ench;
+		this.type = type;
 	}
 }

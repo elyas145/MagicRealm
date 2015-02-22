@@ -1,20 +1,28 @@
 package model.player;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import model.activity.Activity;
+import model.enums.TileName;
 
 public class PersonalHistory {
 	private ArrayList<PersonalHistoryDay> days;
 	private int currentDay;
-	private ArrayList<HistoryPath> paths;
+	private Map<TileName, Set<HistoryPath>> paths;
 	
-	public ArrayList<HistoryPath> getPaths() {
+	public Map<TileName, Set<HistoryPath>> getPaths() {
 		return paths;
 	}
 
 	public void addPath(HistoryPath path) {
-		this.paths.add(path);
+		if(paths.get(path.getTile()) == null){
+			paths.put(path.getTile(), new HashSet<HistoryPath>());
+		}
+		this.paths.get(path.getTile()).add(path);
 	}
 
 	public PersonalHistory(){
@@ -24,7 +32,7 @@ public class PersonalHistory {
 	public PersonalHistory reset(){
 		days = new ArrayList<PersonalHistoryDay>();
 		days.add(new PersonalHistoryDay());
-		paths = new ArrayList<HistoryPath>();
+		paths = new HashMap<TileName, Set<HistoryPath>>();
 		currentDay = 1;
 		return this;
 	}

@@ -10,6 +10,7 @@ import java.util.Set;
 import model.EnchantedHolder;
 import model.activity.Activity;
 import model.character.Character;
+import model.enums.PathType;
 import model.interfaces.ClearingInterface;
 
 public class Player {
@@ -53,6 +54,7 @@ public class Player {
 		System.out.println("between " + cl1 + " and " + cl2);
 		connectClearings(cl1, cl2, cl1.isEnchanted());
 		connectClearings(cl2, cl1, cl1.isEnchanted());
+		historyPad.addPath(new HistoryPath(cl1.getParentTile().getName(), cl1.getClearingNumber(), cl2.getClearingNumber(), cl1.isEnchanted(), PathType.HIDDEN));
 	}
 
 	public boolean hasDiscoveredPath(ClearingInterface cl1,
@@ -71,7 +73,7 @@ public class Player {
 							new HashSet<ClearingInterface>(),
 							new HashSet<ClearingInterface>()));
 		}
-		discoveredPaths.get(cl1).get(ench).add(cl2);
+		discoveredPaths.get(cl1).get(ench).add(cl2);		
 	}
 
 }

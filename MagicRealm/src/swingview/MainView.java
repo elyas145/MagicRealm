@@ -13,11 +13,16 @@ import java.awt.event.WindowListener;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 
+import javax.swing.BoxLayout;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
 import model.character.Phase;
+import model.counter.chit.MapChit;
 import model.enums.CharacterType;
+import model.enums.ChitType;
 import model.player.Player;
 import swingview.controller.birdsong.BirdSongView;
 import swingview.controller.mainmenu.MainMenu;
@@ -120,6 +125,18 @@ public class MainView extends JFrame implements ViewController, WindowListener,
 
 	}
 
+	public void displayMessage(ArrayList<MapChit> peek) {
+		JFrame frame = new JFrame("FOUND");
+		frame.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		frame.setSize(200, 200);
+		JPanel panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+		for (MapChit chit : peek){
+			panel.add(new JLabel(chit.toString()));
+		}
+		frame.add(panel);
+		frame.setVisible(true);
+	}
 	@Override
 	public view.controller.search.SearchView enterSearchView(CharacterType character) {
 		SearchView search = new SearchView(this, character);
@@ -177,5 +194,6 @@ public class MainView extends JFrame implements ViewController, WindowListener,
 		// TODO Auto-generated method stub
 
 	}
+
 
 }

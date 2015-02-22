@@ -66,4 +66,15 @@ public class MapChit extends Chit{
 			break;
 		}
 	}
+	
+	@Override
+	public String toString(){
+		String str = "";
+		if(this.type != null){
+			str += type.type().toString() + ": ";
+			str += this.type.toString() + ". ";
+			str += this.identifier;			
+		}
+		return str;
+	}
 }

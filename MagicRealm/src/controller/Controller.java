@@ -9,6 +9,7 @@ import model.activity.Activity;
 import model.activity.Move;
 import model.board.clearing.Clearing;
 import model.controller.ModelController;
+import model.counter.chit.MapChit;
 import model.enums.CharacterType;
 import model.enums.CounterType;
 import model.enums.PeerType;
@@ -62,5 +63,7 @@ public interface Controller {
 	void focusOnBoard(CounterType counter);
 
 	PeerType getPeerChoice();
+
+	void displayMessage(ArrayList<MapChit> peek);
 	
 }

@@ -477,7 +477,7 @@ public class ModelController {
 	}
 
 	private void peerTableSearch() {
-		int roll = 2;//Random.dieRoll();
+		int roll = 2;// Random.dieRoll();
 		TileName ct = getCurrentTile();
 		switch (roll) {
 		case 1:
@@ -508,11 +508,20 @@ public class ModelController {
 	}
 
 	private void peerC() {
+		// Player gets to look at the map chits in their tile. 
+		// they do not discover any sites, but just get to see that they are there.
+		ArrayList<MapChit> peek = new ArrayList<MapChit>();
+		for(MapChit chit : mapChits){
+			if(chit.getTile() == board.getLocationOfCounter(getCurrentCharacter().getType().toCounter()).getParentTile().getName()){
+				peek.add(chit);
+			}
+		}
+		client.displayMessage(peek);
 		
 	}
 
 	private void peerH() {
-		// TODO Auto-generated method stub
+		// we don't have any enemies yet.
 
 	}
 
@@ -531,8 +540,9 @@ public class ModelController {
 		ClearingInterface clearing = board
 				.getLocationOfCounter(getCurrentPlayer().getCharacter()
 						.getType().toCounter());
-		ClearingInterface source = board.getLocationOfCounter(getCurrentPlayer().getCharacter().getType()
-				.toCounter());
+		ClearingInterface source = board
+				.getLocationOfCounter(getCurrentPlayer().getCharacter()
+						.getType().toCounter());
 		for (ClearingInterface cl : clearing.getSurrounding(PathType.HIDDEN)) {
 			getCurrentPlayer().addDiscoveredPath(source, cl);
 		}

@@ -80,7 +80,7 @@ public class ControllerMain implements Controller {
 						ci.getClearingNumber());
 			}
 			boardView.loadMapChits(model.getMapChits());
-			for(MapChit mc: model.getMapChits()) {
+			for (MapChit mc : model.getMapChits()) {
 				boardView.setMapChit(mc);
 			}
 			gfx.start();
@@ -270,6 +270,11 @@ public class ControllerMain implements Controller {
 	@Override
 	public void displayMessage(String string) {
 		getMainView().displayMessage(string);
+	}
+
+	@Override
+	public void displayMessage(ArrayList<MapChit> peek) {
+		getMainView().displayMessage(peek);
 	}
 
 	@Override

@@ -189,7 +189,6 @@ public class Board implements BoardInterface {
 					.remove(possibleValues)));
 		}
 	}
-
 	private void hardCodeTiles() {
 		// this setup is based on the picture found here, rotated left to match
 		// video:
@@ -300,5 +299,6 @@ public class Board implements BoardInterface {
 	private Map<CounterType, ClearingInterface> counterPositions;
 	private ArrayList<Treasure> treasures = new ArrayList<Treasure>();
 	private JSONArray arr;
+
 
 }
