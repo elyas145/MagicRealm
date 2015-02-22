@@ -33,11 +33,6 @@ public class Images {
 		int width, height;
 		width = GraphicsConfiguration.IMAGE_SCALE_WIDTH;
 		height = GraphicsConfiguration.IMAGE_SCALE_HEIGHT;
-		BufferedImage newImage = new BufferedImage(width, height,
-				BufferedImage.TYPE_INT_ARGB);
-		Graphics g = newImage.createGraphics();
-		g.drawImage(before, 0, 0, width, height, null);
-		g.dispose();
 		return createImage(width, height,
 				new ImageScaler(before, width, height));
 	}
@@ -52,7 +47,7 @@ public class Images {
 
 		@Override
 		public void draw(Graphics g) {
-			g.drawImage(img, width, height, null);
+			g.drawImage(img, 0, 0, width, height, null);
 		}
 
 		private BufferedImage img;

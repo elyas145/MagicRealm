@@ -3,8 +3,10 @@ package model.controller;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.event.RowSorterEvent.Type;
 
@@ -21,6 +23,7 @@ import model.board.Board;
 import model.enums.ActivityType;
 import model.enums.CharacterType;
 import model.enums.ChitType;
+import model.enums.CounterType;
 import model.enums.MapChitType;
 import model.enums.PathType;
 import model.enums.PeerType;
@@ -57,7 +60,7 @@ public class ModelController {
 	private List<CharacterType> randomOrder;
 	private Queue<CharacterType> orderOfPlay;
 	private boolean currentPlayerDone = false;
-	private ArrayList<MapChit> mapChits;
+	private Set<MapChit> mapChits;
 	private Controller client;
 
 	private static final RuntimeException noPlayersException = new RuntimeException(
@@ -75,13 +78,11 @@ public class ModelController {
 			sites.add(t);
 		}
 
-		mapChits = new ArrayList<MapChit>();
-		for (MapChitType type : MapChitType.values()) {
-			if (type.type() == ChitType.WARNING) {
-				mapChits.add(new MapChit(type, 'C'));
-				mapChits.add(new MapChit(type, 'W'));
-				mapChits.add(new MapChit(type, 'M'));
-			}
+		mapChits = new HashSet<MapChit>();
+		for (MapChitType type : MapChitType.WARNINGS) {
+			mapChits.add(new MapChit(type, 'C'));
+			mapChits.add(new MapChit(type, 'W'));
+			mapChits.add(new MapChit(type, 'M'));
 		}
 
 		lostCity = new LostSite(MapChitType.LOST_CITY);
@@ -94,7 +95,12 @@ public class ModelController {
 
 	public void moveCharacter(CharacterType characterType, TileName tt,
 			int clearing) throws IllegalMoveException {
-		if (board.isValidMove(characterType.toCounter(), tt, clearing)) {
+		Character ct = characters.get(characterType);
+		ClearingInterface cl1 = board.getLocationOfCounter(characterType
+				.toCounter());
+		ClearingInterface cl2 = board.getClearing(tt, clearing);
+		if (cl1.isConnectedTo(cl2, PathType.NORMAL)
+				|| ct.hasDiscoveredPath(cl1, cl2)) {
 			board.moveCharacter(characterType, tt, clearing);
 			client.moveCounter(characterType.toCounter(), tt, clearing);
 		} else {
@@ -162,7 +168,9 @@ public class ModelController {
 			board.setLocationOfCounter(c.getType().toCounter(),
 					GameConfiguration.INITIAL_SITE);
 		}
-
+		// TODO hard set location of amazon to find hidden path
+		board.setLocationOfCounter(CounterType.CHARACTER_AMAZON,
+				TileName.CLIFF, 2);
 	}
 
 	public void setSiteLocations() {
@@ -273,8 +281,7 @@ public class ModelController {
 	}
 
 	public Character getCharacter(CharacterType ct) {
-		// TODO Auto-generated method stub
-		return null;
+		return characters.get(ct);
 	}
 
 	public boolean isCurrentHidden() {
@@ -456,27 +463,29 @@ public class ModelController {
 
 	}
 
-	public ArrayList<MapChit> getMapChits() {
+	public Iterable<MapChit> getMapChits() {
 		return mapChits;
 	}
 
 	public void performSearch(TableType selectedTable) {
-		switch (selectedTable){
+		switch (selectedTable) {
 		default:
-			//peer table.
-			peerTableSearch();		
+			// peer table.
+			peerTableSearch();
 		}
-		
+
 	}
 
 	private void peerTableSearch() {
 		int roll = Random.dieRoll();
-		switch (roll){
+		TileName ct = getCurrentTile();
+		switch (roll) {
 		case 1:
 			peerChoice();
 			break;
 		case 2:
 			peerCP();
+			showMessage("Found hidden paths and clues in " + ct);
 			break;
 		case 3:
 			peerHP();
@@ -488,37 +497,55 @@ public class ModelController {
 			peerC();
 			break;
 		default:
+			showMessage("Peer has failed");
 			break;
 		}
 	}
 
+	private void showMessage(String string) {
+		CharacterType ct = getCurrentCharacter().getType();
+		client.displayMessage(ct + "\n" + string);
+	}
+
 	private void peerC() {
-		// TODO Auto-generated method stub
 		
 	}
 
 	private void peerH() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
-	private void peerHP() {
+	private void peerHP() { // hidden enemies and paths
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	// PEER SEARCH: clues and paths search
 	private void peerCP() {
-		ClearingInterface clearing = board.getLocationOfCounter(getCurrentPlayer().getCharacter().getType().toCounter());
-		for(ClearingInterface cl : clearing.getSurrounding(PathType.HIDDEN)){
-			
-		}
-		
+		peerC();
+		peerP();
 	}
 
-	private void peerChoice() {
+	private void peerP() { // peer paths
+		ClearingInterface clearing = board
+				.getLocationOfCounter(getCurrentPlayer().getCharacter()
+						.getType().toCounter());
+		Character chr = getCurrentCharacter();
+		ClearingInterface source = board.getLocationOfCounter(chr.getType()
+				.toCounter());
+		for (ClearingInterface cl : clearing.getSurrounding(PathType.HIDDEN)) {
+			chr.addDiscoveredPath(source, cl);
+		}
+	}
+
+	private void peerChoice() { // choice of peer
 		PeerType choice = client.getPeerChoice();
-		switch (choice){
+		if (choice == null) {
+			System.out.println("PEER CHOICE WAS NULL");
+			return;
+		}
+		switch (choice) {
 		case CLUES_AND_PATHS:
 		case CLUES:
 			peerCP();
@@ -526,7 +553,14 @@ public class ModelController {
 		default:
 			break;
 		}
-		
+
+	}
+
+	private TileName getCurrentTile() {
+		return board
+				.getLocationOfCounter(
+						getCurrentCharacter().getType().toCounter())
+				.getParentTile().getName();
 	}
 
 }

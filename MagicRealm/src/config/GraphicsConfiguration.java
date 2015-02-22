@@ -1,7 +1,7 @@
 package config;
 
 public class GraphicsConfiguration {
-	 
+	
 	public static final int INITIAL_WINDOW_WIDTH = 1000;
 	public static final int INITIAL_WINDOW_HEIGHT = 700;
 	

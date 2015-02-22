@@ -39,6 +39,7 @@ public class MovePanel extends JPanel implements ActionListener {
 		tilePanel.add(tiles);
 		clearings = new JComboBox<Integer>();
 		tiles.addActionListener(this);
+		clearings.addActionListener(this);
 		setClearings();
 
 		JPanel clearingsPanel = new JPanel();
@@ -54,7 +55,7 @@ public class MovePanel extends JPanel implements ActionListener {
 	}
 
 	private void setClearings() {
-		TileName selectedTile = (TileName) tiles.getSelectedItem();
+		TileName selectedTile = getSelectedTile();
 		List<Integer> clearingsArray = controller
 				.getPossibleClearings(selectedTile);
 		Integer[] ca = new Integer[clearingsArray.size()];
@@ -63,10 +64,24 @@ public class MovePanel extends JPanel implements ActionListener {
 		}
 		clearings.setModel(new JComboBox<Integer>(ca).getModel());
 	}
+	
+	private void changeFocusTile() {
+		controller.focusOnBoard(getSelectedTile());
+	}
+	
+	private void changeFocusClearing() {
+		controller.focusOnBoard(getSelectedTile(), getSelectedClearing());
+	}
 
 	@Override
 	public void actionPerformed(ActionEvent ae) {
-		setClearings();
+		if(ae.getSource() == tiles) {
+			setClearings();
+			changeFocusTile();
+		}
+		else if(ae.getSource() == clearings) {
+			changeFocusClearing();
+		}
 	}
 
 	public TileName getSelectedTile() {

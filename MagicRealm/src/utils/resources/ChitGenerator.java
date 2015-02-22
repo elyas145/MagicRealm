@@ -12,7 +12,7 @@ import model.counter.chit.MapChit;
 
 public class ChitGenerator {
 
-	public BufferedImage generateMapChit(MapChit chit) {
+	public static BufferedImage generateMapChit(MapChit chit) {
 		int width, height;
 		width = GraphicsConfiguration.IMAGE_SCALE_WIDTH;
 		height = GraphicsConfiguration.IMAGE_SCALE_HEIGHT;

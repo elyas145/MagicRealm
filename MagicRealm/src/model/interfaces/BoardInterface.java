@@ -7,6 +7,11 @@
  */
 package model.interfaces;
 
+import model.enums.CharacterType;
+import model.enums.CounterType;
+import model.enums.TileName;
+import model.enums.ValleyChit;
+
 public interface BoardInterface {
   
   /**
@@ -23,5 +28,19 @@ public interface BoardInterface {
 	 * @return iterator over the board tiles
 	 */
 	public Iterable<? extends HexTileInterface> iterateTiles();
+
+	public ClearingInterface getLocationOfCounter(CounterType counter);
+
+	public ClearingInterface getClearing(TileName tt, int clearing);
+
+	public void moveCharacter(CharacterType characterType, TileName tt,
+			int clearing);
+
+	public void removeCharacter(CharacterType type);
+
+	public void setLocationOfCounter(CounterType counter, ValleyChit initialSite);
+
+	public void setLocationOfCounter(CounterType characterAmazon,
+			TileName cliff, int i);
 	
 }

@@ -116,13 +116,13 @@ public class MainView extends JFrame implements ViewController, WindowListener,
 	}
 
 	public void displayMessage(String string) {
-		JOptionPane.showMessageDialog(this, "Illegal move cancelled.");
+		JOptionPane.showMessageDialog(this, string);
 
 	}
 
 	@Override
 	public view.controller.search.SearchView enterSearchView(CharacterType character) {
-		SearchView search = new SearchView(character);
+		SearchView search = new SearchView(this, character);
 		setContentPane(search);
 		pack();
 		return search;

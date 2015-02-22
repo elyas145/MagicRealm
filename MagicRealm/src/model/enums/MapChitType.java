@@ -29,6 +29,35 @@ public enum MapChitType {
 	LOST_CITY,
 	LOST_CASTLE;
 	
+	public static final MapChitType[] SOUNDS = {
+		HOWL,
+		FLUTTER,
+		ROAR,
+		PATTER,
+		SLITHER
+	};
+	
+	public static final MapChitType[] WARNINGS = {
+		STINK,
+		SMOKE,
+		RUINS,
+		DANK,
+		BONES
+	};
+	
+	public static final MapChitType[] SITES = {
+		STATUE,
+		ALTAR,
+		VAULT,
+		POOL,
+		HOARD,
+		LAIR,
+		CAIRNS,
+		SHRINE,
+		LOST_CITY,
+		LOST_CASTLE
+	};
+	
 	public ChitType type(){
 		switch (this){
 		case HOWL:

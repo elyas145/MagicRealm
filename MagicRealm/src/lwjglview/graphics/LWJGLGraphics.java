@@ -4,7 +4,6 @@ import lwjglview.graphics.board.LWJGLBoardDrawable;
 import lwjglview.graphics.shader.GLShaderHandler;
 import lwjglview.graphics.shader.ShaderType;
 import model.board.Board;
-import model.enums.TileName;
 import model.interfaces.HexTileInterface;
 
 import org.lwjgl.glfw.*;
@@ -22,9 +21,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 
 import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;

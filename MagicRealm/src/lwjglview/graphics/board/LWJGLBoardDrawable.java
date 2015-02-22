@@ -27,14 +27,17 @@ import lwjglview.graphics.model.ModelData;
 import lwjglview.graphics.shader.GLShaderHandler;
 import lwjglview.graphics.shader.ShaderType;
 import model.counter.chit.MapChit;
+import model.enums.CharacterType;
 import model.enums.CounterType;
 import model.enums.MapChitType;
 import model.enums.TileName;
 import model.enums.TimeOfDay;
+import model.enums.ValleyChit;
 import model.interfaces.ClearingInterface;
 import utils.images.ImageTools;
 import utils.math.Mathf;
 import utils.math.Matrix;
+import utils.resources.ChitGenerator;
 import utils.resources.CounterImages;
 import utils.resources.ResourceHandler;
 import utils.resources.TileImages;
@@ -64,7 +67,7 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 		cameraFocus = new FollowAnimator(pos, new StaticMatrixCalculator(pos),
 				GraphicsConfiguration.CAMERA_SPEED);
 		buffer4 = BufferUtils.createFloatBuffer(4);
-		
+
 		textureWidth = GraphicsConfiguration.IMAGE_SCALE_WIDTH;
 		textureHeight = GraphicsConfiguration.IMAGE_SCALE_HEIGHT;
 
@@ -89,16 +92,19 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 		loadChitImages();
 		System.out.println("Finished loading chit images");
 		System.out.println("Loading chit model data");
-		roundCounter = new LWJGLDrawableLeaf(this, ModelData.loadModelData(resources, "circle_counter.obj"));
-		squareCounter = new LWJGLDrawableLeaf(this, ModelData
-				.loadModelData(resources, "square_counter.obj"));
-		LWJGLDrawableNode knight = new LWJGLDrawableLeaf(null, ModelData.loadModelData(resources, "knight5.obj"));
-		knightCounter = new TransformationDrawable(this, knight,
-				Matrix.dilation(2f, 2f, 2f, 1f).multiply(Matrix.rotationX(4, Mathf.PI * .5f)));
+		roundCounter = new LWJGLDrawableLeaf(this, ModelData.loadModelData(
+				resources, "circle_counter.obj"));
+		squareCounter = new LWJGLDrawableLeaf(this, ModelData.loadModelData(
+				resources, "square_counter.obj"));
+		LWJGLDrawableNode knight = new LWJGLDrawableLeaf(null,
+				ModelData.loadModelData(resources, "knight4.obj"));
+		knightCounter = new TransformationDrawable(this, knight, Matrix
+				.dilation(2f, 2f, 2f, 1f).multiply(
+						Matrix.rotationX(4, Mathf.PI * .5f)));
 		knight.setParent(knightCounter);
 		System.out.println("Finished loading chit model data");
-		
-		mapChitIndex = -1;
+
+		mapChitTextureLocation = -1;
 
 		// initialize buffers for tile locations
 		bufferN = BufferUtils.createFloatBuffer(2);
@@ -136,7 +142,7 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 		ClearingStorage store = stores.get(cl.clearing);
 		store.getLocation(ct, position);
 	}
-	
+
 	public void changeColour(CounterType ct, Color col) {
 		counterDrawables.get(ct).changeColour(col);
 	}
@@ -148,25 +154,51 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 	 */
 
 	@Override
-	public void loadMapChits(Iterable<MapChit> chits) {
+	public synchronized void loadMapChits(Iterable<MapChit> chits) {
 		System.out.println("Generating map chits");
-		List<BufferedImage> mapChitImages = new ArrayList<BufferedImage>();
-		int i = 0;
-		for(MapChit mc: chits) {
-			//mapChitImages.addAll(generateImage)
+		mapChitNumber = 0;
+		mapChitIndex = 0;
+		mapChitDrawables = new HashMap<MapChitType, Map<Integer, LWJGLCounterDrawable>>();
+		for (MapChit chit : chits) {
+			BufferedImage bi = ChitGenerator.generateMapChit(chit);
+			loadMapChitImage(bi);
+			LWJGLBoardDrawable self = LWJGLBoardDrawable.this;
+			MapChitType mct = chit.getType();
+			CounterType ct = mct.toCounter();
+			if (!mapChitDrawables.containsKey(mct)) {
+				mapChitDrawables.put(mct,
+						new HashMap<Integer, LWJGLCounterDrawable>());
+			}
+			Map<Integer, LWJGLCounterDrawable> clears = mapChitDrawables
+					.get(mct);
+			clears.put(chit.getClearing(), new LWJGLCounterDrawable(self, ct,
+					squareCounter, mapChitNumber++));
 		}
 		System.out.println("Finished generating map chits");
+		// TODO check if this actually works
 	}
-	
+
 	@Override
 	public void setMapChit(MapChit mc) {
-		// TODO Auto-generated method stub
-		
+		// TODO set the map chit on the board
+
+		/*MapChitType mct = mc.getType();
+		if (!counterDrawables.containsKey(mct)) {
+			counterDrawables.put(tp, new LWJGLCounterDrawable(this, tp,
+					getCounterRepresentation(tp), getCounterTextureIndex(tp)));
+		}
+
+		if (!counterLocations.containsKey(tp)) {
+			counterLocations.put(tp, new CounterLocation(tile, clearing));
+		} else {
+			CounterLocation loc = counterLocations.get(tp);
+			clearings.get(loc.tile).get(loc.clearing).remove(tp);
+			loc.tile = tile;
+			loc.clearing = clearing;
+		}
+
+		clearings.get(tile).get(clearing).put(tp);*/
 	}
-	
-	private Map<MapChitType, LWJGLCounterDrawable> mapChits;
-	private ByteBuffer rawMapChitData;
-	private int mapChitIndex;
 
 	@Override
 	public void enchantTile(TileName tile) {
@@ -178,9 +210,12 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 	@Override
 	public void updateNodeUniforms(LWJGLGraphics gfx) {
 		GLShaderHandler shaders = gfx.getShaders();
-		buffer4.clear();
-		ambientColour.apply().toFloatBuffer(buffer4);
-		shaders.setUniformFloatArrayValue(currentShader, "ambientColour", 4, buffer4);
+		synchronized(buffer4) {
+			buffer4.clear();
+			ambientColour.apply().toFloatBuffer(buffer4);
+			shaders.setUniformFloatArrayValue(currentShader, "ambientColour", 4,
+					buffer4);
+		}
 	}
 
 	@Override
@@ -189,7 +224,7 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 
 	@Override
 	public void draw(LWJGLGraphics lwgfx) {
-		
+
 		resetView(lwgfx);
 
 		// load all textures to GPU
@@ -232,27 +267,29 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 		shaders.useShaderProgram(currentShader);
 
 		synchronized (counterDrawables) {
-			// draw all chits
+			// draw all counters
 			for (LWJGLCounterDrawable counter : counterDrawables.values()) {
 				counter.draw(lwgfx);
 			}
 		}
+		
+		// TODO draw map chits
 	}
 
 	@Override
-	public void focusOn(TileName tile) {
+	public synchronized void focusOn(TileName tile) {
 		Matrix vector = tiles.get(tile).getVector();
 		MatrixCalculator calc = new StaticMatrixCalculator(vector);
 		cameraFocus.changeFocus(calc);
 	}
 
 	@Override
-	public void focusOn(CounterType counter) {
+	public synchronized void focusOn(CounterType counter) {
 		cameraFocus.changeFocus(new CounterFocus(counter));
 	}
 
 	@Override
-	public void focusOn(TileName tile, int clearing) {
+	public synchronized void focusOn(TileName tile, int clearing) {
 		cameraFocus.changeFocus(new ClearingFocus(tile, clearing));
 	}
 
@@ -262,17 +299,17 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 	}
 
 	@Override
-	public void hideCounter(CounterType ct) {
+	public synchronized void hideCounter(CounterType ct) {
 		changeColour(ct, Color.GREEN);
 	}
 
 	@Override
-	public void unHideCounter(CounterType ct) {
+	public synchronized void unHideCounter(CounterType ct) {
 		changeColour(ct, Color.WHITE);
 	}
 
 	@Override
-	public void setTimeOfDay(TimeOfDay time) {
+	public synchronized void setTimeOfDay(TimeOfDay time) {
 		ambientColour.push(new FadeAnimator(
 				GraphicsConfiguration.DAY_CHANGE_TIME,
 				getColourOfDay(timeOfDay), getColourOfDay(time)));
@@ -307,7 +344,7 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 	}
 
 	@Override
-	public void setCounter(CounterType tp, TileName tile, int clearing) {
+	public synchronized void setCounter(CounterType tp, TileName tile, int clearing) {
 
 		if (!counterDrawables.containsKey(tp)) {
 			counterDrawables.put(tp, new LWJGLCounterDrawable(this, tp,
@@ -337,19 +374,21 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 	 * PRIVATE METHODS
 	 * ***********************************************************************
 	 */
-	
+
 	private void resetView(LWJGLGraphics lwgfx) {
 
 		// reset the view matrix
 		lwgfx.resetViewMatrix();
 		float time = Timing.getSeconds() * .1f;
 		Matrix tmp = Matrix.rotationX(4, Mathf.PI / 4f);
-		float k = (Mathf.sin(time * .6f) + 6f) / 4f;
+		float k = (Mathf.sin(time * .6f) + 6f) / 6f;
 		tmp = Matrix.translation(new float[] { 0f, -1f * k, 1f * k }).multiply(
 				tmp);
 		tmp = Matrix.rotationZ(4, time * .3f).multiply(tmp);
 		lwgfx.applyCameraTransform(tmp);
-		lwgfx.applyCameraTransform(cameraFocus.apply());
+		synchronized(cameraFocus) {
+			lwgfx.applyCameraTransform(cameraFocus.apply());
+		}
 
 	}
 
@@ -400,6 +439,9 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 			chitTextureLocation = gfx.loadTextureArray(rawChitData, numChits,
 					textureHeight, textureWidth);
 		}
+		if(mapChitTextureLocation < 0) {
+			// TODO load map chit textures
+		}
 	}
 
 	private void loadTileImages(boolean enchanted) throws IOException {
@@ -412,11 +454,23 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 	}
 
 	private void loadChitImages() throws IOException {
-		for (CounterType type : CounterType.values()) {
-			BufferedImage img = CounterImages.getCounterImage(resources, type);
+		for (CharacterType type : CharacterType.values()) {
+			BufferedImage img = CounterImages.getCounterImage(resources,
+					type.toCounter());
 			chitIndex = ImageTools.loadRawImage(img, chitIndex, img.getWidth(),
 					img.getHeight(), rawChitData);
 		}
+		for (ValleyChit type : ValleyChit.values()) {
+			BufferedImage img = CounterImages.getCounterImage(resources,
+					type.toCounterType());
+			chitIndex = ImageTools.loadRawImage(img, chitIndex, img.getWidth(),
+					img.getHeight(), rawChitData);
+		}
+	}
+
+	private void loadMapChitImage(BufferedImage bi) {
+		mapChitIndex = ImageTools.loadRawImage(bi, mapChitIndex, bi.getWidth(),
+				bi.getHeight(), rawMapChitData);
 	}
 
 	private synchronized void relocateChit(CounterType type, float x, float y) {
@@ -425,9 +479,9 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 
 	private int getCounterTextureIndex(CounterType ct) {
 		int idx = 0;
-		if(ct == CounterType.CHARACTER_SWORDSMAN) {
-			return -1;
-		}
+		//if (ct == CounterType.CHARACTER_SWORDSMAN) {
+		//	return -1;
+		//}
 		for (CounterType tp : CounterType.values()) {
 			if (tp == ct) {
 				return idx;
@@ -452,11 +506,10 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 			dim = 0;
 			buff = BufferUtils.createFloatBuffer(2);
 		}
-		
+
 		public ClearingStorage(TileName tl, FloatBuffer tc) {
 			tile = tl;
-			posns = new float[][] {
-					{ tc.get(0), tc.get(1) },
+			posns = new float[][] { { tc.get(0), tc.get(1) },
 					{ tc.get(0), tc.get(1) } };
 			chits = new ArrayList<CounterType>();
 			dim = 0;
@@ -464,25 +517,29 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 		}
 
 		public void put(CounterType ct) {
-			if (!chits.contains(ct)) {
-				chits.add(ct);
-				if (changeDim()) {
-					relocateAllChits();
-				} else {
-					moveChit(ct);
+			synchronized(chits) {
+				if (!chits.contains(ct)) {
+					chits.add(ct);
+					if (changeDim()) {
+						relocateAllChits();
+					} else {
+						moveChit(ct);
+					}
 				}
 			}
 		}
 
 		public void remove(CounterType ct) {
-			if (chits.contains(ct)) {
-				int idx = chits.indexOf(ct);
-				chits.remove(ct);
-				if (changeDim()) {
-					relocateAllChits();
-				} else {
-					for (; idx < chits.size(); ++idx) {
-						moveChit(chits.get(idx));
+			synchronized(chits) {
+				if (chits.contains(ct)) {
+					int idx = chits.indexOf(ct);
+					chits.remove(ct);
+					if (changeDim()) {
+						relocateAllChits();
+					} else {
+						for (; idx < chits.size(); ++idx) {
+							moveChit(chits.get(idx));
+						}
 					}
 				}
 			}
@@ -523,14 +580,18 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 		}
 
 		private void relocateAllChits() {
-			for (CounterType type : chits) {
-				moveChit(type);
+			synchronized(chits) {
+				for (CounterType type : chits) {
+					moveChit(type);
+				}
 			}
 		}
 
 		private void moveChit(CounterType ct) {
-			getLocation(ct, buff);
-			relocateChit(ct, buff.get(0), buff.get(1));
+			synchronized(buff) {
+				getLocation(ct, buff);
+				relocateChit(ct, buff.get(0), buff.get(1));
+			}
 		}
 
 		private TileName tile;
@@ -579,8 +640,10 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 		}
 
 		private void updateMatrix() {
-			store.getLocation(buffer4);
-			position = Matrix.columnVector(buffer4.get(0), buffer4.get(1), 0f);
+			synchronized(buffer4) {
+				store.getLocation(buffer4);
+				position = Matrix.columnVector(buffer4.get(0), buffer4.get(1), 0f);
+			}
 		}
 
 		private ClearingStorage store;
@@ -589,9 +652,15 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 		private TileName tile;
 	}
 
+	private Map<MapChitType, Map<Integer, LWJGLCounterDrawable>> mapChitDrawables;
+	private ByteBuffer rawMapChitData;
+	private int mapChitNumber;
+	private int mapChitIndex;
+	private int mapChitTextureLocation;
+
 	private int textureWidth;
 	private int textureHeight;
-	
+
 	private int tileIndex;
 	private int numTiles;
 	private int tileTextureLocation;
@@ -626,7 +695,7 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 	private TimeOfDay timeOfDay;
 
 	private FloatBuffer bufferN, bufferE, bufferT;
-	
+
 	private ShaderType currentShader;
 
 }

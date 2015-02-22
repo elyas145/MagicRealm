@@ -21,11 +21,6 @@ public interface ClearingInterface {
 	 * @return the parent tile
 	 */
 	HexTileInterface getParentTile();
-	
-	/**
-	 * @return random connected clearing for testing
-	 */
-	ClearingInterface getRandomConnection();
 
 	void connectTo(ClearingInterface other, boolean ench, PathType pt);
 
@@ -38,5 +33,7 @@ public interface ClearingInterface {
 	Iterable<ClearingInterface> getSurrounding();
 	
 	Iterable<ClearingInterface> getSurrounding(PathType pt);
+
+	boolean isEnchanted();
 
 }

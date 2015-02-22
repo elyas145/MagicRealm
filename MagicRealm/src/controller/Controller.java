@@ -54,6 +54,12 @@ public interface Controller {
 	void moveCounter(CounterType counter, TileName tt, int clearing);
 
 	void startSearch(CharacterType actor);
+	
+	void focusOnBoard(TileName tile);
+	
+	void focusOnBoard(TileName tile, int clearing);
+	
+	void focusOnBoard(CounterType counter);
 
 	PeerType getPeerChoice();
 	

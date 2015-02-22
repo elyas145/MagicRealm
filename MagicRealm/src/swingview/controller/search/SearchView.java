@@ -9,6 +9,7 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import swingview.MainView;
 import model.enums.CharacterType;
 import model.enums.TableType;
 
@@ -16,7 +17,7 @@ import model.enums.TableType;
 public class SearchView extends JPanel implements
 		view.controller.search.SearchView {
 
-	public SearchView(CharacterType character) {
+	public SearchView(MainView parent, CharacterType character) {
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		add(new JLabel("Search View"));
 		add(new JLabel(character.toString()));
@@ -37,6 +38,7 @@ public class SearchView extends JPanel implements
 			}
 		});
 		add(done);
+		revalidate();
 	}
 
 	@Override

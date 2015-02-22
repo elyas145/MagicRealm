@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import model.EnchantedHolder;
 import model.board.tile.HexTile;
 import model.counter.chit.Chit;
 import model.enums.PathType;
@@ -23,8 +24,8 @@ public class Clearing implements ClearingInterface {
 		parent = par;
 		location = nloc;
 		location_e = eloc;
-		internalConnections = new HashMap<ClearingInterface, PathType[]>();
-		externalConnections = new HashMap<HexTileInterface, ClearingResolver[]>();
+		internalConnections = new HashMap<ClearingInterface, EnchantedHolder<PathType>>();
+		externalConnections = new HashMap<HexTileInterface, EnchantedHolder<ClearingResolver>>();
 		number = num;
 	}
 
@@ -36,10 +37,9 @@ public class Clearing implements ClearingInterface {
 	@Override
 	public void connectTo(ClearingInterface other, boolean ench, PathType pt) {
 		if (!internalConnections.containsKey(other)) {
-			PathType[] conns = new PathType[2];
-			internalConnections.put(other, conns);
+			internalConnections.put(other, new EnchantedHolder<PathType>());
 		}
-		internalConnections.get(other)[ench ? 1 : 0] = pt;
+		internalConnections.get(other).set(ench, pt);
 	}
 
 	@Override
@@ -48,10 +48,9 @@ public class Clearing implements ClearingInterface {
 			connectTo(other.getEntryClearing(entr, ench), ench, PathType.NORMAL);
 		} else {
 			if (!externalConnections.containsKey(other)) {
-				externalConnections.put(other, new ClearingResolver[2]);
+				externalConnections.put(other, new EnchantedHolder<ClearingResolver>());
 			}
-			ClearingResolver[] resv = externalConnections.get(other);
-			resv[ench ? 1 : 0] = new ClearingResolver(other, entr);
+			externalConnections.get(other).set(ench, new ClearingResolver(other, entr));
 		}
 	}
 
@@ -67,24 +66,20 @@ public class Clearing implements ClearingInterface {
 
 	@Override
 	public boolean isConnectedTo(ClearingInterface other, PathType pt) {
-		PathType[] res = internalConnections.get(other);
-		int ench = isEnchanted() ? 1 : 0;
-		if (res != null) {
-			if (res[ench] == pt) {
+		EnchantedHolder<PathType> res = internalConnections.get(other);
+		boolean ench = isEnchanted();
+		if (res != null && res.has(ench)) {
+			if (res.get(ench) == pt) {
 				return true;
 			}
 		}
 		if (pt != PathType.NORMAL) {
 			return false;
 		}
-		ClearingResolver[] reslvrs = externalConnections.get(other
+		EnchantedHolder<ClearingResolver> rsv = externalConnections.get(other
 				.getParentTile());
-		ClearingResolver rsv = null;
-		if (reslvrs != null) {
-			rsv = reslvrs[ench];
-		}
-		if (rsv != null) {
-			if (rsv.getClearing() == other) {
+		if (rsv != null && rsv.has(ench)) {
+			if (rsv.get(ench).getClearing() == other) {
 				return true;
 			}
 		}
@@ -94,29 +89,30 @@ public class Clearing implements ClearingInterface {
 	@Override
 	public Iterable<ClearingInterface> getSurrounding() {
 		ArrayList<ClearingInterface> surround = new ArrayList<ClearingInterface>();
-		int ench = isEnchanted() ? 1 : 0;
-		for (Map.Entry<ClearingInterface, PathType[]> entr : internalConnections
+		boolean ench = isEnchanted();
+		for (Map.Entry<ClearingInterface, EnchantedHolder<PathType>> entr : internalConnections
 				.entrySet()) {
 			ClearingInterface clr = entr.getKey();
-			PathType[] val = entr.getValue();
-			if(val[ench] != null) {
+			EnchantedHolder<PathType> val = entr.getValue();
+			if (val.has(ench)) {
 				surround.add(clr);
 			}
 		}
-		for(ClearingResolver[] rslv: externalConnections.values()) {
-			if(rslv[ench] != null) {
-				surround.add(rslv[ench].getClearing());
+		for (EnchantedHolder<ClearingResolver> rslv : externalConnections.values()) {
+			if (rslv.has(ench)) {
+				surround.add(rslv.get(ench).getClearing());
 			}
 		}
 		return surround;
 	}
-	
+
 	@Override
 	public Iterable<ClearingInterface> getSurrounding(PathType pt) {
 		return IterationTools.filter(getSurrounding(), new FilterFunction(pt));
 	}
-	
-	private class FilterFunction implements Function<ClearingInterface, Boolean> {
+
+	private class FilterFunction implements
+			Function<ClearingInterface, Boolean> {
 
 		public FilterFunction(PathType pt) {
 			path = pt;
@@ -126,9 +122,9 @@ public class Clearing implements ClearingInterface {
 		public Boolean apply(ClearingInterface other) {
 			return isConnectedTo(other, path);
 		}
-		
+
 		private PathType path;
-		
+
 	}
 
 	public Object getLocation_e() {
@@ -182,22 +178,6 @@ public class Clearing implements ClearingInterface {
 	}
 
 	@Override
-	public ClearingInterface getRandomConnection() {
-		List<ClearingInterface> possible = new ArrayList<ClearingInterface>();
-		for (Map.Entry<ClearingInterface, PathType[]> ent : internalConnections
-				.entrySet()) {
-			if (ent.getValue()[0] != null) {
-				possible.add(ent.getKey());
-			}
-		}
-		for (ClearingResolver[] cr : externalConnections.values()) {
-			if (cr[0] != null) {
-				possible.add(cr[0].getClearing());
-			}
-		}
-		return Random.choose(possible);
-	}
-
 	public boolean isEnchanted() {
 		return getParent().isEnchanted();
 	}
@@ -228,8 +208,8 @@ public class Clearing implements ClearingInterface {
 
 	private HexTileInterface parent;
 
-	private Map<ClearingInterface, PathType[]> internalConnections;
-	private Map<HexTileInterface, ClearingResolver[]> externalConnections;
+	private Map<ClearingInterface, EnchantedHolder<PathType>> internalConnections;
+	private Map<HexTileInterface, EnchantedHolder<ClearingResolver>> externalConnections;
 
 	private List<Chit> chits;
 	private int number;

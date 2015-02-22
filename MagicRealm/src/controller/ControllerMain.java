@@ -19,6 +19,7 @@ import model.board.tile.HexTile;
 import model.character.Character;
 import model.character.CharacterFactory;
 import model.controller.ModelController;
+import model.counter.chit.MapChit;
 import model.enums.ActivityType;
 import model.enums.CharacterType;
 import model.enums.CounterType;
@@ -78,7 +79,10 @@ public class ControllerMain implements Controller {
 				boardView.setCounter(ct, ci.getParentTile().getName(),
 						ci.getClearingNumber());
 			}
-
+			boardView.loadMapChits(model.getMapChits());
+			for(MapChit mc: model.getMapChits()) {
+				boardView.setMapChit(mc);
+			}
 			gfx.start();
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
@@ -265,7 +269,7 @@ public class ControllerMain implements Controller {
 
 	@Override
 	public void displayMessage(String string) {
-		getMainView().displayMessage("Illegal move cancelled.");
+		getMainView().displayMessage(string);
 	}
 
 	@Override
@@ -275,7 +279,7 @@ public class ControllerMain implements Controller {
 
 	@Override
 	public void setCurrentCharacter(CharacterType character) {
-		boardView.focusOn(character.toCounter());
+		focusOnBoard(character.toCounter());
 	}
 
 	@Override
@@ -299,7 +303,23 @@ public class ControllerMain implements Controller {
 
 	@Override
 	public PeerType getPeerChoice() {
+		// TODO
 		return null;
+	}
+
+	@Override
+	public void focusOnBoard(TileName tile) {
+		boardView.focusOn(tile);
+	}
+
+	@Override
+	public void focusOnBoard(TileName tile, int clearing) {
+		boardView.focusOn(tile, clearing);
+	}
+
+	@Override
+	public void focusOnBoard(CounterType counter) {
+		boardView.focusOn(counter);
 	}
 
 }

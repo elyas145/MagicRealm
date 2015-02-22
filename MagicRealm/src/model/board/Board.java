@@ -9,9 +9,7 @@ package model.board;
 
 import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -25,22 +23,19 @@ import utils.math.Point;
 import utils.random.Random;
 import utils.resources.ResourceHandler;
 import model.board.tile.HexTile;
-import model.counter.chit.Chit;
 import model.enums.CharacterType;
-import model.enums.ChitType;
 import model.enums.CounterType;
 import model.enums.MapChitType;
 import model.enums.TileName;
 import model.enums.ValleyChit;
 import model.interfaces.BoardInterface;
-import model.interfaces.ChitInterface;
 import model.interfaces.ClearingInterface;
 import model.interfaces.HexTileInterface;
 
 public class Board implements BoardInterface {
 
 	public static void main(String[] args) {
-		Board b = new Board(new ResourceHandler());
+		new Board(new ResourceHandler());
 	}
 
 	public Board(ResourceHandler rh) {
@@ -111,6 +106,72 @@ public class Board implements BoardInterface {
 		counterPositions.remove(character.toCounter());
 	}
 
+	public ClearingInterface getLocationOfCounter(CounterType ct) {
+		return counterPositions.get(ct);
+	}
+
+	public void setLocationOfCounter(CounterType ct, TileName tn, int clearing) {
+		HexTile ht = mapOfTiles.get(tn);
+		ClearingInterface cl = ht.getClearing(clearing);
+		setClearingOfCounter(ct, cl);
+	}
+
+	public void setLocationOfCounter(CounterType ct, ValleyChit site) {
+		ClearingInterface ci = getLocationOfCounter(site.toCounterType());
+		setClearingOfCounter(ct, ci);
+	}
+
+	public void setClearingOfCounter(CounterType ct, ClearingInterface cl) {
+
+		counterPositions.put(ct, cl);
+
+	}
+
+	public void removeCounter(CounterType ct) {
+		counterPositions.remove(ct);
+	}
+
+	public Iterable<CounterType> getCounters() {
+		return counterPositions.keySet();
+	}
+
+	public Set<TileName> getAllTiles() {
+		return mapOfTiles.keySet();
+	}
+
+	public ArrayList<ClearingInterface> getConntectedClearings(
+			ClearingInterface clearing) {
+		ArrayList<ClearingInterface> clearings = new ArrayList<ClearingInterface>();
+		for (HexTile tile : mapOfTiles.values()) {
+			for (ClearingInterface c : tile.getClearings()) {
+				if (clearing.isConnectedTo(c)) {
+					clearings.add(c);
+				}
+			}
+		}
+		return clearings;
+	}
+
+	public boolean isValidMove(CharacterType ct, TileName destTile,
+			int destClearing) {
+		return getLocationOfCounter(ct.toCounter()).isConnectedTo(
+				getClearing(destTile, destClearing));
+	}
+
+	public ClearingInterface getClearing(TileName tile, int clearing) {
+		HexTile hexTile = mapOfTiles.get(tile);
+		return hexTile.getClearing(clearing);
+	}
+
+	public void setLocationOfMapChit(MapChitType type, TileName tile) {
+		mapChitLocations.put(type, tile);
+	}
+
+	@Override
+	public Iterable<? extends HexTileInterface> iterateTiles() {
+		return mapOfTiles.values();
+	}
+
 	private void initTreasures() {
 		ArrayList<Integer> possibleValues = new ArrayList<Integer>();
 
@@ -165,11 +226,6 @@ public class Board implements BoardInterface {
 
 		setTile(TileName.HIGH_PASS, 1, 8, 0);
 
-	}
-
-	@Override
-	public Iterable<? extends HexTileInterface> iterateTiles() {
-		return mapOfTiles.values();
 	}
 
 	private void setTile(TileName tile, int x, int y, int rot) {
@@ -232,68 +288,6 @@ public class Board implements BoardInterface {
 		if (row != null) {
 			surround[rot] = row.get(nx);
 		}
-	}
-
-	public ClearingInterface getLocationOfCounter(CounterType ct) {
-		return counterPositions.get(ct);
-	}
-
-	public void setLocationOfCounter(CounterType ct, TileName tn, int clearing) {
-		HexTile ht = mapOfTiles.get(tn);
-		ClearingInterface cl = ht.getClearing(clearing);
-		setClearingOfCounter(ct, cl);
-	}
-
-	public void setLocationOfCounter(CounterType ct, ValleyChit site) {
-		ClearingInterface ci = getLocationOfCounter(site.toCounterType());
-		setClearingOfCounter(ct, ci);
-	}
-
-	public void setClearingOfCounter(CounterType ct, ClearingInterface cl) {
-
-		counterPositions.put(ct, cl);
-
-	}
-
-	public void removeCounter(CounterType ct) {
-		counterPositions.remove(ct);
-	}
-
-	public Iterable<CounterType> getCounters() {
-		return counterPositions.keySet();
-	}
-
-	public Set<TileName> getAllTiles() {
-		return mapOfTiles.keySet();
-	}
-
-	public ArrayList<ClearingInterface> getConntectedClearings(
-			ClearingInterface clearing) {
-		ArrayList<ClearingInterface> clearings = new ArrayList<ClearingInterface>();
-		for (HexTile tile : mapOfTiles.values()) {
-			for (ClearingInterface c : tile.getClearings()) {
-				if (clearing.isConnectedTo(c)) {
-					clearings.add(c);
-				}
-			}
-		}
-		return clearings;
-	}
-
-	public boolean isValidMove(CounterType ct, TileName destTile,
-			int destClearing) {
-		return getLocationOfCounter(ct).isConnectedTo(
-				getClearing(destTile, destClearing));
-	}
-
-	public ClearingInterface getClearing(TileName tile, int clearing) {
-		HexTile hexTile = mapOfTiles.get(tile);
-		return hexTile.getClearing(clearing);
-	}
-
-	public void setLocationOfMapChit(MapChitType type, TileName tile) {
-		mapChitLocations.put(type, tile);
-
 	}
 
 	private Map<TileName, Map<Integer, Point[]>> clearingLocations;
