@@ -1,5 +1,6 @@
 package utils.resources;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
@@ -30,15 +31,16 @@ public class ChitGenerator implements ImageTools.GraphicsHandler {
 		double width = this.width;
 		double height = this.height;
 		g.fillRect(0, 0, (int) width, (int) height);
-		g.setFont(new Font("TimesRoman", Font.PLAIN, (int) (height * .2)));
+		g.setFont(new Font("TimesRoman", Font.BOLD, (int) (height * .2)));
+		g.setColor(Color.BLACK);
 		FontMetrics fm = g.getFontMetrics();
 		Rectangle2D rekt = fm.getStringBounds(name, g);
 		g.drawString(name, (int) ((width - rekt.getWidth()) * .5),
-				(int) (height * .4 - rekt.getHeight() * .5));
+				(int) (height * .6 - rekt.getHeight() * .5));
 		String id = Character.toString(identifier);
 		rekt = fm.getStringBounds(id, g);
 		g.drawString(id, (int) ((width - rekt.getWidth()) * .5),
-				(int) (height * .6 - rekt.getHeight() * .5));
+				(int) (height - rekt.getHeight() * .5));
 	}
 
 	private String name;

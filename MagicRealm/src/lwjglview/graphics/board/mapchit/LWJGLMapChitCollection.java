@@ -37,7 +37,6 @@ public class LWJGLMapChitCollection extends LWJGLDrawableNode {
 	}
 
 	public LWJGLCounterDrawable get(MapChitType type, char identifier) {
-		System.out.println(mapChits);
 		return mapChits.get(type).get(identifier);
 	}
 

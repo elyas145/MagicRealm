@@ -156,7 +156,7 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 
 	@Override
 	public synchronized void setMapChit(MapChit mc) {
-		setCounter(mapChits.getID(mc), mc.getTile(), mc.getClearing());
+		setCounter(mapChits.getID(mc), mc.getTile(), 0);
 	}
 
 	@Override
