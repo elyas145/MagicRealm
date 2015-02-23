@@ -22,7 +22,7 @@ import model.enums.MapChitType;
 public class LWJGLMapChitCollection extends LWJGLDrawableNode {
 
 	private static final Color BLANK = GraphicsConfiguration.MAP_CHIT_HIDE_COLOUR;
-	private static final Color SHOW = GraphicsConfiguration.MAP_CHIT_HIDE_COLOUR;
+	private static final Color SHOW = GraphicsConfiguration.MAP_CHIT_SHOW_COLOUR;
 
 	public LWJGLMapChitCollection(LWJGLBoardDrawable par,
 			Iterable<MapChit> avail) {
@@ -91,6 +91,7 @@ public class LWJGLMapChitCollection extends LWJGLDrawableNode {
 	}
 
 	public void reveal(MapChit chit) {
+		System.out.println("Changing color of " + chit + " to show");
 		get(chit).changeColour(SHOW);
 	}
 

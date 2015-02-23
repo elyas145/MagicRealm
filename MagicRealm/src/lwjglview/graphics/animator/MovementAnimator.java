@@ -2,7 +2,7 @@ package lwjglview.graphics.animator;
 
 import utils.math.Matrix;
 
-public abstract class MovementAnimator extends FadeAnimator {
+public class MovementAnimator extends FadeAnimator {
 
 	public MovementAnimator(float vel, Matrix init, Matrix fin) {
 		super(getTime(vel, init, fin), init, fin);

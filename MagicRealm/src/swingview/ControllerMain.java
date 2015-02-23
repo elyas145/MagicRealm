@@ -207,7 +207,6 @@ public class ControllerMain implements Controller {
 							model.wait();
 						} catch (InterruptedException e) {
 						}
-						boardView.revealAllMapChits(plr.getDiscoveredMapChits());
 					}
 					model.nextPlayer();
 				}

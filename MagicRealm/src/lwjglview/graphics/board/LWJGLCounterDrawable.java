@@ -53,7 +53,8 @@ public class LWJGLCounterDrawable extends LWJGLDrawableNode {
 		if (currentColour == null) {
 			currentColour = newCol;
 		}
-		colours.push(new FadeAnimator(GraphicsConfiguration.COUNTER_FLIP_TIME,
+		float dist = currentColour.subtract(newCol).length();
+		colours.push(new FadeAnimator(dist * GraphicsConfiguration.COUNTER_FLIP_TIME,
 				currentColour, newCol));
 		currentColour = newCol;
 	}
