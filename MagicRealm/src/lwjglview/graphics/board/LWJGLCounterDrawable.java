@@ -22,8 +22,9 @@ public class LWJGLCounterDrawable extends LWJGLDrawableNode {
 	public LWJGLCounterDrawable(LWJGLBoardDrawable bd, LWJGLDrawableNode chitBlock,
 			int texid, Color col) {
 		super(bd);
+		board = bd;
 		textureIndex = texid;
-		identifier = bd.addCounterDrawable(this);
+		identifier = board.addCounterDrawable(this);
 		representation = chitBlock;
 		textureIndex = texid;
 		position = null;
@@ -42,7 +43,11 @@ public class LWJGLCounterDrawable extends LWJGLDrawableNode {
 		return identifier;
 	}
 
-	public void changeColour(Color col) {
+	public void forget() {
+		board.removeCounterDrawable(getID());
+	}
+
+	public synchronized void changeColour(Color col) {
 		col.getRGBComponents(colourBuffer);
 		Matrix newCol = Matrix.columnVector(colourBuffer);
 		if (currentColour == null) {
@@ -53,7 +58,7 @@ public class LWJGLCounterDrawable extends LWJGLDrawableNode {
 		currentColour = newCol;
 	}
 
-	public void moveTo(float x, float y) {
+	public synchronized void moveTo(float x, float y) {
 		buffer.put(0, x);
 		buffer.put(1, y);
 		move();
@@ -79,6 +84,10 @@ public class LWJGLCounterDrawable extends LWJGLDrawableNode {
 
 	public boolean isAnimationFinished() {
 		return movements.isFinished() && colours.isFinished();
+	}
+
+	public LWJGLDrawableNode getRepresentation() {
+		return representation;
 	}
 
 	@Override
@@ -128,6 +137,8 @@ public class LWJGLCounterDrawable extends LWJGLDrawableNode {
 		position.put(0, xf);
 		position.put(1, yf);
 	}
+	
+	private LWJGLBoardDrawable board;
 
 	private float[] colourBuffer;
 

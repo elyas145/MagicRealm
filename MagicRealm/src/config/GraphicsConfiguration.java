@@ -1,5 +1,7 @@
 package config;
 
+import java.awt.Color;
+
 public class GraphicsConfiguration {
 	
 	public static final int INITIAL_WINDOW_WIDTH = 1000;
@@ -35,6 +37,9 @@ public class GraphicsConfiguration {
 	public static final float COUNTER_FLIP_TIME = 1f;
 	
 	public static final float DAY_CHANGE_TIME = 3f;
+	
+	public static final Color MAP_CHIT_HIDE_COLOUR = new Color(1f, 1f, 1f, 0f);
+	public static final Color MAP_CHIT_SHOW_COLOUR = new Color(1f, 1f, 1f, 1f);
 	
 	public static final int INITIAL_ACTION_WIDTH = 200;
 	public static final int INITIAL_ACTION_HEIGHT = 150;

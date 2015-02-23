@@ -32,5 +32,13 @@ public interface BoardView {
 	void unHideCounter(CounterType currentCounter);
 	
 	void setMapChit(MapChit chit);
+	
+	void hideAllMapChits();
+	
+	void revealMapChit(MapChit chit);
+	
+	void replaceMapChit(MapChit chit, Iterable<MapChit> replacements);
+	
+	void removeMapChit(MapChit chit);
 
 }

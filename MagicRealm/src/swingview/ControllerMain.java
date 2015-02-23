@@ -1,4 +1,4 @@
-package controller;
+package swingview;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -9,6 +9,7 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import config.GameConfiguration;
+import controller.Controller;
 import lwjglview.graphics.LWJGLGraphics;
 import lwjglview.graphics.board.LWJGLBoardDrawable;
 import model.activity.Activity;
@@ -30,7 +31,6 @@ import model.interfaces.ClearingInterface;
 import model.interfaces.HexTileInterface;
 import model.player.PersonalHistory;
 import model.player.Player;
-import swingview.MainView;
 import utils.resources.ResourceHandler;
 import view.controller.game.BoardView;
 import view.controller.search.SearchView;
@@ -84,7 +84,6 @@ public class ControllerMain implements Controller {
 			}
 			gfx.start();
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 	}
@@ -158,8 +157,7 @@ public class ControllerMain implements Controller {
 	}
 
 	@Override
-	public ArrayList<TileName> getPossibleTiles() {
-		// TODO Auto-generated method stub
+	public List<TileName> getPossibleTiles() {
 		return new ArrayList<TileName>(model.getBoard().getAllTiles());
 	}
 
@@ -202,8 +200,6 @@ public class ControllerMain implements Controller {
 						try {
 							model.wait();
 						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							// e.printStackTrace();
 						}
 					}
 					model.nextPlayer();
@@ -308,7 +304,7 @@ public class ControllerMain implements Controller {
 	@Override
 	public PeerType getPeerChoice() {
 		// TODO
-		return null;
+		return PeerType.CLUES_AND_PATHS;
 	}
 
 	@Override

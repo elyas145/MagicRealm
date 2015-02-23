@@ -156,6 +156,10 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 		counterLocations.put(id, new CounterStorage(counter));
 		return id;
 	}
+	
+	public void removeCounterDrawable(int id) {
+		counterLocations.remove(id);
+	}
 
 	/*
 	 * ***********************************************************************
@@ -268,6 +272,26 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 	@Override
 	public void setCounter(CounterType counter, TileName tile) {
 		setCounter(counter, tile, 0);
+	}
+
+	@Override
+	public void hideAllMapChits() {
+		mapChits.hideAll();
+	}
+
+	@Override
+	public void revealMapChit(MapChit chit) {
+		mapChits.reveal(chit);
+	}
+
+	@Override
+	public void replaceMapChit(MapChit chit, Iterable<MapChit> replacements) {
+		mapChits.replace(chit, replacements);
+	}
+
+	@Override
+	public void removeMapChit(MapChit chit) {
+		mapChits.remove(chit);
 	}
 
 	/*

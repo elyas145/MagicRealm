@@ -54,23 +54,21 @@ public class LWJGLTileStorage extends LWJGLCounterStorage {
 		Matrix rand = randomLocation();
 		boolean ench = isEnchanted();
 		for (int i = 0; i < 20; ++i) {
-			List<Obstruction> obst = new ArrayList<Obstruction>();
+			int obst = 0;
 			for (Obstruction ob : obstructions.get(ench)) {
 				if (ob.obstructs(rand)) {
-					obst.add(ob);
+					++obst;
+					rand = ob.recommend(rand);
 				}
 			}
 			for (Obstruction ob : chits.values()) {
 				if (ob.obstructs(rand)) {
-					obst.add(ob);
-				}
-			}
-			if (obst.size() >= 3) {
-				rand = randomLocation();
-			} else {
-				for (Obstruction ob : obst) {
+					++obst;
 					rand = ob.recommend(rand);
 				}
+			}
+			if (obst >= 3) {
+				rand = randomLocation();
 			}
 		}
 		for (int i = 0; i < 10; ++i) {
@@ -85,14 +83,14 @@ public class LWJGLTileStorage extends LWJGLCounterStorage {
 				}
 			}
 		}
-		boolean obstructed = false;
+		int obstructed = 0;
 		for (Obstruction ob : obstructions.get(ench)) {
 			if (ob.obstructs(rand)) {
-				obstructed = true;
+				++obstructed;
 			}
 		}
-		if (obstructed) {
-			System.out.println("Counter is obstructed");
+		if (obstructed > 0) {
+			System.out.println("Counter is obstructed: " + obstructed);
 		}
 		synchronized (chits) {
 			chits.put(id, new Obstruction(rand, counterRadius, false));
