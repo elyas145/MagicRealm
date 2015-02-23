@@ -487,12 +487,14 @@ public class ModelController {
 			break;
 		case 3:
 			peerHP();
+			showMessage("Found hidden paths in " + ct);
 			break;
 		case 4:
 			peerH();
 			break;
 		case 5:
 			peerC();
+			showMessage("Found hidden clues in " + ct);
 			break;
 		default:
 			showMessage("Peer has failed");
@@ -515,6 +517,7 @@ public class ModelController {
 			}
 		}
 		getCurrentPlayer().discoverAllMapChits(peek);
+		client.revealMapChits(peek);
 	}
 
 	private void peerH() {
@@ -524,7 +527,7 @@ public class ModelController {
 
 	private void peerHP() { // hidden enemies and paths
 		// TODO Auto-generated method stub
-
+		peerP();
 	}
 
 	// PEER SEARCH: clues and paths search

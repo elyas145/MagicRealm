@@ -272,6 +272,11 @@ public class ControllerMain implements Controller {
 	public void displayMessage(String string) {
 		getMainView().displayMessage(string);
 	}
+	
+	@Override
+	public void revealMapChits(Iterable<MapChit> chits) {
+		boardView.revealAllMapChits(chits);
+	}
 
 	@Override
 	public void setHiding(CharacterType character) {
