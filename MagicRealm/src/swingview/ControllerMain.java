@@ -58,8 +58,7 @@ public class ControllerMain implements Controller {
 	}
 
 	private void start() {
-		//mainView.enterSplashScreen();
-		goToMainMenu();
+		mainView.enterSplashScreen();
 	}
 
 	public void startBoardView() {
