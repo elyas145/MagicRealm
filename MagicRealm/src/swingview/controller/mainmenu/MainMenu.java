@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 
 import controller.Controller;
@@ -32,6 +33,9 @@ public class MainMenu extends JPanel implements ActionListener {
 		exit.setAlignmentX(Component.CENTER_ALIGNMENT);
 		add(start);
 		add(exit);
+		JCheckBox cheatMode = new JCheckBox("Enable Cheat Mode");
+		add(cheatMode);
+		
 		Thread t = new Thread(new Runnable(){
 			@Override
 			public void run() {

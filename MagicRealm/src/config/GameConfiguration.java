@@ -11,4 +11,6 @@ public class GameConfiguration {
 	public static final int SUNLIGHT_PHASES = 2;
 
 	public static final ValleyChit INITIAL_SITE = ValleyChit.INN;
+	
+	public static boolean Cheat = false;
 }
