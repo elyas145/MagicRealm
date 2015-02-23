@@ -79,7 +79,6 @@ public class ControllerMain implements Controller {
 				boardView.setCounter(ct, ci.getParentTile().getName(),
 						ci.getClearingNumber());
 			}
-			boardView.loadMapChits(model.getMapChits());
 			for (MapChit mc : model.getMapChits()) {
 				boardView.setMapChit(mc);
 			}

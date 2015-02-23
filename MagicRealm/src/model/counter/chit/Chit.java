@@ -56,6 +56,11 @@ public abstract class Chit extends ChitInterface {
 		this.tile = name;
 	}
 	
+	@Override
+	public String toString() {
+		return "Chit: flip: " + flipped + ", tile: " + tile + ", clearing: " + clearing;
+	}
+	
 	private boolean flipped;	//unflipped chits, mean they are face down.
 	private TileName tile;
 	private int clearing;

@@ -11,33 +11,38 @@ import utils.images.ImageTools;
 import model.counter.chit.MapChit;
 
 public class ChitGenerator implements ImageTools.GraphicsHandler {
-	public ChitGenerator(MapChit mc) {
+	public ChitGenerator(MapChit mc, int w, int h) {
 		name = mc.getType().toString();
 		identifier = mc.getIdentifier();
+		width = w;
+		height = h;
 	}
 	
-	public ChitGenerator(String nm, char id) {
+	public ChitGenerator(String nm, char id, int w, int h) {
 		name = nm;
 		identifier = id;
+		width = w;
+		height = h;
 	}
 
 	@Override
 	public void draw(Graphics g) {
-		Rectangle2D rect = g.getClipBounds();
-		double width = rect.getWidth();
-		double height = rect.getHeight();
+		double width = this.width;
+		double height = this.height;
 		g.fillRect(0, 0, (int) width, (int) height);
 		g.setFont(new Font("TimesRoman", Font.PLAIN, (int) (height * .2)));
 		FontMetrics fm = g.getFontMetrics();
-		rect = fm.getStringBounds(name, g);
-		g.drawString(name, (int) ((width - rect.getWidth()) * .5),
-				(int) (height * .4 - rect.getHeight() * .5));
+		Rectangle2D rekt = fm.getStringBounds(name, g);
+		g.drawString(name, (int) ((width - rekt.getWidth()) * .5),
+				(int) (height * .4 - rekt.getHeight() * .5));
 		String id = Character.toString(identifier);
-		rect = fm.getStringBounds(id, g);
-		g.drawString(id, (int) ((width - rect.getWidth()) * .5),
-				(int) (height * .6 - rect.getHeight() * .5));
+		rekt = fm.getStringBounds(id, g);
+		g.drawString(id, (int) ((width - rekt.getWidth()) * .5),
+				(int) (height * .6 - rekt.getHeight() * .5));
 	}
 
 	private String name;
 	private char identifier;
+	private int width;
+	private int height;
 }

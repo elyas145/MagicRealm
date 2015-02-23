@@ -1,4 +1,4 @@
-package lwjglview.graphics.board.counter;
+package lwjglview.graphics.board;
 
 import java.awt.Color;
 import java.nio.FloatBuffer;
@@ -10,7 +10,6 @@ import lwjglview.graphics.LWJGLGraphics;
 import lwjglview.graphics.animator.AnimationQueue;
 import lwjglview.graphics.animator.FadeAnimator;
 import lwjglview.graphics.animator.MovementAnimator;
-import lwjglview.graphics.board.LWJGLBoardDrawable;
 import lwjglview.graphics.shader.ShaderType;
 import model.enums.CounterType;
 import config.GraphicsConfiguration;

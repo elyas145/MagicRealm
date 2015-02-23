@@ -14,6 +14,7 @@ import lwjglview.graphics.LWJGLDrawableNode;
 import lwjglview.graphics.LWJGLGraphics;
 import lwjglview.graphics.LWJGLTextureArrayLoader;
 import lwjglview.graphics.board.LWJGLBoardDrawable;
+import lwjglview.graphics.board.LWJGLCounterDrawable;
 import lwjglview.graphics.shader.ShaderType;
 import model.enums.CharacterType;
 import model.enums.CounterType;

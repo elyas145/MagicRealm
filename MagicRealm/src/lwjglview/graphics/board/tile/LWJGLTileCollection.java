@@ -49,7 +49,7 @@ public class LWJGLTileCollection extends LWJGLDrawableNode {
 		get(tile).setEnchanted(ench);
 	}
 	
-	public void setTile(TileName tile, int rw, int cl, int rot,
+	public synchronized void setTile(TileName tile, int rw, int cl, int rot,
 			Iterable<? extends ClearingInterface> clears) {
 		int row = rw;
 		int col = cl;
@@ -67,7 +67,7 @@ public class LWJGLTileCollection extends LWJGLDrawableNode {
 		board.relocateChit(id, f, g);
 	}
 	
-	public LWJGLTileDrawable get(TileName tl) {
+	public synchronized LWJGLTileDrawable get(TileName tl) {
 		return tiles.get(tl);
 	}
 

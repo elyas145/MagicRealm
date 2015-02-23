@@ -31,8 +31,6 @@ public interface BoardView {
 	
 	void unHideCounter(CounterType currentCounter);
 	
-	void loadMapChits(Iterable<MapChit> chits);
-	
 	void setMapChit(MapChit chit);
 
 }

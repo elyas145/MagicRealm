@@ -23,6 +23,7 @@ import utils.math.Point;
 import utils.random.Random;
 import utils.resources.ResourceHandler;
 import model.board.tile.HexTile;
+import model.counter.chit.MapChit;
 import model.enums.CharacterType;
 import model.enums.CounterType;
 import model.enums.MapChitType;
@@ -163,8 +164,9 @@ public class Board implements BoardInterface {
 		return hexTile.getClearing(clearing);
 	}
 
-	public void setLocationOfMapChit(MapChitType type, TileName tile) {
-		mapChitLocations.put(type, tile);
+	public void setLocationOfMapChit(MapChit mc, TileName tile) {
+		mapChitLocations.put(mc.getType(), tile);
+		mc.setTile(tile);
 	}
 
 	@Override

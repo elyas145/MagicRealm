@@ -30,6 +30,7 @@ import model.enums.PeerType;
 import model.enums.PhaseType;
 import model.enums.TableType;
 import model.enums.TileName;
+import model.enums.TileType;
 import model.enums.ValleyChit;
 import model.enums.WarningType;
 import model.exceptions.IllegalMoveException;
@@ -351,58 +352,105 @@ public class ModelController {
 				}
 			}
 		}
-		Random.shuffle(cave);
+		
 		// set the tiles
-		cave.get(0).setTile(TileName.CAVERN);
-		board.setLocationOfMapChit(cave.get(0).getType(), TileName.CAVERN);
-		cave.get(1).setTile(TileName.CAVES);
-		board.setLocationOfMapChit(cave.get(1).getType(), TileName.CAVES);
-		cave.get(2).setTile(TileName.HIGH_PASS);
-		board.setLocationOfMapChit(cave.get(2).getType(), TileName.HIGH_PASS);
-		cave.get(3).setTile(TileName.BORDERLAND);
-		board.setLocationOfMapChit(cave.get(3).getType(), TileName.BORDERLAND);
-		cave.get(4).setTile(TileName.RUINS);
-		board.setLocationOfMapChit(cave.get(4).getType(), TileName.RUINS);
-
-		woods.get(0).setTile(TileName.LINDEN_WOODS);
-		board.setLocationOfMapChit(cave.get(0).getType(), TileName.LINDEN_WOODS);
-		woods.get(1).setTile(TileName.MAPLE_WOODS);
-		board.setLocationOfMapChit(cave.get(1).getType(), TileName.MAPLE_WOODS);
-		woods.get(2).setTile(TileName.NUT_WOODS);
-		board.setLocationOfMapChit(cave.get(2).getType(), TileName.NUT_WOODS);
-		woods.get(3).setTile(TileName.OAK_WOODS);
-		board.setLocationOfMapChit(cave.get(3).getType(), TileName.OAK_WOODS);
-		woods.get(4).setTile(TileName.PINE_WOODS);
-		board.setLocationOfMapChit(cave.get(4).getType(), TileName.PINE_WOODS);
-
-		mountain.get(0).setTile(TileName.CLIFF);
-		board.setLocationOfMapChit(cave.get(0).getType(), TileName.CLIFF);
-		mountain.get(1).setTile(TileName.CRAG);
-		board.setLocationOfMapChit(cave.get(1).getType(), TileName.CRAG);
-		mountain.get(2).setTile(TileName.DEEP_WOODS);
-		board.setLocationOfMapChit(cave.get(2).getType(), TileName.DEEP_WOODS);
-		mountain.get(3).setTile(TileName.LEDGES);
-		board.setLocationOfMapChit(cave.get(3).getType(), TileName.LEDGES);
-		mountain.get(4).setTile(TileName.MOUNTAIN);
-		board.setLocationOfMapChit(cave.get(4).getType(), TileName.MOUNTAIN);
+		for(TileName tn: new TileName[] {
+				TileName.CAVERN,
+				TileName.CAVES,
+				TileName.HIGH_PASS,
+				TileName.BORDERLAND,
+				TileName.RUINS
+		}) {
+			board.setLocationOfMapChit(Random.remove(cave), tn);
+		}
+		
+		for(TileName tn: new TileName[] {
+				TileName.LINDEN_WOODS,
+				TileName.MAPLE_WOODS,
+				TileName.NUT_WOODS,
+				TileName.OAK_WOODS,
+				TileName.PINE_WOODS
+		}) {
+			board.setLocationOfMapChit(Random.remove(woods), tn);
+		}
+		
+		for(TileName tn: new TileName[] {
+				TileName.CLIFF,
+				TileName.CRAG,
+				TileName.DEEP_WOODS,
+				TileName.LEDGES,
+				TileName.MOUNTAIN
+		}) {
+			board.setLocationOfMapChit(Random.remove(mountain), tn);
+		}
+	}
+	
+	private static List<Integer> makeClearings() {
+		ArrayList<Integer> ret = new ArrayList<Integer>();
+		for(int i = 1; i <= BoardConfiguration.MAX_CLEARINGS_IN_TILE; ++i) {
+			ret.add(i);
+		}
+		return ret;
 	}
 
 	private void setUpSoundAndSite() {
 		ArrayList<MapChit> chits = new ArrayList<MapChit>();
 
 		// add sound and site chits to array.
-		for (MapChitType chit : MapChitType.values()) {
-			if (chit.type() == ChitType.SOUND || chit.type() == ChitType.SITE) {
-				chits.add(new MapChit(chit));
-				if (chit.type() == ChitType.SOUND) {
-					chits.add(new MapChit(chit));
-				}
+		for (MapChitType chit : MapChitType.SITES) {
+			MapChit mc = new MapChit(chit);
+			chits.add(mc);
+		}
+		for(MapChitType chit: MapChitType.SOUNDS) {
+			List<Integer> clears = makeClearings();
+			MapChit mc;
+			for(int i = 0; i < 2; ++i) {
+				mc = new MapChit(chit, Random.remove(clears));
+				chits.add(mc);
 			}
 		}
+		mapChits.addAll(chits);
+
+		// rest of chits to be split up into two groups of 4.
+		// one group gets the lost castle chit, and the other gets the lost
+		// city.
+		ArrayList<MapChit> cityList = new ArrayList<MapChit>();
+		ArrayList<MapChit> castleList = new ArrayList<MapChit>();
+
+		for(int i = 0; i < 4; ++i) {
+			cityList.add(Random.remove(chits));
+			castleList.add(Random.remove(chits));
+		}
+
+		// add corresponding chits.
+		cityList.add(lostCity);
+
+		castleList.add(lostCastle);
+
+		// each chit in city list, goes on a cave tile.
+		for(TileName tn: new TileName[] {
+				TileName.BORDERLAND,
+				TileName.CAVERN,
+				TileName.CAVES,
+				TileName.HIGH_PASS,
+				TileName.RUINS
+		}) {
+			board.setLocationOfMapChit(Random.remove(cityList), tn);
+		}
+
+		// each chit in castle list goes on mountain tile
+		for(TileName tn: new TileName[] {
+				TileName.CLIFF,
+				TileName.CRAG,
+				TileName.DEEP_WOODS,
+				TileName.LEDGES,
+				TileName.MOUNTAIN
+		}) {
+			board.setLocationOfMapChit(Random.remove(castleList), tn);
+		}
+		
 		ArrayList<MapChit> lostCityChits = new ArrayList<MapChit>();
 		ArrayList<MapChit> lostCastleChits = new ArrayList<MapChit>();
-		System.out.println("size: " + chits.size());
-		System.out.println("List: " + chits);
 		for (int i = 0; i < 5; i++) {
 			// add 5 chits to lost city.
 			lostCityChits.add(Random.remove(chits));
@@ -411,56 +459,6 @@ public class ModelController {
 		}
 		lostCastle.setWarningAndSite(lostCastleChits);
 		lostCity.setWarningAndSite(lostCityChits);
-
-		// rest of chits to be split up into two groups of 4.
-		// one group gets the lost castle chit, and the other gets the lost
-		// city.
-		ArrayList<MapChit> cityList = new ArrayList<MapChit>();
-		ArrayList<MapChit> castleList = new ArrayList<MapChit>();
-
-		for (int i = 0; i < 4; i++) {
-			cityList.add(Random.remove(chits));
-			castleList.add(Random.remove(chits));
-		}
-
-		// add corresponding chits.
-		cityList.add(lostCity);
-		Random.shuffle(cityList);
-
-		castleList.add(lostCastle);
-		Random.shuffle(castleList);
-
-		// each chit in city list, goes on a cave tile.
-		board.setLocationOfMapChit(cityList.get(0).getType(),
-				TileName.BORDERLAND);
-		cityList.get(0).setTile(TileName.BORDERLAND);
-		board.setLocationOfMapChit(cityList.get(1).getType(), TileName.CAVERN);
-		cityList.get(1).setTile(TileName.CAVERN);
-		board.setLocationOfMapChit(cityList.get(2).getType(), TileName.CAVES);
-		cityList.get(2).setTile(TileName.CAVES);
-		board.setLocationOfMapChit(cityList.get(3).getType(),
-				TileName.HIGH_PASS);
-		cityList.get(3).setTile(TileName.HIGH_PASS);
-		board.setLocationOfMapChit(cityList.get(4).getType(), TileName.RUINS);
-		cityList.get(4).setTile(TileName.RUINS);
-
-		// each chit in castle list goes on mountain tile
-		board.setLocationOfMapChit(castleList.get(0).getType(), TileName.CLIFF);
-		castleList.get(0).setTile(TileName.CLIFF);
-		board.setLocationOfMapChit(castleList.get(1).getType(), TileName.CRAG);
-		castleList.get(1).setTile(TileName.CRAG);
-		board.setLocationOfMapChit(castleList.get(2).getType(),
-				TileName.DEEP_WOODS);
-		castleList.get(2).setTile(TileName.DEEP_WOODS);
-		board.setLocationOfMapChit(castleList.get(3).getType(), TileName.LEDGES);
-		castleList.get(3).setTile(TileName.LEDGES);
-		board.setLocationOfMapChit(castleList.get(4).getType(),
-				TileName.MOUNTAIN);
-		castleList.get(4).setTile(TileName.MOUNTAIN);
-
-		// add all chits to one array list
-		mapChits.addAll(chits);
-
 	}
 
 	public Iterable<MapChit> getMapChits() {

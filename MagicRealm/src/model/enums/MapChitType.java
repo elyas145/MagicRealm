@@ -53,9 +53,7 @@ public enum MapChitType {
 		HOARD,
 		LAIR,
 		CAIRNS,
-		SHRINE,
-		LOST_CITY,
-		LOST_CASTLE
+		SHRINE
 	};
 	
 	public ChitType type(){
@@ -87,6 +85,43 @@ public enum MapChitType {
 			return ChitType.LOST_CASTLE;
 		}
 		return null;
+	}
+	
+	public int getClearing() {
+		switch(this) {
+		case HOWL:
+			return 4;
+		case FLUTTER:
+			return 1;
+		case ROAR:
+			return 6;
+		case PATTER:
+			return 2;
+		case SLITHER:
+			return 3;
+		case STATUE:
+			return 2;
+		case ALTAR:
+			return 1;
+		case VAULT:
+			return 3;
+		case POOL:
+			return 6;
+		case HOARD:
+			return 6;
+		case LAIR:
+			return 3;
+		case CAIRNS:
+			return 5;
+		case SHRINE:
+			return 4;
+		case LOST_CITY:
+			return 3;
+		case LOST_CASTLE:
+			return 1;
+		default:
+			return 0;
+		}
 	}
 
 	public CounterType toCounter() {

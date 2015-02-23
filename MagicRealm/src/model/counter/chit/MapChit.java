@@ -31,16 +31,18 @@ public class MapChit extends Chit{
 		setFlipped(false);
 		setTile(tt);
 		this.type = type;
+		setClearing(this.type.getClearing());
 	}
 	
 	public MapChit(MapChitType type) {
 		setFlipped(false);
 		this.type = type;
+		setClearing(this.type.getClearing());
 	}
 	
-	public MapChit(TileName tt, int clearing) {
+	public MapChit(MapChitType type, int clearing) {
 		setFlipped(false);
-		setTile(tt);
+		this.type = type;
 		setClearing(clearing);
 	}
 	
@@ -73,7 +75,8 @@ public class MapChit extends Chit{
 		if(this.type != null){
 			str += type.type().toString() + ": ";
 			str += this.type.toString() + ". ";
-			str += this.identifier;			
+			str += this.identifier + ", ";
+			str += super.toString();
 		}
 		return str;
 	}

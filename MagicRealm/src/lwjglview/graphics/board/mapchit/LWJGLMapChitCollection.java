@@ -1,32 +1,24 @@
 package lwjglview.graphics.board.mapchit;
 
 import java.awt.Color;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import config.GraphicsConfiguration;
 import utils.math.Matrix;
 import utils.resources.ChitGenerator;
-import utils.resources.CounterImages;
-import lwjglview.graphics.LWJGLDrawable;
 import lwjglview.graphics.LWJGLDrawableNode;
 import lwjglview.graphics.LWJGLGraphics;
 import lwjglview.graphics.LWJGLTextureArrayLoader;
 import lwjglview.graphics.board.LWJGLBoardDrawable;
-import lwjglview.graphics.board.counter.LWJGLCounterDrawable;
+import lwjglview.graphics.board.LWJGLCounterDrawable;
 import lwjglview.graphics.shader.ShaderType;
 import model.counter.chit.MapChit;
-import model.enums.CharacterType;
-import model.enums.CounterType;
 import model.enums.MapChitType;
-import model.enums.ValleyChit;
 
 public class LWJGLMapChitCollection extends LWJGLDrawableNode {
 
-	protected LWJGLMapChitCollection(LWJGLBoardDrawable par,
+	public LWJGLMapChitCollection(LWJGLBoardDrawable par,
 			Iterable<MapChit> avail) {
 		super(par);
 		board = par;
@@ -35,6 +27,8 @@ public class LWJGLMapChitCollection extends LWJGLDrawableNode {
 		textures = new LWJGLTextureArrayLoader(
 				GraphicsConfiguration.IMAGE_SCALE_WIDTH,
 				GraphicsConfiguration.IMAGE_SCALE_HEIGHT);
+		imageWidth = GraphicsConfiguration.IMAGE_SCALE_WIDTH;
+		imageHeight = GraphicsConfiguration.IMAGE_SCALE_HEIGHT;
 		loadImages(avail);
 	}
 
@@ -43,6 +37,7 @@ public class LWJGLMapChitCollection extends LWJGLDrawableNode {
 	}
 
 	public LWJGLCounterDrawable get(MapChitType type, char identifier) {
+		System.out.println(mapChits);
 		return mapChits.get(type).get(identifier);
 	}
 
@@ -88,6 +83,14 @@ public class LWJGLMapChitCollection extends LWJGLDrawableNode {
 	public void changeColour(MapChitType mct, char id, Color col) {
 		get(mct, id).changeColour(col);
 	}
+	
+	public int getID(MapChit mc) {
+		return get(mc).getID();
+	}
+	
+	public int getID(MapChitType mct, char id) {
+		return get(mct, id).getID();
+	}
 
 	@Override
 	public void applyNodeTransformation(LWJGLGraphics gfx) {
@@ -122,9 +125,11 @@ public class LWJGLMapChitCollection extends LWJGLDrawableNode {
 		}
 		Map<Character, Integer> typeLocations = textureLocations.get(mct);
 		char mcid = mc.getIdentifier();
-		typeLocations.put(mcid, textures.addImage(new ChitGenerator(mc)));
+		typeLocations.put(mcid, textures.addImage(new ChitGenerator(mc, imageWidth, imageHeight)));
 	}
 
+	private int imageWidth;
+	private int imageHeight;
 	private LWJGLBoardDrawable board;
 	private LWJGLTextureArrayLoader textures;
 	private Map<MapChitType, Map<Character, LWJGLCounterDrawable>> mapChits;

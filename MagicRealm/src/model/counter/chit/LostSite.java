@@ -13,6 +13,9 @@ public class LostSite extends MapChit{
 	}
 	public void setWarningAndSite(ArrayList<MapChit> lostCastleChits) {
 		WarningAndSite = lostCastleChits;
+		for(MapChit mc: WarningAndSite) {
+			mc.setTile(getTile());
+		}
 	}
 	public LostSite(MapChitType type) {
 		super(type);
