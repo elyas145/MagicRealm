@@ -475,7 +475,7 @@ public class ModelController {
 	}
 
 	private void peerTableSearch() {
-		int roll = 2;// Random.dieRoll();
+		int roll = 2;// Random.dieRoll(); TODO cheat mode
 		TileName ct = getCurrentTile();
 		switch (roll) {
 		case 1:
