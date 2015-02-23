@@ -176,6 +176,11 @@ public class ControllerMain implements Controller {
 		}
 		model.setPlayerDone();
 	}
+	
+	private void beginBoardTurn(Player plr) {
+		boardView.focusOn(plr.getCharacter().getType().toCounter());
+		boardView.hideAllMapChits();
+	}
 
 	@Override
 	public void startGame() {
@@ -194,13 +199,15 @@ public class ControllerMain implements Controller {
 			for (int i = 0; i < model.getNumPlayers(); i++) {
 				synchronized (model) {
 					plr = model.getCurrentPlayer();
-					boardView.focusOn(plr.getCharacter().getType().toCounter());
+					beginBoardTurn(plr);
+					boardView.revealAllMapChits(plr.getDiscoveredMapChits());
 					startBirdSong(plr);
 					while (!model.isPlayerDone()) {
 						try {
 							model.wait();
 						} catch (InterruptedException e) {
 						}
+						boardView.revealAllMapChits(plr.getDiscoveredMapChits());
 					}
 					model.nextPlayer();
 				}
@@ -212,7 +219,7 @@ public class ControllerMain implements Controller {
 			for (int i = 0; i < model.getNumPlayers(); i++) {
 				synchronized (model) {
 					plr = model.getCurrentPlayer();
-					boardView.focusOn(getCurrentCharacter().toCounter());
+					beginBoardTurn(plr);
 					if (plr.getCharacter().isHiding()) {
 						model.unhideCurrent();
 						boardView.unHideCounter(model.getCurrentCharacterType()
@@ -223,7 +230,6 @@ public class ControllerMain implements Controller {
 						try {
 							model.wait();
 						} catch (InterruptedException e) {
-							// e.printStackTrace();
 						}
 					}
 					while (!boardView.isAnimationFinished(getCurrentCharacter()
@@ -265,11 +271,6 @@ public class ControllerMain implements Controller {
 	@Override
 	public void displayMessage(String string) {
 		getMainView().displayMessage(string);
-	}
-
-	@Override
-	public void displayMessage(ArrayList<MapChit> peek) {
-		getMainView().displayMessage(peek);
 	}
 
 	@Override

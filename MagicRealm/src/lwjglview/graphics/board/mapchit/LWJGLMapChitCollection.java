@@ -2,8 +2,10 @@ package lwjglview.graphics.board.mapchit;
 
 import java.awt.Color;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import config.GraphicsConfiguration;
 import utils.math.Matrix;
@@ -27,7 +29,7 @@ public class LWJGLMapChitCollection extends LWJGLDrawableNode {
 		super(par);
 		board = par;
 		mapChits = new HashMap<MapChitType, Map<Character, LWJGLCounterDrawable>>();
-		iter = new ChitIterator();
+		drawables = new HashSet<LWJGLCounterDrawable>();
 		textureLocations = new HashMap<MapChitType, Map<Character, Integer>>();
 		textures = new LWJGLTextureArrayLoader(
 				GraphicsConfiguration.IMAGE_SCALE_WIDTH,
@@ -51,12 +53,19 @@ public class LWJGLMapChitCollection extends LWJGLDrawableNode {
 
 	public LWJGLCounterDrawable create(MapChitType type, char identifier,
 			LWJGLDrawableNode repr) {
-		if (!mapChits.containsKey(type)) {
-			mapChits.put(type, new HashMap<Character, LWJGLCounterDrawable>());
+		LWJGLCounterDrawable drbl = new LWJGLCounterDrawable(board, repr,
+				textureLocations.get(type).get(identifier), BLANK);
+		synchronized (mapChits) {
+			if (!mapChits.containsKey(type)) {
+				mapChits.put(type,
+						new HashMap<Character, LWJGLCounterDrawable>());
+			}
+			Map<Character, LWJGLCounterDrawable> typeMap = mapChits.get(type);
+			typeMap.put(identifier, drbl);
 		}
-		Map<Character, LWJGLCounterDrawable> typeMap = mapChits.get(type);
-		typeMap.put(identifier, new LWJGLCounterDrawable(board, repr,
-				textureLocations.get(type).get(identifier), BLANK));
+		synchronized (drawables) {
+			drawables.add(drbl);
+		}
 		return get(type, identifier);
 	}
 
@@ -65,18 +74,19 @@ public class LWJGLMapChitCollection extends LWJGLDrawableNode {
 	}
 
 	public boolean contains(MapChitType mct, char identifier) {
-		if (mapChits.containsKey(mct)) {
-			return mapChits.get(mct).containsKey(identifier);
+		synchronized (mapChits) {
+			if (mapChits.containsKey(mct)) {
+				return mapChits.get(mct).containsKey(identifier);
+			}
 		}
 		return false;
 	}
 
 	public void hideAll() {
-		synchronized (iter) {
-			while (iter.hasNext()) {
-				iter.next().changeColour(BLANK);
+		synchronized (drawables) {
+			for (LWJGLCounterDrawable drbl : drawables) {
+				drbl.changeColour(BLANK);
 			}
-			iter.remove();
 		}
 	}
 
@@ -104,7 +114,10 @@ public class LWJGLMapChitCollection extends LWJGLDrawableNode {
 			drbl = row.get(id);
 			row.remove(id);
 		}
-		if(drbl != null) {
+		synchronized (drawables) {
+			drawables.remove(drbl);
+		}
+		if (drbl != null) {
 			drbl.forget();
 		}
 	}
@@ -145,11 +158,9 @@ public class LWJGLMapChitCollection extends LWJGLDrawableNode {
 	public void draw(LWJGLGraphics gfx) {
 		gfx.getShaders().useShaderProgram(ShaderType.CHIT_SHADER);
 		textures.useTextures(gfx);
-		synchronized (mapChits) {
-			for (Map<Character, LWJGLCounterDrawable> row : mapChits.values()) {
-				for (LWJGLCounterDrawable chit : row.values()) {
-					chit.draw(gfx);
-				}
+		synchronized (drawables) {
+			for (LWJGLCounterDrawable drbl : drawables) {
+				drbl.draw(gfx);
 			}
 		}
 	}
@@ -172,51 +183,12 @@ public class LWJGLMapChitCollection extends LWJGLDrawableNode {
 				imageWidth, imageHeight)));
 	}
 
-	private class ChitIterator implements Iterator<LWJGLCounterDrawable> {
-		@Override
-		public boolean hasNext() {
-			if (row == null) {
-				row = mapChits.values().iterator();
-				if (row.hasNext()) {
-					items = row.next().values().iterator();
-					return items.hasNext();
-				}
-				return false;
-			}
-			while (row.hasNext()) {
-				if (items.hasNext()) {
-					return true;
-				}
-				items = row.next().values().iterator();
-			}
-			return false;
-		}
-
-		@Override
-		public LWJGLCounterDrawable next() {
-			return items.next();
-		}
-
-		@Override
-		public void remove() {
-			if (items != null) {
-				items.remove();
-			}
-			if (row != null) {
-				row.remove();
-			}
-		}
-
-		private Iterator<Map<Character, LWJGLCounterDrawable>> row;
-		private Iterator<LWJGLCounterDrawable> items;
-	}
-
-	private ChitIterator iter;
 	private int imageWidth;
 	private int imageHeight;
 	private LWJGLBoardDrawable board;
 	private LWJGLTextureArrayLoader textures;
 	private Map<MapChitType, Map<Character, LWJGLCounterDrawable>> mapChits;
+	private Set<LWJGLCounterDrawable> drawables;
 	private Map<MapChitType, Map<Character, Integer>> textureLocations;
 
 }

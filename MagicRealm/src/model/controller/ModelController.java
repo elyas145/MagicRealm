@@ -514,8 +514,7 @@ public class ModelController {
 				peek.add(chit);
 			}
 		}
-		client.displayMessage(peek);
-		
+		getCurrentPlayer().discoverAllMapChits(peek);
 	}
 
 	private void peerH() {

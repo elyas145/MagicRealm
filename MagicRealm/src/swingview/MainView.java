@@ -124,19 +124,7 @@ public class MainView extends JFrame implements ViewController, WindowListener,
 		JOptionPane.showMessageDialog(this, string);
 
 	}
-
-	public void displayMessage(ArrayList<MapChit> peek) {
-		JFrame frame = new JFrame("FOUND");
-		frame.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		frame.setSize(200, 200);
-		JPanel panel = new JPanel();
-		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-		for (MapChit chit : peek){
-			panel.add(new JLabel(chit.toString()));
-		}
-		frame.add(panel);
-		frame.setVisible(true);
-	}
+	
 	@Override
 	public view.controller.search.SearchView enterSearchView(CharacterType character) {
 		SearchView search = new SearchView(this, character);

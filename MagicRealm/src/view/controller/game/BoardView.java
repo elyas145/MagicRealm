@@ -41,4 +41,6 @@ public interface BoardView {
 	
 	void removeMapChit(MapChit chit);
 
+	void revealAllMapChits(Iterable<MapChit> discoveredMapChits);
+
 }

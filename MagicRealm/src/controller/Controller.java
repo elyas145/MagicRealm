@@ -63,7 +63,5 @@ public interface Controller {
 	void focusOnBoard(CounterType counter);
 
 	PeerType getPeerChoice();
-
-	void displayMessage(ArrayList<MapChit> peek);
 	
 }

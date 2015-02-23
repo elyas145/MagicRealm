@@ -281,7 +281,15 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 
 	@Override
 	public void revealMapChit(MapChit chit) {
+		System.out.println("Revealing: " + chit);
 		mapChits.reveal(chit);
+	}
+
+	@Override
+	public void revealAllMapChits(Iterable<MapChit> discChits) {
+		for(MapChit mc: discChits) {
+			revealMapChit(mc);
+		}
 	}
 
 	@Override

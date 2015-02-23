@@ -10,6 +10,7 @@ import java.util.Set;
 import model.EnchantedHolder;
 import model.activity.Activity;
 import model.character.Character;
+import model.counter.chit.MapChit;
 import model.enums.PathType;
 import model.interfaces.ClearingInterface;
 
@@ -20,6 +21,7 @@ public class Player {
 	private Character character;
 	private PersonalHistory historyPad;
 	private Map<ClearingInterface, EnchantedHolder<Set<ClearingInterface>>> discoveredPaths;
+	private Set<MapChit> discoveredChits;
 
 	public Player(int num, String nm) {
 		number = num;
@@ -28,6 +30,7 @@ public class Player {
 		historyPad = new PersonalHistory();
 
 		discoveredPaths = new HashMap<ClearingInterface, EnchantedHolder<Set<ClearingInterface>>>();
+		discoveredChits = new HashSet<MapChit>();
 	}
 
 	public void setCharacter(Character c) {
@@ -63,6 +66,22 @@ public class Player {
 			return false;
 		}
 		return discoveredPaths.get(cl1).get(cl1.isEnchanted()).contains(cl2);
+	}
+	
+	public void discoverMapChit(MapChit mc) {
+		synchronized(discoveredChits) {
+			discoveredChits.add(mc);
+		}
+	}
+	
+	public void discoverAllMapChits(Iterable<MapChit> chits) {
+		for(MapChit mc: chits) {
+			discoverMapChit(mc);
+		}
+	}
+	
+	public Iterable<MapChit> getDiscoveredMapChits() {
+		return discoveredChits;
 	}
 
 	private void connectClearings(ClearingInterface cl1, ClearingInterface cl2,
