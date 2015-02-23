@@ -33,7 +33,7 @@ public class CounterImages {
 		case CHARACTER_AMAZON:
 			return "amazon.png";
 		case CHARACTER_CAPTAIN:
-			return "captain.png";
+			return "flag.jpg";
 		case CHARACTER_SWORDSMAN:
 			return "iron.jpg";//"swordsman.png";
 		case VALLEY_CHAPEL:

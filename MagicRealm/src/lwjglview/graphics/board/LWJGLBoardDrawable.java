@@ -66,16 +66,26 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 		System.out.println("Finished loading tile images");
 		
 		System.out.println("Loading chit model data");
+		
 		roundCounter = new LWJGLDrawableLeaf(this, ModelData.loadModelData(
 				resources, "circle_counter.obj"));
+		
 		squareCounter = new LWJGLDrawableLeaf(this, ModelData.loadModelData(
 				resources, "square_counter.obj"));
-		LWJGLDrawableNode knight = new LWJGLDrawableLeaf(null,
+		
+		LWJGLDrawableNode tmp = new LWJGLDrawableLeaf(null,
 				ModelData.loadModelData(resources, "knight4.obj"));
-		knightCounter = new TransformationDrawable(this, knight, Matrix
-				.dilation(2.4f, 2.4f, 2.4f, 1f).multiply(
+		knightCounter = new TransformationDrawable(this, tmp, Matrix
+				.dilation(2.7f, 2.7f, 2.7f, 1f).multiply(
 						Matrix.rotationX(4, Mathf.PI * .5f)));
-		knight.setParent(knightCounter);
+		tmp.setParent(knightCounter);
+		
+		tmp = new LWJGLDrawableLeaf(null,
+				ModelData.loadModelData(resources, "captain.obj"));
+		captainCounter = new TransformationDrawable(this, tmp, Matrix
+				.dilation(1.3f, 1.3f, 1.3f, 1f).multiply(
+						Matrix.rotationX(4, Mathf.PI * .5f)));
+		tmp.setParent(captainCounter);
 		System.out.println("Finished loading chit model data");
 
 		counterID = 0;
@@ -301,7 +311,7 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 		lwgfx.resetViewMatrix();
 		float time = Timing.getSeconds() * .1f;
 		Matrix tmp = Matrix.rotationX(4, Mathf.PI / 4f);
-		float k = (Mathf.sin(time * .6f) + 6f) / 6f;
+		float k = (Mathf.sin(time * .6f) + 6f) / 10f;
 		tmp = Matrix.translation(new float[] { 0f, -1f * k, 1f * k }).multiply(
 				tmp);
 		tmp = Matrix.rotationZ(4, time * .3f).multiply(tmp);
@@ -329,10 +339,14 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 
 	private LWJGLDrawableNode getCounterRepresentation(CounterType tp) {
 		if (tp.isCharacter()) {
-			if (tp == CounterType.CHARACTER_SWORDSMAN) {
+			switch(tp) {
+			case CHARACTER_SWORDSMAN:
 				return knightCounter;
+			case CHARACTER_CAPTAIN:
+				return captainCounter;
+			default:
+				return roundCounter;
 			}
-			return roundCounter;
 		} else if (tp.isValley()) {
 			return squareCounter;
 		}
@@ -409,6 +423,7 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 	private LWJGLDrawableNode roundCounter;
 	private LWJGLDrawableNode squareCounter;
 	private LWJGLDrawableNode knightCounter;
+	private LWJGLDrawableNode captainCounter;
 
 	private LWJGLTileCollection tiles;
 	private LWJGLCounterCollection counters;
