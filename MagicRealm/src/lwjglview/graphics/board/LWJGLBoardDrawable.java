@@ -20,6 +20,7 @@ import lwjglview.graphics.animator.matrixcalculator.MatrixCalculator;
 import lwjglview.graphics.animator.matrixcalculator.StaticMatrixCalculator;
 import lwjglview.graphics.board.counter.LWJGLCounterCollection;
 import lwjglview.graphics.board.mapchit.LWJGLMapChitCollection;
+import lwjglview.graphics.board.tile.LWJGLCounterStorage;
 import lwjglview.graphics.board.tile.LWJGLTileCollection;
 import lwjglview.graphics.board.tile.LWJGLTileDrawable;
 import lwjglview.graphics.board.tile.clearing.LWJGLClearingStorage;
@@ -64,28 +65,36 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 		System.out.println("Loading tile images");
 		tiles = new LWJGLTileCollection(this);
 		System.out.println("Finished loading tile images");
-		
+
 		System.out.println("Loading chit model data");
-		
+
 		roundCounter = new LWJGLDrawableLeaf(this, ModelData.loadModelData(
 				resources, "circle_counter.obj"));
-		
+
 		squareCounter = new LWJGLDrawableLeaf(this, ModelData.loadModelData(
 				resources, "square_counter.obj"));
-		
+
 		LWJGLDrawableNode tmp = new LWJGLDrawableLeaf(null,
 				ModelData.loadModelData(resources, "knight4.obj"));
-		knightCounter = new TransformationDrawable(this, tmp, Matrix
-				.dilation(2.7f, 2.7f, 2.7f, 1f).multiply(
-						Matrix.rotationX(4, Mathf.PI * .5f)));
+		knightCounter = new TransformationDrawable(this, tmp, Matrix.dilation(
+				2.7f, 2.7f, 2.7f, 1f).multiply(
+				Matrix.rotationX(4, Mathf.PI * .5f)));
 		tmp.setParent(knightCounter);
-		
-		tmp = new LWJGLDrawableLeaf(null,
-				ModelData.loadModelData(resources, "captain.obj"));
-		captainCounter = new TransformationDrawable(this, tmp, Matrix
-				.dilation(1.3f, 1.3f, 1.3f, 1f).multiply(
-						Matrix.rotationX(4, Mathf.PI * .5f)));
+
+		tmp = new LWJGLDrawableLeaf(null, ModelData.loadModelData(resources,
+				"captain.obj"));
+		captainCounter = new TransformationDrawable(this, tmp, Matrix.dilation(
+				1.3f, 1.3f, 1.3f, 1f).multiply(
+				Matrix.rotationX(4, Mathf.PI * .5f)));
 		tmp.setParent(captainCounter);
+
+		tmp = new LWJGLDrawableLeaf(null, ModelData.loadModelData(resources,
+				"lara.obj"));
+		amazonCounter = new TransformationDrawable(this, tmp, Matrix.dilation(
+				1.3f, 1.3f, 1.3f, 1f).multiply(
+				Matrix.rotationX(4, Mathf.PI * .5f)));
+		tmp.setParent(amazonCounter);
+
 		System.out.println("Finished loading chit model data");
 
 		counterID = 0;
@@ -94,7 +103,7 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 		System.out.println("Loading chit images");
 		counters = new LWJGLCounterCollection(this);
 		mapChits = new LWJGLMapChitCollection(this, chits);
-		for(MapChit mc: chits) {
+		for (MapChit mc : chits) {
 			mapChits.create(mc, squareCounter);
 		}
 		System.out.println("Finished loading chit images");
@@ -124,7 +133,7 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 	public void getCounterPosition(LWJGLCounterDrawable cd, FloatBuffer position) {
 		int id = cd.getID();
 		CounterStorage cl;
-		synchronized(counterLocations) {
+		synchronized (counterLocations) {
 			cl = counterLocations.get(id);
 		}
 		getClearing(cl.tile, cl.clearing).getLocation(id, position);
@@ -267,7 +276,7 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 	 * ***********************************************************************
 	 */
 
-	protected LWJGLClearingStorage getClearing(TileName tl, int clr) {
+	protected LWJGLCounterStorage getClearing(TileName tl, int clr) {
 		System.out.println(tl);
 		return getTile(tl).getClearing(clr);
 	}
@@ -339,11 +348,13 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 
 	private LWJGLDrawableNode getCounterRepresentation(CounterType tp) {
 		if (tp.isCharacter()) {
-			switch(tp) {
+			switch (tp) {
 			case CHARACTER_SWORDSMAN:
 				return knightCounter;
 			case CHARACTER_CAPTAIN:
 				return captainCounter;
+			case CHARACTER_AMAZON:
+				return amazonCounter;
 			default:
 				return roundCounter;
 			}
@@ -396,7 +407,7 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 		public ClearingFocus(TileName tl, int clr) {
 			tile = getTile(tl);
 			position = new EnchantedHolder<Matrix>();
-			LWJGLClearingStorage store = getClearing(tl, clr);
+			LWJGLCounterStorage store = getClearing(tl, clr);
 			synchronized (buffer4) {
 				addPosition(store, false);
 				addPosition(store, true);
@@ -408,7 +419,7 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 			return position.get(tile.isEnchanted());
 		}
 
-		private void addPosition(LWJGLClearingStorage store, boolean ench) {
+		private void addPosition(LWJGLCounterStorage store, boolean ench) {
 			store.getLocation(buffer4, false);
 			position.set(false,
 					Matrix.columnVector(buffer4.get(0), buffer4.get(1), 0f));
@@ -424,6 +435,7 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 	private LWJGLDrawableNode squareCounter;
 	private LWJGLDrawableNode knightCounter;
 	private LWJGLDrawableNode captainCounter;
+	private LWJGLDrawableNode amazonCounter;
 
 	private LWJGLTileCollection tiles;
 	private LWJGLCounterCollection counters;

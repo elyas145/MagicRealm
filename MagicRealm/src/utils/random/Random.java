@@ -34,8 +34,12 @@ public class Random {
 		return (int) (random() * (size - i)) + i;
 	}
 	
-	public static double random() {
-		return Math.random();
+	public static float random() {
+		return (float) Math.random();
+	}
+	
+	public static float random(float min, float max) {
+		return (float) (Math.random() * (max - min) + min);
 	}
 
 }

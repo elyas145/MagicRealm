@@ -31,11 +31,11 @@ public class CounterImages {
 	private static String getName(CounterType tile) {
 		switch (tile) {
 		case CHARACTER_AMAZON:
-			return "amazon.png";
+			return "jungle.jpg";
 		case CHARACTER_CAPTAIN:
 			return "flag.jpg";
 		case CHARACTER_SWORDSMAN:
-			return "iron.jpg";//"swordsman.png";
+			return "iron.jpg";
 		case VALLEY_CHAPEL:
 			return "chapel.gif";
 		case VALLEY_GUARD_HOUSE:

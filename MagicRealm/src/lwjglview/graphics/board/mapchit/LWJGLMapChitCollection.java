@@ -18,6 +18,8 @@ import model.enums.MapChitType;
 
 public class LWJGLMapChitCollection extends LWJGLDrawableNode {
 
+	private static final Color BLANK = new Color(1f, 1f, 1f, 0f);
+
 	public LWJGLMapChitCollection(LWJGLBoardDrawable par,
 			Iterable<MapChit> avail) {
 		super(par);
@@ -52,7 +54,7 @@ public class LWJGLMapChitCollection extends LWJGLDrawableNode {
 		Map<Character, LWJGLCounterDrawable> typeMap = mapChits.get(type);
 		typeMap.put(identifier,
 				new LWJGLCounterDrawable(board, repr,
-						textureLocations.get(type).get(identifier)));
+						textureLocations.get(type).get(identifier), BLANK));
 		return get(type, identifier);
 	}
 

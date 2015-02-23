@@ -31,7 +31,7 @@ public class ChitGenerator implements ImageTools.GraphicsHandler {
 		double width = this.width;
 		double height = this.height;
 		g.fillRect(0, 0, (int) width, (int) height);
-		g.setFont(new Font("TimesRoman", Font.BOLD, (int) (height * .2)));
+		g.setFont(new Font("TimesRoman", Font.BOLD, (int) (height * .19)));
 		g.setColor(Color.BLACK);
 		FontMetrics fm = g.getFontMetrics();
 		Rectangle2D rekt = fm.getStringBounds(name, g);

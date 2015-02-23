@@ -30,6 +30,9 @@ void main() {
 	else {
 		color = raw.gba;
 	}
+	float fade = counterColour.a;
+	color *= fade;
+	color += vec3(1. - fade);
 	color *= counterColour.rgb;
 	color *= ambientColour.rgb;
 	gl_FragColor = vec4(color.rgb * scale, 1.);

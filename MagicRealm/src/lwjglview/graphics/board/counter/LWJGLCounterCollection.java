@@ -45,7 +45,9 @@ public class LWJGLCounterCollection extends LWJGLDrawableNode {
 	}
 
 	public LWJGLCounterDrawable create(CounterType tp, LWJGLDrawableNode repr) {
-		counters.put(tp, new LWJGLCounterDrawable(board, repr, textureLocations.get(tp)));
+		counters.put(tp,
+				new LWJGLCounterDrawable(board, repr, textureLocations.get(tp),
+						Color.WHITE));
 		return get(tp);
 	}
 

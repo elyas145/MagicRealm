@@ -20,7 +20,7 @@ public class LWJGLCounterDrawable extends LWJGLDrawableNode {
 	public static final ShaderType SHADER = ShaderType.CHIT_SHADER;
 
 	public LWJGLCounterDrawable(LWJGLBoardDrawable bd, LWJGLDrawableNode chitBlock,
-			int texid) {
+			int texid, Color col) {
 		super(bd);
 		textureIndex = texid;
 		identifier = bd.addCounterDrawable(this);
@@ -33,7 +33,7 @@ public class LWJGLCounterDrawable extends LWJGLDrawableNode {
 		colours.start();
 		colourBuffer = new float[4];
 		currentColour = null;
-		changeColour(Color.WHITE);
+		changeColour(col);
 		movements = new AnimationQueue();
 		movements.start();
 	}

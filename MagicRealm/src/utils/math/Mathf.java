@@ -24,4 +24,8 @@ public class Mathf {
 		return (float) Math.sin(ang);
 	}
 
+	public static float cos(float ang) {
+		return (float) Math.cos(ang);
+	}
+
 }

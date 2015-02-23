@@ -16,7 +16,6 @@ import lwjglview.graphics.LWJGLTextureArrayLoader;
 import lwjglview.graphics.board.LWJGLBoardDrawable;
 import lwjglview.graphics.shader.ShaderType;
 import model.EnchantedHolder;
-import model.enums.CounterType;
 import model.enums.TileName;
 import model.interfaces.ClearingInterface;
 
@@ -49,7 +48,7 @@ public class LWJGLTileCollection extends LWJGLDrawableNode {
 		get(tile).setEnchanted(ench);
 	}
 	
-	public synchronized void setTile(TileName tile, int rw, int cl, int rot,
+	public void setTile(TileName tile, int rw, int cl, int rot,
 			Iterable<? extends ClearingInterface> clears) {
 		int row = rw;
 		int col = cl;
@@ -67,7 +66,7 @@ public class LWJGLTileCollection extends LWJGLDrawableNode {
 		board.relocateChit(id, f, g);
 	}
 	
-	public synchronized LWJGLTileDrawable get(TileName tl) {
+	public LWJGLTileDrawable get(TileName tl) {
 		return tiles.get(tl);
 	}
 

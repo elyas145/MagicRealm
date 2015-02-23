@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.lwjgl.BufferUtils;
 
+import config.BoardConfiguration;
 import config.GraphicsConfiguration;
 import lwjglview.graphics.LWJGLDrawable;
 import lwjglview.graphics.LWJGLDrawableLeaf;
@@ -89,7 +90,10 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode {
 		tiles.relocateChit(id, f, g);
 	}
 
-	public LWJGLClearingStorage getClearing(int clr) {
+	public LWJGLCounterStorage getClearing(int clr) {
+		if(clr <= 0 || clr > BoardConfiguration.MAX_CLEARINGS_IN_TILE) {
+			return freeSpace;
+		}
 		return clearings.get(clr);
 	}
 
@@ -115,13 +119,14 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode {
 
 	private void initClearings(Iterable<? extends ClearingInterface> clears) {
 		getPosition(bufferT);
-		clearings.put(0, new LWJGLClearingStorage(this, bufferT));
 		for (ClearingInterface clr : clears) {
 			clr.getPosition(false, bufferN);
 			clr.getPosition(true, bufferE);
 			clearings.put(clr.getClearingNumber(), new LWJGLClearingStorage(
 					this, bufferT, bufferN, bufferE));
 		}
+		freeSpace = new LWJGLTileStorage(this, bufferT.get(0), bufferT.get(1),
+				clearings.values());
 	}
 
 	private FloatBuffer bufferN, bufferE, bufferT;
@@ -171,7 +176,7 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode {
 	}
 
 	private abstract class TileFace extends LWJGLDrawable {
-		
+
 		public abstract int getIndex();
 
 		public TileFace(Matrix mat) {
@@ -235,6 +240,7 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode {
 	}
 
 	private Map<Integer, LWJGLClearingStorage> clearings;
+	private LWJGLTileStorage freeSpace;
 	private LWJGLTileCollection tiles;
 	private Collection<LWJGLDrawableLeaf> faces;
 	private Matrix transformation;
