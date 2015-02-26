@@ -12,7 +12,7 @@ import org.lwjgl.opengl.*;
 import config.GraphicsConfiguration;
 import swingview.ControllerMain;
 import utils.math.Mathf;
-import utils.math.Matrix;
+import utils.math.linear.Matrix;
 import utils.resources.ResourceHandler;
 import view.graphics.Drawable;
 import view.graphics.Graphics;
@@ -44,13 +44,15 @@ public final class LWJGLGraphics implements Graphics {
 		control = cm;
 	}
 
-	public MVPState saveState() {
-		return state.copy();
+	public void saveState(MVPState st) {
+		synchronized(state) {
+			state.copyTo(st);
+		}
 	}
 
 	public void loadState(MVPState st) {
-		if (st != null) {
-			state = st;
+		synchronized(state) {
+			st.copyTo(state);
 		}
 	}
 
@@ -59,59 +61,94 @@ public final class LWJGLGraphics implements Graphics {
 	}
 
 	public void resetViewMatrix() {
-		state.viewMatrix = Matrix.identityMatrix(4);
-		updateViewMatrix();
+		synchronized (state) {
+			state.viewMatrix.identity();
+			updateViewMatrix();
+		}
 	}
 
 	public void rotateCameraX(float ang) {
-		applyCameraTransform(Matrix.rotationX(4, ang));
+		synchronized (buffer) {
+			buffer.rotateX(ang);
+			applyCameraTransform(buffer);
+		}
 	}
 
 	public void rotateCameraY(float ang) {
-		applyCameraTransform(Matrix.rotationY(4, ang));
+		synchronized (buffer) {
+			buffer.rotateY(ang);
+			applyCameraTransform(buffer);
+		}
 	}
 
 	public void rotateCameraZ(float ang) {
-		applyCameraTransform(Matrix.rotationZ(4, ang));
+		synchronized (buffer) {
+			buffer.rotateZ(ang);
+			applyCameraTransform(buffer);
+		}
 	}
 
 	public void translateCamera(float x, float y, float z) {
-		applyCameraTransform(Matrix.translation(x, y, z));
+		synchronized (buffer) {
+			buffer.translate(x, y, z);
+			applyCameraTransform(buffer);
+		}
 	}
 
 	public void applyCameraTransform(Matrix mat) {
-		state.viewMatrix = mat.multiply(state.viewMatrix);
-		updateViewMatrix();
+		synchronized (state) {
+			mat.multiply(state.viewMatrix, state.viewMatrix);
+			updateViewMatrix();
+		}
 	}
 
 	public void resetModelMatrix() {
-		state.modelMatrix = Matrix.identityMatrix(4);
-		updateModelViewMatrix();
+		synchronized (state) {
+			state.modelMatrix.identity();
+			updateModelViewMatrix();
+		}
 	}
 
 	public void rotateModelX(float ang) {
-		applyModelTransform(Matrix.rotationX(4, ang));
+		synchronized (buffer) {
+			buffer.rotateX(ang);
+			applyModelTransform(buffer);
+		}
 	}
 
 	public void rotateModelY(float ang) {
-		applyModelTransform(Matrix.rotationY(4, ang));
+		synchronized (buffer) {
+			buffer.rotateY(ang);
+			applyModelTransform(buffer);
+		}
 	}
 
 	public void rotateModelZ(float ang) {
-		applyModelTransform(Matrix.rotationZ(4, ang));
+		synchronized (buffer) {
+			buffer.rotateZ(ang);
+			applyModelTransform(buffer);
+		}
 	}
 
 	public void scaleModel(float f) {
-		applyModelTransform(Matrix.dilation(f, f, f, 1f));
+		synchronized (buffer) {
+			buffer.scale(f, f, f, 1f);
+			applyModelTransform(buffer);
+		}
 	}
 
 	public void translateModel(float x, float y, float z) {
-		applyModelTransform(Matrix.translation(x, y, z));
+		synchronized (buffer) {
+			buffer.translate(x, y, z);
+			applyModelTransform(buffer);
+		}
 	}
 
 	public void applyModelTransform(Matrix mat) {
-		state.modelMatrix = mat.multiply(state.modelMatrix);
-		updateModelViewMatrix();
+		synchronized (state) {
+			mat.multiply(state.modelMatrix, state.modelMatrix);
+			updateModelViewMatrix();
+		}
 	}
 
 	public int loadTexture(ByteBuffer rawData, int height, int width) {
@@ -305,17 +342,19 @@ public final class LWJGLGraphics implements Graphics {
 		}
 	}
 
+	private Matrix e4 = Matrix.columnVector(0f, 0f, 0f, 1f);
+
+	/*public void printTest() { // TODO
+		synchronized (state) {
+			state.modelViewProjectionMatrix.multiply(e4, e4);
+			state.modelMatrix.identity();
+			updateModelViewMatrix();
+		}
+	}*/
+
 	private void init(ResourceHandler rh) {
 		primitives = new GLPrimitives(this);
 		state = new MVPState();
-		state.modelMatrix = new Matrix(4, 4);
-		state.modelMatrix.identity();
-		state.viewMatrix = new Matrix(4, 4);
-		state.viewMatrix.identity();
-		state.modelMatrix = new Matrix(4, 4);
-		state.modelMatrix.identity();
-		state.projectionMatrix = new Matrix(4, 4);
-		state.projectionMatrix.identity();
 		updateViewMatrix();
 		drawables = new HashSet<Drawable>();
 		shaders = new GLShaderHandler(rh);
@@ -328,6 +367,7 @@ public final class LWJGLGraphics implements Graphics {
 				mainLoop();
 			}
 		});
+		buffer = Matrix.identity(4);
 	}
 
 	private void initGL() {
@@ -433,18 +473,18 @@ public final class LWJGLGraphics implements Graphics {
 	}
 
 	private void updateMVP() {
-		state.modelViewProjectionMatrix = state.projectionMatrix
-				.multiply(state.modelViewMatrix);
+		state.projectionMatrix.multiply(state.modelViewMatrix,
+				state.modelViewProjectionMatrix);
 	}
 
 	private void updateViewMatrix() {
-		state.viewInverseMatrix = state.viewMatrix.inverse();
+		state.viewMatrix.inverse(state.viewInverseMatrix);
 		updateModelViewMatrix();
 	}
 
 	private void updateModelViewMatrix() {
-		state.modelViewMatrix = state.viewInverseMatrix
-				.multiply(state.modelMatrix);
+		state.viewInverseMatrix.multiply(state.modelMatrix,
+				state.modelViewMatrix);
 		updateMVP();
 	}
 
@@ -458,7 +498,10 @@ public final class LWJGLGraphics implements Graphics {
 		float fovScale = .3f;
 		glFrustum(-ar * fovScale, ar * fovScale, -1.0 * fovScale,
 				1.0 * fovScale, .1f, 10f);
-		state.projectionMatrix.perspective(Mathf.PI * .5f, ar, .1f, 10f);
+		synchronized(state) {
+			state.projectionMatrix.perspective(Mathf.PI * .5f, ar, .1f, 10f);
+			updateMVP();
+		}
 	}
 
 	private void drawAll() {
@@ -485,24 +528,31 @@ public final class LWJGLGraphics implements Graphics {
 	}
 
 	public class MVPState {
-		protected MVPState copy() {
-			MVPState state = new MVPState();
-			state.projectionMatrix = projectionMatrix;
-			state.viewMatrix = viewMatrix;
-			state.viewInverseMatrix = viewInverseMatrix;
-			state.modelMatrix = modelMatrix;
-			state.modelViewMatrix = modelViewMatrix;
-			state.modelViewProjectionMatrix = modelViewProjectionMatrix;
-			return state;
+		public MVPState() {
+			projectionMatrix = Matrix.identity(4);
+			viewMatrix = Matrix.identity(4);
+			viewInverseMatrix = Matrix.identity(4);
+			modelMatrix = Matrix.identity(4);
+			modelViewMatrix = Matrix.identity(4);
+			modelViewProjectionMatrix = Matrix.identity(4);
 		}
 
-		protected void load(MVPState other) {
-			projectionMatrix = other.projectionMatrix;
-			viewMatrix = other.viewMatrix;
-			viewInverseMatrix = other.viewInverseMatrix;
-			modelMatrix = other.modelMatrix;
-			modelViewMatrix = other.modelViewMatrix;
-			modelViewProjectionMatrix = other.modelViewProjectionMatrix;
+		public void copyTo(MVPState state) {
+			state.projectionMatrix.copyFrom(projectionMatrix);
+			state.viewMatrix.copyFrom(viewMatrix);
+			state.viewInverseMatrix.copyFrom(viewInverseMatrix);
+			state.modelMatrix.copyFrom(modelMatrix);
+			state.modelViewMatrix.copyFrom(modelViewMatrix);
+			state.modelViewProjectionMatrix.copyFrom(modelViewProjectionMatrix);
+		}
+		
+		public String toString() {
+			return "Projection: " + projectionMatrix + "\n"
+					+ "View: " + viewMatrix + "\n"
+					+ "View inverse: " + viewInverseMatrix + "\n"
+					+ "Model: " + modelMatrix + "\n"
+					+ "ModelView: " + modelViewMatrix + "\n"
+					+ "MVP: " + modelViewProjectionMatrix;
 		}
 
 		protected Matrix projectionMatrix;
@@ -536,5 +586,11 @@ public final class LWJGLGraphics implements Graphics {
 	private ControllerMain control;
 
 	private Thread runThread;
+
+	private Matrix buffer;
+
+	public Matrix getModel() {
+		return state.modelMatrix;
+	}
 
 }

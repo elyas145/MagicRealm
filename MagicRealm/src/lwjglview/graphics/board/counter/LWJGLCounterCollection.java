@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import config.GraphicsConfiguration;
-import utils.math.Matrix;
+import utils.math.linear.Matrix;
 import utils.resources.CounterImages;
 import lwjglview.graphics.LWJGLDrawableNode;
 import lwjglview.graphics.LWJGLGraphics;
@@ -55,24 +55,20 @@ public class LWJGLCounterCollection extends LWJGLDrawableNode {
 		return counters.containsKey(ct);
 	}
 
-	public Matrix getVector(CounterType count) {
-		return get(count).getVector();
+	public void getVector(CounterType count, Matrix dest) {
+		get(count).getVector(dest);
 	}
 
 	public boolean isAnimationFinished(CounterType ct) {
 		return get(ct).isAnimationFinished();
 	}
 
-	public void moveTo(CounterType ct, float x, float y) {
-		get(ct).moveTo(x, y);
+	public void moveTo(CounterType ct, Matrix pos) {
+		get(ct).moveTo(pos);
 	}
 
 	public void changeColour(CounterType ct, Color col) {
 		get(ct).changeColour(col);
-	}
-
-	@Override
-	public void applyNodeTransformation(LWJGLGraphics gfx) {
 	}
 
 	@Override
@@ -81,6 +77,7 @@ public class LWJGLCounterCollection extends LWJGLDrawableNode {
 
 	@Override
 	public void draw(LWJGLGraphics gfx) {
+		updateTransformation();
 		gfx.getShaders().useShaderProgram(ShaderType.CHIT_SHADER);
 		textures.useTextures(gfx);
 		// draw all counters

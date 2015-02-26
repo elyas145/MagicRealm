@@ -22,6 +22,7 @@ import config.GraphicsConfiguration;
 import utils.math.Point;
 import utils.random.Random;
 import utils.resources.ResourceHandler;
+import model.EnchantedHolder;
 import model.board.tile.HexTile;
 import model.counter.chit.MapChit;
 import model.enums.CharacterType;
@@ -45,7 +46,7 @@ public class Board implements BoardInterface {
 		tileLocations = new HashMap<TileName, int[]>();
 		mapOfTileLocations = new HashMap<Integer, Map<Integer, TileName>>();
 		mapOfTiles = new HashMap<TileName, HexTile>();
-		clearingLocations = new HashMap<TileName, Map<Integer, Point[]>>();
+		clearingLocations = new HashMap<TileName, Map<Integer, EnchantedHolder<Point>>>();
 		counterPositions = new HashMap<CounterType, ClearingInterface>();
 		try {
 			String path = rh.getResource(
@@ -61,15 +62,15 @@ public class Board implements BoardInterface {
 					JSONObject ns = (JSONObject) js.get("numbers");
 					if (!clearingLocations.containsKey(tn)) {
 						clearingLocations.put(tn,
-								new HashMap<Integer, Point[]>());
+								new HashMap<Integer, EnchantedHolder<Point>>());
 					}
-					Map<Integer, Point[]> pts = clearingLocations.get(tn);
+					Map<Integer, EnchantedHolder<Point>> pts = clearingLocations.get(tn);
 					for (Object key : ns.keySet()) {
 						int val = Integer.parseInt((String) key);
 						if (!pts.containsKey(val)) {
-							pts.put(val, new Point[2]);
+							pts.put(val, new EnchantedHolder<Point>());
 						}
-						Point[] pt = pts.get(val);
+						EnchantedHolder<Point> pt = pts.get(val);
 						JSONObject jpt = (JSONObject) ns.get(key);
 						long x = (Long) jpt.get("x");
 						long y = (Long) jpt.get("y");
@@ -77,7 +78,7 @@ public class Board implements BoardInterface {
 								/ (float) GraphicsConfiguration.TILE_IMAGE_WIDTH;
 						float b = y
 								/ (float) GraphicsConfiguration.TILE_IMAGE_HEIGHT;
-						pt[en ? 1 : 0] = new Point(a, b);
+						pt.set(en, new Point(a, b));
 					}
 				}
 			}
@@ -231,7 +232,7 @@ public class Board implements BoardInterface {
 
 	private void setTile(TileName tile, int x, int y, int rot) {
 		getSurround(x, y, tile);
-		Map<Integer, Point[]> locs = clearingLocations.get(tile);
+		Map<Integer, EnchantedHolder<Point>> locs = clearingLocations.get(tile);
 		HexTile ht = new HexTile(this, tile, x, y, rot, locs, surround);
 		mapOfTiles.put(tile, ht);
 		tileLocations.put(tile, new int[] { x, y });
@@ -291,7 +292,7 @@ public class Board implements BoardInterface {
 		}
 	}
 
-	private Map<TileName, Map<Integer, Point[]>> clearingLocations;
+	private Map<TileName, Map<Integer, EnchantedHolder<Point>>> clearingLocations;
 	private TileName[] surround;
 	// row column
 	private Map<Integer, Map<Integer, TileName>> mapOfTileLocations;

@@ -1,6 +1,6 @@
 package lwjglview.graphics.animator.matrixcalculator;
 
-import utils.math.Matrix;
+import utils.math.linear.Matrix;
 
 public class StaticMatrixCalculator implements MatrixCalculator {
 	

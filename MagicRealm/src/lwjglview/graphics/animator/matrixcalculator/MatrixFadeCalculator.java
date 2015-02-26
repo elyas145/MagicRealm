@@ -1,12 +1,18 @@
 package lwjglview.graphics.animator.matrixcalculator;
 
-import utils.math.Matrix;
+import utils.math.linear.Matrix;
 
 public class MatrixFadeCalculator implements MatrixCalculator {
 	
 	public MatrixFadeCalculator(float fd, Matrix init, Matrix fin) {
-		initialMatrix = init;
-		finalMatrix = fin;
+		int rows = init.rowCount();
+		matrix = Matrix.empty(rows, 2);
+		for(int i = 0; i < rows; ++i) {
+			matrix.set(i, 0, init.get(i, 0));
+			matrix.set(i, 1, fin.get(i, 0));
+		}
+		buffer = Matrix.columnVector(1f - fade, fade);
+		calc = Matrix.clone(init);
 		fade = fd;
 	}
 	
@@ -16,13 +22,16 @@ public class MatrixFadeCalculator implements MatrixCalculator {
 
 	@Override
 	public Matrix calculateMatrix() {
-		Matrix a = initialMatrix.multiply(1f - fade);
-		Matrix b = finalMatrix.multiply(fade);
-		return a.add(b);
+		fade = fade < 0f ? 0f : fade;
+		fade = fade > 1f ? 1f : fade;
+		buffer.set(0, 0, 1f - fade);
+		buffer.set(1, 0, fade);
+		matrix.multiply(buffer, calc);
+		return calc;
 	}
 	
 	private float fade;
-	private Matrix initialMatrix;
-	private Matrix finalMatrix;
-
+	private Matrix matrix;
+	private Matrix buffer;
+	private Matrix calc;
 }

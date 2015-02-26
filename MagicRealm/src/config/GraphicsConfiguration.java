@@ -27,7 +27,7 @@ public class GraphicsConfiguration {
 	
 	public static final float CHIT_SPACING = CHIT_SCALE * .2f;
 	
-	public static final float CLEARING_RADUS = .17f;
+	public static final float CLEARING_RADUS = .2f;
 	
 	public static final int SPLASH_TIME = 1;
 	
@@ -44,4 +44,5 @@ public class GraphicsConfiguration {
 	public static final int INITIAL_ACTION_WIDTH = 200;
 	public static final int INITIAL_ACTION_HEIGHT = 150;
 
+	public static final boolean SIMPLE_COUNTERS = true;
 }

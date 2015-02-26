@@ -10,17 +10,19 @@ import lwjglview.graphics.LWJGLGraphics;
 import lwjglview.graphics.animator.AnimationQueue;
 import lwjglview.graphics.animator.FadeAnimator;
 import lwjglview.graphics.animator.MovementAnimator;
+import lwjglview.graphics.animator.matrixcalculator.MatrixCalculator;
 import lwjglview.graphics.shader.ShaderType;
 import model.enums.CounterType;
 import config.GraphicsConfiguration;
-import utils.math.Matrix;
+import utils.math.linear.Matrix;
 
-public class LWJGLCounterDrawable extends LWJGLDrawableNode {
+public class LWJGLCounterDrawable extends LWJGLDrawableNode implements
+		MatrixCalculator {
 
 	public static final ShaderType SHADER = ShaderType.CHIT_SHADER;
 
-	public LWJGLCounterDrawable(LWJGLBoardDrawable bd, LWJGLDrawableNode chitBlock,
-			int texid, Color col) {
+	public LWJGLCounterDrawable(LWJGLBoardDrawable bd,
+			LWJGLDrawableNode chitBlock, int texid, Color col) {
 		super(bd);
 		board = bd;
 		textureIndex = texid;
@@ -28,15 +30,24 @@ public class LWJGLCounterDrawable extends LWJGLDrawableNode {
 		representation = chitBlock;
 		textureIndex = texid;
 		position = null;
+		vec3 = Matrix.empty(3, 1);
 		buffer = BufferUtils.createFloatBuffer(4);
 		basis4 = Matrix.columnVector(0f, 0f, 0f, 1f);
 		colours = new AnimationQueue();
 		colours.start();
 		colourBuffer = new float[4];
 		currentColour = null;
+		buffer4 = Matrix.empty(4, 1);
+		buffer4A = Matrix.empty(4, 1);
 		changeColour(col);
+		float cs = GraphicsConfiguration.CHIT_SCALE;
+		scale = Matrix.dilation(cs, cs, cs, 1f);
+		hover = Matrix.translation(0f, 0f, GraphicsConfiguration.CHIT_HOVER
+				+ GraphicsConfiguration.TILE_THICKNESS * .5f);
+		bufferMatrix = Matrix.identity(4);
 		movements = new AnimationQueue();
 		movements.start();
+		setCalculator(this);
 	}
 
 	public int getID() {
@@ -49,38 +60,40 @@ public class LWJGLCounterDrawable extends LWJGLDrawableNode {
 
 	public synchronized void changeColour(Color col) {
 		col.getRGBComponents(colourBuffer);
-		Matrix newCol = Matrix.columnVector(colourBuffer);
+		buffer4.fill(colourBuffer);
 		if (currentColour == null) {
-			currentColour = newCol;
+			currentColour = Matrix.clone(buffer4);
 		}
-		float dist = currentColour.subtract(newCol).length();
-		colours.push(new FadeAnimator(dist * GraphicsConfiguration.COUNTER_FLIP_TIME,
-				currentColour, newCol));
-		currentColour = newCol;
+		currentColour.subtract(buffer4, buffer4A);
+		float dist = buffer4A.length();
+		colours.push(new FadeAnimator(dist
+				* GraphicsConfiguration.COUNTER_FLIP_TIME, currentColour,
+				buffer4));
+		currentColour.copyFrom(buffer4);
 	}
 
-	public synchronized void moveTo(float x, float y) {
-		buffer.put(0, x);
-		buffer.put(1, y);
-		move();
+	public void moveTo(Matrix pos) {
+		synchronized(vec3) {
+			vec3.copyFrom(pos);
+			move();
+		}
 	}
 
 	public boolean moving() {
 		return !movements.isFinished();
 	}
 
-	public Matrix getVector() {
+	public void getVector(Matrix focus) {
 		Matrix transform = getTransform();
-		transform = transform.multiply(basis4);
-		return Matrix.columnVector(transform.get(0, 0), transform.get(1, 0),
-				transform.get(2, 0));
+		transform.multiply(basis4, focus);
 	}
 
 	public Matrix getTransform() {
 		if (!movements.isFinished()) {
 			return movements.apply();
 		}
-		return Matrix.translation(position.get(0), position.get(1), 0f);
+		bufferMatrix.translate(position);
+		return bufferMatrix;
 	}
 
 	public boolean isAnimationFinished() {
@@ -89,14 +102,6 @@ public class LWJGLCounterDrawable extends LWJGLDrawableNode {
 
 	public LWJGLDrawableNode getRepresentation() {
 		return representation;
-	}
-
-	@Override
-	public void applyNodeTransformation(LWJGLGraphics lwgfx) {
-		lwgfx.scaleModel(GraphicsConfiguration.CHIT_SCALE);
-		lwgfx.applyModelTransform(getTransform());
-		lwgfx.translateModel(0f, 0f, GraphicsConfiguration.CHIT_HOVER
-				+ GraphicsConfiguration.TILE_THICKNESS * .5f);
 	}
 
 	@Override
@@ -112,51 +117,64 @@ public class LWJGLCounterDrawable extends LWJGLDrawableNode {
 
 	@Override
 	public void draw(LWJGLGraphics lwgfx) {
-
+		updateTransformation();
+		
 		representation.setParent(this);
 		representation.draw(lwgfx);
-		
+
+	}
+
+	@Override
+	public Matrix calculateMatrix() {
+		getTransform().multiply(hover, bufferMatrix);
+		bufferMatrix.multiply(scale, bufferMatrix);
+		return bufferMatrix;
 	}
 
 	private void move() {
-		float xf, yf;
-		xf = buffer.get(0);
-		yf = buffer.get(1);
-		Matrix fin = Matrix.columnVector(xf, yf, 0f);
+		System.out.println(vec3);
+		if(vec3.get(2, 0) > 0f) {
+			throw new RuntimeException(this.toString());
+		}
 		if (position == null) {
-			position = BufferUtils.createFloatBuffer(2);
+			position = Matrix.zeroVector(3);
 		} else {
-			Matrix init = Matrix.columnVector(position.get(0), position.get(1),
-					0f);
 			movements.push(new MovementAnimator(
-					GraphicsConfiguration.ANIMATION_SPEED, init, fin) {
+					GraphicsConfiguration.ANIMATION_SPEED, vec3, position) {
 				@Override
 				public void finish() {
 				}
 			});
 		}
-		position.put(0, xf);
-		position.put(1, yf);
+		position.copyFrom(vec3);
 	}
-	
+
 	private LWJGLBoardDrawable board;
 
 	private float[] colourBuffer;
 
 	private Matrix currentColour;
-
+	
+	private Matrix buffer4;
+	private Matrix buffer4A;
 	private Matrix basis4;
+
+	private Matrix scale;
+	private Matrix hover;
+	private Matrix bufferMatrix;
 
 	private AnimationQueue movements;
 	private AnimationQueue colours;
 
-	private FloatBuffer position;
 	private FloatBuffer buffer;
+	
+	private Matrix position;
+	private Matrix vec3;
 
 	private LWJGLDrawableNode representation;
 
 	private int textureIndex;
-	
+
 	private int identifier;
 
 }

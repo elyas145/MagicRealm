@@ -74,11 +74,6 @@ public class ModelData extends LWJGLDrawable {
 	}
 
 	@Override
-	public void applyTransformation(LWJGLGraphics gfx) {
-		gfx.resetModelMatrix();
-	}
-
-	@Override
 	public void updateUniforms(LWJGLGraphics gfx) {
 	}
 

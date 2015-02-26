@@ -1,47 +1,43 @@
 package lwjglview.graphics.board.tile;
 
-import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-
-import org.lwjgl.BufferUtils;
 
 import config.GraphicsConfiguration;
 import lwjglview.graphics.board.tile.clearing.LWJGLClearingStorage;
 import model.EnchantedHolder;
 import utils.math.Mathf;
-import utils.math.Matrix;
+import utils.math.linear.Matrix;
 import utils.random.Random;
 
 public class LWJGLTileStorage extends LWJGLCounterStorage {
 
-	public LWJGLTileStorage(LWJGLTileDrawable td, float f, float g,
+	public LWJGLTileStorage(LWJGLTileDrawable td, Matrix pos,
 			Iterable<LWJGLClearingStorage> clrs) {
-		super(td, f, g, f, g);
+		super(td, pos, pos);
 		obstructions = new EnchantedHolder<Collection<Obstruction>>(
 				new ArrayList<Obstruction>(), new ArrayList<Obstruction>());
-		buff = BufferUtils.createFloatBuffer(2);
-		counterRadius = GraphicsConfiguration.CHIT_SCALE * 1.5f;
-		outerRadius = GraphicsConfiguration.TILE_WIDTH * .43f;
+		vec3 = Matrix.zeroVector(3);
+		counterRadius = GraphicsConfiguration.CHIT_SCALE * 1.4f;
+		outerRadius = GraphicsConfiguration.TILE_WIDTH * .2f;
 		clearingRadius = GraphicsConfiguration.CLEARING_RADUS;
-		Obstruction self = new Obstruction(f, g, outerRadius, true);
+		Obstruction self = new Obstruction(pos, outerRadius, true);
 		obstructions.get(false).add(self);
 		obstructions.get(true).add(self);
 		setObstructions(clrs, false);
 		setObstructions(clrs, true);
 		chits = new HashMap<Integer, Obstruction>();
-		getLocation(buff, false);
-		Matrix norm = Matrix.columnVector(buff.get(0), buff.get(1));
-		getLocation(buff, true);
-		Matrix ench = Matrix.columnVector(buff.get(0), buff.get(1));
+		getLocation(vec3, false);
+		Matrix norm = Matrix.clone(vec3);
+		getLocation(vec3, true);
+		Matrix ench = Matrix.clone(vec3);
 		location = new EnchantedHolder<Matrix>(norm, ench);
 	}
 
 	@Override
-	public void getLocation(int id, FloatBuffer buff) {
+	public void getLocation(int id, Matrix buff) {
 		Obstruction ob;
 		synchronized (chits) {
 			ob = chits.get(id);
@@ -49,37 +45,62 @@ public class LWJGLTileStorage extends LWJGLCounterStorage {
 		ob.getLocation(buff);
 	}
 
+	/*
 	@Override
 	public void put(int id) {
-		Matrix rand = randomLocation();
+		Matrix rand = vec3;
+		randomLocation(rand);
+		boolean ench = isEnchanted();
+		for (int i = 0; i < 20; ++i) {
+			for (Obstruction ob : obstructions.get(ench)) {
+				if (ob.obstructs(rand)) {
+					ob.recommend(rand);
+				}
+			}
+			for (Obstruction ob : chits.values()) {
+				if (ob.obstructs(rand)) {
+					ob.recommend(rand);
+				}
+			}
+		}
+		synchronized (chits) {
+			chits.put(id, new Obstruction(rand, counterRadius, false));
+		}
+		moveChit(id);
+	}*/
+	
+	@Override
+	public void put(int id) {
+		Matrix rand = vec3;
+		randomLocation(rand);
 		boolean ench = isEnchanted();
 		for (int i = 0; i < 20; ++i) {
 			int obst = 0;
 			for (Obstruction ob : obstructions.get(ench)) {
 				if (ob.obstructs(rand)) {
 					++obst;
-					rand = ob.recommend(rand);
+					ob.recommend(rand);
 				}
 			}
 			for (Obstruction ob : chits.values()) {
 				if (ob.obstructs(rand)) {
 					++obst;
-					rand = ob.recommend(rand);
+					ob.recommend(rand);
 				}
 			}
 			if (obst >= 3) {
-				rand = randomLocation();
+				randomLocation(rand);
 			}
 		}
 		for (int i = 0; i < 10; ++i) {
 			for (Obstruction ob : obstructions.get(ench)) {
 				if (ob.obstructs(rand)) {
-					rand = ob.recommend(rand);
+					ob.recommend(rand);
 				}
 			}
 			for (Obstruction ob : chits.values()) {
 				if (ob.obstructs(rand)) {
-					rand = ob.recommend(rand);
+					ob.recommend(rand);
 				}
 			}
 		}
@@ -105,10 +126,13 @@ public class LWJGLTileStorage extends LWJGLCounterStorage {
 		}
 	}
 
-	private Matrix randomLocation() {
-		float x = Random.random(-1f, 1f);
-		float y = Random.random(-1f, 1f);
-		return Matrix.columnVector(x, y).add(location.get(isEnchanted()));
+	private void randomLocation(Matrix matr) {
+		float r, O;
+		r = Mathf.sqrt(Random.random(0f, 1f)) * outerRadius;
+		O = Random.random(-Mathf.PI, Mathf.PI);
+		matr.set(0, 0, r * Mathf.cos(O));
+		matr.set(1, 0, r * Mathf.sin(O));
+		matr.add(location.get(isEnchanted()), matr);
 	}
 
 	private boolean isEnchanted() {
@@ -118,54 +142,51 @@ public class LWJGLTileStorage extends LWJGLCounterStorage {
 	private void setObstructions(Iterable<LWJGLClearingStorage> clrs, boolean b) {
 		Collection<Obstruction> obs = obstructions.get(b);
 		for (LWJGLClearingStorage st : clrs) {
-			obs.add(new Obstruction(st));
+			obs.add(new Obstruction(st, b));
 		}
 	}
 
 	private class Obstruction {
-		public Obstruction(float f, float g, float rad, boolean out) {
-			location = Matrix.columnVector(f, g);
-			radius = rad;
-			isOut = out;
-			adjustRadius();
-		}
-
 		public Obstruction(Matrix mat, float rad, boolean out) {
-			location = mat;
+			location = Matrix.clone(mat);
 			radius = rad;
 			isOut = out;
 			adjustRadius();
 		}
 
-		public Obstruction(LWJGLClearingStorage st) {
-			st.getLocation(buff);
-			location = Matrix.columnVector(buff.get(0), buff.get(1));
+		public Obstruction(LWJGLClearingStorage st, boolean ench) {
+			location = Matrix.zeroVector(3);
+			st.getLocation(location, ench);
 			radius = clearingRadius;
 			isOut = false;
 			adjustRadius();
 		}
 
-		public void getLocation(FloatBuffer buff) {
-			location.toFloatBuffer(buff);
+		public void getLocation(Matrix buff) {
+			buff.copyFrom(location);
 		}
 
 		public boolean obstructs(Matrix pos) {
-			return pos.subtract(location).length() < radius ^ isOut;
+			pos.subtract(location, buffer);
+			return buffer.length() < radius ^ isOut;
 		}
 
-		public Matrix recommend(Matrix pos) {
-			Matrix delt = pos.subtract(location);
-			float len = delt.length();
-			float fact = radius;
-			fact *= isOut ? .95f : 1.05f;
-			return location.add(delt.multiply(fact / len));
+		public void recommend(Matrix pos) {
+			pos.subtract(location, buffer);
+			float len = radius / buffer.length();
+			len *= isOut ? .95f : 1.05f;
+			System.out.println(pos + ", " + len);
+			buffer.multiply(len, buffer);
+			location.add(buffer, pos);
 		}
 
 		private void adjustRadius() {
 			radius += isOut ? -counterRadius : counterRadius;
+			buffer = Matrix.zeroVector(3);
 		}
 
 		Matrix location;
+		Matrix buffer;
 		float radius;
 		boolean isOut;
 	}
@@ -176,5 +197,5 @@ public class LWJGLTileStorage extends LWJGLCounterStorage {
 	private EnchantedHolder<Matrix> location;
 	private EnchantedHolder<Collection<Obstruction>> obstructions;
 	private Map<Integer, Obstruction> chits;
-	private FloatBuffer buff;
+	private Matrix vec3;
 }

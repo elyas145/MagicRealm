@@ -6,6 +6,26 @@ import org.lwjgl.BufferUtils;
 
 public class GLPrimitives {
 	
+	public static final LWJGLDrawable HEXAGON = new LWJGLDrawable() {
+		@Override
+		public void updateUniforms(LWJGLGraphics gfx) {
+		}
+		@Override
+		public void draw(LWJGLGraphics gfx) {
+			gfx.getPrimitiveTool().drawHexagon();
+		}
+	};
+	
+	public static final LWJGLDrawable SQUARE = new LWJGLDrawable() {
+		@Override
+		public void updateUniforms(LWJGLGraphics gfx) {
+		}
+		@Override
+		public void draw(LWJGLGraphics gfx) {
+			gfx.getPrimitiveTool().drawSquare();
+		}
+	};
+	
 	public GLPrimitives(LWJGLGraphics drawer) {
 		square = -1;
 		hexagon = -1;

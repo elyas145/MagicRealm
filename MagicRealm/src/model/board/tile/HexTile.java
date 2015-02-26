@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import model.EnchantedHolder;
 import model.board.Board;
 import model.board.clearing.Clearing;
 import model.counter.chit.Chit;
@@ -15,46 +16,38 @@ import model.interfaces.HexTileInterface;
 import org.json.simple.JSONArray;
 
 import utils.math.Mathf;
-import utils.math.Matrix;
 import utils.math.Point;
+import utils.math.linear.Matrix;
 import utils.tools.IterationTools;
 
 public class HexTile implements HexTileInterface {
 
-	public HexTile(Board par, TileName tp, int rw, int col, int rot) {
-		parent = par;
-		name = tp;
-		row = rw;
-		column = col;
-		rotation = rot;
-		clearings = new HashMap<Integer, Clearing>();
-		exits = new int[2][6];
-		clearExits();
-	}
-
 	public HexTile(Board par, TileName tile, int x, int y, int rot,
-			Map<Integer, Point[]> locations, TileName[] surrounding) {
+			Map<Integer, EnchantedHolder<Point>> locations, TileName[] surrounding) {
 		parent = par;
 		name = tile;
 		row = x;
 		column = y;
 		rotation = rot;
 		clearings = new HashMap<Integer, Clearing>();
-		for (Map.Entry<Integer, Point[]> ents : locations.entrySet()) {
-			Point[] pts = ents.getValue();
+		bufferA = Matrix.zeroVector(3);
+		bufferB = Matrix.zeroVector(3);
+		bufferC = Matrix.square(3);
+		for (Map.Entry<Integer, EnchantedHolder<Point>> ents : locations.entrySet()) {
+			EnchantedHolder<Point> pts = ents.getValue();
 			int num = ents.getKey();
-			if (pts[0] == null) {
+			if (!pts.has(false)) {
 				throw new RuntimeException(
 						"Missing normal position data for tile " + name
 								+ ", clearing " + num);
 			}
-			if (pts[1] == null) {
+			if (!pts.has(true)) {
 				throw new RuntimeException(
 						"Missing enchanted position data for tile " + name
 								+ ", clearing " + num);
 			}
-			Clearing cl = new Clearing(this, num, transform(pts[0]),
-					transform(pts[1]));
+			Clearing cl = new Clearing(this, num, transform(pts.get(false), bufferA),
+					transform(pts.get(true), bufferB));
 			clearings.put(num, cl);
 		}
 		exits = new int[2][6];
@@ -90,12 +83,6 @@ public class HexTile implements HexTileInterface {
 		int entr = exits[enchant ? 1 : 0][rot % 6];
 		return clearings.get(entr);
 	}
-
-	/*
-	 * public HexTile(TileName tile, int x, int y, int rot, JSONArray arr) {
-	 * name = tile; row = x; column = y; rotation = rot; this.arr = arr;
-	 * clearings = new HashMap<Integer, Clearing>(); //setClearings(); }
-	 */
 
 	@Override
 	public Collection<? extends ClearingInterface> getClearings() {
@@ -431,16 +418,30 @@ public class HexTile implements HexTileInterface {
 		exit[rot] = clear;
 	}
 
-	private Point transform(Point point) {
-		Matrix p = Matrix
-				.columnVector(new float[] { point.getX(), point.getY() });
-		p = p.multiply(2f)
-				.subtract(Matrix.columnVector(new float[] { 1f, 1f }));
-		p = Matrix.dilation(new float[] { 1f, -0.866025f }).multiply(p);
-		p = Matrix.rotation(-Mathf.PI * getRotation() / 3f).multiply(p);
-		return new Point(p.get(0, 0), p.get(1, 0));
+	private Matrix transform(Point point, Matrix buffer) {
+		buffer.set(0, 0, point.getX());
+		buffer.set(1, 0, point.getY());
+		buffer.set(2, 0, 1f);
+		// scale the point to [0,2]X[0,2]
+		bufferC.scale(2f, 2f, 1f);
+		bufferC.multiply(buffer, buffer);
+		// translate the point to [-1,1]X[-1,1]
+		bufferC.translate(-1f, -1f);
+		bufferC.multiply(buffer, buffer);
+		// scale and invert the point
+		bufferC.scale(1f, -0.866025f, 1f);
+		bufferC.multiply(buffer, buffer);
+		// rotate the point
+		bufferC.rotate(-Mathf.PI * getRotation() / 3f);
+		bufferC.multiply(buffer, buffer);
+		// reset the point to 3d instead of 2d homogenous
+		buffer.set(2, 0, 0f);
+		return buffer;
 	}
 
+	private Matrix bufferA;
+	private Matrix bufferB;
+	private Matrix bufferC;
 	private Board parent;
 	private int[][] exits;
 	private TileName name;

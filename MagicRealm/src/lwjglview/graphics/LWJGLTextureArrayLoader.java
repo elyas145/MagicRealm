@@ -45,6 +45,7 @@ public class LWJGLTextureArrayLoader {
 	public void loadTextures(LWJGLGraphics gfx) {
 		if(!loadedTextures()) {
 			textureIndex = gfx.loadTextureArray(rawData, images.size(), height, width);
+			rawData = null;
 		}
 	}
 	

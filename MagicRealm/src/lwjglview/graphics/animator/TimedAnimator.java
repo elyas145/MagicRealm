@@ -1,6 +1,6 @@
 package lwjglview.graphics.animator;
 
-import utils.math.Matrix;
+import utils.math.linear.Matrix;
 import utils.time.Timing;
 
 public abstract class TimedAnimator extends Animator {

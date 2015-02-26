@@ -1,6 +1,6 @@
 package lwjglview.graphics.animator;
 
-import utils.math.Matrix;
+import utils.math.linear.Matrix;
 
 public class AnimationQueue extends Animator {
 	
@@ -99,5 +99,4 @@ public class AnimationQueue extends Animator {
 	private Link head;
 	private Link tail;
 	private boolean paused;
-	
 }

@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import config.GraphicsConfiguration;
-import utils.math.Matrix;
+import utils.math.linear.Matrix;
 import utils.resources.ChitGenerator;
 import lwjglview.graphics.LWJGLDrawableNode;
 import lwjglview.graphics.LWJGLGraphics;
@@ -123,12 +123,12 @@ public class LWJGLMapChitCollection extends LWJGLDrawableNode {
 		}
 	}
 
-	public Matrix getVector(MapChit mc) {
-		return get(mc).getVector();
+	public void getVector(MapChit mc, Matrix dest) {
+		get(mc).getVector(dest);
 	}
 
-	public Matrix getVector(MapChitType mct, char identifier) {
-		return get(mct, identifier).getVector();
+	public void getVector(MapChitType mct, char identifier, Matrix dest) {
+		get(mct, identifier).getVector(dest);
 	}
 
 	public void changeColour(MapChit mc, Color col) {
@@ -148,15 +148,12 @@ public class LWJGLMapChitCollection extends LWJGLDrawableNode {
 	}
 
 	@Override
-	public void applyNodeTransformation(LWJGLGraphics gfx) {
-	}
-
-	@Override
 	public void updateNodeUniforms(LWJGLGraphics gfx) {
 	}
 
 	@Override
 	public void draw(LWJGLGraphics gfx) {
+		updateTransformation();
 		gfx.getShaders().useShaderProgram(ShaderType.CHIT_SHADER);
 		textures.useTextures(gfx);
 		synchronized (drawables) {

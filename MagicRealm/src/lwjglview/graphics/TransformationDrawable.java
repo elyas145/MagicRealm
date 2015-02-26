@@ -1,20 +1,21 @@
 package lwjglview.graphics;
 
-import utils.math.Matrix;
-import view.graphics.Drawable;
-import view.graphics.Graphics;
+import lwjglview.graphics.animator.matrixcalculator.MatrixCalculator;
+import lwjglview.graphics.animator.matrixcalculator.StaticMatrixCalculator;
+import lwjglview.graphics.board.LWJGLBoardDrawable;
+import utils.math.linear.Matrix;
 
 public class TransformationDrawable extends LWJGLDrawableNode {
 
-	public TransformationDrawable(LWJGLDrawable parent, LWJGLDrawable draw, Matrix transform) {
-		super(parent);
+	public TransformationDrawable(LWJGLDrawableNode parent, LWJGLDrawable draw, MatrixCalculator transform) {
+		super(parent, transform);
 		drawable = draw;
-		transformation = transform;
 	}
-	
-	@Override
-	public void applyNodeTransformation(LWJGLGraphics gfx) {
-		gfx.applyModelTransform(transformation);
+
+	public TransformationDrawable(LWJGLBoardDrawable parent,
+			LWJGLDrawableNode draw, Matrix transform) {
+		super(parent, new StaticMatrixCalculator(transform));
+		drawable = draw;
 	}
 
 	@Override
@@ -23,10 +24,10 @@ public class TransformationDrawable extends LWJGLDrawableNode {
 
 	@Override
 	public void draw(LWJGLGraphics gfx) {
+		updateTransformation();
 		drawable.draw(gfx);
 	}
 
 	private LWJGLDrawable drawable;
-	private Matrix transformation;
 
 }

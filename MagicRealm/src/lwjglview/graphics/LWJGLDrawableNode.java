@@ -1,25 +1,23 @@
 package lwjglview.graphics;
 
+import utils.math.linear.Matrix;
+import lwjglview.graphics.animator.matrixcalculator.MatrixCalculator;
+import lwjglview.graphics.animator.matrixcalculator.StaticMatrixCalculator;
+
 public abstract class LWJGLDrawableNode extends LWJGLDrawable {
 	
-	public abstract void applyNodeTransformation(LWJGLGraphics gfx);
-	
 	public abstract void updateNodeUniforms(LWJGLGraphics gfx);
+	
+	public Matrix getTransformation() {
+		return buffered;
+	}
 	
 	public LWJGLDrawable getParent() {
 		return parent;
 	}
 	
-	public void setParent(LWJGLDrawable par) {
+	public void setParent(LWJGLDrawableNode par) {
 		parent = par;
-	}
-	
-	@Override
-	public final void applyTransformation(LWJGLGraphics gfx) {
-		applyNodeTransformation(gfx);
-		if(parent != null) {
-			parent.applyTransformation(gfx);
-		}
 	}
 	
 	@Override
@@ -30,10 +28,39 @@ public abstract class LWJGLDrawableNode extends LWJGLDrawable {
 		updateNodeUniforms(gfx);
 	}
 	
-	protected LWJGLDrawableNode(LWJGLDrawable par) {
+	protected LWJGLDrawableNode(LWJGLDrawableNode par) {
 		parent = par;
+		buffered = Matrix.identity(4);
+		transformation = new StaticMatrixCalculator(Matrix.identity(4));
 	}
 	
-	private LWJGLDrawable parent;
+	protected LWJGLDrawableNode(LWJGLDrawableNode par, MatrixCalculator calc) {
+		parent = par;
+		buffered = Matrix.identity(4);
+		transformation = calc;
+	}
+	
+	protected LWJGLDrawableNode(LWJGLDrawableNode par, Matrix mat) {
+		parent = par;
+		buffered = Matrix.identity(4);
+		transformation = new StaticMatrixCalculator(mat);
+	}
 
+	protected void setCalculator(MatrixCalculator calc) {
+		transformation = calc;
+	}
+	
+	protected final void updateTransformation() {
+		Matrix mat = transformation.calculateMatrix();
+		if(parent != null) {
+			parent.getTransformation().multiply(mat, buffered);
+		}
+		else {
+			buffered.copyFrom(mat);
+		}
+	}
+	
+	private LWJGLDrawableNode parent;
+	private MatrixCalculator transformation;
+	private Matrix buffered;
 }

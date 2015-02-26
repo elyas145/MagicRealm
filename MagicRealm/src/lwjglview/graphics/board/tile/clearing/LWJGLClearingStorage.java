@@ -1,26 +1,25 @@
 package lwjglview.graphics.board.tile.clearing;
 
-import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.lwjgl.BufferUtils;
+import utils.math.linear.Matrix;
 
 import config.GraphicsConfiguration;
 import lwjglview.graphics.board.tile.LWJGLCounterStorage;
 import lwjglview.graphics.board.tile.LWJGLTileDrawable;
 
 public class LWJGLClearingStorage extends LWJGLCounterStorage {
-	public LWJGLClearingStorage(LWJGLTileDrawable td, FloatBuffer tc,
-			FloatBuffer nl, FloatBuffer el) {
-		super(td, tc.get(0) + nl.get(0), tc.get(1) + nl.get(1),
-				tc.get(0) + el.get(0), tc.get(1) + el.get(1));
+	public LWJGLClearingStorage(LWJGLTileDrawable td, Matrix norm, Matrix ench) {
+		super(td, norm, ench);
 		chits = new ArrayList<Integer>();
 		dim = 0;
-		buff = BufferUtils.createFloatBuffer(2);
+		vec3 = Matrix.zeroVector(3);
+		buffer3 = Matrix.zeroVector(3);
 	}
 
-	public void getLocation(int id, FloatBuffer loc) {
+	// get the location of a counter in the clearing
+	public void getLocation(int id, Matrix loc) {
 		int idx = chits.indexOf(id);
 		int row = dim - idx / dim - 1;
 		int col = idx % dim;
@@ -28,11 +27,11 @@ public class LWJGLClearingStorage extends LWJGLCounterStorage {
 		float spacing = 2f * GraphicsConfiguration.CHIT_SCALE
 				+ GraphicsConfiguration.CHIT_SPACING;
 		float offs = spacing * gaps * .5f;
-		synchronized (buff) {
-			getLocation(buff);
+		synchronized (vec3) {
+			getLocation(vec3);
+			buffer3.fill(col * spacing - offs, row * spacing - offs, 0f);
+			vec3.add(buffer3, loc);
 		}
-		loc.put(0, col * spacing - offs + buff.get(0));
-		loc.put(1, row * spacing - offs + buff.get(1));
 	}
 
 	public void put(int id) {
@@ -87,5 +86,6 @@ public class LWJGLClearingStorage extends LWJGLCounterStorage {
 	
 	private int dim;
 	private List<Integer> chits;
-	private FloatBuffer buff;
+	private Matrix vec3;
+	private Matrix buffer3;
 }

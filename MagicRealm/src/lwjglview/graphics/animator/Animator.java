@@ -1,6 +1,6 @@
 package lwjglview.graphics.animator;
 
-import utils.math.Matrix;
+import utils.math.linear.Matrix;
 
 public abstract class Animator {
 	

@@ -1,6 +1,6 @@
 package model.interfaces;
 
-import java.nio.FloatBuffer;
+import utils.math.linear.Matrix;
 
 import model.enums.PathType;
 
@@ -15,7 +15,7 @@ public interface ClearingInterface {
 	 * @return into destination
 	 * 	       the position of the clearing in the unit square
 	 */
-	void getPosition(boolean enchanted, FloatBuffer dest);
+	void getPosition(boolean enchanted, Matrix dest);
 	
 	/**
 	 * @return the parent tile

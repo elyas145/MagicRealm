@@ -1,8 +1,6 @@
 package lwjglview.graphics.board.tile;
 
-import java.nio.FloatBuffer;
-
-import org.lwjgl.BufferUtils;
+import utils.math.linear.Matrix;
 
 import model.EnchantedHolder;
 
@@ -12,22 +10,19 @@ public abstract class LWJGLCounterStorage {
 
 	public abstract void remove(int id);
 
-	public abstract void getLocation(int id, FloatBuffer buff);
+	public abstract void getLocation(int id, Matrix buff);
 
-	public LWJGLCounterStorage(LWJGLTileDrawable td, float f, float g, float h, float i) {
+	public LWJGLCounterStorage(LWJGLTileDrawable td, Matrix norm, Matrix ench) {
 		tile = td;
-		posns = new EnchantedHolder<float[]>(new float[] { f, g }, new float[] {
-				h, i });
-		buff = BufferUtils.createFloatBuffer(2);
+		posns = new EnchantedHolder<Matrix>(Matrix.clone(norm), Matrix.clone(ench));
+		buff = Matrix.zeroVector(3);
 	}
 
-	public final void getLocation(FloatBuffer loc, boolean ench) {
-		float[] pos = getPosition(ench);
-		loc.put(0, pos[0]);
-		loc.put(1, pos[1]);
+	public final void getLocation(Matrix loc, boolean ench) {
+		getPosition(ench, loc);
 	}
 
-	public final void getLocation(FloatBuffer loc) {
+	public final void getLocation(Matrix loc) {
 		getLocation(loc, getParent().isEnchanted());
 	}
 	
@@ -35,19 +30,19 @@ public abstract class LWJGLCounterStorage {
 		return tile;
 	}
 	
-	protected float[] getPosition(boolean ench) {
-		return posns.get(ench);
+	protected void getPosition(boolean ench, Matrix pos) {
+		pos.copyFrom(posns.get(ench));
 	}
 
 	protected void moveChit(int id) {
 		synchronized (buff) {
 			getLocation(id, buff);
-			tile.relocateChit(id, buff.get(0), buff.get(1));
+			tile.relocateChit(id, buff);
 		}
 	}
 
 	private LWJGLTileDrawable tile;
-	private EnchantedHolder<float[]> posns;
-	private FloatBuffer buff;
+	private EnchantedHolder<Matrix> posns;
+	private Matrix buff;
 
 }

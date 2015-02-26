@@ -4,24 +4,17 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JDialog;
 import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
 
 import config.GameConfiguration;
 import controller.Controller;
 import lwjglview.graphics.LWJGLGraphics;
 import lwjglview.graphics.board.LWJGLBoardDrawable;
 import model.activity.Activity;
-import model.activity.Move;
-import model.board.Board;
-import model.board.clearing.Clearing;
-import model.board.tile.HexTile;
 import model.character.Character;
 import model.character.CharacterFactory;
 import model.controller.ModelController;
 import model.counter.chit.MapChit;
-import model.enums.ActivityType;
 import model.enums.CharacterType;
 import model.enums.CounterType;
 import model.enums.PeerType;

@@ -1,24 +1,37 @@
 package lwjglview.graphics;
 
+import utils.math.linear.Matrix;
+import lwjglview.graphics.animator.matrixcalculator.MatrixCalculator;
+
 public class LWJGLDrawableLeaf extends LWJGLDrawableNode {
 
-	public LWJGLDrawableLeaf(LWJGLDrawable par, LWJGLDrawable draw) {
+	public LWJGLDrawableLeaf(LWJGLDrawableNode par, LWJGLDrawable draw) {
 		super(par);
 		drawable = draw;
 	}
 
-	@Override
-	public void applyNodeTransformation(LWJGLGraphics gfx) {
+	public LWJGLDrawableLeaf(LWJGLDrawableNode par, Matrix matr, LWJGLDrawable draw) {
+		super(par, matr);
+		drawable = draw;
 	}
-
+	
+	public LWJGLDrawableLeaf(LWJGLDrawableNode par, MatrixCalculator matr, LWJGLDrawable draw) {
+		super(par, matr);
+		drawable = draw;
+	}
+	
 	@Override
 	public void updateNodeUniforms(LWJGLGraphics gfx) {
 	}
 	
+	private Matrix e4 = Matrix.columnVector(0f, 0f, 0f, 1f);
+	private Matrix res = Matrix.clone(e4);
+	
 	@Override
-	public void draw(LWJGLGraphics gfx) {
-		drawable.applyTransformation(gfx);
-		applyTransformation(gfx);
+	public final void draw(LWJGLGraphics gfx) {
+		updateTransformation();
+		gfx.resetModelMatrix();
+		gfx.applyModelTransform(getTransformation());
 		updateUniforms(gfx);
 		drawable.updateUniforms(gfx);
 		drawable.draw(gfx);

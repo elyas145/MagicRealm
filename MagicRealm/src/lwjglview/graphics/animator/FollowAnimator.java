@@ -1,7 +1,7 @@
 package lwjglview.graphics.animator;
 
 import lwjglview.graphics.animator.matrixcalculator.MatrixCalculator;
-import utils.math.Matrix;
+import utils.math.linear.Matrix;
 import utils.time.Timing;
 
 public class FollowAnimator extends Animator {
@@ -11,6 +11,8 @@ public class FollowAnimator extends Animator {
 		calculator = position;
 		speed = vel;
 		lastTime = Timing.getSeconds();
+		bufferNx1 = Matrix.clone(currentPosition);
+		bufferN1xN1 = Matrix.translation(bufferNx1);
 	}
 	
 	public void changeFocus(MatrixCalculator mc) {
@@ -40,10 +42,12 @@ public class FollowAnimator extends Animator {
 	@Override
 	protected Matrix calculateTransform() {
 		if (paused) {
-			return Matrix.translation(currentPosition);
+			bufferN1xN1.translate(currentPosition);
+			return bufferN1xN1;
 		}
 		Matrix pos = calculator.calculateMatrix();
-		Matrix diff = pos.subtract(currentPosition);
+		Matrix diff = bufferNx1;
+		pos.subtract(currentPosition, diff);
 		float ct = Timing.getSeconds();
 		float dist = (ct - lastTime) * speed;
 		lastTime = ct;
@@ -54,11 +58,14 @@ public class FollowAnimator extends Animator {
 		} else {
 			delt = diff;
 		}
-		currentPosition = currentPosition.add(delt);
-		return Matrix.translation(currentPosition);
+		currentPosition.add(delt, currentPosition);
+		bufferN1xN1.translate(currentPosition);
+		return bufferN1xN1;
 	}
 
 	private Matrix currentPosition;
+	private Matrix bufferNx1;
+	private Matrix bufferN1xN1;
 	private MatrixCalculator calculator;
 	private float lastTime;
 	private float speed;

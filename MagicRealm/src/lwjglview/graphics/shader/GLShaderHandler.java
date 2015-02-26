@@ -14,7 +14,7 @@ import org.lwjgl.BufferUtils;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.*;
-import utils.math.Matrix;
+import utils.math.linear.Matrix;
 import utils.resources.ResourceHandler;
 
 public class GLShaderHandler {

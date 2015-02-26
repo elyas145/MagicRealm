@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import utils.math.Mathf;
-import utils.math.Matrix;
+import utils.math.linear.Matrix;
 import utils.resources.ResourceHandler;
 import utils.resources.TileImages;
 import config.GraphicsConfiguration;
@@ -29,6 +29,7 @@ public class LWJGLTileCollection extends LWJGLDrawableNode {
 				GraphicsConfiguration.IMAGE_SCALE_HEIGHT);
 		tiles = new HashMap<TileName, LWJGLTileDrawable>();
 		textureLocations = new HashMap<TileName, EnchantedHolder<Integer>>();
+		buffer3 = Matrix.zeroVector(3);
 		loadTileImages();
 	}
 
@@ -36,10 +37,10 @@ public class LWJGLTileCollection extends LWJGLDrawableNode {
 		return get(name).isEnchanted();
 	}
 
-	public void getPosition(TileName name, FloatBuffer position) {
+	public void getPosition(TileName name, Matrix position) {
 		get(name).getPosition(position);
 	}
-	
+
 	public Matrix getVector(TileName tile) {
 		return get(tile).getVector();
 	}
@@ -47,31 +48,25 @@ public class LWJGLTileCollection extends LWJGLDrawableNode {
 	public void setEnchanted(TileName tile, boolean ench) {
 		get(tile).setEnchanted(ench);
 	}
-	
+
 	public void setTile(TileName tile, int rw, int cl, int rot,
 			Iterable<? extends ClearingInterface> clears) {
 		int row = rw;
 		int col = cl;
-		float x, y, r;
-		x = row % 2 == 0 ? 0f : 1.5f;
-		x += col * 3f;
-		y = -row * 0.866025f;
-		r = Mathf.PI * rot / 3f;
+		buffer3.fill((row % 2 == 0 ? 0f : 1.5f) + col * 3f, -row * 0.866025f,
+				0f);
+		float r = Mathf.PI * rot / 3f;
 		EnchantedHolder<Integer> loc = textureLocations.get(tile);
-		tiles.put(tile, new LWJGLTileDrawable(this, x, y, r,
-				loc.get(false), loc.get(true), clears));
+		tiles.put(tile, new LWJGLTileDrawable(this, buffer3, r, loc.get(false),
+				loc.get(true), clears));
 	}
 
-	public void relocateChit(int id, float f, float g) {
-		board.relocateChit(id, f, g);
+	public void relocateChit(int id, Matrix pos) {
+		board.relocateChit(id, pos);
 	}
-	
+
 	public LWJGLTileDrawable get(TileName tl) {
 		return tiles.get(tl);
-	}
-
-	@Override
-	public void applyNodeTransformation(LWJGLGraphics gfx) {
 	}
 
 	@Override
@@ -80,6 +75,7 @@ public class LWJGLTileCollection extends LWJGLDrawableNode {
 
 	@Override
 	public void draw(LWJGLGraphics gfx) {
+		updateTransformation();
 		gfx.getShaders().useShaderProgram(ShaderType.TILE_SHADER);
 		textures.useTextures(gfx);
 		// draw all tiles
@@ -106,5 +102,5 @@ public class LWJGLTileCollection extends LWJGLDrawableNode {
 	private Map<TileName, LWJGLTileDrawable> tiles;
 	private LWJGLTextureArrayLoader textures;
 	private LWJGLBoardDrawable board;
-
+	private Matrix buffer3;
 }

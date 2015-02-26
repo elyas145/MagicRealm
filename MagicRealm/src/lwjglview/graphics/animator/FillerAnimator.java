@@ -1,6 +1,6 @@
 package lwjglview.graphics.animator;
 
-import utils.math.Matrix;
+import utils.math.linear.Matrix;
 import lwjglview.graphics.animator.matrixcalculator.StaticMatrixCalculator;
 
 public class FillerAnimator extends StaticAnimator {

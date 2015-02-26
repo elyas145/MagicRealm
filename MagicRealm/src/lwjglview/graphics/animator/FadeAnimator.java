@@ -1,7 +1,7 @@
 package lwjglview.graphics.animator;
 
 import lwjglview.graphics.animator.matrixcalculator.MatrixFadeCalculator;
-import utils.math.Matrix;
+import utils.math.linear.Matrix;
 
 public class FadeAnimator extends TimedAnimator {
 

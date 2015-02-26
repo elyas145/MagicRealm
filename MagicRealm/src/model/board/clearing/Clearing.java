@@ -1,6 +1,5 @@
 package model.board.clearing;
 
-import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,18 +11,16 @@ import model.counter.chit.Chit;
 import model.enums.PathType;
 import model.interfaces.ClearingInterface;
 import model.interfaces.HexTileInterface;
-import utils.math.Point;
-import utils.random.Random;
+import utils.math.linear.Matrix;
 import utils.tools.Function;
 import utils.tools.IterationTools;
 
 public class Clearing implements ClearingInterface {
 
 	// nloc and eloc distance from center of tile
-	public Clearing(HexTile par, int num, Point nloc, Point eloc) {
+	public Clearing(HexTile par, int num, Matrix nloc, Matrix eloc) {
 		parent = par;
-		location = nloc;
-		location_e = eloc;
+		locations = new EnchantedHolder<Matrix>(Matrix.clone(nloc), Matrix.clone(eloc));
 		internalConnections = new HashMap<ClearingInterface, EnchantedHolder<PathType>>();
 		externalConnections = new HashMap<HexTileInterface, EnchantedHolder<ClearingResolver>>();
 		number = num;
@@ -127,24 +124,6 @@ public class Clearing implements ClearingInterface {
 
 	}
 
-	public Object getLocation_e() {
-		return location_e;
-	}
-
-	public void setLocation_e(Point location_e) {
-		this.location_e = location_e;
-		// System.out.println("Set Location_e: " + location_e.toSring());
-	}
-
-	public Point getLocation() {
-		return location;
-	}
-
-	public void setLocation(Point location) {
-		this.location = location;
-		// System.out.println("Set Location: " + location.toSring());
-	}
-
 	public List<Chit> getChits() {
 		return chits;
 	}
@@ -167,14 +146,8 @@ public class Clearing implements ClearingInterface {
 	}
 
 	@Override
-	public void getPosition(boolean enchanted, FloatBuffer dest) {
-		if (enchanted) {
-			dest.put(0, location_e.getX());
-			dest.put(1, location_e.getY());
-		} else {
-			dest.put(0, location.getX());
-			dest.put(1, location.getY());
-		}
+	public void getPosition(boolean enchanted, Matrix dest) {
+		dest.copyFrom(locations.get(enchanted));
 	}
 
 	@Override
@@ -214,6 +187,5 @@ public class Clearing implements ClearingInterface {
 	private List<Chit> chits;
 	private int number;
 
-	private Point location;
-	private Point location_e;
+	private EnchantedHolder<Matrix> locations;
 }
