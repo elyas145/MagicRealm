@@ -26,7 +26,6 @@ public class ThreadInvoker<T> extends Threadable {
 
 	public ThreadInvoker(Handler<T> hand) {
 		queued = new LinkedQueue<Invoker<T>>();
-		running = true;
 		cancelled = false;
 		handler = hand;
 		semaphore = new Semaphore(0); // queue is empty
@@ -47,12 +46,12 @@ public class ThreadInvoker<T> extends Threadable {
 
 	public void cancel() {
 		cancelled = true;
-		running = false;
-		semaphore.release();
+		stop();
 	}
 
+	@Override
 	public void stop() {
-		running = false;
+		super.stop();
 		semaphore.release();
 	}
 
@@ -82,12 +81,12 @@ public class ThreadInvoker<T> extends Threadable {
 	private void iterate() throws InterruptedException {
 		try {
 			Invoker<T> invoker;
-			semaphore.acquire();
+			semaphore.acquire(); // consume a handler
 			if (!queued.isEmpty() && !cancelled) {
 				synchronized (queued) {
 					invoker = queued.pop();
 				}
-				invoker.invoke(handler);
+				invoker.invoke(handler); // invoke the handler
 			}
 		} catch (QueueEmptyException qee) {
 			qee.printStackTrace();
@@ -113,8 +112,6 @@ public class ThreadInvoker<T> extends Threadable {
 	}
 
 	private Queue<Invoker<T>> queued;
-
-	private boolean running;
 
 	private boolean cancelled;
 

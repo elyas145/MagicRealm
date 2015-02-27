@@ -18,6 +18,5 @@ public class ConsoleLogger
 		super.start();
 		log("logger.ConsoleLogger: ConsoleLogger thread started");
 	}
-	
-	
+
 }

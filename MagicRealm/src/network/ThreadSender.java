@@ -32,6 +32,10 @@ public class ThreadSender<T> implements Sender<T> {
 	public void cancel() {
 		invoker.cancel();
 	}
+	
+	public void join() {
+		invoker.join();
+	}
 
 	// public Sender override
 

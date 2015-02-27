@@ -41,6 +41,10 @@ public abstract class ThreadLogger implements Logger {
 	public void cancel() {
 		invoker.cancel();
 	}
+	
+	public void join() {
+		invoker.join();
+	}
 
 	// public Logger override method
 

@@ -12,6 +12,7 @@ import network.server.Server;
 
 public class NetworkTester {
 	
+	// serializable handler of Logger objects that logs the message
 	static class LoggerHandler implements NetworkHandler<Logger> {
 		
 		private static final long serialVersionUID = 6453692154486461928L;
@@ -39,10 +40,13 @@ public class NetworkTester {
 
 	public static void main(String[] args) {
 		try {
+			// initialize and start the logger
 			logger = new ConsoleLogger();
 			logger.start();
+			// create a new server
 			server = new Server<Logger, Logger>(new Invoker<Logger>() {
 				
+				// this invoker gives feedback about the operations
 				@Override
 				public void invoke(Handler<Logger> handle) {
 					logger.log("Invoking a handler from the client");
@@ -52,6 +56,7 @@ public class NetworkTester {
 				}
 
 			});
+			// set the handler for new connections
 			server.setConnectionHandler(new Handler<Integer>() {
 
 				@Override
@@ -61,6 +66,7 @@ public class NetworkTester {
 				}
 				
 			});
+			// set the handler for dropped connections
 			server.setDroppedConnectionHandler(new Handler<Integer>() {
 
 				@Override
@@ -69,17 +75,24 @@ public class NetworkTester {
 				}
 				
 			});
+			// start the server
 			server.start();
+			// create a new client
 			client = new Client<Logger, Logger>(logger, "localhost");
+			// start the client
 			client.start();
+			// send a message
 			client.send(new LoggerHandler("Client says: 'Hi server!'"));
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			// stop and wait for the client to finish
 			client.stop();
+			client.join();
+			// stop and wait for the server to finish
 			server.stop();
+			server.join();
+			// stop and wait for the logger to finish
+			logger.log("Stopping logger");
+			logger.stop();
+			logger.join();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

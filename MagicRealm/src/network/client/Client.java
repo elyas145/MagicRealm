@@ -56,7 +56,7 @@ public class Client<S, R> implements Sender<S> {
 	public void setData(R dat) {
 		invoker = new PlainInvoker<R>(dat);
 	}
-	
+
 	public void setInvoker(Invoker<R> inv) {
 		invoker = inv;
 	}
@@ -72,37 +72,43 @@ public class Client<S, R> implements Sender<S> {
 	}
 
 	public void stop() {
+		// close connection
+		connection.close();
 		// stop receiving new handlers
 		receiveThread.stop();
 		// stop sending objects
 		sender.stop();
 		// stop invoking new objects
 		receiver.stop();
-		if(onDisconnect != null) {
+		if (onDisconnect != null) {
 			// disconnect listener
 			onDisconnect.run();
 			onDisconnect = null;
 		}
-		// close connection
-		connection.close();
+	}
+	
+	public void join() {
+		receiveThread.join();
+		sender.join();
+		receiver.join();
 	}
 
 	public void cancel() {
+		// close connection
+		connection.close();
 		// stop receiving new handlers
 		receiveThread.stop();
 		// stop sending handlers
 		sender.cancel();
 		// cancel receiving handlers
 		receiver.cancel();
-		if(onDisconnect != null) {
+		if (onDisconnect != null) {
 			// disconnected
 			onDisconnect.run();
 			onDisconnect = null;
 		}
-		// close connection
-		connection.close();
 	}
-	
+
 	public void setExceptionHandler(ExceptionHandler eh) {
 		exceptionHandler = eh;
 	}
@@ -124,7 +130,7 @@ public class Client<S, R> implements Sender<S> {
 			public void handle(Handler<R> object) {
 				invoker.invoke(object);
 			}
-			
+
 		});
 		exceptionHandler = null;
 		adder = new Invoker<R>() {
@@ -133,30 +139,26 @@ public class Client<S, R> implements Sender<S> {
 			public void invoke(Handler<R> object) {
 				receiver.add(new PlainInvoker<Handler<R>>(object));
 			}
-			
+
 		};
 		receiveThread = new Threadable() {
 
 			@Override
 			public void mainLoop() {
-				receiveLoop();
+				try {
+					while (isRunning()) {
+						connection.receive(adder);
+					}
+				} catch (ConnectionClosedException cce) {
+					cancel();
+				} catch (Exception e) {
+					e.printStackTrace();
+					cancel();
+				}
 			}
 
 		};
 		sender = new ThreadSender<S>(connection);
-	}
-
-	private void receiveLoop() {
-		try {
-			while(true) {
-				connection.receive(adder);
-			}
-		} catch(ConnectionClosedException cce) {
-			cancel();
-		} catch(Exception e) {
-			e.printStackTrace();
-			cancel();
-		}
 	}
 
 	// private object members
@@ -166,15 +168,15 @@ public class Client<S, R> implements Sender<S> {
 	private Invoker<R> invoker;
 
 	private ThreadSender<S> sender;
-	
+
 	private ThreadInvoker<Handler<R>> receiver;
-	
+
 	private Threadable receiveThread;
 
 	private Invoker<R> adder;
 
 	private Runnable onDisconnect;
-	
+
 	private ExceptionHandler exceptionHandler;
 
 }

@@ -13,4 +13,5 @@ public class GameConfiguration {
 	public static final ValleyChit INITIAL_SITE = ValleyChit.INN;
 	
 	public static boolean Cheat = false;
+	public static final boolean DEBUG_MODE = true;
 }

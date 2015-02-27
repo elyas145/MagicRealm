@@ -3,17 +3,16 @@ package network.server;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import config.NetworkConfiguration;
-import network.Connection;
 import network.NetworkHandler;
 import network.Sender;
 import network.SocketConnection;
-import network.ThreadSender;
 import network.client.Client;
 import utils.handler.Handler;
 import utils.handler.Invoker;
@@ -50,11 +49,20 @@ public class Server<S, R> implements Sender<S> {
 
 	public void stop() {
 		synchronizer.stop();
+		try {
+			serverSocket.close();
+		} catch (IOException e) {
+		}
 		accepter.stop();
 		List<Integer> clientIDs = new ArrayList<Integer>(clients.keySet());
 		for(int i: clientIDs) {
 			removeConnection(i);
 		}
+	}
+
+	public void join() {
+		synchronizer.join();
+		accepter.join();
 	}
 
 	public void setConnectionHandler(Handler<Integer> handler) {
@@ -128,6 +136,7 @@ public class Server<S, R> implements Sender<S> {
 					while(isRunning()) {
 						accept();
 					}
+				} catch(SocketException se) {
 				} catch (IOException e) {
 					e.printStackTrace();
 				}

@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -16,6 +17,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
+
+import config.GameConfiguration;
 
 public class ResourceHandler {
 
@@ -36,11 +39,17 @@ public class ResourceHandler {
 			throw new IOException("The file " + fname + " could not be found, "
 					+ "try refreshing the project (F5)");
 		}
-		return ret;*/
+		return ret;
 		URL ur = getClass().getClassLoader().getResource(ResourceHandler.joinPath("resources", fname));
 		String decodedPath = URLDecoder.decode(ur.getPath(), "UTF-8");
 		System.out.println(decodedPath);
-		return decodedPath;
+		return decodedPath;*/
+		if(GameConfiguration.DEBUG_MODE) {
+			String path = ResourceHandler.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+			return ResourceHandler.joinPath(path, "resources", fname);
+		} else {
+			return ResourceHandler.joinPath(path(), "resources", fname);
+		}
 	}
 
 	public String readFile(String fname) throws IOException {
@@ -95,6 +104,15 @@ public class ResourceHandler {
 			return path;
 		}
 		return new File(path , joinPath(paths.remove(0), paths)).toString();
+	}
+	
+	private String path() throws UnsupportedEncodingException {
+		URL url1 = getClass().getResource("");
+		String ur = url1.toString();
+		ur = ur.substring(9);
+		String truePath = ur.split("game.jar")[0];
+		truePath = URLDecoder.decode(truePath, "UTF-8");
+		return truePath;
 	}
 
 	private Map<String, String> files;
