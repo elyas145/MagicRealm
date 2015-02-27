@@ -140,7 +140,7 @@ public class LWJGLCounterDrawable extends LWJGLDrawableNode implements
 			position = Matrix.zeroVector(3);
 		} else {
 			movements.push(new MovementAnimator(
-					GraphicsConfiguration.ANIMATION_SPEED, vec3, position) {
+					GraphicsConfiguration.ANIMATION_SPEED, position, vec3) {
 				@Override
 				public void finish() {
 				}

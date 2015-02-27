@@ -8,7 +8,6 @@ import java.util.Map;
 
 import org.lwjgl.BufferUtils;
 
-import config.GameConfiguration;
 import config.GraphicsConfiguration;
 import lwjglview.graphics.LWJGLDrawableLeaf;
 import lwjglview.graphics.LWJGLDrawableNode;
@@ -24,7 +23,6 @@ import lwjglview.graphics.board.mapchit.LWJGLMapChitCollection;
 import lwjglview.graphics.board.tile.LWJGLCounterStorage;
 import lwjglview.graphics.board.tile.LWJGLTileCollection;
 import lwjglview.graphics.board.tile.LWJGLTileDrawable;
-import lwjglview.graphics.board.tile.clearing.LWJGLClearingStorage;
 import lwjglview.graphics.model.ModelData;
 import lwjglview.graphics.shader.GLShaderHandler;
 import model.EnchantedHolder;
@@ -260,8 +258,6 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 		tiles.setTile(tile, rw, cl, rot, clears);
 	}
 	
-	private static int CLNUM = 0;
-
 	@Override
 	public synchronized void setCounter(CounterType tp, TileName tile,
 			int clearing) {
@@ -272,8 +268,7 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 			drwble = counters.get(tp);
 		}
 
-		setCounter(drwble, TileName.BORDERLAND, CLNUM + 1);// tile, clearing);
-		CLNUM = (CLNUM + 1) % 6;
+		setCounter(drwble, tile, clearing);
 	}
 
 	@Override
@@ -458,7 +453,7 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 		private void addPosition(LWJGLCounterStorage store, boolean ench) {
 			synchronized(buffer3) {
 				store.getLocation(buffer3, false);
-				position.get(false).copyFrom(buffer3);
+				position.set(false, Matrix.clone(buffer3));
 			}
 		}
 

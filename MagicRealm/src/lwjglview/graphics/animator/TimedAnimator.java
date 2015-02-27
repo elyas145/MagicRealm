@@ -42,11 +42,11 @@ public abstract class TimedAnimator extends Animator {
 	}
 
 	protected float getInterval() {
-		if(paused) {
-			return 1f - (endTime - pauseTime) / length;
-		}
 		if(isFinished()) {
 			return 1f;
+		}
+		if(paused) {
+			return 1f - (endTime - pauseTime) / length;
 		}
 		return 1f - (endTime - currentTime) / length;
 	}

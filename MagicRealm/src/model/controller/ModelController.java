@@ -169,9 +169,6 @@ public class ModelController {
 			board.setLocationOfCounter(c.getType().toCounter(),
 					GameConfiguration.INITIAL_SITE);
 		}
-		// TODO hard set location of amazon to find hidden path
-		board.setLocationOfCounter(CounterType.CHARACTER_AMAZON,
-				TileName.CLIFF, 2);
 	}
 
 	public void setSiteLocations() {

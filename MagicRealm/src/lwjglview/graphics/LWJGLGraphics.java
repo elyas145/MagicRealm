@@ -342,16 +342,6 @@ public final class LWJGLGraphics implements Graphics {
 		}
 	}
 
-	private Matrix e4 = Matrix.columnVector(0f, 0f, 0f, 1f);
-
-	/*public void printTest() { // TODO
-		synchronized (state) {
-			state.modelViewProjectionMatrix.multiply(e4, e4);
-			state.modelMatrix.identity();
-			updateModelViewMatrix();
-		}
-	}*/
-
 	private void init(ResourceHandler rh) {
 		primitives = new GLPrimitives(this);
 		state = new MVPState();
