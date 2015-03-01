@@ -7,8 +7,11 @@ import network.NetworkHandler;
 import network.server.Server;
 import controller.ClientController;
 import controller.network.server.handlers.EnterLobby;
+import controller.network.server.handlers.InitBoard;
+import controller.network.server.handlers.MessageDisplay;
 import controller.network.server.handlers.ServerClosed;
 import model.activity.Activity;
+import model.board.Board;
 import model.controller.ModelControlInterface;
 import model.controller.requests.DieRequest;
 import model.counter.chit.MapChit;
@@ -55,7 +58,7 @@ public class NetworkController implements ClientController {
 
 	@Override
 	public void displayMessage(String string) {
-		// TODO Auto-generated method stub
+		send(new MessageDisplay(string));
 
 	}
 
@@ -127,7 +130,7 @@ public class NetworkController implements ClientController {
 
 	@Override
 	public void initializeBoard(NetworkHandler<BoardView> initializer) {
-		// TODO Auto-generated method stub
+		server.send(new InitBoard(initializer), clientID);
 
 	}
 

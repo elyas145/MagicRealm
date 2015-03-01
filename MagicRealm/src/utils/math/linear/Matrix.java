@@ -1,5 +1,6 @@
 package utils.math.linear;
 
+import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -8,7 +9,7 @@ import org.lwjgl.BufferUtils;
 
 import utils.math.Mathf;
 
-public abstract class Matrix {
+public abstract class Matrix implements Serializable {
 
 	public static void main(String[] args) {
 		Matrix test = Matrix.initialize(4, 4, new float[] { -0.9623067f,

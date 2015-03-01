@@ -1,6 +1,6 @@
 package model.enums;
 
-public enum TileType {
+public enum LandType {
 	CAVE,
 	MOUNTAIN,
 	VALLEY,

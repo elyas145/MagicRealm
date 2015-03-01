@@ -1,12 +1,13 @@
 package model.counter.chit;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import model.enums.ChitType;
 import model.enums.MapChitType;
 import model.enums.TileName;
 
-public class MapChit extends Chit{
+public class MapChit extends Chit implements Serializable{
 	
 	private MapChitType type;
 	private char identifier;

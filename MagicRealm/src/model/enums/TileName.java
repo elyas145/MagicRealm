@@ -22,34 +22,34 @@ public enum TileName {
 	PINE_WOODS, // woods
 	RUINS, // cave
 	EMPTY;
-	public TileType getType() {
+	public LandType getType() {
 		switch(this) {
 		case BORDERLAND:
 		case CAVERN:
 		case CAVES:
 		case HIGH_PASS:
 		case RUINS:
-			return TileType.CAVE;
+			return LandType.CAVE;
 		case CLIFF:
 		case CRAG:
 		case LEDGES:
 		case MOUNTAIN:
-			return TileType.MOUNTAIN;
+			return LandType.MOUNTAIN;
 		case AWFUL_VALLEY:
 		case BAD_VALLEY:
 		case CURST_VALLEY:
 		case DARK_VALLEY:
 		case EVIL_VALLEY:
-			return TileType.VALLEY;
+			return LandType.VALLEY;
 		case DEEP_WOODS:
 		case LINDEN_WOODS:
 		case MAPLE_WOODS:
 		case NUT_WOODS:
 		case OAK_WOODS:
 		case PINE_WOODS:
-			return TileType.WOODS;
+			return LandType.WOODS;
 		default:
-			return TileType.NONE;
+			return LandType.NONE;
 		}
 	}
 }

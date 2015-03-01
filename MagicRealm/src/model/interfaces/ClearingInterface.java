@@ -1,10 +1,11 @@
 package model.interfaces;
 
-import utils.math.linear.Matrix;
+import java.io.Serializable;
 
+import utils.math.linear.Matrix;
 import model.enums.PathType;
 
-public interface ClearingInterface {
+public interface ClearingInterface extends Serializable{
 	
 	/**
 	 * @return the clearing number

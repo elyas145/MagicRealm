@@ -50,8 +50,7 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 					}), Matrix.columnVector(new float[] { .4f, .4f, .5f, 1f // 21:00
 					}) };
 
-	public LWJGLBoardDrawable(ResourceHandler rh)
-			throws IOException {
+	public LWJGLBoardDrawable(ResourceHandler rh) throws IOException {
 		super(null);
 		resources = rh;
 		counterLocations = new HashMap<Integer, CounterStorage>();
@@ -76,26 +75,26 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 		squareCounter = new LWJGLDrawableLeaf(this, ModelData.loadModelData(
 				resources, "square_counter.obj"));
 
-		if(!GraphicsConfiguration.SIMPLE_COUNTERS) {
+		if (!GraphicsConfiguration.SIMPLE_COUNTERS) {
 			LWJGLDrawableNode tmp = new LWJGLDrawableLeaf(null,
 					ModelData.loadModelData(resources, "knight4.obj"));
-			knightCounter = new TransformationDrawable(this, tmp, Matrix.dilation(
-					2.7f, 2.7f, 2.7f, 1f).multiply(
-					Matrix.rotationX(4, Mathf.PI * .5f)));
+			knightCounter = new TransformationDrawable(this, tmp, Matrix
+					.dilation(2.7f, 2.7f, 2.7f, 1f).multiply(
+							Matrix.rotationX(4, Mathf.PI * .5f)));
 			tmp.setParent(knightCounter);
-	
-			tmp = new LWJGLDrawableLeaf(null, ModelData.loadModelData(resources,
-					"captain.obj"));
-			captainCounter = new TransformationDrawable(this, tmp, Matrix.dilation(
-					1.3f, 1.3f, 1.3f, 1f).multiply(
-					Matrix.rotationX(4, Mathf.PI * .5f)));
+
+			tmp = new LWJGLDrawableLeaf(null, ModelData.loadModelData(
+					resources, "captain.obj"));
+			captainCounter = new TransformationDrawable(this, tmp, Matrix
+					.dilation(1.3f, 1.3f, 1.3f, 1f).multiply(
+							Matrix.rotationX(4, Mathf.PI * .5f)));
 			tmp.setParent(captainCounter);
-	
-			tmp = new LWJGLDrawableLeaf(null, ModelData.loadModelData(resources,
-					"lara.obj"));
-			amazonCounter = new TransformationDrawable(this, tmp, Matrix.dilation(
-					1.3f, 1.3f, 1.3f, 1f).multiply(
-					Matrix.rotationX(4, Mathf.PI * .5f)));
+
+			tmp = new LWJGLDrawableLeaf(null, ModelData.loadModelData(
+					resources, "lara.obj"));
+			amazonCounter = new TransformationDrawable(this, tmp, Matrix
+					.dilation(1.3f, 1.3f, 1.3f, 1f).multiply(
+							Matrix.rotationX(4, Mathf.PI * .5f)));
 			tmp.setParent(amazonCounter);
 		}
 
@@ -114,7 +113,7 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 		timeOfDay = TimeOfDay.DUSK;
 		setTimeOfDay(timeOfDay);
 	}
-	
+
 	@Override
 	public void loadMapChits(Iterable<MapChit> chits) {
 		mapChits = new LWJGLMapChitCollection(this, chits);
@@ -165,7 +164,7 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 		counterLocations.put(id, new CounterStorage(counter));
 		return id;
 	}
-	
+
 	public void removeCounterDrawable(int id) {
 		counterLocations.remove(id);
 	}
@@ -211,9 +210,10 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 		synchronized (counters) {
 			counters.draw(lwgfx);
 		}
-
-		synchronized (mapChits) {
-			mapChits.draw(lwgfx);
+		if (mapChits != null) {
+			synchronized (mapChits) {
+				mapChits.draw(lwgfx);
+			}
 		}
 	}
 
@@ -262,7 +262,7 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 			Iterable<? extends ClearingInterface> clears) {
 		tiles.setTile(tile, rw, cl, rot, clears);
 	}
-	
+
 	@Override
 	public synchronized void setCounter(CounterType tp, TileName tile,
 			int clearing) {
@@ -293,7 +293,7 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 
 	@Override
 	public void revealAllMapChits(Iterable<MapChit> discChits) {
-		for(MapChit mc: discChits) {
+		for (MapChit mc : discChits) {
 			revealMapChit(mc);
 		}
 	}
@@ -386,7 +386,7 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 
 	private LWJGLDrawableNode getCounterRepresentation(CounterType tp) {
 		if (tp.isCharacter()) {
-			if(GraphicsConfiguration.SIMPLE_COUNTERS) {
+			if (GraphicsConfiguration.SIMPLE_COUNTERS) {
 				return roundCounter;
 			}
 			switch (tp) {
@@ -456,7 +456,7 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 		}
 
 		private void addPosition(LWJGLCounterStorage store, boolean ench) {
-			synchronized(buffer3) {
+			synchronized (buffer3) {
 				store.getLocation(buffer3, false);
 				position.set(false, Matrix.clone(buffer3));
 			}
@@ -485,13 +485,13 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 	private AnimationQueue ambientColour;
 
 	private Matrix buffer3;
-	
+
 	private FloatBuffer fBuffer4;
 
 	private FollowAnimator cameraFocus;
 
 	private TimeOfDay timeOfDay;
-	
+
 	private Matrix bufferA;
 	private Matrix bufferB;
 

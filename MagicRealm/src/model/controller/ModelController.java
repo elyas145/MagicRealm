@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import network.NetworkHandler;
 import config.BoardConfiguration;
 import config.GameConfiguration;
 import controller.ClientController;
@@ -18,6 +19,7 @@ import utils.resources.ResourceHandler;
 import utils.structures.LinkedQueue;
 import utils.structures.Queue;
 import utils.structures.QueueEmptyException;
+import view.controller.game.BoardView;
 import model.activity.Activity;
 import model.board.Board;
 import model.enums.ActivityType;
@@ -34,6 +36,7 @@ import model.enums.TimeOfDay;
 import model.enums.ValleyChit;
 import model.exceptions.GameFullException;
 import model.exceptions.IllegalMoveException;
+import model.exceptions.PhasesAlreadySubmitedException;
 import model.interfaces.ClearingInterface;
 import model.interfaces.HexTileInterface;
 import model.player.Player;
@@ -124,7 +127,7 @@ public class ModelController implements ModelControlInterface {
 
 		lostCity = new LostSite(MapChitType.LOST_CITY);
 		lostCastle = new LostSite(MapChitType.LOST_CASTLE);
-		
+
 		gameStarted = false;
 		lobby = new HashSet<ClientController>();
 	}
@@ -152,10 +155,11 @@ public class ModelController implements ModelControlInterface {
 		if (cl1.isConnectedTo(cl2, PathType.NORMAL)
 				|| ct.hasDiscoveredPath(cl1, cl2)) {
 			board.moveCharacter(characterType, tt, clearing);
-			getClient(characterType).moveCounter(characterType.toCounter(), tt, clearing);
+			getClient(characterType).moveCounter(characterType.toCounter(), tt,
+					clearing);
 		} else {
-			getClient(characterType).raiseException(new IllegalMoveException(tt, clearing,
-					characterType));
+			getClient(characterType).raiseException(
+					new IllegalMoveException(tt, clearing, characterType));
 		}
 	}
 
@@ -255,11 +259,18 @@ public class ModelController implements ModelControlInterface {
 		return currentDay;
 	}
 
-	public void setCurrentPlayerActivities(List<Activity> activities) {
-		try {
-			players.get(orderOfPlay.top()).setActivities(activities);
-		} catch (QueueEmptyException e) {
-			throw noPlayersException;
+	private Map<CharacterType, List<Activity>> activities;
+	private Set<CharacterType> waitingCharacters;
+
+	public void setPlayerActivities(CharacterType player, List<Activity> a) {
+		if (waitingCharacters.contains(player)) {
+			waitingCharacters.remove(player);
+			activities.put(player, a);
+			if (waitingCharacters.isEmpty()) {
+				dayLight();
+			}
+		} else {
+			getClient(player).raiseException(new PhasesAlreadySubmitedException());
 		}
 	}
 
@@ -294,7 +305,8 @@ public class ModelController implements ModelControlInterface {
 			resetOrderOfPlay();
 		}
 		currentPlayerDone = false;
-		getClient(getCurrentCharacterType()).setCurrentCharacter(getCurrentCharacterType());
+		getClient(getCurrentCharacterType()).setCurrentCharacter(
+				getCurrentCharacterType());
 		try {
 			return players.get(orderOfPlay.pop());
 		} catch (QueueEmptyException e) {
@@ -354,12 +366,13 @@ public class ModelController implements ModelControlInterface {
 	}
 
 	private void waitForPlayers() {
-		while(lobby.size() < numPlayers) {
+		while (lobby.size() < numPlayers) {
 			ClientController ctrl = controlGenerator.generateController();
 			lobby.add(ctrl);
 			ctrl.enterLobby();
 		}
 		controlGenerator.rejectNew();
+		this.startGame();
 	}
 
 	private void birdsong() {
@@ -389,7 +402,7 @@ public class ModelController implements ModelControlInterface {
 
 	private void playActivities(CharacterType chr) {
 		Player plr = getPlayerOf(chr);
-		for(Activity act: plr.getPersonalHistory().getCurrentActivities()) {
+		for (Activity act : plr.getPersonalHistory().getCurrentActivities()) {
 			act.perform(this);
 		}
 	}
@@ -400,8 +413,16 @@ public class ModelController implements ModelControlInterface {
 	}
 
 	private void showBoards() {
-		// TODO create a handler to show the clients board
-
+		// TODO new InitBoard.
+		List<HexTileInterface> tiles = new ArrayList<HexTileInterface>();
+		List<TileName> tileNames = new ArrayList<TileName>(board.getAllTiles());
+		for(TileName name : tileNames){
+			tiles.add(board.getTile(name));
+		}
+		NetworkHandler<BoardView> initializer = new BoardViewInitializer(tiles, mapChits);
+		for(ClientController c : lobby){
+			c.initializeBoard(initializer);
+		}
 	}
 
 	private void resetOrderOfPlay() {
@@ -651,13 +672,13 @@ public class ModelController implements ModelControlInterface {
 	private Queue<CharacterType> orderOfPlay;
 	private boolean currentPlayerDone = false;
 	private Set<MapChit> mapChits;
-	
+
 	private ControllerGenerator controlGenerator;
-	
+
 	private Set<ClientController> lobby;
-	
+
 	private HashMap<CharacterType, ClientController> playingCharacters;
-	
+
 	private boolean gameStarted;
 
 	private static final RuntimeException noPlayersException = new RuntimeException(

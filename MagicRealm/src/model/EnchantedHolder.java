@@ -1,7 +1,9 @@
 package model;
 
-public class EnchantedHolder <T> {
-	
+import java.io.Serializable;
+
+public class EnchantedHolder <T> implements Serializable {
+	private static final long serialVersionUID = 3008920658203964520L;
 	public EnchantedHolder() {
 		normal = enchanted = null;
 	}

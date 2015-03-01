@@ -1,5 +1,6 @@
 package model.board.clearing;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,6 +17,11 @@ import utils.tools.Function;
 import utils.tools.IterationTools;
 
 public class Clearing implements ClearingInterface {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8081415374136797789L;
 
 	// nloc and eloc distance from center of tile
 	public Clearing(HexTile par, int num, Matrix nloc, Matrix eloc) {
@@ -165,7 +171,11 @@ public class Clearing implements ClearingInterface {
 		return parent;
 	}
 
-	private class ClearingResolver {
+	private class ClearingResolver implements Serializable {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 6156205823122632890L;
 		public ClearingResolver(HexTileInterface other, int loc) {
 			tile = other;
 			entrance = loc % 6;

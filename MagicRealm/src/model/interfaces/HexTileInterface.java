@@ -1,13 +1,14 @@
 package model.interfaces;
 
+import java.io.Serializable;
 import java.util.Collection;
 
 import model.board.clearing.Clearing;
 import model.counter.chit.Chit;
 import model.enums.TileName;
-import model.enums.TileType;
+import model.enums.LandType;
 
-public interface HexTileInterface {
+public interface HexTileInterface extends Serializable{
 
 	/**
 	 * @return name of hex tile

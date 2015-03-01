@@ -5,6 +5,7 @@ import java.util.List;
 import view.controller.game.BoardView;
 import network.NetworkHandler;
 import model.activity.Activity;
+import model.board.Board;
 import model.controller.requests.DieRequest;
 import model.counter.chit.MapChit;
 import model.enums.CharacterType;

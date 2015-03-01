@@ -189,8 +189,14 @@ public class ControllerMain implements ClientController {
 
 	@Override
 	public void initializeBoard(NetworkHandler<BoardView> initializer) {
-		// TODO Auto-generated method stub
-
+		try {
+			LWJGLBoardDrawable draw = new LWJGLBoardDrawable(rh);
+			boardView = draw;
+			gfx.addDrawable(draw);
+			initializer.handle(boardView);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
