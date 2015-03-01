@@ -1,5 +1,6 @@
 package controller;
 
+import controller.network.server.NetworkClientController;
 import model.controller.ModelControlInterface;
 
 public interface ControllerGenerator {
@@ -8,6 +9,6 @@ public interface ControllerGenerator {
 	
 	void rejectNew();
 
-	ClientController generateController();
+	NetworkClientController generateController();
 
 }

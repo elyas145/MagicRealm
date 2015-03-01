@@ -54,7 +54,7 @@ public class NetworkControllerGenerator implements ControllerGenerator {
 	}
 
 	@Override
-	public ClientController generateController() {
+	public NetworkClientController generateController() {
 		while(queued.isEmpty()) {
 			try {
 				wait.acquire();
@@ -66,7 +66,7 @@ public class NetworkControllerGenerator implements ControllerGenerator {
 		synchronized(queued) {
 			id = queued.pop();
 		}
-		return new NetworkController(server, id);
+		return new NetworkClientController(server, id);
 	}
 
 	private Server<ClientController, ModelControlInterface> server;

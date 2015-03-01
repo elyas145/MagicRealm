@@ -13,6 +13,7 @@ import config.BoardConfiguration;
 import config.GameConfiguration;
 import controller.ClientController;
 import controller.ControllerGenerator;
+import controller.network.server.NetworkClientController;
 import controller.network.server.NetworkControllerGenerator;
 import utils.random.Random;
 import utils.resources.ResourceHandler;
@@ -129,7 +130,7 @@ public class ModelController implements ModelControlInterface {
 		lostCastle = new LostSite(MapChitType.LOST_CASTLE);
 
 		gameStarted = false;
-		lobby = new HashSet<ClientController>();
+		lobby = new HashSet<NetworkClientController>();
 	}
 
 	public void startControl() {
@@ -367,7 +368,7 @@ public class ModelController implements ModelControlInterface {
 
 	private void waitForPlayers() {
 		while (lobby.size() < numPlayers) {
-			ClientController ctrl = controlGenerator.generateController();
+			NetworkClientController ctrl = controlGenerator.generateController();
 			lobby.add(ctrl);
 			ctrl.enterLobby();
 		}
@@ -376,7 +377,6 @@ public class ModelController implements ModelControlInterface {
 	}
 
 	private void birdsong() {
-		// TODO Auto-generated method stub
 		for (Player plr : getPlayers()) {
 			startBirdSong(plr);
 		}
@@ -391,7 +391,6 @@ public class ModelController implements ModelControlInterface {
 			while (!orderOfPlay.isEmpty()) {
 				CharacterType chr;
 				chr = orderOfPlay.pop();
-				// TODO Auto-generated catch block
 				setCharacterHidden(chr, false);
 				playActivities(chr);
 			}
@@ -408,8 +407,9 @@ public class ModelController implements ModelControlInterface {
 	}
 
 	private void hideCharacters() {
-		// TODO hide the characters on each controller
-
+		for(NetworkClientController c : lobby){
+			c.setHiding(true);
+		}
 	}
 
 	private void showBoards() {
@@ -420,7 +420,7 @@ public class ModelController implements ModelControlInterface {
 			tiles.add(board.getTile(name));
 		}
 		NetworkHandler<BoardView> initializer = new BoardViewInitializer(tiles, mapChits);
-		for(ClientController c : lobby){
+		for(NetworkClientController c : lobby){
 			c.initializeBoard(initializer);
 		}
 	}
@@ -675,7 +675,7 @@ public class ModelController implements ModelControlInterface {
 
 	private ControllerGenerator controlGenerator;
 
-	private Set<ClientController> lobby;
+	private Set<NetworkClientController> lobby;
 
 	private HashMap<CharacterType, ClientController> playingCharacters;
 

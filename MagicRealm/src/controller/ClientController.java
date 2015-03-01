@@ -58,4 +58,8 @@ public interface ClientController {
 
 	void enterLobby();
 
+	void enterCharacterSelection();
+
+	void enterBirdSong();
+
 }
