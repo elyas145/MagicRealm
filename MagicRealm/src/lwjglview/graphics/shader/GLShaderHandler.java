@@ -109,6 +109,9 @@ public class GLShaderHandler {
 	}
 	
 	private static String getVSFname(ShaderType shader) {
+		if(shader == ShaderType.BACKGROUND_SHADER) {
+			return "background.glsl";
+		}
 		return "flat.glsl";
 	}
 	
@@ -118,8 +121,13 @@ public class GLShaderHandler {
 			return "tile.glsl";
 		case CHIT_SHADER:
 			return "counter.glsl";
+		case SELECTION_SHADER:
+			return "selection.glsl";
+		case BACKGROUND_SHADER:
+			return "texture.glsl";
+		default:
+			return "flat.glsl";
 		}
-		return "flat.glsl";
 	}
 	
 	private String getShaderPath(String folder, String shaderName) {

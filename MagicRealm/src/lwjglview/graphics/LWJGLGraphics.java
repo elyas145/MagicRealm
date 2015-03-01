@@ -1,27 +1,30 @@
 package lwjglview.graphics;
 
-import lwjglview.graphics.board.LWJGLBoardDrawable;
 import lwjglview.graphics.shader.GLShaderHandler;
 import lwjglview.graphics.shader.ShaderType;
-import model.board.Board;
-import model.interfaces.HexTileInterface;
 
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 
 import config.GraphicsConfiguration;
 import swingview.ControllerMain;
+import utils.handler.Handler;
 import utils.math.Mathf;
 import utils.math.linear.Matrix;
 import utils.resources.ResourceHandler;
-import view.graphics.Drawable;
-import view.graphics.Graphics;
+import view.selection.CursorListener;
+import view.selection.CursorSelection;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
-import java.util.Collection;
+import java.nio.IntBuffer;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.Semaphore;
 
 import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
@@ -30,9 +33,22 @@ import static org.lwjgl.opengl.GL12.*;
 import static org.lwjgl.opengl.GL13.*;
 import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.opengl.ARBTextureStorage.*;
+import static org.lwjgl.opengl.EXTFramebufferObject.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
-public final class LWJGLGraphics implements Graphics {
+public final class LWJGLGraphics {
+
+	public static final int LAYER0 = 0;
+	public static final int LAYER1 = LAYER0 + 1;
+	public static final int LAYER2 = LAYER1 + 1;
+	public static final int LAYER3 = LAYER2 + 1;
+	public static final int LAYER4 = LAYER3 + 1;
+	public static final int LAYER5 = LAYER4 + 1;
+	public static final int LAYER6 = LAYER5 + 1;
+	public static final int LAYER7 = LAYER6 + 1;
+	public static final int LAYER8 = LAYER7 + 1;
+	public static final int LAYER9 = LAYER8 + 1;
+	public static final int MAX_LAYERS = LAYER9 + 1;
 
 	public LWJGLGraphics(ResourceHandler rh) {
 		init(rh);
@@ -44,14 +60,18 @@ public final class LWJGLGraphics implements Graphics {
 		control = cm;
 	}
 
+	public void setCursorListener(CursorListener listen) {
+		cursorListener = listen;
+	}
+
 	public void saveState(MVPState st) {
-		synchronized(state) {
+		synchronized (state) {
 			state.copyTo(st);
 		}
 	}
 
 	public void loadState(MVPState st) {
-		synchronized(state) {
+		synchronized (state) {
 			st.copyTo(state);
 		}
 	}
@@ -151,13 +171,68 @@ public final class LWJGLGraphics implements Graphics {
 		}
 	}
 
+	public void getPixel(int x, int y, ByteBuffer buff) {
+		glReadPixels(x, height - y, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, buff);
+	}
+
+	public int createFrameBuffer() {
+		IntBuffer buffer = ByteBuffer.allocateDirect(4)
+				.order(ByteOrder.nativeOrder()).asIntBuffer();
+		glGenFramebuffersEXT(buffer);
+		return buffer.get();
+	}
+
+	public void bindFrameBuffer(int fb) {
+		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fb);
+	}
+
+	public void bindMainBuffer() {
+		bindFrameBuffer(0);
+	}
+
+	public void useFrameBuffer(int fb) {
+		bindFrameBuffer(fb);
+		glPushAttrib(GL_VIEWPORT_BIT);
+		onResize(width, height);
+	}
+
+	public void releaseFrameBuffer() {
+		bindMainBuffer();
+		glPopAttrib();
+	}
+
+	public void bindFrameBufferTexture(int fb, int texID) {
+		bindFrameBuffer(fb);
+		glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
+				GL_TEXTURE_2D, texID, 0);
+		releaseFrameBuffer();
+	}
+
+	public int generateBufferTexture() {
+		return createTexture(width, height);
+	}
+
+	public int createTexture(int width, int height) {
+		return loadTexture(null, width, height);
+	}
+
+	public void setClearColor(float r, float g, float b, float a) {
+		glClearColor(r, g, b, a);
+	}
+
 	public int loadTexture(ByteBuffer rawData, int height, int width) {
 		int texID = glGenTextures();
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texID);
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA,
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA,
 				GL_UNSIGNED_BYTE, rawData);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
+				GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,
+				GL_CLAMP_TO_EDGE);
 		return texID;
 	}
 
@@ -200,20 +275,40 @@ public final class LWJGLGraphics implements Graphics {
 		return shaders;
 	}
 
+	public void updateModelUniform(String name) {
+		updateModelUniform(getShaders().getType(), name);
+	}
+
 	public void updateModelUniform(ShaderType st, String name) {
 		getShaders().setUniformMatrixValue(st, name, state.modelMatrix);
+	}
+
+	public void updateViewUniform(String name) {
+		updateViewUniform(getShaders().getType(), name);
 	}
 
 	public void updateViewUniform(ShaderType st, String name) {
 		shaders.setUniformMatrixValue(st, name, state.viewInverseMatrix);
 	}
 
+	public void updateModelViewUniform(String name) {
+		updateModelViewUniform(getShaders().getType(), name);
+	}
+
 	public void updateModelViewUniform(ShaderType st, String name) {
 		shaders.setUniformMatrixValue(st, name, state.modelViewMatrix);
 	}
 
+	public void updateProjectionUniform(String name) {
+		updateProjectionUniform(getShaders().getType(), name);
+	}
+
 	public void updateProjectionUniform(ShaderType st, String name) {
 		shaders.setUniformMatrixValue(st, name, state.viewInverseMatrix);
+	}
+
+	public void updateMVPUniform(String name) {
+		updateMVPUniform(getShaders().getType(), name);
 	}
 
 	public void updateMVPUniform(ShaderType st, String name) {
@@ -312,13 +407,11 @@ public final class LWJGLGraphics implements Graphics {
 		}
 	}
 
-	@Override
 	public void start() {
 		running = true;
 		runThread.start();
 	}
 
-	@Override
 	public void stop() {
 		running = false;
 		if (runThread != null) {
@@ -330,23 +423,71 @@ public final class LWJGLGraphics implements Graphics {
 		}
 	}
 
-	@Override
-	public void addDrawable(Drawable dr) {
-		drawables.add(dr);
+	public void prepareLayer(Handler<LWJGLGraphics> handle, int layer) {
+		checkLayer(layer);
+		drawables[layer].addPreparation(handle);
 	}
 
-	@Override
-	public void addAllDrawables(Iterable<? extends Drawable> drbls) {
-		for (Drawable dr : drbls) {
+	public void clearLayerDepth(int layer) {
+		checkLayer(layer);
+		drawables[layer].addPreparation(new Handler<LWJGLGraphics>() {
+
+			@Override
+			public void handle(LWJGLGraphics graphics) {
+				graphics.clearDepthBuffer();
+			}
+
+		});
+	}
+
+	public void addDrawable(LWJGLDrawable dr) {
+		addDrawable(dr, LAYER0);
+	}
+
+	public void addDrawable(LWJGLDrawable dr, int layer) {
+		checkLayer(layer);
+		drawables[layer].addDrawable((LWJGLDrawable) dr);
+	}
+
+	public void removeDrawable(LWJGLDrawable dr, int layer) {
+		checkLayer(layer);
+		drawables[layer].removeDrawable(dr);
+	}
+
+	public void addAllDrawables(Iterable<? extends LWJGLDrawable> drbls) {
+		for (LWJGLDrawable dr : drbls) {
 			addDrawable(dr);
 		}
 	}
 
+	public void addAllDrawables(Iterable<? extends LWJGLDrawable> drbls,
+			int layer) {
+		for (LWJGLDrawable dr : drbls) {
+			addDrawable(dr, layer);
+		}
+	}
+
+	public void clearColourBuffer() {
+		glClear(GL_COLOR_BUFFER_BIT);
+	}
+
+	public void clearDepthBuffer() {
+		glClear(GL_DEPTH_BUFFER_BIT);
+	}
+
+	public void clearActiveBuffers() {
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	}
+
 	private void init(ResourceHandler rh) {
+		self = this;
 		primitives = new GLPrimitives(this);
 		state = new MVPState();
 		updateViewMatrix();
-		drawables = new HashSet<Drawable>();
+		drawables = new LayerStorage[MAX_LAYERS];
+		for (int i = 0; i < drawables.length; ++i) {
+			drawables[i] = new LayerStorage();
+		}
 		shaders = new GLShaderHandler(rh);
 		width = GraphicsConfiguration.INITIAL_WINDOW_WIDTH;
 		height = GraphicsConfiguration.INITIAL_WINDOW_HEIGHT;
@@ -358,6 +499,13 @@ public final class LWJGLGraphics implements Graphics {
 			}
 		});
 		buffer = Matrix.identity(4);
+	}
+
+	private void checkLayer(int layer) {
+		if (layer < 0 || layer >= MAX_LAYERS) {
+			throw new RuntimeException("The provided layer " + layer
+					+ " excedes the maximum number of layers " + MAX_LAYERS);
+		}
 	}
 
 	private void initGL() {
@@ -374,8 +522,14 @@ public final class LWJGLGraphics implements Graphics {
 												// after creation
 		glfwWindowHint(GLFW_RESIZABLE, GL_TRUE); // the window will be resizable
 
+		// Get the resolution of the primary monitor
+		ByteBuffer vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+
 		// Create the window
-		window = glfwCreateWindow(width, height, "LWJGLGraphics", NULL, NULL);
+		width = GLFWvidmode.width(vidmode);
+		height = GLFWvidmode.height(vidmode);
+		window = glfwCreateWindow(width, height, "LWJGLGraphics",
+				glfwGetPrimaryMonitor(), NULL);
 		if (window == NULL)
 			throw new RuntimeException("Failed to create the GLFW window");
 
@@ -410,11 +564,40 @@ public final class LWJGLGraphics implements Graphics {
 
 		glfwSetWindowCloseCallback(window, windowCloseCallback);
 
-		// Get the resolution of the primary monitor
-		ByteBuffer vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-		// Center our window
-		glfwSetWindowPos(window, (GLFWvidmode.width(vidmode) - width) / 2,
-				(GLFWvidmode.height(vidmode) - height) / 2);
+		mousePositionCallback = new GLFWCursorPosCallback() {
+
+			@Override
+			public void invoke(long window, double xpos, double ypos) {
+				if (cursorListener != null) {
+					cursorListener.onMove((int) xpos, (int) ypos);
+				}
+			}
+
+		};
+
+		glfwSetCursorPosCallback(window, mousePositionCallback);
+
+		mouseClickCallback = new GLFWMouseButtonCallback() {
+
+			@Override
+			public void invoke(long window, int button, int action, int mods) {
+				if (cursorListener != null) {
+					CursorSelection butt;
+					if (button == GLFW_MOUSE_BUTTON_LEFT
+							|| button == GLFW_MOUSE_BUTTON_RIGHT) {
+						if (button == GLFW_MOUSE_BUTTON_LEFT) {
+							butt = CursorSelection.PRIMARY;
+						} else {
+							butt = CursorSelection.SECONDARY;
+						}
+						cursorListener.onSelection(butt, action == GLFW_PRESS);
+					}
+				}
+			}
+
+		};
+
+		glfwSetMouseButtonCallback(window, mouseClickCallback);
 
 		// Make the OpenGL context current
 		glfwMakeContextCurrent(window);
@@ -422,6 +605,8 @@ public final class LWJGLGraphics implements Graphics {
 		glfwSwapInterval(0);
 
 		GLContext.createFromCurrent();
+
+		glEnable(GL_TEXTURE_2D);
 
 		glEnable(GL_TEXTURE_2D_ARRAY);
 
@@ -435,7 +620,7 @@ public final class LWJGLGraphics implements Graphics {
 		onResize(width, height);
 
 		// Set the clear color
-		glClearColor(0.1f, 0.2f, 1f, 0.0f);
+		setClearColor(.1f, .2f, 1f, 0f);
 
 		System.out.println("Loading shaders");
 		GLShaderHandler shaders = getShaders();
@@ -488,25 +673,20 @@ public final class LWJGLGraphics implements Graphics {
 		float fovScale = .3f;
 		glFrustum(-ar * fovScale, ar * fovScale, -1.0 * fovScale,
 				1.0 * fovScale, .1f, 10f);
-		synchronized(state) {
+		synchronized (state) {
 			state.projectionMatrix.perspective(Mathf.PI * .5f, ar, .1f, 10f);
 			updateMVP();
 		}
 	}
 
 	private void drawAll() {
-		for (Drawable dr : drawables) {
-			resetViewMatrix();
-			resetModelMatrix();
-			dr.draw(this);
+		for (LayerStorage layer : drawables) {
+			layer.draw();
 		}
 	}
 
 	private void mainLoop() {
 		while (running && glfwWindowShouldClose(window) == GL_FALSE) {
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the
-																// framebuffer
-
 			drawAll();
 
 			glfwSwapBuffers(window); // swap the color buffers
@@ -535,14 +715,13 @@ public final class LWJGLGraphics implements Graphics {
 			state.modelViewMatrix.copyFrom(modelViewMatrix);
 			state.modelViewProjectionMatrix.copyFrom(modelViewProjectionMatrix);
 		}
-		
+
 		public String toString() {
-			return "Projection: " + projectionMatrix + "\n"
-					+ "View: " + viewMatrix + "\n"
-					+ "View inverse: " + viewInverseMatrix + "\n"
-					+ "Model: " + modelMatrix + "\n"
-					+ "ModelView: " + modelViewMatrix + "\n"
-					+ "MVP: " + modelViewProjectionMatrix;
+			return "Projection: " + projectionMatrix + "\n" + "View: "
+					+ viewMatrix + "\n" + "View inverse: " + viewInverseMatrix
+					+ "\n" + "Model: " + modelMatrix + "\n" + "ModelView: "
+					+ modelViewMatrix + "\n" + "MVP: "
+					+ modelViewProjectionMatrix;
 		}
 
 		protected Matrix projectionMatrix;
@@ -553,6 +732,39 @@ public final class LWJGLGraphics implements Graphics {
 		protected Matrix modelViewProjectionMatrix;
 	}
 
+	private class LayerStorage {
+		private Set<LWJGLDrawable> drawables;
+		private List<Handler<LWJGLGraphics>> prepare;
+
+		public LayerStorage() {
+			drawables = new HashSet<LWJGLDrawable>();
+			prepare = new ArrayList<Handler<LWJGLGraphics>>();
+		}
+
+		public void addPreparation(Handler<LWJGLGraphics> prep) {
+			prepare.add(prep);
+		}
+
+		public void addDrawable(LWJGLDrawable drble) {
+			drawables.add(drble);
+		}
+
+		public void removeDrawable(LWJGLDrawable drble) {
+			drawables.remove(drble);
+		}
+
+		public void draw() {
+			for (Handler<LWJGLGraphics> prep : prepare) {
+				prep.handle(self);
+			}
+			for (LWJGLDrawable drble : drawables) {
+				drble.draw(self);
+			}
+		}
+	}
+
+	private LWJGLGraphics self;
+
 	private boolean running;
 
 	private GLPrimitives primitives;
@@ -562,7 +774,7 @@ public final class LWJGLGraphics implements Graphics {
 	private int width;
 	private int height;
 
-	private Collection<Drawable> drawables;
+	private LayerStorage[] drawables;
 
 	private long window;
 
@@ -572,15 +784,15 @@ public final class LWJGLGraphics implements Graphics {
 	private GLFWKeyCallback keyCallback;
 	private GLFWWindowSizeCallback windowSizeCallback;
 	private GLFWWindowCloseCallback windowCloseCallback;
+	private GLFWCursorPosCallback mousePositionCallback;
+	private GLFWMouseButtonCallback mouseClickCallback;
+
+	private CursorListener cursorListener;
 
 	private ControllerMain control;
 
 	private Thread runThread;
 
 	private Matrix buffer;
-
-	public Matrix getModel() {
-		return state.modelMatrix;
-	}
 
 }

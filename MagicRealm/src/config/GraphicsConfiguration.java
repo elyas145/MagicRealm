@@ -2,6 +2,8 @@ package config;
 
 import java.awt.Color;
 
+import lwjglview.graphics.LWJGLGraphics;
+
 public class GraphicsConfiguration {
 	
 	public static final int INITIAL_WINDOW_WIDTH = 1000;
@@ -45,4 +47,18 @@ public class GraphicsConfiguration {
 	public static final int INITIAL_ACTION_HEIGHT = 150;
 
 	public static final boolean SIMPLE_COUNTERS = true;
+	
+	public static final int BOARD_DISPLAY_LAYER = LWJGLGraphics.LAYER1;
+	
+	public static final int BOARD_SELECTION_LAYER = LWJGLGraphics.LAYER3;
+	
+	public static final int MENUS_DISPLAY_LAYER = LWJGLGraphics.LAYER2;
+	
+	public static final int MENUS_SELECTION_LAYER = LWJGLGraphics.LAYER4;
+	
+	public static final int DISPLAY_START_LAYER = BOARD_DISPLAY_LAYER;
+	
+	public static final int SELECTION_START_LAYER = BOARD_SELECTION_LAYER;
+	public static final int SELECTION_END_LAYER = MENUS_SELECTION_LAYER + 1;
+	
 }

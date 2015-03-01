@@ -17,7 +17,7 @@ import utils.resources.ResourceHandler;
 import view.graphics.Drawable;
 import view.graphics.Graphics;
 
-public class ModelData extends LWJGLDrawable {
+public class ModelData implements LWJGLDrawable {
 
 	public static ModelData loadModelData(ResourceHandler rh, String file)
 			throws IOException {
@@ -84,12 +84,6 @@ public class ModelData extends LWJGLDrawable {
 		} else {
 			lwgfx.callList(verticesLocation);
 		}
-	}
-
-	@Override
-	public void draw(Graphics gfx) {
-		LWJGLGraphics lwgfx = (LWJGLGraphics) gfx;
-		draw(lwgfx);
 	}
 
 	private void parseVertex(String[] line) {

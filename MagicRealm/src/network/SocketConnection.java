@@ -18,8 +18,6 @@ public class SocketConnection<S, R> implements Connection<S, R> {
 		socket = sock;
 		outStream = new ObjectOutputStream(sock.getOutputStream());
 		inStream = new ObjectInputStream(sock.getInputStream());
-		int i = 0;
-		int j = i;
 	}
 	
 	
