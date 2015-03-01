@@ -17,19 +17,20 @@ import lwjglview.graphics.animator.FillerAnimator;
 import lwjglview.graphics.animator.TimedAnimator;
 import lwjglview.graphics.animator.matrixcalculator.MatrixCalculator;
 import lwjglview.graphics.board.tile.clearing.LWJGLClearingStorage;
-import lwjglview.graphics.shader.ShaderType;
+import lwjglview.selection.SelectionFrame;
 import model.EnchantedHolder;
 import model.interfaces.ClearingInterface;
 import utils.math.Mathf;
 import utils.math.linear.Matrix;
+import view.selection.CursorListener;
 
-public class LWJGLTileDrawable extends LWJGLDrawableNode implements MatrixCalculator {
+public class LWJGLTileDrawable extends LWJGLDrawableNode implements
+		MatrixCalculator {
 
-	public static final ShaderType SHADER = ShaderType.TILE_SHADER;
-
-	public LWJGLTileDrawable(LWJGLTileCollection parent, Matrix pos,
-			float rot, int norm, int enchant,
-			Iterable<? extends ClearingInterface> clears) {
+	public LWJGLTileDrawable(LWJGLTileCollection parent, Matrix pos, float rot,
+			int norm, int enchant,
+			Iterable<? extends ClearingInterface> clears,
+			Map<Integer, Integer> listeners) {
 		super(parent);
 		tiles = parent;
 		position = Matrix.clone(pos);
@@ -47,8 +48,9 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode implements MatrixCalcul
 		flipper.start();
 		flipper.push(new FillerAnimator(Matrix.identity(4)));
 		clearings = new HashMap<Integer, LWJGLClearingStorage>();
-		initClearings(clears);
+		initClearings(clears, listeners);
 		setCalculator(this);
+		identifier = listeners.get(0);
 	}
 
 	public void setTextures(int norm, int ench) {
@@ -85,7 +87,7 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode implements MatrixCalcul
 	}
 
 	public LWJGLCounterStorage getClearing(int clr) {
-		if(clr <= 0 || clr > BoardConfiguration.MAX_CLEARINGS_IN_TILE) {
+		if (clr <= 0 || clr > BoardConfiguration.MAX_CLEARINGS_IN_TILE) {
 			return freeSpace;
 		}
 		return clearings.get(clr);
@@ -101,19 +103,25 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode implements MatrixCalcul
 
 	@Override
 	public void updateNodeUniforms(LWJGLGraphics lwgfx) {
+		SelectionFrame sf = tiles.getSelectionFrame();
+		if(sf.isSelectionPass()) {
+			sf.loadID(identifier, lwgfx);
+		}
 	}
 
 	@Override
 	public void draw(LWJGLGraphics lwgfx) {
 		updateTransformation();
-		
+
 		for (LWJGLDrawable tf : faces) {
 			tf.draw(lwgfx);
 		}
 
 	}
 
-	private void initClearings(Iterable<? extends ClearingInterface> clears) {
+	private void initClearings(Iterable<? extends ClearingInterface> clears,
+			Map<Integer, Integer> listeners) {
+		// TODO create select texture for each clearing
 		getPosition(vec3T);
 		for (ClearingInterface clr : clears) {
 			clr.getPosition(false, vec3N);
@@ -123,8 +131,7 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode implements MatrixCalcul
 			clearings.put(clr.getClearingNumber(), new LWJGLClearingStorage(
 					this, vec3N, vec3E));
 		}
-		freeSpace = new LWJGLTileStorage(this, vec3T,
-				clearings.values());
+		freeSpace = new LWJGLTileStorage(this, vec3T, clearings.values());
 	}
 
 	private Matrix vec3T, vec3N, vec3E;
@@ -151,7 +158,6 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode implements MatrixCalcul
 
 		public TileFlipper(float time, boolean flip) {
 			super(time);
-			whenDone = flip;
 		}
 
 		@Override
@@ -163,8 +169,6 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode implements MatrixCalcul
 		@Override
 		public void finish() {
 		}
-
-		private boolean whenDone;
 
 	}
 
@@ -178,8 +182,8 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode implements MatrixCalcul
 
 		@Override
 		public void updateNodeUniforms(LWJGLGraphics lwgfx) {
-			lwgfx.updateModelViewUniform(SHADER, "modelViewMatrix");
-			lwgfx.updateMVPUniform(SHADER, "mvpMatrix");
+			lwgfx.updateModelViewUniform("modelViewMatrix");
+			lwgfx.updateMVPUniform("mvpMatrix");
 			lwgfx.getShaders().setUniformIntValue("index", getIndex());
 		}
 	}
@@ -220,10 +224,11 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode implements MatrixCalcul
 	private Matrix transformation;
 	private Matrix rotation;
 	private Matrix position;
-	//private Matrix vector;
+	// private Matrix vector;
 	private Matrix translation;
 	private EnchantedHolder<Integer> textureLocation;
 	private boolean enchanted;
 	private AnimationQueue flipper;
+	private int identifier;
 
 }

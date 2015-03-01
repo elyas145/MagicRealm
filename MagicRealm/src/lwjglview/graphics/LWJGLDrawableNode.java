@@ -4,7 +4,7 @@ import utils.math.linear.Matrix;
 import lwjglview.graphics.animator.matrixcalculator.MatrixCalculator;
 import lwjglview.graphics.animator.matrixcalculator.StaticMatrixCalculator;
 
-public abstract class LWJGLDrawableNode extends LWJGLDrawable {
+public abstract class LWJGLDrawableNode implements LWJGLDrawable {
 	
 	public abstract void updateNodeUniforms(LWJGLGraphics gfx);
 	

@@ -12,6 +12,7 @@ import controller.ClientController;
 import controller.ModelControllerGenerator;
 import lwjglview.graphics.LWJGLGraphics;
 import lwjglview.graphics.board.LWJGLBoardDrawable;
+import lwjglview.selection.SelectionFrame;
 import model.activity.Activity;
 import model.character.Character;
 import model.character.CharacterFactory;
@@ -38,11 +39,13 @@ public class ControllerMain implements ClientController {
 	private ModelControllerGenerator modelGenerator;
 	private ModelControlInterface model;
 	private CharacterType player;
+	private SelectionFrame selectFrame;
 
 	public ControllerMain(ViewController view) {
 		rh = new ResourceHandler();
 		mainView = view;
 		gfx = new LWJGLGraphics(rh, this);
+		selectFrame = new SelectionFrame(gfx);
 	}
 	
 	public void setModelControllerGenerator(ModelControllerGenerator mcg) {
@@ -57,8 +60,9 @@ public class ControllerMain implements ClientController {
 	@Override
 	public BoardView startBoardView() {
 		LWJGLBoardDrawable boardDrawable;
+		SelectionFrame selectFrame = new SelectionFrame(gfx);
 		try {
-			boardDrawable = new LWJGLBoardDrawable(rh);
+			boardDrawable = new LWJGLBoardDrawable(rh, gfx, selectFrame);
 			boardView = boardDrawable;
 			gfx.addDrawable(boardDrawable);
 			return boardView;
@@ -190,9 +194,8 @@ public class ControllerMain implements ClientController {
 	@Override
 	public void initializeBoard(NetworkHandler<BoardView> initializer) {
 		try {
-			LWJGLBoardDrawable draw = new LWJGLBoardDrawable(rh);
+			LWJGLBoardDrawable draw = new LWJGLBoardDrawable(rh, gfx, selectFrame);
 			boardView = draw;
-			gfx.addDrawable(draw);
 			initializer.handle(boardView);
 		} catch (IOException e) {
 			e.printStackTrace();

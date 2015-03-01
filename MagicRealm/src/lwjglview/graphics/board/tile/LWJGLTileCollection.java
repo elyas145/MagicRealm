@@ -9,12 +9,15 @@ import utils.math.Mathf;
 import utils.math.linear.Matrix;
 import utils.resources.ResourceHandler;
 import utils.resources.TileImages;
+import view.selection.CursorListener;
+import view.selection.CursorSelection;
 import config.GraphicsConfiguration;
 import lwjglview.graphics.LWJGLDrawableNode;
 import lwjglview.graphics.LWJGLGraphics;
 import lwjglview.graphics.LWJGLTextureArrayLoader;
 import lwjglview.graphics.board.LWJGLBoardDrawable;
 import lwjglview.graphics.shader.ShaderType;
+import lwjglview.selection.SelectionFrame;
 import model.EnchantedHolder;
 import model.enums.TileName;
 import model.interfaces.ClearingInterface;
@@ -51,14 +54,21 @@ public class LWJGLTileCollection extends LWJGLDrawableNode {
 
 	public void setTile(TileName tile, int rw, int cl, int rot,
 			Iterable<? extends ClearingInterface> clears) {
-		int row = rw;
-		int col = cl;
+		int row = cl;
+		int col = rw;
 		buffer3.fill((row % 2 == 0 ? 0f : 1.5f) + col * 3f, -row * 0.866025f,
 				0f);
 		float r = Mathf.PI * rot / 3f;
 		EnchantedHolder<Integer> loc = textureLocations.get(tile);
+		Map<Integer, Integer> listeners = new HashMap<Integer, Integer>();
+		SelectionFrame sf = board.getSelectionFrame();
+		listeners.put(0, sf.getNewID(new ChangeFocus(tile, 0)));
+		for(ClearingInterface cli: clears) {
+			int num = cli.getClearingNumber();
+			listeners.put(num, 0);// TODO uncomment sf.getNewID(new ChangeFocus(tile, num)));
+		}
 		tiles.put(tile, new LWJGLTileDrawable(this, buffer3, r, loc.get(false),
-				loc.get(true), clears));
+				loc.get(true), clears, listeners));
 	}
 
 	public void relocateChit(int id, Matrix pos) {
@@ -68,6 +78,14 @@ public class LWJGLTileCollection extends LWJGLDrawableNode {
 	public LWJGLTileDrawable get(TileName tl) {
 		return tiles.get(tl);
 	}
+	
+	public boolean isSelectionPass() {
+		return getSelectionFrame().isSelectionPass();
+	}
+	
+	public SelectionFrame getSelectionFrame() {
+		return board.getSelectionFrame();
+	}
 
 	@Override
 	public void updateNodeUniforms(LWJGLGraphics gfx) {
@@ -76,8 +94,10 @@ public class LWJGLTileCollection extends LWJGLDrawableNode {
 	@Override
 	public void draw(LWJGLGraphics gfx) {
 		updateTransformation();
-		gfx.getShaders().useShaderProgram(ShaderType.TILE_SHADER);
-		textures.useTextures(gfx);
+		if(!isSelectionPass()) {
+			gfx.getShaders().useShaderProgram(ShaderType.TILE_SHADER);
+			textures.useTextures(gfx);
+		}
 		// draw all tiles
 		for (LWJGLTileDrawable tile : tiles.values()) {
 			tile.draw(gfx);
@@ -96,6 +116,27 @@ public class LWJGLTileCollection extends LWJGLDrawableNode {
 											true))));
 		}
 		textures.loadImages();
+	}
+	
+	private class ChangeFocus implements CursorListener {
+		
+		public ChangeFocus(TileName tn, int clr) {
+			tile = tn;
+			clearing = clr;
+		}
+
+		@Override
+		public void onMove(int x, int y) {
+		}
+
+		@Override
+		public void onSelection(CursorSelection select, boolean down) {
+			board.requestFocus(tile, clearing);
+		}
+		
+		private TileName tile;
+		private int clearing;
+		
 	}
 
 	private Map<TileName, EnchantedHolder<Integer>> textureLocations;

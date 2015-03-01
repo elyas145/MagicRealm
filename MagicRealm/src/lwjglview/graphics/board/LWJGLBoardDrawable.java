@@ -25,6 +25,7 @@ import lwjglview.graphics.board.tile.LWJGLTileCollection;
 import lwjglview.graphics.board.tile.LWJGLTileDrawable;
 import lwjglview.graphics.model.ModelData;
 import lwjglview.graphics.shader.GLShaderHandler;
+import lwjglview.selection.SelectionFrame;
 import model.EnchantedHolder;
 import model.counter.chit.MapChit;
 import model.enums.CounterType;
@@ -36,6 +37,7 @@ import utils.math.linear.Matrix;
 import utils.resources.ResourceHandler;
 import utils.time.Timing;
 import view.controller.game.BoardView;
+import view.selection.CursorListener;
 
 public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 
@@ -50,7 +52,8 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 					}), Matrix.columnVector(new float[] { .4f, .4f, .5f, 1f // 21:00
 					}) };
 
-	public LWJGLBoardDrawable(ResourceHandler rh) throws IOException {
+	public LWJGLBoardDrawable(ResourceHandler rh, LWJGLGraphics gfx, SelectionFrame frame)
+			throws IOException {
 		super(null);
 		resources = rh;
 		counterLocations = new HashMap<Integer, CounterStorage>();
@@ -112,18 +115,30 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 		ambientColour.start();
 		timeOfDay = TimeOfDay.DUSK;
 		setTimeOfDay(timeOfDay);
-	}
+		selectionPass = false;
+		clearingFocus = new ClearingFocusHandler() {
 
-	@Override
-	public void loadMapChits(Iterable<MapChit> chits) {
-		mapChits = new LWJGLMapChitCollection(this, chits);
-		for (MapChit mc : chits) {
-			mapChits.create(mc, squareCounter);
-		}
+			@Override
+			public void onFocus(TileName tile, int clearing) {
+				focusOn(tile, clearing);
+			}
+			
+		};
+		selectionFrame = frame;
+		addTo(gfx);
 	}
 
 	public boolean isTileEnchanted(TileName name) {
 		return tiles.isEnchanted(name);
+	}
+
+	public void addTo(LWJGLGraphics gfx) {
+		gfx.addDrawable(this, GraphicsConfiguration.BOARD_DISPLAY_LAYER);
+		gfx.addDrawable(this, GraphicsConfiguration.BOARD_SELECTION_LAYER);
+	}
+
+	public SelectionFrame getSelectionFrame() {
+		return selectionFrame;
 	}
 
 	/*
@@ -169,11 +184,38 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 		counterLocations.remove(id);
 	}
 
+	public void requestFocus(TileName tile, int clearing) {
+		clearingFocus.onFocus(tile, clearing);
+	}
+	
+	public void setDefaultClearingFocus() {
+		clearingFocus = new ClearingFocusHandler() {
+
+			@Override
+			public void onFocus(TileName tile, int clearing) {
+				focusOn(tile, clearing);
+			}
+			
+		};
+	}
+	
+	public void setCleaingFocus(ClearingFocusHandler cfh) {
+		clearingFocus = cfh;
+	}
+
 	/*
 	 * ***********************************************************************
 	 * OVERRIDE METHODS
 	 * ***********************************************************************
 	 */
+	
+	@Override
+	public void loadMapChits(Iterable<MapChit> chits) {
+		mapChits = new LWJGLMapChitCollection(this, chits);
+		for (MapChit mc : chits) {
+			mapChits.create(mc, squareCounter);
+		}
+	}
 
 	@Override
 	public synchronized void setMapChit(MapChit mc) {
@@ -189,11 +231,13 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 
 	@Override
 	public synchronized void updateNodeUniforms(LWJGLGraphics gfx) {
-		GLShaderHandler shaders = gfx.getShaders();
-		synchronized (fBuffer4) {
-			fBuffer4.clear();
-			ambientColour.apply().toFloatBuffer(fBuffer4);
-			shaders.setUniformFloatArrayValue("ambientColour", 4, fBuffer4);
+		if(!selectionFrame.isSelectionPass()) {
+			GLShaderHandler shaders = gfx.getShaders();
+			synchronized (fBuffer4) {
+				fBuffer4.clear();
+				ambientColour.apply().toFloatBuffer(fBuffer4);
+				shaders.setUniformFloatArrayValue("ambientColour", 4, fBuffer4);
+			}
 		}
 	}
 
@@ -207,20 +251,28 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 			tiles.draw(lwgfx);
 		}
 
-		synchronized (counters) {
-			counters.draw(lwgfx);
-		}
-		if (mapChits != null) {
-			synchronized (mapChits) {
-				mapChits.draw(lwgfx);
+		// draw the other objects if selection is not activated
+		if(!selectionFrame.isSelectionPass()) {
+			synchronized (counters) {
+				counters.draw(lwgfx);
+			}
+	
+			if(mapChits != null) {
+				synchronized (mapChits) {
+					mapChits.draw(lwgfx);
+				}
 			}
 		}
 	}
 
 	@Override
 	public synchronized void focusOn(TileName tile) {
-		Matrix vector = tiles.getVector(tile);
-		MatrixCalculator calc = new StaticMatrixCalculator(vector);
+		Matrix vector;
+		MatrixCalculator calc;
+		synchronized(tiles) {
+			vector = tiles.getVector(tile);
+			calc = new StaticMatrixCalculator(vector);
+		}
 		cameraFocus.changeFocus(calc);
 	}
 
@@ -260,7 +312,9 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 	@Override
 	public void setTile(TileName tile, int rw, int cl, int rot,
 			Iterable<? extends ClearingInterface> clears) {
-		tiles.setTile(tile, rw, cl, rot, clears);
+		synchronized(tiles) {
+			tiles.setTile(tile, rw, cl, rot, clears);
+		}
 	}
 
 	@Override
@@ -494,5 +548,11 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 
 	private Matrix bufferA;
 	private Matrix bufferB;
+	
+	private boolean selectionPass;
+	
+	private ClearingFocusHandler clearingFocus;
+	
+	private SelectionFrame selectionFrame;
 
 }
