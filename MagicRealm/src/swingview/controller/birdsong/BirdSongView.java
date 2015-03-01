@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.BoxLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -15,6 +16,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
 import swingview.controller.HistoryView;
+import view.controller.ViewController;
 import model.activity.Activity;
 import model.activity.Empty;
 import model.activity.Hide;
@@ -23,59 +25,67 @@ import model.character.Phase;
 import model.enums.ActivityType;
 import model.enums.CharacterType;
 import model.enums.PhaseType;
+import model.enums.TileName;
 import model.player.PersonalHistory;
 import model.player.Player;
-import controller.Controller;
 
 @SuppressWarnings("serial")
 public class BirdSongView extends JPanel implements ActionListener {
-	private Controller parent;
+	private ViewController parent;
 	private PersonalHistory history;
 	private JButton submit;
-	ArrayList<JComboBox<Object>> boxesArray;
+	private List<JComboBox<Object>> boxesArray;
 	private ArrayList<String> actions = new ArrayList<String>();
+	private CharacterType character;
+	private ActivityView activityView;
 
-	public BirdSongView(Controller parent, String player, ArrayList<Phase> phases) {
+	public BirdSongView(ViewController parent, CharacterType chr, int day,
+			List<Phase> phases, PersonalHistory hist,
+			Map<TileName, List<Integer>> tileClrs) {
 		this.parent = parent;
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-		JLabel lblPlayer = new JLabel(player);
+		character = chr;
+		JLabel lblPlayer = new JLabel(character.toString());
 		add(lblPlayer);
-		history = parent.getPlayerHistory();
+		history = hist;
 		HistoryView historyView = new HistoryView(history);
 		historyView.setAlignmentX(Component.CENTER_ALIGNMENT);
 		add(historyView);
 
-		JLabel lbl = new JLabel("CurrentDay: " + parent.getCurrentDay());		
+		JLabel lbl = new JLabel("CurrentDay: " + day);
 		add(lbl);
-		
+
 		JPanel wrapper = new JPanel();
 		wrapper.setLayout(new BoxLayout(wrapper, BoxLayout.X_AXIS));
-		
+
 		boxesArray = new ArrayList<JComboBox<Object>>();
-		for (int i = 0; i < phases.size(); i++) {
+		for (Phase phase : phases) {
 			JPanel pane = new JPanel();
 			pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
-			switch(phases.get(i).getType()) {
+			switch (phase.getType()) {
 			case SUNLIGHT:
-				lbl = new JLabel("Sunlight Phase: " + (i + 1));
+				lbl = new JLabel("Sunlight Phase");
 				break;
 			case SPECIAL:
-				lbl = new JLabel("Special Phase: " + (i + 1));
+				lbl = new JLabel("Special Phase");
 				break;
 			default:
-				lbl = new JLabel("Default Phase: " + (i + 1));
+				lbl = new JLabel("Default Phase");
 				break;
 			}
 			pane.setAlignmentX(Component.LEFT_ALIGNMENT);
 			pane.add(lbl);
-			boxesArray.add(new JComboBox<Object>(phases.get(i).getPossibleActivities().toArray()));
-			pane.add(boxesArray.get(i));
+			JComboBox<Object> tmp = new JComboBox<Object>(phase
+					.getPossibleActivities().toArray());
+			boxesArray.add(tmp);
+			pane.add(tmp);
 			wrapper.add(pane);
 		}
 		add(wrapper);
 		submit = new JButton("Submit");
 		submit.addActionListener(this);
 		add(submit);
+		activityView = new ActivityView(this, parent, actions, character, tileClrs);
 	}
 
 	@Override
@@ -85,25 +95,26 @@ public class BirdSongView extends JPanel implements ActionListener {
 			for (JComboBox<Object> b : boxesArray) {
 				actions.add(b.getSelectedItem().toString());
 			}
-			//trim none activities from end.
-			while(actions.size() > 0 && actions.get(actions.size() - 1).equals(ActivityType.NONE.toString())) {
+			// trim none activities from end.
+			while (actions.size() > 0
+					&& actions.get(actions.size() - 1).equals(
+							ActivityType.NONE.toString())) {
 				actions.remove(actions.size() - 1);
 			}
-			
-			//check if no activities were set.
+
+			// check if no activities were set.
 			if (!actions.isEmpty()) {
-				if(actions.contains(ActivityType.MOVE.toString())){
-					//setup move activities if needed.
-					ActivityView activityView = new ActivityView(this, parent,
-							actions);
-				}else{
+				if (actions.contains(ActivityType.MOVE.toString())) {
+					// setup move activities if needed.
+					activityView.show();
+				} else {
 					String[] arr = new String[actions.size()];
-					for(int i = 0; i < arr.length; i++){
+					for (int i = 0; i < arr.length; i++) {
 						arr[i] = actions.get(i);
 					}
 					sendActivities(arr);
 				}
-				
+
 			} else {
 				sendActivities(new String[0]);
 			}
@@ -115,29 +126,29 @@ public class BirdSongView extends JPanel implements ActionListener {
 		ArrayList<Activity> activities = new ArrayList<Activity>();
 		for (String action : actions) {
 			ActivityType act = ActivityType.valueOf(action);
-			switch(act) {
+			switch (act) {
 			case MOVE:
 				activities.add(moveActivities.get(moveCounter));
 				moveCounter++;
 				break;
 			case HIDE:
-				activities.add(new Hide(parent.getCurrentCharacter()));
+				activities.add(new Hide(character));
 				break;
 			case SEARCH:
-				activities.add(new Search(parent.getCurrentCharacter()));
+				activities.add(new Search(character));
 				break;
 			default:
 				break;
 			}
 		}
-		parent.setCurrentPlayerActivities(activities);
+		parent.setPlayerActivities(character, activities);
 	}
 
 	public void sendActivities(String[] activitiesArr) {
 		List<Activity> activities = new ArrayList<Activity>();
-		CharacterType chr = parent.getCurrentCharacter();
+		CharacterType chr = character;
 		for (String action : activitiesArr) {
-			switch(ActivityType.valueOf(action)) {
+			switch (ActivityType.valueOf(action)) {
 			case HIDE:
 				activities.add(new Hide(chr));
 				break;
@@ -151,7 +162,7 @@ public class BirdSongView extends JPanel implements ActionListener {
 				break;
 			}
 		}
-		parent.setCurrentPlayerActivities(activities);
+		parent.setPlayerActivities(character, activities);
 	}
 
 }

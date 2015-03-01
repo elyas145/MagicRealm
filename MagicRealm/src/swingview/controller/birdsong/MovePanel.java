@@ -4,22 +4,25 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import view.controller.ViewController;
 import model.enums.TileName;
-import controller.Controller;
 
 @SuppressWarnings("serial")
 public class MovePanel extends JPanel implements ActionListener {
 	private JComboBox<TileName> tiles;
 	private JComboBox<Integer> clearings;
-	private Controller controller;
+	private ViewController controller;
+	private Map<TileName, List<Integer>> tileClearings;
 
-	public MovePanel(Controller controller, int i) {
+	public MovePanel(ViewController controller, int i,
+			Map<TileName, List<Integer>> tileClrs) {
 		this.controller = controller;
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		JLabel lblMovePhase = new JLabel("Move Phase: " + i);
@@ -29,13 +32,9 @@ public class MovePanel extends JPanel implements ActionListener {
 		JLabel lblTile = new JLabel("Tile: ");
 		JLabel lblClearing = new JLabel("Clearing: ");
 		tilePanel.add(lblTile);
-
-		TileName[] tileArray = new TileName[controller.getPossibleTiles()
-				.size()];
-		for (int j = 0; j < tileArray.length; j++) {
-			tileArray[j] = controller.getPossibleTiles().get(j);
-		}
-		tiles = new JComboBox<TileName>(tileArray);
+		tileClearings = tileClrs;
+		tiles = new JComboBox<TileName>((TileName[]) tileClearings.keySet()
+				.toArray());
 		tilePanel.add(tiles);
 		clearings = new JComboBox<Integer>();
 		tiles.addActionListener(this);
@@ -56,30 +55,25 @@ public class MovePanel extends JPanel implements ActionListener {
 
 	private void setClearings() {
 		TileName selectedTile = getSelectedTile();
-		List<Integer> clearingsArray = controller
-				.getPossibleClearings(selectedTile);
-		Integer[] ca = new Integer[clearingsArray.size()];
-		for (int j = 0; j < ca.length; j++) {
-			ca[j] = clearingsArray.get(j);
-		}
-		clearings.setModel(new JComboBox<Integer>(ca).getModel());
+		List<Integer> clearingsArray = tileClearings.get(selectedTile);
+		clearings.setModel(new JComboBox<Integer>((Integer[]) clearingsArray
+				.toArray()).getModel());
 	}
-	
+
 	private void changeFocusTile() {
 		controller.focusOnBoard(getSelectedTile());
 	}
-	
+
 	private void changeFocusClearing() {
 		controller.focusOnBoard(getSelectedTile(), getSelectedClearing());
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent ae) {
-		if(ae.getSource() == tiles) {
+		if (ae.getSource() == tiles) {
 			setClearings();
 			changeFocusTile();
-		}
-		else if(ae.getSource() == clearings) {
+		} else if (ae.getSource() == clearings) {
 			changeFocusClearing();
 		}
 	}

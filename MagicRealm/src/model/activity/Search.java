@@ -1,5 +1,6 @@
 package model.activity;
 
+import model.controller.ModelControlInterface;
 import model.controller.ModelController;
 import model.enums.ActivityType;
 import model.enums.CharacterType;
@@ -11,7 +12,7 @@ public class Search extends Activity {
 	}
 
 	@Override
-	public void perform(ModelController controller) {
+	public void perform(ModelControlInterface controller) {
 		controller.startSearching(getActor());
 	}
 

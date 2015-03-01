@@ -1,5 +1,5 @@
 package config;
 
 public class NetworkConfiguration {
-	public static final int DEFAULT_PORT = 4095;
+	public static final int DEFAULT_PORT = 4096;
 }

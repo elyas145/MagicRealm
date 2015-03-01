@@ -1,5 +1,6 @@
 package model.activity;
 
+import model.controller.ModelControlInterface;
 import model.controller.ModelController;
 import model.enums.ActivityType;
 import model.enums.CharacterType;
@@ -33,13 +34,9 @@ public class Move extends Activity {
 	}
 
 	@Override
-	public void perform(ModelController controller) {
+	public void perform(ModelControlInterface controller) {
 		// set location on the board.
-		try {
-			controller.moveCharacter(getActor(), getTile(), getClearing());
-		} catch (IllegalMoveException e) {
-			controller.raiseMessage(getActor(), "Illegal move cancelled");
-		}
+		controller.moveCharacter(getActor(), getTile(), getClearing());
 	}
 
 }

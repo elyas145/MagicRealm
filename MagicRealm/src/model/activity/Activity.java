@@ -1,13 +1,13 @@
 package model.activity;
 
-import model.controller.ModelController;
+import model.controller.ModelControlInterface;
 import model.enums.ActivityType;
 import model.enums.CharacterType;
 
 public abstract class Activity {
 
 	// perform the action on the model controller
-	public abstract void perform(ModelController controller);
+	public abstract void perform(ModelControlInterface controller);
 
 	public ActivityType getType() {
 		return type;

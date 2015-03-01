@@ -43,4 +43,6 @@ public interface BoardView {
 
 	void revealAllMapChits(Iterable<MapChit> discoveredMapChits);
 
+	void loadMapChits(Iterable<MapChit> chits);
+
 }

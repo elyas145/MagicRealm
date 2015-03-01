@@ -4,29 +4,35 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import view.controller.ViewController;
 import config.GraphicsConfiguration;
-import controller.Controller;
 import model.activity.Activity;
 import model.activity.Move;
 import model.enums.ActivityType;
+import model.enums.CharacterType;
+import model.enums.TileName;
 
 @SuppressWarnings("serial")
 public class ActivityView extends JFrame implements ActionListener {
 	private BirdSongView parent;
 	private JButton go;
 	private ArrayList<MovePanel> movePanels;
-	private Controller control;
+	private ViewController control;
+	private CharacterType character;
 
-	public ActivityView(BirdSongView parent, Controller controller,
-			ArrayList<String> actions) {
+	public ActivityView(BirdSongView parent, ViewController controller,
+			ArrayList<String> actions, CharacterType chr, Map<TileName, List<Integer>> tileClrs) {
 		super("Set Activity");
 		control = controller;
+		character = chr;
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		setPreferredSize(new Dimension(
 				GraphicsConfiguration.INITIAL_ACTION_WIDTH * actions.size(),
@@ -45,7 +51,7 @@ public class ActivityView extends JFrame implements ActionListener {
 		moveP.setLayout(new BoxLayout(moveP, BoxLayout.X_AXIS));
 		for (int i = 0; i < actions.size(); i++) {
 			if (actions.get(i).equals(ActivityType.MOVE.toString())) {
-				MovePanel tmp = new MovePanel(controller, i);
+				MovePanel tmp = new MovePanel(controller, i, tileClrs);
 				movePanels.add(tmp);
 				moveP.add(tmp);
 			}
@@ -54,6 +60,9 @@ public class ActivityView extends JFrame implements ActionListener {
 		getContentPane().add(moveP);
 		getContentPane().add(go);
 		pack();
+	}
+	
+	public void show() {
 		setVisible(true);
 	}
 
@@ -65,7 +74,7 @@ public class ActivityView extends JFrame implements ActionListener {
 			ArrayList<Activity> activities = new ArrayList<Activity>();
 
 			for (MovePanel panel : movePanels) {
-				activities.add(new Move(control.getCurrentCharacter(), panel
+				activities.add(new Move(character, panel
 						.getSelectedTile(), panel.getSelectedClearing()));
 			}
 			parent.sendActivities(activities);

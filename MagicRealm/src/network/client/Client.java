@@ -109,10 +109,6 @@ public class Client<S, R> implements Sender<S> {
 		}
 	}
 
-	public void setExceptionHandler(ExceptionHandler eh) {
-		exceptionHandler = eh;
-	}
-
 	@Override
 	public void send(NetworkHandler<S> nh) {
 		sender.send(nh);
@@ -132,7 +128,6 @@ public class Client<S, R> implements Sender<S> {
 			}
 
 		});
-		exceptionHandler = null;
 		adder = new Invoker<R>() {
 
 			@Override
@@ -176,7 +171,5 @@ public class Client<S, R> implements Sender<S> {
 	private Invoker<R> adder;
 
 	private Runnable onDisconnect;
-
-	private ExceptionHandler exceptionHandler;
 
 }

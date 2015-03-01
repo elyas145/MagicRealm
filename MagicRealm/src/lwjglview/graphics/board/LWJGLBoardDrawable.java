@@ -50,7 +50,7 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 					}), Matrix.columnVector(new float[] { .4f, .4f, .5f, 1f // 21:00
 					}) };
 
-	public LWJGLBoardDrawable(ResourceHandler rh, Iterable<MapChit> chits)
+	public LWJGLBoardDrawable(ResourceHandler rh)
 			throws IOException {
 		super(null);
 		resources = rh;
@@ -106,16 +106,21 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 		// initialize chits
 		System.out.println("Loading chit images");
 		counters = new LWJGLCounterCollection(this);
-		mapChits = new LWJGLMapChitCollection(this, chits);
-		for (MapChit mc : chits) {
-			mapChits.create(mc, squareCounter);
-		}
+		mapChits = null;
 		System.out.println("Finished loading chit images");
 
 		ambientColour = new AnimationQueue();
 		ambientColour.start();
 		timeOfDay = TimeOfDay.DUSK;
 		setTimeOfDay(timeOfDay);
+	}
+	
+	@Override
+	public void loadMapChits(Iterable<MapChit> chits) {
+		mapChits = new LWJGLMapChitCollection(this, chits);
+		for (MapChit mc : chits) {
+			mapChits.create(mc, squareCounter);
+		}
 	}
 
 	public boolean isTileEnchanted(TileName name) {

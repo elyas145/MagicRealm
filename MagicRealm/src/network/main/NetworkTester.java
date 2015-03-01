@@ -84,6 +84,11 @@ public class NetworkTester {
 			// send a message
 			client.send(new LoggerHandler("Client says: 'Hi server!'"));
 			// stop and wait for the client to finish
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 			client.stop();
 			client.join();
 			// stop and wait for the server to finish

@@ -1,7 +1,6 @@
 package model.activity;
 
-import utils.random.Random;
-import controller.Controller;
+import model.controller.ModelControlInterface;
 import model.controller.ModelController;
 import model.enums.ActivityType;
 import model.enums.CharacterType;
@@ -13,15 +12,8 @@ public class Hide extends Activity {
 	}
 
 	@Override
-	public void perform(ModelController controller) {
-		if (!controller.isCharacterHiding(getActor())) {
-			int rand = Random.dieRoll();
-			System.out.println("random hide: " + rand);
-			if (rand != 6) {
-				controller.setCurrentHiding();
-			}
-		}
-
+	public void perform(ModelControlInterface controller) {
+		controller.hideCharacter(getActor());
 	}
 
 }

@@ -8,11 +8,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.swing.event.RowSorterEvent.Type;
-
 import config.BoardConfiguration;
 import config.GameConfiguration;
-import controller.Controller;
+import controller.ClientController;
+import controller.ControllerGenerator;
+import controller.network.server.NetworkControllerGenerator;
 import utils.random.Random;
 import utils.resources.ResourceHandler;
 import utils.structures.LinkedQueue;
@@ -30,45 +30,81 @@ import model.enums.PeerType;
 import model.enums.PhaseType;
 import model.enums.TableType;
 import model.enums.TileName;
-import model.enums.TileType;
+import model.enums.TimeOfDay;
 import model.enums.ValleyChit;
-import model.enums.WarningType;
+import model.exceptions.GameFullException;
 import model.exceptions.IllegalMoveException;
 import model.interfaces.ClearingInterface;
+import model.interfaces.HexTileInterface;
 import model.player.Player;
 import model.character.CharacterFactory;
 import model.character.Character;
 import model.character.Phase;
+import model.controller.requests.DieRequest;
 import model.counter.chit.LostSite;
 import model.counter.chit.MapChit;
 
 /*
  * Meant to be a container for the entire model
  */
-public class ModelController {
-	private ResourceHandler rh;
-	private int numPlayers = 0;
-	private ArrayList<ValleyChit> sites;
-	private int currentDay = 0;
-	private LostSite lostCity;
-	private LostSite lostCastle;
+public class ModelController implements ModelControlInterface {
 
-	private Board board = null;
-	// private ArrayList<Character> characters = null;
-	private Map<CharacterType, Character> characters;
-	// private ArrayList<Player> players = null;
-	private Map<CharacterType, Player> players;
-	private List<CharacterType> randomOrder;
-	private Queue<CharacterType> orderOfPlay;
-	private boolean currentPlayerDone = false;
-	private Set<MapChit> mapChits;
-	private Controller client;
+	@Override
+	public void setCharacterHidden(CharacterType character, boolean hid) {
+		getCharacter(character).setHiding(hid);
+		getClient(character).setHiding(character, hid);
+	}
 
-	private static final RuntimeException noPlayersException = new RuntimeException(
-			"There are no players in the queue");
+	@Override
+	public void performSearch(TableType selectedTable, CharacterType chr) {
+		// TODO add other search table options
+		switch (selectedTable) {
+		default:
+			// peer table.
+			peerTableSearch(chr);
+		}
+	}
 
-	public ModelController(ResourceHandler rh, Controller cln) {
-		client = cln;
+	@Override
+	public void peerChoice(PeerType choice, CharacterType actor) { // choice of
+																	// peer
+		if (choice == null) {
+			System.out.println("PEER CHOICE WAS NULL");
+			return;
+		}
+		switch (choice) {
+		case CLUES_AND_PATHS:
+		case CLUES:
+			peerCP(actor);
+			break;
+		default:
+			break;
+		}
+
+	}
+
+	@Override
+	public void hideCharacter(CharacterType actor) {
+		getClient(actor).rollDie(actor, DieRequest.PEER_TABLE);
+	}
+
+	@Override
+	public void setPlayerActivities(List<Activity> activities, CharacterType chr) {
+		getPlayerOf(chr).setActivities(activities);
+	}
+
+	@Override
+	public void hideCharacter(int chance, CharacterType character) {
+		if (chance <= 5) {
+			setCharacterHidden(character, true);
+		} else {
+			setCharacterHidden(character, false);
+		}
+	}
+
+	public ModelController(ResourceHandler rh, ControllerGenerator cg) {
+		controlGenerator = cg;
+		playingCharacters = new HashMap<CharacterType, ClientController>();
 		this.rh = rh;
 		currentDay = 1;
 		sites = new ArrayList<ValleyChit>();
@@ -88,14 +124,27 @@ public class ModelController {
 
 		lostCity = new LostSite(MapChitType.LOST_CITY);
 		lostCastle = new LostSite(MapChitType.LOST_CASTLE);
+		
+		gameStarted = false;
+		lobby = new HashSet<ClientController>();
+	}
+
+	public void startControl() {
+		setBoard();
+		setNumberPlayers(GameConfiguration.MAX_PLAYERS);
+		setCharacters();
+		setPlayers();
+		setSiteLocations();
+		setPlayersInitialLocations();
+		waitForPlayers();
 	}
 
 	public void raiseMessage(CharacterType plr, String msg) {
-		client.displayMessage("Illegal move cancelled.");
+		getClient(plr).displayMessage("Illegal move cancelled.");
 	}
 
 	public void moveCharacter(CharacterType characterType, TileName tt,
-			int clearing) throws IllegalMoveException {
+			int clearing) {
 		Player ct = players.get(characterType);
 		ClearingInterface cl1 = board.getLocationOfCounter(characterType
 				.toCounter());
@@ -103,14 +152,15 @@ public class ModelController {
 		if (cl1.isConnectedTo(cl2, PathType.NORMAL)
 				|| ct.hasDiscoveredPath(cl1, cl2)) {
 			board.moveCharacter(characterType, tt, clearing);
-			client.moveCounter(characterType.toCounter(), tt, clearing);
+			getClient(characterType).moveCounter(characterType.toCounter(), tt, clearing);
 		} else {
-			throw new IllegalMoveException(tt, clearing, characterType);
+			getClient(characterType).raiseException(new IllegalMoveException(tt, clearing,
+					characterType));
 		}
 	}
 
-	public void killCharacter(Character character) {
-		board.removeCharacter(character.getType());
+	public void killCharacter(CharacterType character) {
+		board.removeCharacter(character);
 	}
 
 	public Board setBoard() {
@@ -165,6 +215,7 @@ public class ModelController {
 	}
 
 	public void setPlayersInitialLocations() {
+		// TODO get users to set locations
 		for (Character c : characters.values()) {
 			board.setLocationOfCounter(c.getType().toCounter(),
 					GameConfiguration.INITIAL_SITE);
@@ -243,7 +294,7 @@ public class ModelController {
 			resetOrderOfPlay();
 		}
 		currentPlayerDone = false;
-		client.setCurrentCharacter(getCurrentCharacterType());
+		getClient(getCurrentCharacterType()).setCurrentCharacter(getCurrentCharacterType());
 		try {
 			return players.get(orderOfPlay.pop());
 		} catch (QueueEmptyException e) {
@@ -282,26 +333,75 @@ public class ModelController {
 		return characters.get(ct);
 	}
 
-	public boolean isCurrentHidden() {
-		return getCurrentCharacter().isHiding();
-	}
-
-	public void setCurrentHiding() {
-		getCurrentCharacter().setHiding(true);
-		client.setHiding(getCurrentCharacterType());
-		System.out.println("current is now hiding.");
-	}
-
-	public void unhideCurrent() {
-		getCurrentCharacter().setHiding(false);
-	}
-
-	public boolean isCharacterHiding(CharacterType actor) {
-		return characters.get(actor).isHiding();
-	}
-
 	public void startSearching(CharacterType actor) {
-		client.startSearch(actor);
+		getClient(actor).startSearch(actor);
+	}
+
+	private void startGame() {
+		showBoards();
+		hideCharacters();
+		TimeOfDay tod = TimeOfDay.MIDNIGHT;
+		while (getCurrentDay() <= GameConfiguration.LUNAR_MONTH) {
+			newDay();
+			newDayTime();
+			Player plr;
+			// birdsong
+			birdsong();
+			newDayTime();
+			// dayLight
+			dayLight();
+		}
+	}
+
+	private void waitForPlayers() {
+		while(lobby.size() < numPlayers) {
+			ClientController ctrl = controlGenerator.generateController();
+			lobby.add(ctrl);
+			ctrl.enterLobby();
+		}
+		controlGenerator.rejectNew();
+	}
+
+	private void birdsong() {
+		// TODO Auto-generated method stub
+		for (Player plr : getPlayers()) {
+			startBirdSong(plr);
+		}
+	}
+
+	private void startBirdSong(Player plr) {
+		getClient(plr.getCharacter().getType()).startBirdsong();
+	}
+
+	private void dayLight() {
+		try {
+			while (!orderOfPlay.isEmpty()) {
+				CharacterType chr;
+				chr = orderOfPlay.pop();
+				// TODO Auto-generated catch block
+				setCharacterHidden(chr, false);
+				playActivities(chr);
+			}
+		} catch (QueueEmptyException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private void playActivities(CharacterType chr) {
+		Player plr = getPlayerOf(chr);
+		for(Activity act: plr.getPersonalHistory().getCurrentActivities()) {
+			act.perform(this);
+		}
+	}
+
+	private void hideCharacters() {
+		// TODO hide the characters on each controller
+
+	}
+
+	private void showBoards() {
+		// TODO create a handler to show the clients board
+
 	}
 
 	private void resetOrderOfPlay() {
@@ -349,42 +449,28 @@ public class ModelController {
 				}
 			}
 		}
-		
+
 		// set the tiles
-		for(TileName tn: new TileName[] {
-				TileName.CAVERN,
-				TileName.CAVES,
-				TileName.HIGH_PASS,
-				TileName.BORDERLAND,
-				TileName.RUINS
-		}) {
+		for (TileName tn : new TileName[] { TileName.CAVERN, TileName.CAVES,
+				TileName.HIGH_PASS, TileName.BORDERLAND, TileName.RUINS }) {
 			board.setLocationOfMapChit(Random.remove(cave), tn);
 		}
-		
-		for(TileName tn: new TileName[] {
-				TileName.LINDEN_WOODS,
-				TileName.MAPLE_WOODS,
-				TileName.NUT_WOODS,
-				TileName.OAK_WOODS,
-				TileName.PINE_WOODS
-		}) {
+
+		for (TileName tn : new TileName[] { TileName.LINDEN_WOODS,
+				TileName.MAPLE_WOODS, TileName.NUT_WOODS, TileName.OAK_WOODS,
+				TileName.PINE_WOODS }) {
 			board.setLocationOfMapChit(Random.remove(woods), tn);
 		}
-		
-		for(TileName tn: new TileName[] {
-				TileName.CLIFF,
-				TileName.CRAG,
-				TileName.DEEP_WOODS,
-				TileName.LEDGES,
-				TileName.MOUNTAIN
-		}) {
+
+		for (TileName tn : new TileName[] { TileName.CLIFF, TileName.CRAG,
+				TileName.DEEP_WOODS, TileName.LEDGES, TileName.MOUNTAIN }) {
 			board.setLocationOfMapChit(Random.remove(mountain), tn);
 		}
 	}
-	
+
 	private static List<Integer> makeClearings() {
 		ArrayList<Integer> ret = new ArrayList<Integer>();
-		for(int i = 1; i <= BoardConfiguration.MAX_CLEARINGS_IN_TILE; ++i) {
+		for (int i = 1; i <= BoardConfiguration.MAX_CLEARINGS_IN_TILE; ++i) {
 			ret.add(i);
 		}
 		return ret;
@@ -398,10 +484,10 @@ public class ModelController {
 			MapChit mc = new MapChit(chit);
 			chits.add(mc);
 		}
-		for(MapChitType chit: MapChitType.SOUNDS) {
+		for (MapChitType chit : MapChitType.SOUNDS) {
 			List<Integer> clears = makeClearings();
 			MapChit mc;
-			for(int i = 0; i < 2; ++i) {
+			for (int i = 0; i < 2; ++i) {
 				mc = new MapChit(chit, Random.remove(clears));
 				chits.add(mc);
 			}
@@ -414,7 +500,7 @@ public class ModelController {
 		ArrayList<MapChit> cityList = new ArrayList<MapChit>();
 		ArrayList<MapChit> castleList = new ArrayList<MapChit>();
 
-		for(int i = 0; i < 4; ++i) {
+		for (int i = 0; i < 4; ++i) {
 			cityList.add(Random.remove(chits));
 			castleList.add(Random.remove(chits));
 		}
@@ -425,27 +511,18 @@ public class ModelController {
 		castleList.add(lostCastle);
 
 		// each chit in city list, goes on a cave tile.
-		for(TileName tn: new TileName[] {
-				TileName.BORDERLAND,
-				TileName.CAVERN,
-				TileName.CAVES,
-				TileName.HIGH_PASS,
-				TileName.RUINS
-		}) {
+		for (TileName tn : new TileName[] { TileName.BORDERLAND,
+				TileName.CAVERN, TileName.CAVES, TileName.HIGH_PASS,
+				TileName.RUINS }) {
 			board.setLocationOfMapChit(Random.remove(cityList), tn);
 		}
 
 		// each chit in castle list goes on mountain tile
-		for(TileName tn: new TileName[] {
-				TileName.CLIFF,
-				TileName.CRAG,
-				TileName.DEEP_WOODS,
-				TileName.LEDGES,
-				TileName.MOUNTAIN
-		}) {
+		for (TileName tn : new TileName[] { TileName.CLIFF, TileName.CRAG,
+				TileName.DEEP_WOODS, TileName.LEDGES, TileName.MOUNTAIN }) {
 			board.setLocationOfMapChit(Random.remove(castleList), tn);
 		}
-		
+
 		ArrayList<MapChit> lostCityChits = new ArrayList<MapChit>();
 		ArrayList<MapChit> lostCastleChits = new ArrayList<MapChit>();
 		for (int i = 0; i < 5; i++) {
@@ -462,104 +539,93 @@ public class ModelController {
 		return mapChits;
 	}
 
-	public void performSearch(TableType selectedTable) {
-		switch (selectedTable) {
-		default:
-			// peer table.
-			peerTableSearch();
-		}
-
-	}
-
-	private void peerTableSearch() {
+	private void peerTableSearch(CharacterType character) {
 		int roll = 2;// Random.dieRoll(); TODO cheat mode
-		TileName ct = getCurrentTile();
+		TileName ct = getTileOf(character).getName();
 		switch (roll) {
 		case 1:
-			peerChoice();
+			getClient(character).performPeerChoice();
 			break;
 		case 2:
-			peerCP();
-			showMessage("Found hidden paths and clues in " + ct);
+			peerCP(character);
+			showMessage(character, "Found hidden paths and clues in " + ct);
 			break;
 		case 3:
-			peerHP();
-			showMessage("Found hidden paths in " + ct);
+			peerHP(character);
+			showMessage(character, "Found hidden paths in " + ct);
 			break;
 		case 4:
-			peerH();
+			peerH(character);
 			break;
 		case 5:
-			peerC();
-			showMessage("Found hidden clues in " + ct);
+			peerC(character);
+			showMessage(character, "Found hidden clues in " + ct);
 			break;
 		default:
-			showMessage("Peer has failed");
+			showMessage(character, "Peer has failed");
 			break;
 		}
 	}
 
-	private void showMessage(String string) {
-		CharacterType ct = getCurrentCharacter().getType();
-		client.displayMessage(ct + "\n" + string);
+	private ClientController getClient(CharacterType character) {
+		// TODO get specific game client to character
+		return playingCharacters.get(character);
 	}
 
-	private void peerC() {
-		// Player gets to look at the map chits in their tile. 
-		// they do not discover any sites, but just get to see that they are there.
+	private void showMessage(CharacterType character, String string) {
+		CharacterType ct = getCurrentCharacter().getType();
+		getClient(character).displayMessage(ct + "\n" + string);
+	}
+
+	private void peerC(CharacterType character) {
+		// Player gets to look at the map chits in their tile.
+		// they do not discover any sites, but just get to see that they are
+		// there.
+		// TODO clearing type affects peer
 		ArrayList<MapChit> peek = new ArrayList<MapChit>();
-		for(MapChit chit : mapChits){
-			if(chit.getTile() == board.getLocationOfCounter(getCurrentCharacter().getType().toCounter()).getParentTile().getName()){
+		for (MapChit chit : mapChits) {
+			if (chit.getTile() == board
+					.getLocationOfCounter(
+							getCurrentCharacter().getType().toCounter())
+					.getParentTile().getName()) {
 				peek.add(chit);
 			}
 		}
-		getCurrentPlayer().discoverAllMapChits(peek);
-		client.revealMapChits(peek);
+		getPlayerOf(character).discoverAllMapChits(peek);
+		getClient(character).revealMapChits(peek);
 	}
 
-	private void peerH() {
-		// we don't have any enemies yet.
+	private Player getPlayerOf(CharacterType character) {
+		return players.get(character);
+	}
+
+	private void peerH(CharacterType character) {
+		// TODO we don't have any enemies yet.
 
 	}
 
-	private void peerHP() { // hidden enemies and paths
+	private void peerHP(CharacterType character) { // hidden enemies and paths
 		// TODO Auto-generated method stub
-		peerP();
+		peerP(character);
 	}
 
 	// PEER SEARCH: clues and paths search
-	private void peerCP() {
-		peerC();
-		peerP();
+	private void peerCP(CharacterType character) {
+		peerC(character);
+		peerP(character);
 	}
 
-	private void peerP() { // peer paths
-		ClearingInterface clearing = board
-				.getLocationOfCounter(getCurrentPlayer().getCharacter()
-						.getType().toCounter());
-		ClearingInterface source = board
-				.getLocationOfCounter(getCurrentPlayer().getCharacter()
-						.getType().toCounter());
+	private void peerP(CharacterType character) { // peer paths
+		CounterType playerCounter = character.toCounter();
+		ClearingInterface clearing = board.getLocationOfCounter(playerCounter);
+		ClearingInterface source = board.getLocationOfCounter(playerCounter);
 		for (ClearingInterface cl : clearing.getSurrounding(PathType.HIDDEN)) {
-			getCurrentPlayer().addDiscoveredPath(source, cl);
+			getPlayerOf(character).addDiscoveredPath(source, cl);
 		}
 	}
 
-	private void peerChoice() { // choice of peer
-		PeerType choice = client.getPeerChoice();
-		if (choice == null) {
-			System.out.println("PEER CHOICE WAS NULL");
-			return;
-		}
-		switch (choice) {
-		case CLUES_AND_PATHS:
-		case CLUES:
-			peerCP();
-			break;
-		default:
-			break;
-		}
-
+	private HexTileInterface getTileOf(CharacterType chr) {
+		return board.getLocationOfCounter(chr.toCounter()).getParentTile();
 	}
 
 	private TileName getCurrentTile() {
@@ -568,5 +634,33 @@ public class ModelController {
 						getCurrentCharacter().getType().toCounter())
 				.getParentTile().getName();
 	}
+
+	private ResourceHandler rh;
+	private int numPlayers = 0;
+	private ArrayList<ValleyChit> sites;
+	private int currentDay = 0;
+	private LostSite lostCity;
+	private LostSite lostCastle;
+
+	private Board board = null;
+	// private ArrayList<Character> characters = null;
+	private Map<CharacterType, Character> characters;
+	// private ArrayList<Player> players = null;
+	private Map<CharacterType, Player> players;
+	private List<CharacterType> randomOrder;
+	private Queue<CharacterType> orderOfPlay;
+	private boolean currentPlayerDone = false;
+	private Set<MapChit> mapChits;
+	
+	private ControllerGenerator controlGenerator;
+	
+	private Set<ClientController> lobby;
+	
+	private HashMap<CharacterType, ClientController> playingCharacters;
+	
+	private boolean gameStarted;
+
+	private static final RuntimeException noPlayersException = new RuntimeException(
+			"There are no players in the queue");
 
 }

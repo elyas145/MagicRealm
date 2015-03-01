@@ -3,22 +3,16 @@ package utils.math.linear;
 import java.nio.FloatBuffer;
 
 public class ConcreteMatrix extends Matrix {
-	
-	private static int NUMBER_OF_MATS = 0;
 
 	public ConcreteMatrix(int r, int c) {
 		super(r, c);
 		data = new float[rowCount()][columnCount()];
-		++NUMBER_OF_MATS;
-		System.out.println(NUMBER_OF_MATS);
 	}
 
 	public ConcreteMatrix(int r, int c, FloatBuffer fb) {
 		super(r, c);
 		data = new float[rowCount()][columnCount()];
 		fill(fb);
-		++NUMBER_OF_MATS;
-		System.out.println(NUMBER_OF_MATS);
 	}
 	
 	@Override

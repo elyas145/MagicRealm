@@ -1,5 +1,8 @@
 package network;
 
+import java.io.IOException;
+import java.net.SocketException;
+
 import utils.handler.Handler;
 import utils.handler.PlainInvoker;
 import utils.threading.ThreadInvoker;
@@ -59,7 +62,7 @@ public class ThreadSender<T> implements Sender<T> {
 	private void transmit(NetworkHandler<T> object) {
 		try {
 			connection.send(object);
-		} catch (Exception e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}

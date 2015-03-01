@@ -9,11 +9,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 
-import controller.Controller;
 import view.controller.ViewController;
-import view.controller.game.GameView;
-import view.controller.mainmenu.MenuItem;
-import view.controller.mainmenu.MenuItemListener;
 
 @SuppressWarnings("serial")
 public class MainMenu extends JPanel implements ActionListener {
@@ -21,8 +17,9 @@ public class MainMenu extends JPanel implements ActionListener {
 	private JButton exit;
 	private ViewController parent;
 	private Object clickSource = null;
-	public MainMenu(ViewController parent) {
-		this.parent = parent;
+	private MainMenu self = this;
+	public MainMenu(ViewController par) {
+		this.parent = par;
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		start = new JButton("Start Game");
 		exit = new JButton("Exit");
@@ -50,10 +47,10 @@ public class MainMenu extends JPanel implements ActionListener {
 					}
 					if(clickSource.equals(start)){
 						//start game
-						MainMenu.this.parent.startGameView();
+						parent.startNetworkGame();
 					}else if(clickSource.equals(exit)){
 						//exit game.
-						MainMenu.this.parent.exit();
+						parent.exit();
 					}
 				}
 				

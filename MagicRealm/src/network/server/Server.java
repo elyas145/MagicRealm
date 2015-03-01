@@ -80,6 +80,14 @@ public class Server<S, R> implements Sender<S> {
 	public synchronized void close(int client) {
 		removeConnection(client);
 	}
+	
+	public void setData(R dat) {
+		invoker = new PlainInvoker<R>(dat);
+	}
+	
+	public void setInvoker(Invoker<R> ink) {
+		invoker = ink;
+	}
 
 
 	// public Connection override
@@ -104,17 +112,13 @@ public class Server<S, R> implements Sender<S> {
 		}
 	}
 
-	protected void setData(R dat) {
-		invoker = new PlainInvoker<R>(dat);
-	}
-
 	// private methods
 
 	private void init(Invoker<R> dat, ServerSocket sock) {
 		serverSocket = sock;
 		clients = new HashMap<Integer, Client<S, R>>();
 		availID = 0;
-		invoker = dat;
+		setInvoker(dat);
 		connectionHandler = null;
 		droppedConnectionHandler = null;
 		synchronizer = new ThreadInvoker<Handler<R>>(new Handler<Handler<R>>() {
@@ -175,8 +179,10 @@ public class Server<S, R> implements Sender<S> {
 
 		@Override
 		public void run() {
-			synchronized(droppedConnectionHandler) {
-				droppedConnectionHandler.handle(clientID);
+			if(droppedConnectionHandler != null) {
+				synchronized(droppedConnectionHandler) {
+					droppedConnectionHandler.handle(clientID);
+				}
 			}
 		}
 		

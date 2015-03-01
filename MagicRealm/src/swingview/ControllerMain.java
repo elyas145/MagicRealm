@@ -3,82 +3,67 @@ package swingview;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.JOptionPane;
 
-import config.GameConfiguration;
-import controller.Controller;
+import network.NetworkHandler;
+import controller.ClientController;
+import controller.ModelControllerGenerator;
 import lwjglview.graphics.LWJGLGraphics;
 import lwjglview.graphics.board.LWJGLBoardDrawable;
 import model.activity.Activity;
 import model.character.Character;
 import model.character.CharacterFactory;
-import model.controller.ModelController;
+import model.character.Phase;
+import model.controller.ModelControlInterface;
+import model.controller.requests.DieRequest;
 import model.counter.chit.MapChit;
 import model.enums.CharacterType;
 import model.enums.CounterType;
-import model.enums.PeerType;
 import model.enums.TileName;
-import model.enums.TimeOfDay;
-import model.interfaces.ClearingInterface;
-import model.interfaces.HexTileInterface;
-import model.player.PersonalHistory;
+import model.exceptions.MRException;
 import model.player.Player;
 import utils.resources.ResourceHandler;
+import view.controller.ViewController;
 import view.controller.game.BoardView;
 import view.controller.search.SearchView;
 
-public class ControllerMain implements Controller {
+public class ControllerMain implements ClientController {
 
 	private LWJGLGraphics gfx;
 	private ResourceHandler rh;
-	private MainView mainView = null;
+	private ViewController mainView;
 	private BoardView boardView;
-	private ModelController model;
-	private Controller thisController = this;
+	private ModelControllerGenerator modelGenerator;
+	private ModelControlInterface model;
+	private CharacterType player;
 
-	public ControllerMain() {
+	public ControllerMain(ViewController view) {
 		rh = new ResourceHandler();
-		model = new ModelController(rh, this);
-		mainView = new MainView(thisController);
-		new Thread(mainView).start();
-		model.setBoard();
-		model.setNumberPlayers(GameConfiguration.MAX_PLAYERS);
-		model.setCharacters();
-		model.setPlayers();
-		model.setSiteLocations();
-		model.setPlayersInitialLocations();
-	}
-
-	private void start() {
-		//mainView.enterSplashScreen();
-		goToMainMenu();
-	}
-
-	public void startBoardView() {
+		mainView = view;
 		gfx = new LWJGLGraphics(rh, this);
+	}
+	
+	public void setModelControllerGenerator(ModelControllerGenerator mcg) {
+		modelGenerator = mcg;
+		modelGenerator.setController(this);
+	}
+
+	public void start() {
+		model = modelGenerator.generateModelController();
+	}
+
+	@Override
+	public BoardView startBoardView() {
 		LWJGLBoardDrawable boardDrawable;
 		try {
-			boardDrawable = new LWJGLBoardDrawable(rh, model.getMapChits());
+			boardDrawable = new LWJGLBoardDrawable(rh);
 			boardView = boardDrawable;
 			gfx.addDrawable(boardDrawable);
-			for (HexTileInterface hti : model.getBoard().iterateTiles()) {
-				boardView.setTile(hti.getName(), hti.getBoardColumn(),
-						hti.getBoardRow(), hti.getRotation(),
-						hti.getClearings());
-			}
-			for (CounterType ct : model.getBoard().getCounters()) {
-				ClearingInterface ci = model.getBoard()
-						.getLocationOfCounter(ct);
-				boardView.setCounter(ct, ci.getParentTile().getName(),
-						ci.getClearingNumber());
-			}
-			for (MapChit mc : model.getMapChits()) {
-				boardView.setMapChit(mc);
-			}
-			gfx.start();
+			return boardView;
 		} catch (IOException e1) {
-			e1.printStackTrace();
+			throw new RuntimeException(e1);
 		}
 	}
 
@@ -88,19 +73,6 @@ public class ControllerMain implements Controller {
 
 	public ResourceHandler getRh() {
 		return rh;
-	}
-
-	public Iterable<Player> getPlayers() {
-		return model.getPlayers();
-	}
-
-	public int getNumCharacters() {
-		return model.getNumPlayers();
-	}
-
-	public static void main(String[] args) throws IOException {
-		ControllerMain main = new ControllerMain();
-		main.start();
 	}
 
 	public void goToMainMenu() {
@@ -129,151 +101,28 @@ public class ControllerMain implements Controller {
 		startBoardView();
 	}
 
-	@Override
-	public PersonalHistory getPlayerHistory() {
-		return model.getCurrentPlayer().getPersonalHistory();
+	private void sendActivities(List<Activity> activities) {
+		model.setPlayerActivities(activities, player);
 	}
 
-	@Override
-	public int getCurrentDay() {
-		return model.getCurrentDay();
-	}
-
-	@Override
-	public ArrayList<Integer> getPossibleClearings(TileName tile) {
-		ArrayList<ClearingInterface> clearings = new ArrayList<ClearingInterface>(
-				model.getBoard().getTile(tile).getClearings());
-		ArrayList<Integer> ints = new ArrayList<Integer>();
-		for (ClearingInterface ci : clearings) {
-			ints.add(ci.getClearingNumber());
-		}
-		return ints;
-	}
-
-	@Override
-	public List<TileName> getPossibleTiles() {
-		return new ArrayList<TileName>(model.getBoard().getAllTiles());
-	}
-
-	@Override
-	public void setCurrentPlayerActivities(List<Activity> activities) {
-		model.setCurrentPlayerActivities(activities);
-		model.setPlayerDone();
-	}
-
-	private void playCurrentActivities() {
-		List<Activity> activities = model.getCurrentActivities();
-		// unhide player.
-		model.unhideCurrent();
-		for (Activity activity : activities) {
-			activity.perform(model);
-		}
-		model.setPlayerDone();
-	}
-	
 	private void beginBoardTurn(Player plr) {
 		boardView.focusOn(plr.getCharacter().getType().toCounter());
 		boardView.hideAllMapChits();
 	}
 
-	@Override
-	public void startGame() {
-		this.startBoardView();
-		TimeOfDay tod = TimeOfDay.MIDNIGHT;
-		for (Player plr : model.getPlayers()) {
-			boardView.hideCounter(plr.getCharacter().getType().toCounter());
-		}
-		while (model.getCurrentDay() <= GameConfiguration.LUNAR_MONTH) {
-			model.newDay();
-			model.newDayTime();
-			tod = tod.next();
-			boardView.setTimeOfDay(tod);
-			Player plr;
-			// birdsong
-			for (int i = 0; i < model.getNumPlayers(); i++) {
-				synchronized (model) {
-					plr = model.getCurrentPlayer();
-					beginBoardTurn(plr);
-					boardView.revealAllMapChits(plr.getDiscoveredMapChits());
-					startBirdSong(plr);
-					while (!model.isPlayerDone()) {
-						try {
-							model.wait();
-						} catch (InterruptedException e) {
-						}
-					}
-					model.nextPlayer();
-				}
-			}
-			model.newDayTime();
-			tod = tod.next();
-			boardView.setTimeOfDay(tod);
-			// dayLight
-			for (int i = 0; i < model.getNumPlayers(); i++) {
-				synchronized (model) {
-					plr = model.getCurrentPlayer();
-					beginBoardTurn(plr);
-					if (plr.getCharacter().isHiding()) {
-						model.unhideCurrent();
-						boardView.unHideCounter(model.getCurrentCharacterType()
-								.toCounter());
-					}
-					playCurrentActivities();
-					while (!model.isPlayerDone()) {
-						try {
-							model.wait();
-						} catch (InterruptedException e) {
-						}
-					}
-					while (!boardView.isAnimationFinished(getCurrentCharacter()
-							.toCounter()))
-						;
-					model.nextPlayer();
-				}
-			}
-		}
-	}
-
-	private void startBirdSong(Player player) {
-		mainView.enterBirdSong(player.getCharacter().getType().toString(),
-				model.getAllowedPhases());
-	}
-
-	@Override
-	public MainView getMainView() {
-
-		return mainView;
-	}
-
-	@Override
-	public ModelController getModel() {
-		return model;
-	}
-
-	@Override
-	public BoardView getBoardView() {
-
-		return boardView;
-	}
-
-	@Override
-	public CharacterType getCurrentCharacter() {
-		return model.getCurrentCharacterType();
+	private void startBirdSong(Player player, int day, List<Phase> phases, Map<TileName, List<Integer>> tileClrs) {
+		mainView.enterBirdSong(player.getCharacter().getType(), day, phases,
+				player.getPersonalHistory(), tileClrs);
 	}
 
 	@Override
 	public void displayMessage(String string) {
-		getMainView().displayMessage(string);
-	}
-	
-	@Override
-	public void revealMapChits(Iterable<MapChit> chits) {
-		boardView.revealAllMapChits(chits);
+		mainView.displayMessage(string);
 	}
 
 	@Override
-	public void setHiding(CharacterType character) {
-		boardView.hideCounter(character.toCounter());
+	public void revealMapChits(Iterable<MapChit> chits) {
+		boardView.revealAllMapChits(chits);
 	}
 
 	@Override
@@ -296,14 +145,8 @@ public class ControllerMain implements Controller {
 				} catch (InterruptedException e) {
 				}
 			}
-			model.performSearch(sv.getSelectedTable());
+			model.performSearch(sv.getSelectedTable(), searcher);
 		}
-	}
-
-	@Override
-	public PeerType getPeerChoice() {
-		// TODO
-		return PeerType.CLUES_AND_PATHS;
 	}
 
 	@Override
@@ -319,6 +162,57 @@ public class ControllerMain implements Controller {
 	@Override
 	public void focusOnBoard(CounterType counter) {
 		boardView.focusOn(counter);
+	}
+
+	@Override
+	public void setHiding(CharacterType character, boolean hid) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void raiseException(MRException exception) {
+		mainView.displayMessage(exception.getMessage());
+	}
+
+	@Override
+	public void performPeerChoice() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void rollDie(CharacterType actor, DieRequest peerTable) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void initializeBoard(NetworkHandler<BoardView> initializer) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void setPlayerActivities(CharacterType character, List<Activity> activities) {
+		model.setPlayerActivities(activities, character);
+	}
+
+	@Override
+	public void startGame() {
+	}
+
+	@Override
+	public void startBirdsong() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void enterLobby() {
+		// TODO enter lobby view
+		System.out.println("TODO: enter client lobby view");
+		gfx.start();
 	}
 
 }

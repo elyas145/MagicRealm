@@ -1,6 +1,6 @@
 package utils.structures;
 
-public class QueueEmptyException extends Exception {
+public class QueueEmptyException extends RuntimeException {
 	
 	
 	// default serialVersionUID
