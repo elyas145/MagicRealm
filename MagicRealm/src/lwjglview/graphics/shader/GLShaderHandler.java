@@ -109,10 +109,14 @@ public class GLShaderHandler {
 	}
 	
 	private static String getVSFname(ShaderType shader) {
-		if(shader == ShaderType.BACKGROUND_SHADER) {
+		switch(shader) {
+		case BACKGROUND_SHADER:
 			return "background.glsl";
+		case ORTHO_SHADER:
+			return "ortho.glsl";
+		default:
+			return "flat.glsl";
 		}
-		return "flat.glsl";
 	}
 	
 	private static String getFSFname(ShaderType shader) {
@@ -124,7 +128,10 @@ public class GLShaderHandler {
 		case SELECTION_SHADER:
 			return "selection.glsl";
 		case BACKGROUND_SHADER:
+		case ORTHO_SHADER:
 			return "texture.glsl";
+		case TILE_SELECTION_SHADER:
+			return "tileselect.glsl";
 		default:
 			return "flat.glsl";
 		}

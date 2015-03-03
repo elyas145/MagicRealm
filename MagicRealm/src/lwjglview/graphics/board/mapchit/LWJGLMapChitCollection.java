@@ -34,8 +34,6 @@ public class LWJGLMapChitCollection extends LWJGLDrawableNode {
 		textures = new LWJGLTextureArrayLoader(
 				GraphicsConfiguration.IMAGE_SCALE_WIDTH,
 				GraphicsConfiguration.IMAGE_SCALE_HEIGHT);
-		imageWidth = GraphicsConfiguration.IMAGE_SCALE_WIDTH;
-		imageHeight = GraphicsConfiguration.IMAGE_SCALE_HEIGHT;
 		loadImages(avail);
 	}
 
@@ -177,12 +175,9 @@ public class LWJGLMapChitCollection extends LWJGLDrawableNode {
 		}
 		Map<Character, Integer> typeLocations = textureLocations.get(mct);
 		char mcid = mc.getIdentifier();
-		typeLocations.put(mcid, textures.addImage(new ChitGenerator(mc,
-				imageWidth, imageHeight)));
+		typeLocations.put(mcid, textures.addImage(new ChitGenerator(mc)));
 	}
-
-	private int imageWidth;
-	private int imageHeight;
+	
 	private LWJGLBoardDrawable board;
 	private LWJGLTextureArrayLoader textures;
 	private Map<MapChitType, Map<Character, LWJGLCounterDrawable>> mapChits;

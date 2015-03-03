@@ -24,11 +24,11 @@ void main() {
 	else {
 		raw = texture2DArray(texture, vec3(textureCoordinate, float(index)));
 	}
-	if(raw.r < .5) {
+	if(raw.a < .5) {
 		color = vec3(1.);
 	}
 	else {
-		color = raw.gba;
+		color = raw.rgb;
 	}
 	float fade = counterColour.a;
 	color *= fade;

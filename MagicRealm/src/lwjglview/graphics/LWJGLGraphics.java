@@ -31,6 +31,7 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL12.*;
 import static org.lwjgl.opengl.GL13.*;
+import static org.lwjgl.opengl.GL14.*;
 import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.opengl.ARBTextureStorage.*;
 import static org.lwjgl.opengl.EXTFramebufferObject.*;
@@ -176,10 +177,7 @@ public final class LWJGLGraphics {
 	}
 
 	public int createFrameBuffer() {
-		IntBuffer buffer = ByteBuffer.allocateDirect(4)
-				.order(ByteOrder.nativeOrder()).asIntBuffer();
-		glGenFramebuffersEXT(buffer);
-		return buffer.get();
+		return glGenFramebuffersEXT();
 	}
 
 	public void bindFrameBuffer(int fb) {
@@ -192,60 +190,65 @@ public final class LWJGLGraphics {
 
 	public void useFrameBuffer(int fb) {
 		bindFrameBuffer(fb);
-		glPushAttrib(GL_VIEWPORT_BIT);
 		onResize(width, height);
 	}
 
 	public void releaseFrameBuffer() {
-		bindMainBuffer();
-		glPopAttrib();
+		useFrameBuffer(0);
 	}
 
 	public void bindFrameBufferTexture(int fb, int texID) {
 		bindFrameBuffer(fb);
 		glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
 				GL_TEXTURE_2D, texID, 0);
+		int depth = glGenRenderbuffersEXT();
+		glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, depth);
+		glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT24,
+				width, height);
+		glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT,
+				GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, depth);
 		releaseFrameBuffer();
 	}
 
 	public int generateBufferTexture() {
-		return createTexture(width, height);
+		return createTexture(width, height, false);
 	}
 
-	public int createTexture(int width, int height) {
-		return loadTexture(null, width, height);
+	public int createTexture(int width, int height, boolean accurate) {
+		return loadTexture(null, height, width, accurate);
 	}
 
 	public void setClearColor(float r, float g, float b, float a) {
 		glClearColor(r, g, b, a);
 	}
 
-	public int loadTexture(ByteBuffer rawData, int height, int width) {
+	public int loadTexture(ByteBuffer rawData, int height, int width,
+			boolean accurate) {
 		int texID = glGenTextures();
-		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texID);
-		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA,
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+				accurate ? GL_LINEAR : GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+				accurate ? GL_LINEAR : GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA,
 				GL_UNSIGNED_BYTE, rawData);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
-				GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,
-				GL_CLAMP_TO_EDGE);
 		return texID;
 	}
 
 	public int loadTextureArray(ByteBuffer rawData, int number, int height,
-			int width) {
+			int width, boolean accurate) {
 		int texID = glGenTextures();
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D_ARRAY, texID);
 		glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_RGBA8, width, height, number);
 		glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, 0, width, height, number,
 				GL_RGBA, GL_UNSIGNED_BYTE, rawData);
-		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER,
+				accurate ? GL_LINEAR : GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER,
+				accurate ? GL_LINEAR : GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S,
 				GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T,
@@ -256,19 +259,11 @@ public final class LWJGLGraphics {
 	public void bindTextureArray(int location) {
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D_ARRAY, location);
-		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameterf(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameterf(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	}
 
 	public void bindTexture(int location) {
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, location);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	}
 
 	public GLShaderHandler getShaders() {
@@ -667,12 +662,7 @@ public final class LWJGLGraphics {
 		width = w;
 		height = h;
 		glViewport(0, 0, width, height);
-		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
 		float ar = getAspectRatio();
-		float fovScale = .3f;
-		glFrustum(-ar * fovScale, ar * fovScale, -1.0 * fovScale,
-				1.0 * fovScale, .1f, 10f);
 		synchronized (state) {
 			state.projectionMatrix.perspective(Mathf.PI * .5f, ar, .1f, 10f);
 			updateMVP();

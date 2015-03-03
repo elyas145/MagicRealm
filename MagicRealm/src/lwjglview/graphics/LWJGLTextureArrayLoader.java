@@ -43,8 +43,12 @@ public class LWJGLTextureArrayLoader {
 	}
 	
 	public void loadTextures(LWJGLGraphics gfx) {
+		loadTextures(gfx, true);
+	}
+	
+	public void loadTextures(LWJGLGraphics gfx, boolean accurate) {
 		if(!loadedTextures()) {
-			textureIndex = gfx.loadTextureArray(rawData, images.size(), height, width);
+			textureIndex = gfx.loadTextureArray(rawData, images.size(), height, width, accurate);
 			rawData = null;
 		}
 	}

@@ -17,24 +17,21 @@ public class Images {
 		width = GraphicsConfiguration.IMAGE_SCALE_WIDTH;
 		height = GraphicsConfiguration.IMAGE_SCALE_HEIGHT;
 		return ImageTools.createImage(width, height,
-				new ImageScaler(before, width, height));
+				new ImageScaler(before));
 	}
 
 	private static class ImageScaler implements ImageTools.GraphicsHandler {
 
-		public ImageScaler(BufferedImage before, int w, int h) {
+		public ImageScaler(BufferedImage before) {
 			img = before;
-			width = w;
-			height = h;
 		}
 
 		@Override
-		public void draw(Graphics g) {
+		public void draw(Graphics g, int width, int height) {
 			g.drawImage(img, 0, 0, width, height, null);
 		}
 
 		private BufferedImage img;
-		private int width, height;
 
 	}
 }

@@ -1,6 +1,8 @@
 package lwjglview.selection;
 
 import java.awt.Color;
+import java.awt.color.ColorSpace;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
@@ -11,6 +13,8 @@ import org.lwjgl.BufferUtils;
 
 import config.GraphicsConfiguration;
 import utils.handler.Handler;
+import utils.images.ImageTools;
+import utils.resources.Images;
 import utils.resources.ResourceHandler;
 import utils.structures.LinkedQueue;
 import utils.structures.Queue;
@@ -77,16 +81,15 @@ public class SelectionFrame {
 			@Override
 			public void handle(LWJGLGraphics gfx) {
 				if (frameBufferID < 0) {
-					frameBufferID = gfx.createFrameBuffer();
 					textureBufferID = gfx.generateBufferTexture();
+					frameBufferID = gfx.createFrameBuffer();
 					gfx.bindFrameBufferTexture(frameBufferID, textureBufferID);
 				}
 				gfx.useFrameBuffer(frameBufferID);
-				gfx.setClearColor(1f, 0f, 0f, 1f);
+				gfx.setClearColor(0f, 0f, 0f, 0f);
 				gfx.clearActiveBuffers();
 				selectionPass = true;
-				gfx.getShaders().useShaderProgram(
-						ShaderType.SELECTION_SHADER);
+				gfx.getShaders().useShaderProgram(ShaderType.SELECTION_SHADER);
 			}
 
 		}, GraphicsConfiguration.SELECTION_START_LAYER);
@@ -95,7 +98,7 @@ public class SelectionFrame {
 			@Override
 			public void handle(LWJGLGraphics gfx) {
 				selectionPass = false;
-				synchronized(queued) {
+				synchronized (queued) {
 					while (!queued.isEmpty()) {
 						queued.pop().invoke(gfx);
 					}
@@ -104,18 +107,25 @@ public class SelectionFrame {
 			}
 
 		}, GraphicsConfiguration.SELECTION_END_LAYER);
-		gfx.prepareLayer(new Handler<LWJGLGraphics>() {
+		/*gfx.prepareLayer(new Handler<LWJGLGraphics>() {
 
 			@Override
 			public void handle(LWJGLGraphics gfx) {
-				//gfx.bindTexture(textureBufferID);
-				//gfx.clearActiveBuffers();
-				//gfx.getShaders().useShaderProgram(ShaderType.BACKGROUND_SHADER);
-				//gfx.getPrimitiveTool().drawSquare();
+				int stop = 1000;
+				if(integer * 2 < stop) {
+					gfx.bindTexture(textureBufferID);
+					gfx.getShaders().useShaderProgram(ShaderType.BACKGROUND_SHADER);
+					gfx.getPrimitiveTool().drawSquare();
+				}
+				integer = (integer + 1) % stop;
 			}
-			
-		}, LWJGLGraphics.LAYER9);
+
+		}, LWJGLGraphics.LAYER9);*/
 	}
+
+	//int integer = 0;
+	
+	static final int incr = 1;
 
 	public int getNewID(CursorListener listen) {
 		int id = ++numIDs;
@@ -124,15 +134,16 @@ public class SelectionFrame {
 	}
 
 	public Color getColor(int id) {
-		return new Color(getR(id), getG(id), getB(id), getA(id));
+		id *= incr;
+		return new Color(getR(id), getG(id), getB(id));
 	}
 
 	public void loadID(int id, LWJGLGraphics gfx) {
+		id *= incr;
 		synchronized (buffer) {
 			fBuffer.put(0, getR(id));
 			fBuffer.put(1, getG(id));
 			fBuffer.put(2, getB(id));
-			fBuffer.put(3, getA(id));
 			gfx.getShaders().setUniformFloatArrayValue("color", 4, fBuffer);
 		}
 	}
@@ -141,35 +152,41 @@ public class SelectionFrame {
 		return selectionPass;
 	}
 
+	private int getRi(int id) {
+		return maskShift(id, 0);
+	}
+
+	private int getGi(int id) {
+		return maskShift(id, 1);
+	}
+
+	private int getBi(int id) {
+		return maskShift(id, 2);
+	}
+
 	private float getR(int id) {
-		return maskShift(id, 0xFF000000, 6);
+		return getRi(id) / 255f;
 	}
 
 	private float getG(int id) {
-		return maskShift(id, 0x00FF0000, 4);
+		return getGi(id) / 255f;
 	}
 
 	private float getB(int id) {
-		return maskShift(id, 0x0000FF00, 2);
+		return getBi(id) / 255f;
 	}
 
-	private float getA(int id) {
-		return (id & 0xFF) / 255f;
-	}
-
-	private float maskShift(int id, int mask, int shift) {
-		mask = (id & mask) >> shift;
-		return mask / 255f;
+	private int maskShift(int id, int shift) {
+		return (id >> (shift * 8)) & 0xFF;
 	}
 
 	private int join() {
 		int col = 0;
-		int mask = 0xFF;
-		for (int i = 0; i < 4; ++i) {
-			col <<= 2;
-			col |= buffer.get(i) & mask;
+		for (int i = 2; i >=0; --i) {
+			col <<= 8;
+			col |= buffer.get(i) & 0xFF;
 		}
-		return col;
+		return (col + incr - 1) / incr;
 	}
 
 	private abstract class CursorListenerInvoker {
@@ -184,7 +201,6 @@ public class SelectionFrame {
 				gfx.getPixel(xpos, ypos, buffer);
 				id = join();
 			}
-			System.out.println(id);
 			CursorListener listener = listeners.get(id);
 			if (listener != null) {
 				invoke(listener);

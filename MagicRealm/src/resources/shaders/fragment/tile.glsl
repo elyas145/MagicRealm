@@ -16,9 +16,9 @@ void main() {
 	else {
 		color = texture2DArray(texture, vec3(textureCoordinate, float(index)));
 	}
-	if(color.r < 1.) {
+	if(color.a < 1.) {
 		color = vec4(1.);
 	}
 	color *= ambientColour;
-	gl_FragColor = vec4(color.gba, 1.);
+	gl_FragColor = color;
 }

@@ -9,7 +9,7 @@ import config.GraphicsConfiguration;
 public class ImageTools {
 
 	public static interface GraphicsHandler {
-		void draw(Graphics g);
+		void draw(Graphics g, int width, int height);
 	}
 
 	public static BufferedImage createImage(int width, int height,
@@ -21,7 +21,7 @@ public class ImageTools {
 				BufferedImage.TYPE_INT_ARGB);
 
 		Graphics g = newImage.createGraphics();
-		gh.draw(g);
+		gh.draw(g, width, height);
 		g.dispose();
 		return newImage;
 	}
@@ -31,7 +31,14 @@ public class ImageTools {
 		for (int y = 0; y < height; ++y) {
 			for (int x = 0; x < width; ++x) {
 				int i = img.getRGB(x, y);
-				dest.putInt(offset, i);
+				int c = (i >> 16) & 0xFF; // blue
+				c <<= 8;
+				c |= (i >> 8) & 0xFF; // green
+				c <<= 8;
+				c |= i & 0xFF; // red
+				c <<= 8;
+				c |= (i >> 24) & 0xFF; // alpha
+				dest.putInt(offset, c);
 				offset += 4;
 			}
 		}

@@ -12,24 +12,20 @@ import utils.images.ImageTools;
 import model.counter.chit.MapChit;
 
 public class ChitGenerator implements ImageTools.GraphicsHandler {
-	public ChitGenerator(MapChit mc, int w, int h) {
+	public ChitGenerator(MapChit mc) {
 		name = mc.getType().toString();
 		identifier = mc.getIdentifier();
-		width = w;
-		height = h;
 	}
 	
-	public ChitGenerator(String nm, char id, int w, int h) {
+	public ChitGenerator(String nm, char id) {
 		name = nm;
 		identifier = id;
-		width = w;
-		height = h;
 	}
 
 	@Override
-	public void draw(Graphics g) {
-		double width = this.width;
-		double height = this.height;
+	public void draw(Graphics g, int w, int h) {
+		double width = w;
+		double height = h;
 		g.fillRect(0, 0, (int) width, (int) height);
 		g.setFont(new Font("TimesRoman", Font.BOLD, (int) (height * .19)));
 		g.setColor(Color.BLACK);
@@ -45,6 +41,4 @@ public class ChitGenerator implements ImageTools.GraphicsHandler {
 
 	private String name;
 	private char identifier;
-	private int width;
-	private int height;
 }
