@@ -17,14 +17,11 @@ import view.selection.CursorSelection;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Semaphore;
 
 import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
@@ -59,6 +56,14 @@ public final class LWJGLGraphics {
 	public LWJGLGraphics(ResourceHandler rh, ControllerMain cm) {
 		init(rh);
 		control = cm;
+	}
+
+	public void enableDepth() {
+		glEnable(GL_DEPTH_TEST);
+	}
+
+	public void disableDepth() {
+		glDisable(GL_DEPTH_TEST);
 	}
 
 	public void setCursorListener(CursorListener listen) {
@@ -423,6 +428,36 @@ public final class LWJGLGraphics {
 		drawables[layer].addPreparation(handle);
 	}
 
+	public void finishLayer(Handler<LWJGLGraphics> handle,
+			int layer) {
+		checkLayer(layer);
+		drawables[layer].addFinalization(handle);
+	}
+
+	public void enableLayerDepth(int layer) {
+		checkLayer(layer);
+		drawables[layer].addPreparation(new Handler<LWJGLGraphics>() {
+
+			@Override
+			public void handle(LWJGLGraphics gfx) {
+				gfx.enableDepth();
+			}
+			
+		});
+	}
+
+	public void disableLayerDepth(int layer) {
+		checkLayer(layer);
+		drawables[layer].addPreparation(new Handler<LWJGLGraphics>() {
+
+			@Override
+			public void handle(LWJGLGraphics gfx) {
+				gfx.disableDepth();
+			}
+			
+		});
+	}
+
 	public void clearLayerDepth(int layer) {
 		checkLayer(layer);
 		drawables[layer].addPreparation(new Handler<LWJGLGraphics>() {
@@ -725,30 +760,53 @@ public final class LWJGLGraphics {
 	private class LayerStorage {
 		private Set<LWJGLDrawable> drawables;
 		private List<Handler<LWJGLGraphics>> prepare;
+		private List<Handler<LWJGLGraphics>> finalize;
 
 		public LayerStorage() {
 			drawables = new HashSet<LWJGLDrawable>();
 			prepare = new ArrayList<Handler<LWJGLGraphics>>();
+			finalize = new ArrayList<Handler<LWJGLGraphics>>();
+		}
+
+		public void addFinalization(Handler<LWJGLGraphics> fin) {
+			synchronized(finalize) {
+				finalize.add(fin);
+			}
 		}
 
 		public void addPreparation(Handler<LWJGLGraphics> prep) {
-			prepare.add(prep);
+			synchronized(prepare) {
+				prepare.add(prep);
+			}
 		}
 
 		public void addDrawable(LWJGLDrawable drble) {
-			drawables.add(drble);
+			synchronized(drawables) {
+				drawables.add(drble);
+			}
 		}
 
 		public void removeDrawable(LWJGLDrawable drble) {
-			drawables.remove(drble);
+			synchronized(drawables) {
+				drawables.remove(drble);
+			}
 		}
 
 		public void draw() {
-			for (Handler<LWJGLGraphics> prep : prepare) {
-				prep.handle(self);
+			synchronized(prepare) {
+				for (Handler<LWJGLGraphics> prep : prepare) {
+					prep.handle(self);
+				}
 			}
-			for (LWJGLDrawable drble : drawables) {
-				drble.draw(self);
+			synchronized(drawables) {
+				for (LWJGLDrawable drble : drawables) {
+					drble.draw(self);
+				}
+			}
+			synchronized(finalize) {
+				for (Handler<LWJGLGraphics> fin : finalize) {
+					fin.handle(self);
+				}
 			}
 		}
 	}

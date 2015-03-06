@@ -1,9 +1,11 @@
 package lwjglview.menus;
 
+import java.awt.Color;
+import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
 
-import utils.handler.Handler;
+import utils.images.ImageTools;
 import utils.math.linear.Matrix;
 import utils.resources.ResourceHandler;
 import view.selection.CursorListener;
@@ -14,68 +16,90 @@ import lwjglview.graphics.LWJGLDrawableNode;
 import lwjglview.graphics.LWJGLGraphics;
 import lwjglview.graphics.LWJGLTextureLoader;
 import lwjglview.graphics.animator.matrixcalculator.StaticMatrixCalculator;
-import lwjglview.graphics.shader.ShaderType;
 import lwjglview.selection.SelectionFrame;
 
-public class LWJGLPanel extends LWJGLDrawableNode {
-	
-	public static void main(String[] args) {
-		ResourceHandler rh = new ResourceHandler();
-		LWJGLGraphics gfx = new LWJGLGraphics(rh);
-		SelectionFrame sf = new SelectionFrame(gfx);
-		LWJGLTextureLoader text = new LWJGLTextureLoader(rh, "test.jpg");
-		LWJGLPanel panel1 = new LWJGLPanel(null, sf, text, 0f, 0f, 0f, .5f, 1f);
-		gfx.prepareLayer(new Handler<LWJGLGraphics>() {
+public class LWJGLPanel extends LWJGLContentPane {
 
-			@Override
-			public void handle(LWJGLGraphics gfx) {
-				gfx.getShaders().useShaderProgram(ShaderType.ORTHO_SHADER);
-				gfx.clearActiveBuffers();
-			}
-			
-		}, LWJGLGraphics.LAYER0);
-		gfx.addDrawable(panel1, LWJGLGraphics.LAYER0);
-		gfx.start();
+	public static LWJGLPanel fromTextureLoader(LWJGLContentPane cp,
+			LWJGLTextureLoader texture, float x, float y, float size) {
+		size /= texture.getHeight();
+		return new LWJGLPanel(cp, texture, x, y, texture.getWidth() * size,
+				texture.getHeight() * size);
 	}
 
-	public LWJGLPanel(LWJGLDrawableNode par, SelectionFrame select,
-			LWJGLTextureLoader text, float xPos, float yPos, float zPos,
-			float w, float h) {
+	public static LWJGLPanel fromPicture(LWJGLContentPane cp,
+			ResourceHandler rh, String path, float x, float y, float size) {
+		LWJGLTextureLoader texture = new LWJGLTextureLoader(rh, path);
+		return LWJGLPanel.fromTextureLoader(cp, texture, x, y, size);
+	}
+
+	public static LWJGLPanel fromGraphics(LWJGLContentPane cp,
+			ImageTools.GraphicsHandler gh, int width, int height, float x,
+			float y, float size) {
+		LWJGLTextureLoader texture = new LWJGLTextureLoader(gh, width, height);
+		return LWJGLPanel.fromTextureLoader(cp, texture, x, y, size);
+	}
+
+	public static LWJGLPanel fromString(LWJGLContentPane cp, String str,
+			Font fnt, Color col, int height, int width, float x, float y, float size) {
+		return LWJGLPanel.fromGraphics(cp,
+				new ImageTools.StringDrawer(str, fnt, col), width, height, x, y,
+				size);
+	}
+
+	public LWJGLPanel(LWJGLContentPane par, LWJGLTextureLoader text,
+			float xPos, float yPos, float w, float h) {
 		super(par);
-		init(null, select, text, xPos, yPos, zPos, w, h);
+		init(par, par.getSelectionFrame(), text, xPos, yPos, w, h);
+	}
+
+	public void setCursorListener(CursorListener cl) {
+		listener = cl;
+	}
+
+	@Override
+	public void add(LWJGLPanel other) {
+		children.add(other);
+		other.setParent(this);
+	}
+
+	@Override
+	public SelectionFrame getSelectionFrame() {
+		return parent.getSelectionFrame();
 	}
 
 	@Override
 	public void draw(LWJGLGraphics gfx) {
 		updateTransformation();
-		
-		for(LWJGLDrawableNode child: children) {
+
+		SelectionFrame sf = getSelectionFrame();
+
+		if (sf.isSelectionPass()) {
+			sf.loadID(selectionID, gfx);
+		} else {
+			texture.useTexture(gfx);
+		}
+		representation.draw(gfx);
+
+		for (LWJGLDrawableNode child : children) {
 			child.draw(gfx);
 		}
 	}
 
 	@Override
 	public void updateNodeUniforms(LWJGLGraphics gfx) {
-		if (selectFrame.isSelectionPass()) {
-			selectFrame.loadID(selectionID, gfx);
-		} else {
-			texture.useTexture(gfx);
-		}
+		gfx.updateModelViewUniform("modelViewMatrix");
 	}
-	
-	protected void add(LWJGLPanel other) {
-		children.add(other);
-		other.setParent(this);
-	}
-	
-	private void init(LWJGLPanel pane, SelectionFrame select, LWJGLTextureLoader text, float xPos, float yPos, float zPos, float w, float h) {
-		buffer = Matrix.translation(1f, -1f, zPos);
-		transformation = Matrix.dilation(w * .5f, -h * .5f, 1f, 1f);
+
+	private void init(LWJGLContentPane pane, SelectionFrame select,
+			LWJGLTextureLoader text, float xPos, float yPos, float w, float h) {
+		parent = pane;
+		buffer = Matrix.translation(1f, 1f, 0f);
+		transformation = Matrix.dilation(w * .5f, h * .5f, 1f, 1f);
 		transformation.multiply(buffer, buffer);
-		transformation.translate(xPos, yPos, zPos);
+		transformation.translate(xPos, yPos, 0f);
 		texture = text;
-		selectFrame = select;
-		selectionID = select.getNewID(new CursorListener() {
+		selectionID = getSelectionFrame().getNewID(new CursorListener() {
 
 			@Override
 			public void onMove(int x, int y) {
@@ -90,37 +114,44 @@ public class LWJGLPanel extends LWJGLDrawableNode {
 		});
 		setCalculator(new StaticMatrixCalculator(transformation));
 		children = new ArrayList<LWJGLDrawableNode>();
-		children.add(new LWJGLDrawableLeaf(this, buffer, GLPrimitives.SQUARE) {
+		representation = new LWJGLDrawableLeaf(this, buffer,
+				GLPrimitives.SQUARE) {
 			@Override
 			public void updateNodeUniforms(LWJGLGraphics lwgfx) {
 				lwgfx.updateModelViewUniform("modelViewMatrix");
 				lwgfx.updateMVPUniform("mvpMatrix");
-				if(selectFrame.isSelectionPass()) {
-					selectFrame.loadID(selectionID, lwgfx);
-				}
-				else {
+				SelectionFrame sf = getSelectionFrame();
+				if (sf.isSelectionPass()) {
+					sf.loadID(selectionID, lwgfx);
+				} else {
 					texture.useTexture(lwgfx);
 				}
 			}
-		});
-		if(pane != null) {
+		};
+		if (pane != null) {
 			pane.add(this);
 		}
 	}
 
 	private void move(int x, int y) {
-
+		if (listener != null) {
+			listener.onMove(x, y);
+		}
 	}
 
 	private void selection(CursorSelection select, boolean down) {
-
+		if (listener != null) {
+			listener.onSelection(select, down);
+		}
 	}
 
 	private List<LWJGLDrawableNode> children;
+	private LWJGLDrawableLeaf representation;
 	private Matrix transformation;
 	private Matrix buffer;
 	private LWJGLTextureLoader texture;
-	private SelectionFrame selectFrame;
 	private int selectionID;
+	private CursorListener listener;
+	private LWJGLContentPane parent;
 
 }

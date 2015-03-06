@@ -25,6 +25,7 @@ import lwjglview.graphics.LWJGLTextureArrayLoader;
 import lwjglview.graphics.board.LWJGLBoardDrawable;
 import lwjglview.graphics.shader.ShaderType;
 import lwjglview.selection.SelectionFrame;
+import lwjglview.selection.SelectionShaderType;
 import model.EnchantedHolder;
 import model.enums.TileName;
 import model.interfaces.ClearingInterface;
@@ -120,7 +121,7 @@ public class LWJGLTileCollection extends LWJGLDrawableNode {
 	public void draw(LWJGLGraphics gfx) {
 		updateTransformation();
 		if (isSelectionPass()) {
-			gfx.getShaders().useShaderProgram(ShaderType.TILE_SELECTION_SHADER);
+			getSelectionFrame().useShader(gfx.getShaders(), SelectionShaderType.TILE);
 			if(!selectionTextures.loadedTextures()) {
 				if(remaining.isEmpty()) {
 					selectionTextures.loadImages();

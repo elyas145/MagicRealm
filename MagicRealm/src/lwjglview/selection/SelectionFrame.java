@@ -22,6 +22,7 @@ import view.selection.CursorListener;
 import view.selection.CursorSelection;
 import lwjglview.graphics.LWJGLGraphics;
 import lwjglview.graphics.board.LWJGLBoardDrawable;
+import lwjglview.graphics.shader.GLShaderHandler;
 import lwjglview.graphics.shader.ShaderType;
 import model.board.Board;
 import model.enums.TileName;
@@ -35,8 +36,6 @@ public class SelectionFrame {
 		try {
 			ResourceHandler rh = new ResourceHandler();
 			graphics = new LWJGLGraphics(rh);
-			graphics.clearLayerDepth(GraphicsConfiguration.DISPLAY_START_LAYER);
-			graphics.clearLayerDepth(GraphicsConfiguration.SELECTION_START_LAYER);
 			graphics.start();
 			SelectionFrame selectFrame = new SelectionFrame(graphics);
 			board = new LWJGLBoardDrawable(rh, graphics, selectFrame);
@@ -89,11 +88,11 @@ public class SelectionFrame {
 				gfx.setClearColor(0f, 0f, 0f, 0f);
 				gfx.clearActiveBuffers();
 				selectionPass = true;
-				gfx.getShaders().useShaderProgram(ShaderType.SELECTION_SHADER);
+				useShader(gfx.getShaders(), SelectionShaderType.PLAIN);
 			}
 
 		}, GraphicsConfiguration.SELECTION_START_LAYER);
-		gfx.prepareLayer(new Handler<LWJGLGraphics>() {
+		gfx.finishLayer(new Handler<LWJGLGraphics>() {
 
 			@Override
 			public void handle(LWJGLGraphics gfx) {
@@ -107,6 +106,7 @@ public class SelectionFrame {
 			}
 
 		}, GraphicsConfiguration.SELECTION_END_LAYER);
+		gfx.clearLayerDepth(LWJGLGraphics.LAYER9);
 		/*gfx.prepareLayer(new Handler<LWJGLGraphics>() {
 
 			@Override
@@ -114,7 +114,7 @@ public class SelectionFrame {
 				int stop = 1000;
 				if(integer * 2 < stop) {
 					gfx.bindTexture(textureBufferID);
-					gfx.getShaders().useShaderProgram(ShaderType.BACKGROUND_SHADER);
+					gfx.getShaders().useShaderProgram(ShaderType.TARGET_SHADER);
 					gfx.getPrimitiveTool().drawSquare();
 				}
 				integer = (integer + 1) % stop;
@@ -139,12 +139,30 @@ public class SelectionFrame {
 	}
 
 	public void loadID(int id, LWJGLGraphics gfx) {
+		loadID(id, gfx, "color");
+	}
+
+	public void loadID(int id, LWJGLGraphics gfx, String name) {
 		id *= incr;
 		synchronized (buffer) {
 			fBuffer.put(0, getR(id));
 			fBuffer.put(1, getG(id));
 			fBuffer.put(2, getB(id));
 			gfx.getShaders().setUniformFloatArrayValue("color", 4, fBuffer);
+		}
+	}
+	
+	public void useShader(GLShaderHandler shaders, SelectionShaderType shade) {
+		switch(shade) {
+		case TILE:
+			shaders.useShaderProgram(ShaderType.TILE_SELECTION_SHADER);
+			break;
+		case MENU:
+			shaders.useShaderProgram(ShaderType.MENU_SELECTION_SHADER);
+			break;
+		default:
+			shaders.useShaderProgram(ShaderType.SELECTION_SHADER);
+			break;
 		}
 	}
 

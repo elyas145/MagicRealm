@@ -11,7 +11,7 @@ public class CounterImages {
 
 	public static BufferedImage getCounterImage(ResourceHandler rh,
 			CounterType type) throws IOException {
-		return Images.getImage(rh, ResourceHandler.joinPath("counters", getSubDir(type), getName(type)));
+		return Images.getScaledImage(rh, ResourceHandler.joinPath("counters", getSubDir(type), getName(type)));
 	}
 
 	private static String getSubDir(CounterType tile) {

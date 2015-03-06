@@ -12,7 +12,9 @@ import utils.resources.ResourceHandler;
 
 public class LWJGLTextureLoader {
 	
-	public LWJGLTextureLoader(int width, int height, boolean inter) {
+	public LWJGLTextureLoader(int w, int h, boolean inter) {
+		width = w;
+		height = h;
 		init(null);
 		interpolate = inter;
 	}
@@ -67,12 +69,20 @@ public class LWJGLTextureLoader {
 		return textureLocation;
 	}
 	
+	public int getWidth() {
+		return width;
+	}
+	
+	public int getHeight() {
+		return height;
+	}
+	
 	private void init(BufferedImage bi) {
 		if(bi != null) {
 			height = bi.getHeight();
 			width = bi.getWidth();
 		}
-		rawData = BufferUtils.createByteBuffer(4 * width * height);
+		rawData = ByteBuffer.allocateDirect(4 * width * height);
 		if(bi != null) {
 			ImageTools.loadRawImage(bi, 0, width, height, rawData);
 		}
