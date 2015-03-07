@@ -28,6 +28,7 @@ import utils.time.Timing;
 import view.controller.ViewController;
 import config.GraphicsConfiguration;
 import controller.ClientController;
+import controller.ControllerMain;
 import controller.network.client.NetworkModelControllerGenerator;
 
 @SuppressWarnings("serial")
@@ -82,7 +83,6 @@ public class MainView extends JFrame implements ViewController,
 
 	@Override
 	public void enterMainMenu() {
-		System.out.println("main");
 		MainMenu mainMenu = new MainMenu(this);
 		setContentPane(mainMenu);
 		pack();

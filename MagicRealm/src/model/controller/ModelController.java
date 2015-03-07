@@ -15,6 +15,7 @@ import controller.ClientController;
 import controller.ControllerGenerator;
 import controller.network.server.NetworkClientController;
 import controller.network.server.NetworkControllerGenerator;
+import controller.network.server.handlers.EnterCharacterSelection;
 import utils.random.Random;
 import utils.resources.ResourceHandler;
 import utils.structures.LinkedQueue;
@@ -306,7 +307,7 @@ public class ModelController implements ModelControlInterface {
 			resetOrderOfPlay();
 		}
 		currentPlayerDone = false;
-		getClient(getCurrentCharacterType()).setCurrentCharacter(
+		getClient(getCurrentCharacterType()).focusOnCharacter(
 				getCurrentCharacterType());
 		try {
 			return players.get(orderOfPlay.pop());
@@ -366,14 +367,20 @@ public class ModelController implements ModelControlInterface {
 		}
 	}
 
+	private void startCharacterSelection(){
+		for(NetworkClientController controller : lobby){
+			controller.enterCharacterSelection();
+		}
+	}
+
 	private void waitForPlayers() {
 		while (lobby.size() < numPlayers) {
 			NetworkClientController ctrl = controlGenerator.generateController();
 			lobby.add(ctrl);
-			ctrl.enterLobby();
+			ctrl.enterLobby(numPlayers - lobby.size());
 		}
 		controlGenerator.rejectNew();
-		this.startGame();
+		startCharacterSelection();
 	}
 
 	private void birdsong() {
@@ -383,7 +390,7 @@ public class ModelController implements ModelControlInterface {
 	}
 
 	private void startBirdSong(Player plr) {
-		getClient(plr.getCharacter().getType()).startBirdsong();
+		getClient(plr.getCharacter().getType()).enterBirdSong();
 	}
 
 	private void dayLight() {

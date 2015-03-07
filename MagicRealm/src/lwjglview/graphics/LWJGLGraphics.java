@@ -7,7 +7,7 @@ import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 
 import config.GraphicsConfiguration;
-import swingview.ControllerMain;
+import controller.ControllerMain;
 import utils.handler.Handler;
 import utils.math.Mathf;
 import utils.math.linear.Matrix;

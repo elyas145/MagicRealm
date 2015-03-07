@@ -16,50 +16,46 @@ import model.interfaces.HexTileInterface;
 
 public interface ClientController {
 
-	void onSplashScreenEnd();
+	void displayMessage(String string);
+
+	void enterBirdSong();
+
+	void enterCharacterSelection();
+
+	void enterLobby(int currentPlayers);
 
 	void exit();
 
-	void startGameView();
-
-	void setPlayerActivities(CharacterType player, List<Activity> activities);
-
-	void startGame();
-
-	void displayMessage(String string);
-
-	void setHiding(CharacterType character, boolean hid);
-
-	void setCurrentCharacter(CharacterType character);
-
-	void moveCounter(CounterType counter, TileName tt, int clearing);
-
-	void startSearch(CharacterType actor);
+	void focusOnBoard(CounterType counter);
 
 	void focusOnBoard(TileName tile);
 
 	void focusOnBoard(TileName tile, int clearing);
 
-	void focusOnBoard(CounterType counter);
-
-	void revealMapChits(Iterable<MapChit> chits);
-
-	void raiseException(MRException exception);
-
-	void performPeerChoice();
-
-	void rollDie(CharacterType actor, DieRequest peerTable);
+	void focusOnCharacter(CharacterType character);
 
 	void initializeBoard(NetworkHandler<BoardView> initializer);
 
+	void moveCounter(CounterType counter, TileName tt, int clearing);
+
+	void performPeerChoice();
+
+	void raiseException(MRException exception);
+
+	void revealMapChits(Iterable<MapChit> chits);
+
+	void rollDie(CharacterType actor, DieRequest peerTable);
+
+	void setHiding(CharacterType character, boolean hid);
+
+	void setPlayerActivities(CharacterType player, List<Activity> activities);
+
 	BoardView startBoardView();
 
-	void startBirdsong();
+	void startGame();
 
-	void enterLobby();
+	void startGameView();
 
-	void enterCharacterSelection();
-
-	void enterBirdSong();
+	void startSearch(CharacterType actor);
 
 }

@@ -1,4 +1,4 @@
-package swingview;
+package controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -8,8 +8,6 @@ import java.util.Map;
 import javax.swing.JOptionPane;
 
 import network.NetworkHandler;
-import controller.ClientController;
-import controller.ModelControllerGenerator;
 import lwjglview.graphics.LWJGLGraphics;
 import lwjglview.graphics.board.LWJGLBoardDrawable;
 import lwjglview.selection.SelectionFrame;
@@ -46,8 +44,10 @@ public class ControllerMain implements ClientController {
 		mainView = view;
 		gfx = new LWJGLGraphics(rh, this);
 		selectFrame = new SelectionFrame(gfx);
+		System.out.println("Initiated main controller.");
+		goToMainMenu();
 	}
-	
+
 	public void setModelControllerGenerator(ModelControllerGenerator mcg) {
 		modelGenerator = mcg;
 		modelGenerator.setController(this);
@@ -79,13 +79,11 @@ public class ControllerMain implements ClientController {
 		return rh;
 	}
 
+	/**
+	 * called when the client launches the game (controller constructor)
+	 */
 	public void goToMainMenu() {
 		mainView.enterMainMenu();
-	}
-
-	@Override
-	public void onSplashScreenEnd() {
-		goToMainMenu();
 	}
 
 	@Override
@@ -105,32 +103,46 @@ public class ControllerMain implements ClientController {
 		startBoardView();
 	}
 
-	private void sendActivities(List<Activity> activities) {
-		model.setPlayerActivities(activities, player);
-	}
+	/*
+	 * private void sendActivities(List<Activity> activities) {
+	 * model.setPlayerActivities(activities, player); }
+	 * 
+	 * private void beginBoardTurn(Player plr) {
+	 * boardView.focusOn(plr.getCharacter().getType().toCounter());
+	 * boardView.hideAllMapChits(); }
+	 * 
+	 * private void startBirdSong(Player player, int day, List<Phase> phases,
+	 * Map<TileName, List<Integer>> tileClrs) {
+	 * mainView.enterBirdSong(player.getCharacter().getType(), day, phases,
+	 * player.getPersonalHistory(), tileClrs); }
+	 */
 
-	private void beginBoardTurn(Player plr) {
-		boardView.focusOn(plr.getCharacter().getType().toCounter());
-		boardView.hideAllMapChits();
-	}
-
-	private void startBirdSong(Player player, int day, List<Phase> phases, Map<TileName, List<Integer>> tileClrs) {
-		mainView.enterBirdSong(player.getCharacter().getType(), day, phases,
-				player.getPersonalHistory(), tileClrs);
-	}
-
+	/**
+	 * Displays the given message on the client's GUI
+	 * 
+	 * @param message
+	 * 
+	 */
 	@Override
 	public void displayMessage(String string) {
 		mainView.displayMessage(string);
 	}
 
+	/**
+	 * Reveals the map chits given on the board.
+	 * 
+	 * @param chits
+	 */
 	@Override
 	public void revealMapChits(Iterable<MapChit> chits) {
 		boardView.revealAllMapChits(chits);
 	}
 
+	/**
+	 * 
+	 */
 	@Override
-	public void setCurrentCharacter(CharacterType character) {
+	public void focusOnCharacter(CharacterType character) {
 		focusOnBoard(character.toCounter());
 	}
 
@@ -170,7 +182,6 @@ public class ControllerMain implements ClientController {
 
 	@Override
 	public void setHiding(CharacterType character, boolean hid) {
-		// TODO Auto-generated method stub
 
 	}
 
@@ -194,7 +205,8 @@ public class ControllerMain implements ClientController {
 	@Override
 	public void initializeBoard(NetworkHandler<BoardView> initializer) {
 		try {
-			LWJGLBoardDrawable draw = new LWJGLBoardDrawable(rh, gfx, selectFrame);
+			LWJGLBoardDrawable draw = new LWJGLBoardDrawable(rh, gfx,
+					selectFrame);
 			boardView = draw;
 			initializer.handle(boardView);
 		} catch (IOException e) {
@@ -203,25 +215,36 @@ public class ControllerMain implements ClientController {
 	}
 
 	@Override
-	public void setPlayerActivities(CharacterType character, List<Activity> activities) {
+	public void setPlayerActivities(CharacterType character,
+			List<Activity> activities) {
 		model.setPlayerActivities(activities, character);
 	}
 
 	@Override
 	public void startGame() {
 	}
-
+/**
+ * tells the gui to enter the lobby.
+ * 
+ * GUI should display how many more players we need.
+ * 
+ */
 	@Override
-	public void startBirdsong() {
-		// TODO Auto-generated method stub
-
+	public void enterLobby(int numPlayers) {
+		System.out.println("Enter lobby called. players: " + numPlayers);
+		gfx.start();
 	}
 
 	@Override
-	public void enterLobby() {
-		// TODO enter lobby view
-		System.out.println("TODO: enter client lobby view");
-		gfx.start();
+	public void enterCharacterSelection() {
+		System.out.println("Entering player selection.");
+		// TODO gfx.enterCharacterSelection();
+	}
+
+	@Override
+	public void enterBirdSong() {
+		System.out.println("Entering bird song.");
+		// TODO gfx.enterBirdSong();
 	}
 
 }

@@ -66,8 +66,8 @@ public class NetworkClientController {
 		send(new EnterBirdSong());
 	}
 
-	public void enterLobby() {
-		send(new EnterLobby());
+	public void enterLobby(int size) {
+		send(new EnterLobby(size));
 	}
 
 	private void send(NetworkHandler<ClientController> handler) {
