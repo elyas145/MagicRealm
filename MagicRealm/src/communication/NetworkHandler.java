@@ -1,7 +1,8 @@
-package network;
+package communication;
 
 import java.io.Serializable;
 
+import client.ClientController;
 import utils.handler.Handler;
 
 /**
@@ -15,5 +16,7 @@ import utils.handler.Handler;
  * 
  */
 
-public interface NetworkHandler<T> extends Handler<T>, Serializable {
+public interface NetworkHandler extends Serializable {
+
+	void handle(ClientController controller);
 }

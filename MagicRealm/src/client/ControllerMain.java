@@ -1,20 +1,21 @@
-package controller;
+package client;
 
 import java.io.IOException;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.JOptionPane;
 
-import network.NetworkHandler;
+import communication.NetworkHandler;
 import lwjglview.graphics.LWJGLGraphics;
 import lwjglview.graphics.board.LWJGLBoardDrawable;
 import lwjglview.selection.SelectionFrame;
 import model.activity.Activity;
+import model.board.Board;
 import model.character.Character;
 import model.character.CharacterFactory;
-import model.character.Phase;
 import model.controller.ModelControlInterface;
 import model.controller.requests.DieRequest;
 import model.counter.chit.MapChit;
@@ -22,7 +23,7 @@ import model.enums.CharacterType;
 import model.enums.CounterType;
 import model.enums.TileName;
 import model.exceptions.MRException;
-import model.player.Player;
+import swingview.MainView;
 import utils.resources.ResourceHandler;
 import view.controller.ViewController;
 import view.controller.game.BoardView;
@@ -34,33 +35,24 @@ public class ControllerMain implements ClientController {
 	private ResourceHandler rh;
 	private ViewController mainView;
 	private BoardView boardView;
-	private ModelControllerGenerator modelGenerator;
 	private ModelControlInterface model;
 	private CharacterType player;
 	private SelectionFrame selectFrame;
+	private int clientID = -1;
+	private ClientServer server;
 
-	public ControllerMain(ViewController view) {
+	public ControllerMain() {
 		rh = new ResourceHandler();
-		mainView = view;
+		mainView = new MainView(this);
 		gfx = new LWJGLGraphics(rh, this);
 		selectFrame = new SelectionFrame(gfx);
-		System.out.println("Initiated main controller.");
+		server = new ClientServer(this);
 		goToMainMenu();
-	}
-
-	public void setModelControllerGenerator(ModelControllerGenerator mcg) {
-		modelGenerator = mcg;
-		modelGenerator.setController(this);
-	}
-
-	public void start() {
-		model = modelGenerator.generateModelController();
 	}
 
 	@Override
 	public BoardView startBoardView() {
 		LWJGLBoardDrawable boardDrawable;
-		SelectionFrame selectFrame = new SelectionFrame(gfx);
 		try {
 			boardDrawable = new LWJGLBoardDrawable(rh, gfx, selectFrame);
 			boardView = boardDrawable;
@@ -98,11 +90,6 @@ public class ControllerMain implements ClientController {
 		}
 	}
 
-	@Override
-	public void startGameView() {
-		startBoardView();
-	}
-
 	/*
 	 * private void sendActivities(List<Activity> activities) {
 	 * model.setPlayerActivities(activities, player); }
@@ -135,6 +122,7 @@ public class ControllerMain implements ClientController {
 	 */
 	@Override
 	public void revealMapChits(Iterable<MapChit> chits) {
+		
 		boardView.revealAllMapChits(chits);
 	}
 
@@ -203,15 +191,8 @@ public class ControllerMain implements ClientController {
 	}
 
 	@Override
-	public void initializeBoard(NetworkHandler<BoardView> initializer) {
-		try {
-			LWJGLBoardDrawable draw = new LWJGLBoardDrawable(rh, gfx,
-					selectFrame);
-			boardView = draw;
-			initializer.handle(boardView);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	public void initializeBoard(Board board) {
+		
 	}
 
 	@Override
@@ -220,31 +201,87 @@ public class ControllerMain implements ClientController {
 		model.setPlayerActivities(activities, character);
 	}
 
-	@Override
-	public void startGame() {
-	}
-/**
- * tells the gui to enter the lobby.
- * 
- * GUI should display how many more players we need.
- * 
- */
+	/**
+	 * tells the gui to enter the lobby.
+	 * 
+	 * GUI should display how many more players we need.
+	 * 
+	 */
 	@Override
 	public void enterLobby(int numPlayers) {
 		System.out.println("Enter lobby called. players: " + numPlayers);
-		gfx.start();
+		// gfx.start();
 	}
 
 	@Override
 	public void enterCharacterSelection() {
-		System.out.println("Entering player selection.");
+		System.out.println("Entered player selection.");
 		// TODO gfx.enterCharacterSelection();
 	}
 
+	/**
+	 * called by the view when the client has pressed the submit button to
+	 * submit their character.
+	 * 
+	 * @param character
+	 */
+	public void characterSelected(CharacterType character) {
+
+	}
+
+	/**
+	 * 
+	 * Enters bird song. client can select phases. graphics should call
+	 * endBirdSong() when the client is done.
+	 */
 	@Override
 	public void enterBirdSong() {
 		System.out.println("Entering bird song.");
 		// TODO gfx.enterBirdSong();
+	}
+
+	/**
+	 * called when the client is done putting in their moves. sends the
+	 * activities to the server. client should have a message displayed saying
+	 * "waiting for other players" after this method is called.
+	 */
+	public void endBirdSong() {
+
+	}
+
+	/**
+	 * sets the client's id to the given parameter
+	 * 
+	 * called by a network handler sent from the server.
+	 */
+	@Override
+	public void setID(int id) {
+		clientID = id;
+
+	}
+
+	/**
+	 * called when the client receives an object from the server.
+	 * 
+	 * @param obj
+	 */
+	public void handle(Object obj) {
+		if(obj instanceof NetworkHandler){
+			System.out.println("Client: recieved new object.");
+			((NetworkHandler) obj).handle(this);
+		}		
+	}
+
+	@Override
+	public void connect(String ipaddress, int port){
+		clientID = port;
+		try {
+			server.connect(ipaddress, port);
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

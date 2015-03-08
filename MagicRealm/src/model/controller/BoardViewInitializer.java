@@ -4,13 +4,20 @@ package model.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import client.ClientController;
+import communication.NetworkHandler;
 import view.controller.game.BoardView;
 import model.counter.chit.MapChit;
 import model.interfaces.HexTileInterface;
-import network.NetworkHandler;
 
-public class BoardViewInitializer implements NetworkHandler<BoardView>{
-	private static final long serialVersionUID = 6016976537914282259L;
+public class BoardViewInitializer implements NetworkHandler{
+
+	@Override
+	public void handle(ClientController controller) {
+		// TODO Auto-generated method stub
+		
+	}
+/*	private static final long serialVersionUID = 6016976537914282259L;
 	private List<HexTileData> tiles;
 	private List<MapChit> mapChits;
 	
@@ -33,6 +40,6 @@ public class BoardViewInitializer implements NetworkHandler<BoardView>{
 		for(MapChit chit : mapChits){
 			view.setMapChit(chit);
 		}
-	}
+	}*/
 	
 }

@@ -29,7 +29,7 @@ public interface ViewController {
 	void enterMainMenu();
 	void enterLobby();
 	void enterSplashScreen();
-	void startNetworkGame();
 	void exit();
 	SearchView enterSearchView(CharacterType character);
+	void startNetworkGame();
 }

@@ -8,14 +8,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import network.NetworkHandler;
+import communication.NetworkHandler;
+import communication.handler.server.EnterCharacterSelection;
+import client.ClientController;
 import config.BoardConfiguration;
 import config.GameConfiguration;
-import controller.ClientController;
-import controller.ControllerGenerator;
-import controller.network.server.NetworkClientController;
-import controller.network.server.NetworkControllerGenerator;
-import controller.network.server.handlers.EnterCharacterSelection;
 import utils.random.Random;
 import utils.resources.ResourceHandler;
 import utils.structures.LinkedQueue;
@@ -107,8 +104,7 @@ public class ModelController implements ModelControlInterface {
 		}
 	}
 
-	public ModelController(ResourceHandler rh, ControllerGenerator cg) {
-		controlGenerator = cg;
+	public ModelController(ResourceHandler rh) {
 		playingCharacters = new HashMap<CharacterType, ClientController>();
 		this.rh = rh;
 		currentDay = 1;
@@ -131,19 +127,7 @@ public class ModelController implements ModelControlInterface {
 		lostCastle = new LostSite(MapChitType.LOST_CASTLE);
 
 		gameStarted = false;
-		lobby = new HashSet<NetworkClientController>();
 	}
-
-	public void startControl() {
-		setBoard();
-		setNumberPlayers(GameConfiguration.MAX_PLAYERS);
-		setCharacters();
-		setPlayers();
-		setSiteLocations();
-		setPlayersInitialLocations();
-		waitForPlayers();
-	}
-
 	public void raiseMessage(CharacterType plr, String msg) {
 		getClient(plr).displayMessage("Illegal move cancelled.");
 	}
@@ -351,37 +335,7 @@ public class ModelController implements ModelControlInterface {
 		getClient(actor).startSearch(actor);
 	}
 
-	private void startGame() {
-		showBoards();
-		hideCharacters();
-		TimeOfDay tod = TimeOfDay.MIDNIGHT;
-		while (getCurrentDay() <= GameConfiguration.LUNAR_MONTH) {
-			newDay();
-			newDayTime();
-			Player plr;
-			// birdsong
-			birdsong();
-			newDayTime();
-			// dayLight
-			dayLight();
-		}
-	}
 
-	private void startCharacterSelection(){
-		for(NetworkClientController controller : lobby){
-			controller.enterCharacterSelection();
-		}
-	}
-
-	private void waitForPlayers() {
-		while (lobby.size() < numPlayers) {
-			NetworkClientController ctrl = controlGenerator.generateController();
-			lobby.add(ctrl);
-			ctrl.enterLobby(numPlayers - lobby.size());
-		}
-		controlGenerator.rejectNew();
-		startCharacterSelection();
-	}
 
 	private void birdsong() {
 		for (Player plr : getPlayers()) {
@@ -413,24 +367,6 @@ public class ModelController implements ModelControlInterface {
 		}
 	}
 
-	private void hideCharacters() {
-		for(NetworkClientController c : lobby){
-			c.setHiding(true);
-		}
-	}
-
-	private void showBoards() {
-		// TODO new InitBoard.
-		List<HexTileInterface> tiles = new ArrayList<HexTileInterface>();
-		List<TileName> tileNames = new ArrayList<TileName>(board.getAllTiles());
-		for(TileName name : tileNames){
-			tiles.add(board.getTile(name));
-		}
-		NetworkHandler<BoardView> initializer = new BoardViewInitializer(tiles, mapChits);
-		for(NetworkClientController c : lobby){
-			c.initializeBoard(initializer);
-		}
-	}
 
 	private void resetOrderOfPlay() {
 		Random.shuffle(randomOrder);
@@ -680,14 +616,12 @@ public class ModelController implements ModelControlInterface {
 	private boolean currentPlayerDone = false;
 	private Set<MapChit> mapChits;
 
-	private ControllerGenerator controlGenerator;
-
-	private Set<NetworkClientController> lobby;
-
 	private HashMap<CharacterType, ClientController> playingCharacters;
 
 	private boolean gameStarted;
 
+	Map<Integer, Boolean> characterSelectionMap = new HashMap<Integer, Boolean>();	//keeps track of who selected their character already.
+	
 	private static final RuntimeException noPlayersException = new RuntimeException(
 			"There are no players in the queue");
 

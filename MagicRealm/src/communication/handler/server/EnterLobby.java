@@ -1,9 +1,10 @@
-package controller.network.server.handlers;
+package communication.handler.server;
 
-import controller.ClientController;
-import network.NetworkHandler;
+import communication.NetworkHandler;
 
-public class EnterLobby implements NetworkHandler<ClientController> {
+import client.ClientController;
+
+public class EnterLobby implements NetworkHandler {
 	private int playersNeeded;
 	public EnterLobby(int size) {
 		playersNeeded = size;

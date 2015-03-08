@@ -24,8 +24,6 @@ public class Character implements CharacterInterface {
 	private ArrayList<Phase> specialPhases;
 
 	public Character(CharacterType t) {
-		System.out
-				.println("WARNING: only use the CharacterFactory class to create characters, this inssures full initialization. ");
 		type = t;
 		initialLocation = GameConfiguration.INITIAL_SITE;
 		hiding = true;

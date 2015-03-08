@@ -9,6 +9,8 @@ import java.awt.Toolkit;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.geom.Rectangle2D;
+import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +18,8 @@ import java.util.Map;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
+import client.ClientController;
+import client.ControllerMain;
 import model.activity.Activity;
 import model.character.Phase;
 import model.enums.CharacterType;
@@ -27,20 +31,18 @@ import swingview.controller.search.SearchView;
 import utils.time.Timing;
 import view.controller.ViewController;
 import config.GraphicsConfiguration;
-import controller.ClientController;
-import controller.ControllerMain;
-import controller.network.client.NetworkModelControllerGenerator;
+import config.NetworkConfiguration;
 
 @SuppressWarnings("serial")
 public class MainView extends JFrame implements ViewController,
 		Runnable {
-	private ControllerMain gameController;
+	private ClientController gameController;
 
 	private static Toolkit tk = Toolkit.getDefaultToolkit();
 	private static int xSize = ((int) tk.getScreenSize().getWidth());
 	private static int ySize = ((int) tk.getScreenSize().getHeight());
 
-	public MainView() {
+	public MainView(ClientController controller) {
 		super("Magic Realm");
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		setPreferredSize(new Dimension(
@@ -73,7 +75,7 @@ public class MainView extends JFrame implements ViewController,
 			public void windowOpened(WindowEvent arg0) {
 			}
 		});
-		this.gameController = new ControllerMain(this);
+		this.gameController = controller;
 		pack();
 	}
 
@@ -158,8 +160,13 @@ public class MainView extends JFrame implements ViewController,
 
 	@Override
 	public void startNetworkGame() {
-		gameController.setModelControllerGenerator(new NetworkModelControllerGenerator());
-		gameController.start();
+		try {
+			gameController.connect(NetworkConfiguration.DEFAULT_IP, NetworkConfiguration.DEFAULT_PORT);
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override

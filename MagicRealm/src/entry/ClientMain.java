@@ -1,13 +1,9 @@
-package entry;
+package entry; import client.ControllerMain;
 
-import swingview.MainView;
-import view.controller.ViewController;
-
-public class ClientMain {
+class ClientMain {
 
 	public static void main(String[] args) {
-		ViewController vc = new MainView();
-		vc.enterMainMenu();
+		new ControllerMain();
 	}
 
 }

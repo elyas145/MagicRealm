@@ -1,9 +1,12 @@
-package controller;
+package client;
 
+import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.List;
 
+import communication.NetworkHandler;
+
 import view.controller.game.BoardView;
-import network.NetworkHandler;
 import model.activity.Activity;
 import model.board.Board;
 import model.controller.requests.DieRequest;
@@ -34,8 +37,6 @@ public interface ClientController {
 
 	void focusOnCharacter(CharacterType character);
 
-	void initializeBoard(NetworkHandler<BoardView> initializer);
-
 	void moveCounter(CounterType counter, TileName tt, int clearing);
 
 	void performPeerChoice();
@@ -52,10 +53,12 @@ public interface ClientController {
 
 	BoardView startBoardView();
 
-	void startGame();
-
-	void startGameView();
-
 	void startSearch(CharacterType actor);
+
+	void setID(int id);
+
+	void connect(String ipaddress, int port) throws UnknownHostException, IOException;
+
+	void initializeBoard(Board board);
 
 }

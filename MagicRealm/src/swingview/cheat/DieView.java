@@ -10,7 +10,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
-import controller.ClientController;
+import client.ClientController;
 
 public class DieView extends JFrame implements ActionListener {
 	private int rollValue;

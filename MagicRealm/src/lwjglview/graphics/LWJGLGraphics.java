@@ -6,8 +6,8 @@ import lwjglview.graphics.shader.ShaderType;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 
+import client.ControllerMain;
 import config.GraphicsConfiguration;
-import controller.ControllerMain;
 import utils.handler.Handler;
 import utils.math.Mathf;
 import utils.math.linear.Matrix;
