@@ -16,7 +16,7 @@ import utils.handler.Handler;
  * 
  */
 
-public interface NetworkHandler extends Serializable {
+public interface ClientNetworkHandler extends Serializable {
 
 	void handle(ClientController controller);
 }

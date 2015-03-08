@@ -9,22 +9,31 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
 
-import communication.NetworkHandler;
+import model.controller.ModelController;
+import model.enums.CharacterType;
+import communication.ClientNetworkHandler;
+import communication.ServerNetworkHandler;
 import communication.handler.server.EnterCharacterSelection;
 import communication.handler.server.EnterLobby;
+import communication.handler.server.InitBoard;
 import communication.handler.server.MessageDisplay;
 import communication.handler.server.Reject;
+import communication.handler.server.SerializedBoard;
 import server.ClientThread;
+import utils.resources.ResourceHandler;
 import config.GameConfiguration;
 
 public class ServerController {
 	private Server server;
 	private ArrayList<ClientThread> clients;
 	private int clientCount = 0;
-
+	private ModelController model;
+	
 	public ServerController(Server s) {
 		this.server = s;
 		clients = new ArrayList<ClientThread>();
+		model = new ModelController(new ResourceHandler());
+		model.setBoard();
 	}
 
 	/**
@@ -61,7 +70,7 @@ public class ServerController {
 		}
 	}
 
-	private void sendAll(NetworkHandler handler) {
+	private void sendAll(ClientNetworkHandler handler) {
 		for (ClientThread client : clients) {
 			client.send(handler);
 		}
@@ -101,6 +110,31 @@ public class ServerController {
 	 * @param input
 	 */
 	public void handle(Object input) {
-		// ((NetworkHandler) input).handle(this);
+		if (input instanceof ServerNetworkHandler) {
+			System.out.println("SERVER: recieved object from client.");
+			((ServerNetworkHandler) input).handle(this);
+		}
+
+	}
+
+	/**
+	 * called when the client selects their character
+	 * 
+	 * @param iD
+	 * @param character
+	 */
+	public void setCharacter(int iD, CharacterType character) {
+		int pos = findClient(iD);
+		if (pos >= 0) {
+			clients.get(pos).setCharacter(character);
+		}
+		for(ClientThread client : clients){
+			if(! client.didSelectCharacter())
+				return;
+		}
+		// setup the serialized board.
+		
+		SerializedBoard sboard = new SerializedBoard();
+		sendAll(new InitBoard(null));
 	}
 }

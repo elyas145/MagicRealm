@@ -1,10 +1,10 @@
 package communication.handler.server;
 
-import communication.NetworkHandler;
+import communication.ClientNetworkHandler;
 
 import client.ClientController;
 
-public class Reject implements NetworkHandler{
+public class Reject implements ClientNetworkHandler{
 	private static final long serialVersionUID = 8378725316704524987L;
 
 	@Override

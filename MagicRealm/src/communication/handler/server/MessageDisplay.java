@@ -1,10 +1,10 @@
 package communication.handler.server;
 
-import communication.NetworkHandler;
+import communication.ClientNetworkHandler;
 
 import client.ClientController;
 
-public class MessageDisplay implements NetworkHandler {
+public class MessageDisplay implements ClientNetworkHandler {
 	private static final long serialVersionUID = -5820183512389136335L;
 	private String message;
 	

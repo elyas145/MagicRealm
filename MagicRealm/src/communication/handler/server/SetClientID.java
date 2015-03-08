@@ -1,10 +1,10 @@
 package communication.handler.server;
 
-import communication.NetworkHandler;
+import communication.ClientNetworkHandler;
 
 import client.ClientController;
 
-public class SetClientID implements NetworkHandler {
+public class SetClientID implements ClientNetworkHandler {
 	private static final long serialVersionUID = 3401751799578398290L;
 	private int id;
 	public SetClientID(int id){

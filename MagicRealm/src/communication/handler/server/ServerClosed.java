@@ -1,10 +1,10 @@
 package communication.handler.server;
 
-import communication.NetworkHandler;
+import communication.ClientNetworkHandler;
 
 import client.ClientController;
 
-public class ServerClosed implements NetworkHandler {
+public class ServerClosed implements ClientNetworkHandler {
 
 	private static final long serialVersionUID = 9050621094529563261L;
 

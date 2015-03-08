@@ -1,10 +1,10 @@
 package communication.handler.server;
 
-import communication.NetworkHandler;
+import communication.ClientNetworkHandler;
 
 import client.ClientController;
 
-public class EnterCharacterSelection implements NetworkHandler{
+public class EnterCharacterSelection implements ClientNetworkHandler{
 
 	@Override
 	public void handle(ClientController controller) {

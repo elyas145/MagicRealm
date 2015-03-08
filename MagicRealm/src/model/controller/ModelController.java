@@ -7,9 +7,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import communication.NetworkHandler;
-import communication.handler.server.EnterCharacterSelection;
 import client.ClientController;
 import config.BoardConfiguration;
 import config.GameConfiguration;
@@ -18,7 +15,6 @@ import utils.resources.ResourceHandler;
 import utils.structures.LinkedQueue;
 import utils.structures.Queue;
 import utils.structures.QueueEmptyException;
-import view.controller.game.BoardView;
 import model.activity.Activity;
 import model.board.Board;
 import model.enums.ActivityType;
@@ -31,9 +27,7 @@ import model.enums.PeerType;
 import model.enums.PhaseType;
 import model.enums.TableType;
 import model.enums.TileName;
-import model.enums.TimeOfDay;
 import model.enums.ValleyChit;
-import model.exceptions.GameFullException;
 import model.exceptions.IllegalMoveException;
 import model.exceptions.PhasesAlreadySubmitedException;
 import model.interfaces.ClearingInterface;
@@ -49,69 +43,12 @@ import model.counter.chit.MapChit;
 /*
  * Meant to be a container for the entire model
  */
-public class ModelController implements ModelControlInterface {
-
-	@Override
-	public void setCharacterHidden(CharacterType character, boolean hid) {
-		getCharacter(character).setHiding(hid);
-		getClient(character).setHiding(character, hid);
-	}
-
-	@Override
-	public void performSearch(TableType selectedTable, CharacterType chr) {
-		// TODO add other search table options
-		switch (selectedTable) {
-		default:
-			// peer table.
-			peerTableSearch(chr);
-		}
-	}
-
-	@Override
-	public void peerChoice(PeerType choice, CharacterType actor) { // choice of
-																	// peer
-		if (choice == null) {
-			System.out.println("PEER CHOICE WAS NULL");
-			return;
-		}
-		switch (choice) {
-		case CLUES_AND_PATHS:
-		case CLUES:
-			peerCP(actor);
-			break;
-		default:
-			break;
-		}
-
-	}
-
-	@Override
-	public void hideCharacter(CharacterType actor) {
-		getClient(actor).rollDie(actor, DieRequest.PEER_TABLE);
-	}
-
-	@Override
-	public void setPlayerActivities(List<Activity> activities, CharacterType chr) {
-		getPlayerOf(chr).setActivities(activities);
-	}
-
-	@Override
-	public void hideCharacter(int chance, CharacterType character) {
-		if (chance <= 5) {
-			setCharacterHidden(character, true);
-		} else {
-			setCharacterHidden(character, false);
-		}
-	}
-
+public class ModelController{
 	public ModelController(ResourceHandler rh) {
-		playingCharacters = new HashMap<CharacterType, ClientController>();
 		this.rh = rh;
 		currentDay = 1;
 		sites = new ArrayList<ValleyChit>();
-		players = new HashMap<CharacterType, Player>();
-		numPlayers = GameConfiguration.MAX_PLAYERS;
-		orderOfPlay = new LinkedQueue<CharacterType>();
+		
 		for (ValleyChit t : ValleyChit.values()) {
 			sites.add(t);
 		}
@@ -128,8 +65,64 @@ public class ModelController implements ModelControlInterface {
 
 		gameStarted = false;
 	}
-	public void raiseMessage(CharacterType plr, String msg) {
-		getClient(plr).displayMessage("Illegal move cancelled.");
+
+	// TODO belongs in ClientThread.
+	
+	public void setCharacterHidden(CharacterType character, boolean hid) {
+		getCharacter(character).setHiding(hid);
+		getClient(character).setHiding(character, hid);
+	}
+
+	// TODO belongs in ClientThread.
+	/*@Override
+	public void performSearch(TableType selectedTable, CharacterType chr) {
+		// TODO add other search table options
+		switch (selectedTable) {
+		default:
+			// peer table.
+			peerTableSearch(chr);
+		}
+	}*/
+
+	// TODO belongs in ClientThread.
+	/*@Override
+	public void peerChoice(PeerType choice, CharacterType actor) { // choice of
+																	// peer
+		if (choice == null) {
+			System.out.println("PEER CHOICE WAS NULL");
+			return;
+		}
+		switch (choice) {
+		case CLUES_AND_PATHS:
+		case CLUES:
+			peerCP(actor);
+			break;
+		default:
+			break;
+		}
+
+	}*/
+
+	// TODO belongs in ClientThread.
+	/*@Override
+	public void hideCharacter(CharacterType actor) {
+		getClient(actor).rollDie(actor, DieRequest.PEER_TABLE);
+	}*/
+
+	// TODO belongs in ClientThread.
+	/*@Override
+	public void setPlayerActivities(List<Activity> activities, CharacterType chr) {
+		getPlayerOf(chr).setActivities(activities);
+	}*/
+
+	// TODO belongs in ClientThread.
+
+	public void hideCharacter(int chance, CharacterType character) {
+		if (chance <= 5) {
+			setCharacterHidden(character, true);
+		} else {
+			setCharacterHidden(character, false);
+		}
 	}
 
 	public void moveCharacter(CharacterType characterType, TileName tt,
@@ -160,48 +153,6 @@ public class ModelController implements ModelControlInterface {
 			setUpSoundAndSite();
 		}
 		return board;
-	}
-
-	public void setNumberPlayers(int maxPlayers) {
-		numPlayers = maxPlayers;
-	}
-
-	public Collection<Player> getPlayers() {
-		return players.values();
-	}
-
-	public void setPlayers() {
-		if (players != null) {
-			List<CharacterType> possible = new ArrayList<CharacterType>();
-			randomOrder = new ArrayList<CharacterType>();
-			for (CharacterType ct : CharacterType.values()) {
-				possible.add(ct);
-			}
-			for (int i = 0; i < numPlayers; i++) {
-				Player plr = new Player(i, "player: " + i);
-				CharacterType rnd = Random.remove(possible);
-				players.put(rnd, plr);
-				plr.setCharacter(characters.get(rnd));
-				randomOrder.add(rnd);
-			}
-		}
-	}
-
-	public void setCharacters() {
-		if (characters == null) {
-			characters = new HashMap<CharacterType, Character>();
-			for (Character cr : CharacterFactory.getPossibleCharacters()) {
-				characters.put(cr.getType(), cr);
-			}
-		}
-	}
-
-	public Player getCurrentPlayer() {
-		try {
-			return players.get(orderOfPlay.top());
-		} catch (QueueEmptyException e) {
-			throw noPlayersException;
-		}
 	}
 
 	public void setPlayersInitialLocations() {
@@ -248,15 +199,16 @@ public class ModelController implements ModelControlInterface {
 	private Map<CharacterType, List<Activity>> activities;
 	private Set<CharacterType> waitingCharacters;
 
+	// TODO belongs in clientThread
 	public void setPlayerActivities(CharacterType player, List<Activity> a) {
 		if (waitingCharacters.contains(player)) {
 			waitingCharacters.remove(player);
 			activities.put(player, a);
 			if (waitingCharacters.isEmpty()) {
-				dayLight();
 			}
 		} else {
-			getClient(player).raiseException(new PhasesAlreadySubmitedException());
+			getClient(player).raiseException(
+					new PhasesAlreadySubmitedException());
 		}
 	}
 
@@ -269,14 +221,6 @@ public class ModelController implements ModelControlInterface {
 		}
 	}
 
-	public Character getCurrentCharacter() {
-		return getCurrentPlayer().getCharacter();
-	}
-
-	public CharacterType getCurrentCharacterType() {
-		return getCurrentCharacter().getType();
-	}
-
 	public boolean isPlayerDone() {
 		return currentPlayerDone;
 	}
@@ -286,26 +230,9 @@ public class ModelController implements ModelControlInterface {
 		this.notify();
 	}
 
-	public Player nextPlayer() {
-		if (orderOfPlay.isEmpty()) {
-			resetOrderOfPlay();
-		}
-		currentPlayerDone = false;
-		getClient(getCurrentCharacterType()).focusOnCharacter(
-				getCurrentCharacterType());
-		try {
-			return players.get(orderOfPlay.pop());
-		} catch (QueueEmptyException e) {
-			throw noPlayersException;
-		}
-	}
 
 	public Board getBoard() {
 		return board;
-	}
-
-	public void newDayTime() {
-		resetOrderOfPlay();
 	}
 
 	public void newDay() {
@@ -315,10 +242,11 @@ public class ModelController implements ModelControlInterface {
 
 	}
 
+	// TODO belongs in clientThread
 	public ArrayList<Phase> getAllowedPhases() {
 		ArrayList<Phase> phases = new ArrayList<Phase>();
 		phases.addAll(getInitialPhases());
-		phases.addAll(getCurrentCharacter().getSpecialPhases());
+		//phases.addAll(getCurrentCharacter().getSpecialPhases());
 		phases.addAll(getSunlightPhases());
 		return phases;
 	}
@@ -335,47 +263,13 @@ public class ModelController implements ModelControlInterface {
 		getClient(actor).startSearch(actor);
 	}
 
-
-
-	private void birdsong() {
-		for (Player plr : getPlayers()) {
-			startBirdSong(plr);
-		}
-	}
-
-	private void startBirdSong(Player plr) {
-		getClient(plr.getCharacter().getType()).enterBirdSong();
-	}
-
-	private void dayLight() {
-		try {
-			while (!orderOfPlay.isEmpty()) {
-				CharacterType chr;
-				chr = orderOfPlay.pop();
-				setCharacterHidden(chr, false);
-				playActivities(chr);
-			}
-		} catch (QueueEmptyException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	private void playActivities(CharacterType chr) {
+	// TODO belongs in clientThread
+	/*private void playActivities(CharacterType chr) {
 		Player plr = getPlayerOf(chr);
 		for (Activity act : plr.getPersonalHistory().getCurrentActivities()) {
 			act.perform(this);
 		}
-	}
-
-
-	private void resetOrderOfPlay() {
-		Random.shuffle(randomOrder);
-		orderOfPlay.clear();
-		for (CharacterType ct : randomOrder) {
-			orderOfPlay.push(ct);
-		}
-		System.out.println(orderOfPlay);
-	}
+	}*/
 
 	private Collection<? extends Phase> getSunlightPhases() {
 		ArrayList<Phase> init = new ArrayList<Phase>();
@@ -503,7 +397,7 @@ public class ModelController implements ModelControlInterface {
 		return mapChits;
 	}
 
-	private void peerTableSearch(CharacterType character) {
+	/*private void peerTableSearch(CharacterType character) {
 		int roll = 2;// Random.dieRoll(); TODO cheat mode
 		TileName ct = getTileOf(character).getName();
 		switch (roll) {
@@ -529,18 +423,14 @@ public class ModelController implements ModelControlInterface {
 			showMessage(character, "Peer has failed");
 			break;
 		}
-	}
+	}*/
 
 	private ClientController getClient(CharacterType character) {
 		// TODO get specific game client to character
 		return playingCharacters.get(character);
 	}
 
-	private void showMessage(CharacterType character, String string) {
-		CharacterType ct = getCurrentCharacter().getType();
-		getClient(character).displayMessage(ct + "\n" + string);
-	}
-
+	/*
 	private void peerC(CharacterType character) {
 		// Player gets to look at the map chits in their tile.
 		// they do not discover any sites, but just get to see that they are
@@ -557,9 +447,9 @@ public class ModelController implements ModelControlInterface {
 		}
 		getPlayerOf(character).discoverAllMapChits(peek);
 		getClient(character).revealMapChits(peek);
-	}
+	}*/
 
-	private Player getPlayerOf(CharacterType character) {
+	/*private Player getPlayerOf(CharacterType character) {
 		return players.get(character);
 	}
 
@@ -586,18 +476,18 @@ public class ModelController implements ModelControlInterface {
 		for (ClearingInterface cl : clearing.getSurrounding(PathType.HIDDEN)) {
 			getPlayerOf(character).addDiscoveredPath(source, cl);
 		}
-	}
+	}*/
 
 	private HexTileInterface getTileOf(CharacterType chr) {
 		return board.getLocationOfCounter(chr.toCounter()).getParentTile();
 	}
 
-	private TileName getCurrentTile() {
+	/*private TileName getCurrentTile() {
 		return board
 				.getLocationOfCounter(
 						getCurrentCharacter().getType().toCounter())
 				.getParentTile().getName();
-	}
+	}*/
 
 	private ResourceHandler rh;
 	private int numPlayers = 0;
@@ -620,8 +510,15 @@ public class ModelController implements ModelControlInterface {
 
 	private boolean gameStarted;
 
-	Map<Integer, Boolean> characterSelectionMap = new HashMap<Integer, Boolean>();	//keeps track of who selected their character already.
-	
+	Map<Integer, Boolean> characterSelectionMap = new HashMap<Integer, Boolean>(); // keeps
+																					// track
+																					// of
+																					// who
+																					// selected
+																					// their
+																					// character
+																					// already.
+
 	private static final RuntimeException noPlayersException = new RuntimeException(
 			"There are no players in the queue");
 

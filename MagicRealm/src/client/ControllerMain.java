@@ -8,7 +8,8 @@ import java.util.List;
 
 import javax.swing.JOptionPane;
 
-import communication.NetworkHandler;
+import communication.ClientNetworkHandler;
+import communication.handler.client.CharacterSelected;
 import lwjglview.graphics.LWJGLGraphics;
 import lwjglview.graphics.board.LWJGLBoardDrawable;
 import lwjglview.selection.SelectionFrame;
@@ -226,7 +227,7 @@ public class ControllerMain implements ClientController {
 	 * @param character
 	 */
 	public void characterSelected(CharacterType character) {
-
+		server.send(new CharacterSelected(clientID, character));
 	}
 
 	/**
@@ -266,9 +267,9 @@ public class ControllerMain implements ClientController {
 	 * @param obj
 	 */
 	public void handle(Object obj) {
-		if(obj instanceof NetworkHandler){
+		if(obj instanceof ClientNetworkHandler){
 			System.out.println("Client: recieved new object.");
-			((NetworkHandler) obj).handle(this);
+			((ClientNetworkHandler) obj).handle(this);
 		}		
 	}
 

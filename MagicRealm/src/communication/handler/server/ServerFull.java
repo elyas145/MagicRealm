@@ -1,11 +1,11 @@
 package communication.handler.server;
 
-import communication.NetworkHandler;
+import communication.ClientNetworkHandler;
 
 import client.ClientController;
 import model.exceptions.MaximumPlayersException;
 
-public class ServerFull implements NetworkHandler {
+public class ServerFull implements ClientNetworkHandler {
 
 	@Override
 	public void handle(ClientController client) {

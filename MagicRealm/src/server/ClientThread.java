@@ -5,6 +5,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
+import model.enums.CharacterType;
+import model.character.Character;
+import model.character.CharacterFactory;
 public class ClientThread extends Thread {
 	private int ID = -1;
 	private Socket socket = null;
@@ -12,6 +15,8 @@ public class ClientThread extends Thread {
 	private ObjectInputStream oStreamIn = null;
 	private ObjectOutputStream oStreamOut = null;
 	private boolean done = false;
+	private Character character;
+	private boolean characterPicked = false;
 	
 	public ClientThread(Server server, Socket socket) {
 		super();
@@ -62,5 +67,14 @@ public class ClientThread extends Thread {
 			socket.close();
 		if (oStreamIn != null)
 			oStreamIn.close();
+	}
+
+	public void setCharacter(CharacterType character) {
+		this.character = CharacterFactory.create(character);
+		characterPicked = true;
+	}
+
+	public boolean didSelectCharacter() {
+		return this.characterPicked;
 	}
 }

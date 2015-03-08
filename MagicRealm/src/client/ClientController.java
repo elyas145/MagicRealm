@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.List;
 
-import communication.NetworkHandler;
+import communication.ClientNetworkHandler;
 
 import view.controller.game.BoardView;
 import model.activity.Activity;

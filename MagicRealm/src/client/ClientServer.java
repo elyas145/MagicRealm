@@ -6,6 +6,8 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import communication.ServerNetworkHandler;
+
 public class ClientServer {
 	private Socket socket = null;
 	private Thread thread = null;
@@ -56,7 +58,7 @@ public class ClientServer {
 		}
 	}
 
-	public boolean send(Object o) {
+	public boolean send(ServerNetworkHandler o) {
 		if (thread != null && streamOut != null) {
 			try {
 				streamOut.reset();
