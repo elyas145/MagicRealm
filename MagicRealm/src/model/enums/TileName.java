@@ -1,6 +1,8 @@
 package model.enums;
 
-public enum TileName {
+import java.io.Serializable;
+
+public enum TileName implements Serializable{
 	AWFUL_VALLEY, // valley
 	BAD_VALLEY, // valley
 	BORDERLAND, // cave

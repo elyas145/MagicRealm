@@ -59,7 +59,7 @@ public class ClientServer {
 	}
 
 	public boolean send(ServerNetworkHandler o) {
-		if (thread != null && streamOut != null) {
+		if (streamOut != null) {
 			try {
 				streamOut.reset();
 				streamOut.writeObject(o);

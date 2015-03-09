@@ -38,6 +38,7 @@ public class ClientThread extends Thread {
 				server.handle(streamIn.readObject());
 			} catch (Exception e) {
 				System.out.println("Listening error");
+				break;
 				// Trace.exception(e, this);
 			}
 		}

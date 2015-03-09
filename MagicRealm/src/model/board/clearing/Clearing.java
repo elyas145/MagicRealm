@@ -16,7 +16,7 @@ import utils.math.linear.Matrix;
 import utils.tools.Function;
 import utils.tools.IterationTools;
 
-public class Clearing implements ClearingInterface {
+public class Clearing implements ClearingInterface, Serializable {
 
 	/**
 	 * 

@@ -9,9 +9,13 @@ import model.enums.MapChitType;
 import model.enums.TileName;
 import model.interfaces.ClearingInterface;
 
-public class SerializedBoard implements Serializable{
+public class SerializedBoard implements Serializable {
 	private static final long serialVersionUID = 4842931638624923336L;
 	private Map<Integer, Map<Integer, TileName>> mapOfTileLocations;
+	private Map<TileName, SerializedTile> sMapOfTiles = new HashMap<TileName, SerializedTile>();
+	private Map<TileName, int[]> tileLocations;
+	private Map<MapChitType, TileName> mapChitLocations;
+	private Map<CounterType, ClearingInterface> counterPositions;
 
 	public Map<Integer, Map<Integer, TileName>> getMapOfTileLocations() {
 		return mapOfTileLocations;
@@ -32,11 +36,6 @@ public class SerializedBoard implements Serializable{
 	public Map<CounterType, ClearingInterface> getCounterPositions() {
 		return counterPositions;
 	}
-
-	private Map<TileName, SerializedTile> sMapOfTiles = new HashMap<TileName, SerializedTile>();
-	private Map<TileName, int[]> tileLocations;
-	private Map<MapChitType, TileName> mapChitLocations;
-	private Map<CounterType, ClearingInterface> counterPositions;
 
 	public void setMapOfTileLocations(
 			Map<Integer, Map<Integer, TileName>> mapOfTileLocations) {

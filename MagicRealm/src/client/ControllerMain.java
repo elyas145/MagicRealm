@@ -198,6 +198,7 @@ public class ControllerMain implements ClientController {
 		board = new Board(sboard);		
 		//show the board view.
 		this.startBoardView();
+		System.out.println("started the view.");
 	}
 
 	@Override
@@ -221,6 +222,9 @@ public class ControllerMain implements ClientController {
 	@Override
 	public void enterCharacterSelection() {
 		System.out.println("Entered player selection.");
+		
+		// TODO for testing purposes
+		characterSelected(CharacterType.AMAZON);
 		// TODO gfx.enterCharacterSelection();
 	}
 
@@ -231,7 +235,10 @@ public class ControllerMain implements ClientController {
 	 * @param character
 	 */
 	public void characterSelected(CharacterType character) {
-		server.send(new CharacterSelected(clientID, character));
+		System.out.println("character selected.");
+		if(! server.send(new CharacterSelected(clientID, character))){
+			System.out.println("failed to send selected character to server.");
+		}
 	}
 
 	/**
@@ -271,6 +278,10 @@ public class ControllerMain implements ClientController {
 	 * @param obj
 	 */
 	public void handle(Object obj) {
+		if(obj instanceof Integer){
+			// ID
+			setID((Integer) obj);
+		}
 		if(obj instanceof ClientNetworkHandler){
 			System.out.println("Client: recieved new object.");
 			((ClientNetworkHandler) obj).handle(this);
@@ -279,7 +290,7 @@ public class ControllerMain implements ClientController {
 
 	@Override
 	public void connect(String ipaddress, int port){
-		clientID = port;
+		
 		try {
 			server.connect(ipaddress, port);
 		} catch (UnknownHostException e) {

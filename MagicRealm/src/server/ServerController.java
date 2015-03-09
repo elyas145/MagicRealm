@@ -51,10 +51,10 @@ public class ServerController {
 				e.printStackTrace();
 			}
 			temp.start();
-			temp.send(temp.getID());
 			System.out.println("the player id is: " + temp.getID());
 			clients.add(temp);
 			clientCount++;
+			temp.send(new Integer(socket.getPort()));
 			if (GameConfiguration.MAX_PLAYERS - clientCount == 0) {
 				// added last player.
 				// enter character selection.
@@ -126,12 +126,17 @@ public class ServerController {
 	public void setCharacter(int iD, CharacterType character) {
 		int pos = findClient(iD);
 		if (pos >= 0) {
+			System.out.println("SERVER: setting client: " + iD + " character.");
 			clients.get(pos).setCharacter(character);
 		}
 		//wait for all clients to choose their character
 		for(ClientThread client : clients){
-			if(! client.didSelectCharacter())
+			System.out.println("Client request: " + iD);
+			if(! client.didSelectCharacter()){
+				System.out.println("someone did not select their character");
 				return;
+			}
+				
 		}
 		// setup the serialized board.
 		SerializedBoard sboard = model.getBoard().getSerializedBoard();

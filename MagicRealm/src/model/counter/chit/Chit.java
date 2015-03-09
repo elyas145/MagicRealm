@@ -1,5 +1,7 @@
 package model.counter.chit;
 
+import java.io.Serializable;
+
 import model.enums.TileName;
 import model.interfaces.ChitInterface;
 
@@ -10,8 +12,12 @@ import model.interfaces.ChitInterface;
 // action chits.
 // treasure chits
 
-public abstract class Chit extends ChitInterface {
+public abstract class Chit extends ChitInterface implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7004673221116854940L;
 	public boolean isFlipped() {
 		return flipped;
 	}
