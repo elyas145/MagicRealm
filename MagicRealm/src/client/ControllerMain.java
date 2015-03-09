@@ -10,6 +10,7 @@ import javax.swing.JOptionPane;
 
 import communication.ClientNetworkHandler;
 import communication.handler.client.CharacterSelected;
+import communication.handler.server.SerializedBoard;
 import lwjglview.graphics.LWJGLGraphics;
 import lwjglview.graphics.board.LWJGLBoardDrawable;
 import lwjglview.selection.SelectionFrame;
@@ -36,7 +37,7 @@ public class ControllerMain implements ClientController {
 	private ResourceHandler rh;
 	private ViewController mainView;
 	private BoardView boardView;
-	private ModelControlInterface model;
+	private Board board;
 	private CharacterType player;
 	private SelectionFrame selectFrame;
 	private int clientID = -1;
@@ -58,6 +59,7 @@ public class ControllerMain implements ClientController {
 			boardDrawable = new LWJGLBoardDrawable(rh, gfx, selectFrame);
 			boardView = boardDrawable;
 			gfx.addDrawable(boardDrawable);
+			gfx.start();
 			return boardView;
 		} catch (IOException e1) {
 			throw new RuntimeException(e1);
@@ -142,7 +144,7 @@ public class ControllerMain implements ClientController {
 
 	@Override
 	public void startSearch(CharacterType searcher) {
-		SearchView sv = mainView.enterSearchView(searcher);
+		/*SearchView sv = mainView.enterSearchView(searcher);
 		synchronized (sv) {
 			while (!sv.doneSearching()) {
 				try {
@@ -151,7 +153,7 @@ public class ControllerMain implements ClientController {
 				}
 			}
 			model.performSearch(sv.getSelectedTable(), searcher);
-		}
+		}*/
 	}
 
 	@Override
@@ -192,14 +194,16 @@ public class ControllerMain implements ClientController {
 	}
 
 	@Override
-	public void initializeBoard(Board board) {
-		
+	public void initializeBoard(SerializedBoard sboard) {
+		board = new Board(sboard);		
+		//show the board view.
+		this.startBoardView();
 	}
 
 	@Override
 	public void setPlayerActivities(CharacterType character,
 			List<Activity> activities) {
-		model.setPlayerActivities(activities, character);
+		//model.setPlayerActivities(activities, character);
 	}
 
 	/**

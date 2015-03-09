@@ -15,6 +15,8 @@ import model.interfaces.HexTileInterface;
 
 import org.json.simple.JSONArray;
 
+import communication.handler.server.SerializedTile;
+
 import utils.math.Mathf;
 import utils.math.Point;
 import utils.math.linear.Matrix;
@@ -23,7 +25,8 @@ import utils.tools.IterationTools;
 public class HexTile implements HexTileInterface {
 
 	public HexTile(Board par, TileName tile, int x, int y, int rot,
-			Map<Integer, EnchantedHolder<Point>> locations, TileName[] surrounding) {
+			Map<Integer, EnchantedHolder<Point>> locations,
+			TileName[] surrounding) {
 		parent = par;
 		name = tile;
 		row = x;
@@ -33,7 +36,8 @@ public class HexTile implements HexTileInterface {
 		bufferA = Matrix.zeroVector(3);
 		bufferB = Matrix.zeroVector(3);
 		bufferC = Matrix.square(3);
-		for (Map.Entry<Integer, EnchantedHolder<Point>> ents : locations.entrySet()) {
+		for (Map.Entry<Integer, EnchantedHolder<Point>> ents : locations
+				.entrySet()) {
 			EnchantedHolder<Point> pts = ents.getValue();
 			int num = ents.getKey();
 			if (!pts.has(false)) {
@@ -46,8 +50,8 @@ public class HexTile implements HexTileInterface {
 						"Missing enchanted position data for tile " + name
 								+ ", clearing " + num);
 			}
-			Clearing cl = new Clearing(this, num, transform(pts.get(false), bufferA),
-					transform(pts.get(true), bufferB));
+			Clearing cl = new Clearing(this, num, transform(pts.get(false),
+					bufferA), transform(pts.get(true), bufferB));
 			clearings.put(num, cl);
 		}
 		exits = new int[2][6];
@@ -59,18 +63,33 @@ public class HexTile implements HexTileInterface {
 				int entr = (i + 3) % 6;
 				ClearingInterface ocl = other.getEntryClearing(entr, false);
 				ClearingInterface tcl = getEntryClearing(i, false);
-				if(ocl != null && tcl != null) {
+				if (ocl != null && tcl != null) {
 					ocl.connectTo(this, i, false);
 					tcl.connectTo(other, entr, false);
 				}
 				ocl = other.getEntryClearing(entr, true);
 				tcl = getEntryClearing(i, true);
-				if(ocl != null && tcl != null) {
+				if (ocl != null && tcl != null) {
 					ocl.connectTo(this, i, true);
 					tcl.connectTo(other, entr, true);
 				}
 			}
 		}
+	}
+
+	/**
+	 * creates a tile only good enough for drawing. this tile is not connected
+	 * to anything and has no mechanism
+	 * 
+	 * @param serializedTile
+	 */
+	public HexTile(SerializedTile serializedTile) {
+		chitMap = serializedTile.getChitMap();
+		clearings = serializedTile.getClearings();
+		column = serializedTile.getColumn();
+		name = serializedTile.getName();
+		rotation = serializedTile.getRotation();
+		row = serializedTile.getRow();
 	}
 
 	@Override
@@ -451,15 +470,24 @@ public class HexTile implements HexTileInterface {
 	private Map<Chit, Clearing> chitMap;
 	private int rotation;
 	private TileName[] surroundings;
-	
+
 	@Override
 	public void connectTo(TileName otherTile, int exit) {
 		surroundings[exit % 6] = otherTile;
-		
+
 	}
 
 	@Override
 	public Iterable<TileName> getSurrounding() {
 		return IterationTools.notNull(surroundings);
+	}
+
+	public SerializedTile getSerializedTile() {
+		SerializedTile sTile = new SerializedTile();
+		sTile.setPosition(row, column, rotation);
+		sTile.setTileName(name);
+		sTile.setClearings(clearings);
+		sTile.setChitMap(chitMap);
+		return sTile;
 	}
 }

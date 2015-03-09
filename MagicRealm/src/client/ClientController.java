@@ -5,7 +5,7 @@ import java.net.UnknownHostException;
 import java.util.List;
 
 import communication.ClientNetworkHandler;
-
+import communication.handler.server.SerializedBoard;
 import view.controller.game.BoardView;
 import model.activity.Activity;
 import model.board.Board;
@@ -59,6 +59,6 @@ public interface ClientController {
 
 	void connect(String ipaddress, int port) throws UnknownHostException, IOException;
 
-	void initializeBoard(Board board);
+	void initializeBoard(SerializedBoard board);
 
 }

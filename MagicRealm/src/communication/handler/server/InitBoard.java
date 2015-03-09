@@ -3,14 +3,16 @@ package communication.handler.server;
 import communication.ClientNetworkHandler;
 
 import client.ClientController;
-import view.controller.game.BoardView;
-import model.board.Board;
 
 public class InitBoard implements ClientNetworkHandler{
-	private Board board;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 8394627111897586695L;
+	private SerializedBoard board;
 	
-	public InitBoard(Board initializer){
-		board = initializer;
+	public InitBoard(SerializedBoard sboard){
+		board = sboard;
 	}
 	@Override
 	public void handle(ClientController controller) {

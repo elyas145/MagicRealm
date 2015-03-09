@@ -43,7 +43,7 @@ import model.counter.chit.MapChit;
 /*
  * Meant to be a container for the entire model
  */
-public class ModelController{
+public class ModelController {
 	public ModelController(ResourceHandler rh) {
 		this.rh = rh;
 		currentDay = 1;

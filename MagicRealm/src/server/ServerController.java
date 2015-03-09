@@ -128,13 +128,13 @@ public class ServerController {
 		if (pos >= 0) {
 			clients.get(pos).setCharacter(character);
 		}
+		//wait for all clients to choose their character
 		for(ClientThread client : clients){
 			if(! client.didSelectCharacter())
 				return;
 		}
 		// setup the serialized board.
-		
-		SerializedBoard sboard = new SerializedBoard();
-		sendAll(new InitBoard(null));
+		SerializedBoard sboard = model.getBoard().getSerializedBoard();
+		sendAll(new InitBoard(sboard));
 	}
 }

@@ -17,6 +17,8 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
+import communication.handler.server.SerializedBoard;
+import communication.handler.server.SerializedTile;
 import config.BoardConfiguration;
 import config.GraphicsConfiguration;
 import utils.math.Point;
@@ -49,8 +51,8 @@ public class Board implements BoardInterface {
 		clearingLocations = new HashMap<TileName, Map<Integer, EnchantedHolder<Point>>>();
 		counterPositions = new HashMap<CounterType, ClearingInterface>();
 		try {
-			String path = rh.getResource(
-					ResourceHandler.joinPath("data", "data.json"));
+			String path = rh.getResource(ResourceHandler.joinPath("data",
+					"data.json"));
 			FileReader reader = new FileReader(path);
 			JSONParser parser = new JSONParser();
 			arr = (JSONArray) parser.parse(reader);
@@ -64,7 +66,8 @@ public class Board implements BoardInterface {
 						clearingLocations.put(tn,
 								new HashMap<Integer, EnchantedHolder<Point>>());
 					}
-					Map<Integer, EnchantedHolder<Point>> pts = clearingLocations.get(tn);
+					Map<Integer, EnchantedHolder<Point>> pts = clearingLocations
+							.get(tn);
 					for (Object key : ns.keySet()) {
 						int val = Integer.parseInt((String) key);
 						if (!pts.containsKey(val)) {
@@ -89,6 +92,25 @@ public class Board implements BoardInterface {
 		initTreasures();
 		initSound();
 
+	}
+
+	/**
+	 * generates a board only good enough to be drawn on the screen. the board
+	 * generated does not have tiles connected and has no mechanism. The
+	 * legality of phases is done on the server side. this method should only be
+	 * called on the client side once the client receives a new board.
+	 * 
+	 * @param sboard
+	 */
+	public Board(SerializedBoard sboard) {
+		Map<TileName, SerializedTile> stiles = sboard.getsMapOfTiles();
+		for(TileName name : stiles.keySet()){
+			mapOfTiles.put(name, new HexTile(stiles.get(name)));
+		}
+		counterPositions = sboard.getCounterPositions();
+		mapChitLocations = sboard.getMapChitLocations();
+		mapOfTileLocations = sboard.getMapOfTileLocations();
+		tileLocations = sboard.getTileLocations();
 	}
 
 	public HexTileInterface getTile(TileName tile) {
@@ -192,6 +214,7 @@ public class Board implements BoardInterface {
 					.remove(possibleValues)));
 		}
 	}
+
 	private void hardCodeTiles() {
 		// this setup is based on the picture found here, rotated left to match
 		// video:
@@ -300,8 +323,23 @@ public class Board implements BoardInterface {
 	private Map<TileName, int[]> tileLocations;
 	private Map<MapChitType, TileName> mapChitLocations;
 	private Map<CounterType, ClearingInterface> counterPositions;
+	// needs to be relocated.
 	private ArrayList<Treasure> treasures = new ArrayList<Treasure>();
 	private JSONArray arr;
 
+	public SerializedBoard getSerializedBoard() {
+		SerializedBoard sboard = new SerializedBoard();
+		sboard.setMapOfTileLocations(mapOfTileLocations);
+		Map<TileName, SerializedTile> sMapOfTiles = new HashMap<TileName, SerializedTile>();
+		for (TileName name : mapOfTiles.keySet()) {
+			sMapOfTiles.put(name, mapOfTiles.get(name).getSerializedTile());
+		}
+		sboard.setMapOfTiles(sMapOfTiles);
+		sboard.setTileLocations(tileLocations);
+		sboard.setMapChitLocations(mapChitLocations);
+		sboard.setCounterPositions(counterPositions);
+
+		return sboard;
+	}
 
 }

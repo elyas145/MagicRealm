@@ -3,6 +3,7 @@ package model.controller;
 import java.util.List;
 
 import model.activity.Activity;
+import model.board.Board;
 import model.enums.CharacterType;
 import model.enums.PeerType;
 import model.enums.TableType;
@@ -32,5 +33,7 @@ public interface ModelControlInterface {
 	void startSearching(CharacterType actor);
 
 	void hideCharacter(int chance, CharacterType character);
+
+	void setBoard(Board board);
 
 }
