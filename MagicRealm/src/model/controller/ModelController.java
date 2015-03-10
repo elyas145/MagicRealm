@@ -478,9 +478,9 @@ public class ModelController {
 		}
 	}*/
 
-	private HexTileInterface getTileOf(CharacterType chr) {
+	/*private HexTileInterface getTileOf(CharacterType chr) {
 		return board.getLocationOfCounter(chr.toCounter()).getParentTile();
-	}
+	}*/
 
 	/*private TileName getCurrentTile() {
 		return board

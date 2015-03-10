@@ -87,7 +87,7 @@ public class HexTile implements HexTileInterface {
 	 */
 	public HexTile(SerializedTile serializedTile) {
 		Map<Integer, SerializedClearing> sClearings = serializedTile.getClearings();
-		
+		clearings = new HashMap<Integer, Clearing>();
 		//get the actual clearings
 		for(Integer i : sClearings.keySet()){
 			clearings.put(i, new Clearing(sClearings.get(i)));
@@ -96,6 +96,10 @@ public class HexTile implements HexTileInterface {
 		name = serializedTile.getName();
 		rotation = serializedTile.getRotation();
 		row = serializedTile.getRow();
+	}
+
+	public HexTile(TileName parent) {
+		this.name = parent;
 	}
 
 	@Override

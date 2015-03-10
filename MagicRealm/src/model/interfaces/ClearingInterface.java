@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import utils.math.linear.Matrix;
 import model.enums.PathType;
+import model.enums.TileName;
 
 public interface ClearingInterface extends Serializable{
 	
@@ -21,7 +22,7 @@ public interface ClearingInterface extends Serializable{
 	/**
 	 * @return the parent tile
 	 */
-	HexTileInterface getParentTile();
+	TileName getParentTile();
 
 	void connectTo(ClearingInterface other, boolean ench, PathType pt);
 

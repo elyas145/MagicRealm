@@ -224,7 +224,7 @@ public class Clearing implements ClearingInterface, Serializable {
 		sClearing.setChits(chits);
 		sClearing.setLocations(locations);
 		sClearing.setNumber(number);
-		sClearing.setParent(parent.getBoardColumn(), parent.getBoardRow(), parent.getName(), parent.getRotation());
+		sClearing.setParent(parent.getName());
 		return sClearing;
 	}
 }

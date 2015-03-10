@@ -13,9 +13,9 @@ public class SerializedClearing implements Serializable {
 	private List<Chit> chits;
 	private int number;
 	private EnchantedHolder<Matrix> locations;
-	private SerializedTile parent;
+	private TileName parent;
 
-	public SerializedTile getParent() {
+	public TileName getParent() {
 		return parent;
 	}
 
@@ -48,17 +48,17 @@ public class SerializedClearing implements Serializable {
 	 * since clearings have a parent, and a parent has a set of clearings, the
 	 * program will go into infinite recursion trying to serialize the clearings
 	 * and their parents.
+	 * @param rot 
+	 * @param row 
+	 * @param col 
 	 * 
 	 * @param boardColumn
 	 * @param boardRow
 	 * @param name
 	 * @param rotation
 	 */
-	public void setParent(int boardColumn, int boardRow, TileName name,
-			int rotation) {
-		parent = new SerializedTile();
-		parent.setPosition(boardRow, boardColumn, rotation);
-		parent.setTileName(name);
+	public void setParent(TileName parent) {
+		this.parent = parent;
 	}
 
 }
