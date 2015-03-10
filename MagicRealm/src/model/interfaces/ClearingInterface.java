@@ -22,7 +22,7 @@ public interface ClearingInterface extends Serializable{
 	/**
 	 * @return the parent tile
 	 */
-	TileName getParentTile();
+	HexTileInterface getParentTile();
 
 	void connectTo(ClearingInterface other, boolean ench, PathType pt);
 
