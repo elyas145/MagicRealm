@@ -60,11 +60,11 @@ public class HexTile implements HexTileInterface {
 		clearExits();
 		connectClearings();
 		for (int i = 0; i < surrounding.length; ++i) {
-			HexTileInterface other = getParent().getTile(surrounding[i]);
+			HexTile other = getParent().getTile(surrounding[i]);
 			if (other != null) {
 				int entr = (i + 3) % 6;
-				ClearingInterface ocl = other.getEntryClearing(entr, false);
-				ClearingInterface tcl = getEntryClearing(i, false);
+				Clearing ocl = other.getEntryClearing(entr, false);
+				Clearing tcl = getEntryClearing(i, false);
 				if (ocl != null && tcl != null) {
 					ocl.connectTo(this, i, false);
 					tcl.connectTo(other, entr, false);
@@ -423,14 +423,14 @@ public class HexTile implements HexTileInterface {
 	}
 
 	private void connect(int a, int b, boolean enchanted, PathType pt) {
-		ClearingInterface ca, cb;
+		Clearing ca, cb;
 		ca = clearings.get(a);
 		cb = clearings.get(b);
 		connectClearings(ca, cb, enchanted, pt);
 	}
 
-	private static void connectClearings(ClearingInterface ca,
-			ClearingInterface cb, boolean enchanted, PathType pt) {
+	private static void connectClearings(Clearing ca,
+			Clearing cb, boolean enchanted, PathType pt) {
 		ca.connectTo(cb, enchanted, pt);
 		cb.connectTo(ca, enchanted, pt);
 	}

@@ -11,6 +11,7 @@ import javax.swing.JOptionPane;
 import communication.ClientNetworkHandler;
 import communication.handler.client.CharacterSelected;
 import communication.handler.server.SerializedBoard;
+import communication.handler.server.SerializedTile;
 import lwjglview.graphics.LWJGLGraphics;
 import lwjglview.graphics.board.LWJGLBoardDrawable;
 import lwjglview.selection.SelectionFrame;
@@ -194,10 +195,14 @@ public class ControllerMain implements ClientController {
 	}
 
 	@Override
-	public void initializeBoard(SerializedBoard sboard) {
-		board = new Board(sboard);		
+	public void initializeBoard(SerializedBoard sboard) {	
 		//show the board view.
-		this.startBoardView();
+		BoardView bView = this.startBoardView();
+		//init theview.
+		for(SerializedTile tile : sboard.getsMapOfTiles().values()){
+			bView.setTile(tile.getName(), tile.getRow(), tile.getColumn(), tile.getRotation(), tile.getClearings().values());
+		}
+		
 		System.out.println("started the view.");
 	}
 

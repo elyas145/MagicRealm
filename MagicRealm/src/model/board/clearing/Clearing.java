@@ -53,16 +53,14 @@ public class Clearing implements ClearingInterface, Serializable {
 		return getParent();
 	}
 
-	@Override
-	public void connectTo(ClearingInterface other, boolean ench, PathType pt) {
+	public void connectTo(Clearing other, boolean ench, PathType pt) {
 		if (!internalConnections.containsKey(other)) {
 			internalConnections.put(other, new EnchantedHolder<PathType>());
 		}
 		internalConnections.get(other).set(ench, pt);
 	}
 
-	@Override
-	public void connectTo(HexTileInterface other, int entr, boolean ench) {
+	public void connectTo(HexTile other, int entr, boolean ench) {
 		if (other == getParent()) {
 			connectTo(other.getEntryClearing(entr, ench), ench, PathType.NORMAL);
 		} else {

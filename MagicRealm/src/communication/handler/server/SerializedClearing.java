@@ -6,9 +6,12 @@ import java.util.List;
 import utils.math.linear.Matrix;
 import model.EnchantedHolder;
 import model.counter.chit.Chit;
+import model.enums.PathType;
 import model.enums.TileName;
+import model.interfaces.ClearingInterface;
+import model.interfaces.HexTileInterface;
 
-public class SerializedClearing implements Serializable {
+public class SerializedClearing implements Serializable, ClearingInterface {
 	private static final long serialVersionUID = -1947263645476199141L;
 	private List<Chit> chits;
 	private int number;
@@ -60,5 +63,6 @@ public class SerializedClearing implements Serializable {
 	public void setParent(TileName parent) {
 		this.parent = parent;
 	}
+
 
 }

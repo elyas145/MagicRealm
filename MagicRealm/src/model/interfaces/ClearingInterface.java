@@ -24,10 +24,6 @@ public interface ClearingInterface extends Serializable{
 	 */
 	HexTileInterface getParentTile();
 
-	void connectTo(ClearingInterface other, boolean ench, PathType pt);
-
-	void connectTo(HexTileInterface other, int entr, boolean ench);
-
 	boolean isConnectedTo(ClearingInterface other);
 
 	boolean isConnectedTo(ClearingInterface other, PathType pt);

@@ -114,7 +114,7 @@ public class Board implements BoardInterface {
 		tileLocations = sboard.getTileLocations();
 	}
 
-	public HexTileInterface getTile(TileName tile) {
+	public HexTile getTile(TileName tile) {
 		return mapOfTiles.get(tile);
 	}
 
