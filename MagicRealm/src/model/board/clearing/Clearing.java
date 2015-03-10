@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import communication.handler.server.SerializedClearing;
+
 import model.EnchantedHolder;
 import model.board.tile.HexTile;
 import model.counter.chit.Chit;
@@ -26,10 +28,24 @@ public class Clearing implements ClearingInterface, Serializable {
 	// nloc and eloc distance from center of tile
 	public Clearing(HexTile par, int num, Matrix nloc, Matrix eloc) {
 		parent = par;
-		locations = new EnchantedHolder<Matrix>(Matrix.clone(nloc), Matrix.clone(eloc));
+		locations = new EnchantedHolder<Matrix>(Matrix.clone(nloc),
+				Matrix.clone(eloc));
 		internalConnections = new HashMap<ClearingInterface, EnchantedHolder<PathType>>();
 		externalConnections = new HashMap<HexTileInterface, EnchantedHolder<ClearingResolver>>();
 		number = num;
+	}
+
+	/**
+	 * creates a clearing only good enough for drawing. This clearing is not
+	 * connected to anything and cannot be used to validate moves.
+	 * 
+	 * @param serializedClearing
+	 */
+	public Clearing(SerializedClearing sClearing) {
+		chits = sClearing.getChits();
+		locations = sClearing.getLocations();
+		number = sClearing.getNumber();
+		parent = new HexTile(sClearing.getParent());
 	}
 
 	@Override
@@ -51,9 +67,11 @@ public class Clearing implements ClearingInterface, Serializable {
 			connectTo(other.getEntryClearing(entr, ench), ench, PathType.NORMAL);
 		} else {
 			if (!externalConnections.containsKey(other)) {
-				externalConnections.put(other, new EnchantedHolder<ClearingResolver>());
+				externalConnections.put(other,
+						new EnchantedHolder<ClearingResolver>());
 			}
-			externalConnections.get(other).set(ench, new ClearingResolver(other, entr));
+			externalConnections.get(other).set(ench,
+					new ClearingResolver(other, entr));
 		}
 	}
 
@@ -101,7 +119,8 @@ public class Clearing implements ClearingInterface, Serializable {
 				surround.add(clr);
 			}
 		}
-		for (EnchantedHolder<ClearingResolver> rslv : externalConnections.values()) {
+		for (EnchantedHolder<ClearingResolver> rslv : externalConnections
+				.values()) {
 			if (rslv.has(ench)) {
 				surround.add(rslv.get(ench).getClearing());
 			}
@@ -176,6 +195,7 @@ public class Clearing implements ClearingInterface, Serializable {
 		 * 
 		 */
 		private static final long serialVersionUID = 6156205823122632890L;
+
 		public ClearingResolver(HexTileInterface other, int loc) {
 			tile = other;
 			entrance = loc % 6;
@@ -198,4 +218,13 @@ public class Clearing implements ClearingInterface, Serializable {
 	private int number;
 
 	private EnchantedHolder<Matrix> locations;
+
+	public SerializedClearing getSerializedClearing() {
+		SerializedClearing sClearing = new SerializedClearing();
+		sClearing.setChits(chits);
+		sClearing.setLocations(locations);
+		sClearing.setNumber(number);
+		sClearing.setParent(parent.getBoardColumn(), parent.getBoardRow(), parent.getName(), parent.getRotation());
+		return sClearing;
+	}
 }

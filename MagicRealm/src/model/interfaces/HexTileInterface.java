@@ -3,6 +3,8 @@ package model.interfaces;
 import java.io.Serializable;
 import java.util.Collection;
 
+import communication.handler.server.SerializedTile;
+
 import model.board.clearing.Clearing;
 import model.counter.chit.Chit;
 import model.enums.TileName;
@@ -53,4 +55,6 @@ public interface HexTileInterface extends Serializable{
 	
 	void connectTo(TileName tile, int exit);
 	Iterable<TileName> getSurrounding();
+
+	SerializedTile getSerializedTile();
 }

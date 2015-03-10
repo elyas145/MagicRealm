@@ -6,6 +6,7 @@ import java.util.Map;
 import model.board.clearing.Clearing;
 import model.counter.chit.Chit;
 import model.enums.TileName;
+import model.interfaces.HexTileInterface;
 
 public class SerializedTile implements Serializable{
 
@@ -17,8 +18,7 @@ public class SerializedTile implements Serializable{
 	private int column;
 	private int rotation;
 	private TileName name;
-	private Map<Integer, Clearing> clearings;
-	private Map<Chit, Clearing> chitMap;
+	private Map<Integer, SerializedClearing> clearings;
 
 	public int getRow() {
 		return row;
@@ -36,12 +36,8 @@ public class SerializedTile implements Serializable{
 		return name;
 	}
 
-	public Map<Integer, Clearing> getClearings() {
+	public Map<Integer, SerializedClearing> getClearings() {
 		return clearings;
-	}
-
-	public Map<Chit, Clearing> getChitMap() {
-		return chitMap;
 	}
 
 	public void setPosition(int row, int column, int rotation) {
@@ -54,14 +50,10 @@ public class SerializedTile implements Serializable{
 		this.name = name;
 	}
 
-	public void setClearings(Map<Integer, Clearing> clearings) {
+	public void setClearings(Map<Integer, SerializedClearing> clearings) {
 		this.clearings = clearings;
 
 	}
 
-	public void setChitMap(Map<Chit, Clearing> chitMap) {
-		this.chitMap = chitMap;
-
-	}
 
 }

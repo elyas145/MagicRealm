@@ -48,6 +48,7 @@ public class ClientThread extends Thread {
 				server.handle(ID, oStreamIn.readObject());
 			} catch (Exception e) {
 				System.out.println(ID + " Error reading input: ");
+				e.printStackTrace();
 				server.remove(ID);
 				break;
 			}

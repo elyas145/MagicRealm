@@ -15,14 +15,16 @@ import model.interfaces.HexTileInterface;
 
 import org.json.simple.JSONArray;
 
+import communication.handler.server.SerializedClearing;
 import communication.handler.server.SerializedTile;
-
 import utils.math.Mathf;
 import utils.math.Point;
 import utils.math.linear.Matrix;
 import utils.tools.IterationTools;
 
 public class HexTile implements HexTileInterface {
+
+	private static final long serialVersionUID = 5303629252128539756L;
 
 	public HexTile(Board par, TileName tile, int x, int y, int rot,
 			Map<Integer, EnchantedHolder<Point>> locations,
@@ -84,8 +86,12 @@ public class HexTile implements HexTileInterface {
 	 * @param serializedTile
 	 */
 	public HexTile(SerializedTile serializedTile) {
-		chitMap = serializedTile.getChitMap();
-		clearings = serializedTile.getClearings();
+		Map<Integer, SerializedClearing> sClearings = serializedTile.getClearings();
+		
+		//get the actual clearings
+		for(Integer i : sClearings.keySet()){
+			clearings.put(i, new Clearing(sClearings.get(i)));
+		}		
 		column = serializedTile.getColumn();
 		name = serializedTile.getName();
 		rotation = serializedTile.getRotation();
@@ -467,7 +473,6 @@ public class HexTile implements HexTileInterface {
 	private int row;
 	private int column;
 	private Map<Integer, Clearing> clearings;
-	private Map<Chit, Clearing> chitMap;
 	private int rotation;
 	private TileName[] surroundings;
 
@@ -486,8 +491,12 @@ public class HexTile implements HexTileInterface {
 		SerializedTile sTile = new SerializedTile();
 		sTile.setPosition(row, column, rotation);
 		sTile.setTileName(name);
-		sTile.setClearings(clearings);
-		sTile.setChitMap(chitMap);
+		//create the serialized clearings.
+		Map<Integer, SerializedClearing> sClearings = new HashMap<Integer, SerializedClearing>();
+		for(Integer i : clearings.keySet()){
+			sClearings.put(i, clearings.get(i).getSerializedClearing());
+		}
+		sTile.setClearings(sClearings);
 		return sTile;
 	}
 }

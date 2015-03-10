@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import communication.handler.server.SerializedTile;
+
 import model.board.clearing.Clearing;
 import model.enums.TileName;
 import model.interfaces.ClearingInterface;
@@ -75,10 +77,15 @@ public class HexTileData implements HexTileInterface {
 	public Iterable<TileName> getSurrounding() {
 		return null;
 	}
+	@Override
+	public SerializedTile getSerializedTile() {
+		return null;
+	}
 	private Map<Integer, ClearingData> clearings;
 	private TileName name;
 	private int row;
 	private int col;
 	private int rot;
 	private boolean enchanted;
+
 }
