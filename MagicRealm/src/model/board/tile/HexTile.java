@@ -85,13 +85,15 @@ public class HexTile implements HexTileInterface {
 	 * 
 	 * @param serializedTile
 	 */
-	public HexTile(SerializedTile serializedTile) {
-		Map<Integer, SerializedClearing> sClearings = serializedTile.getClearings();
-		clearings = new HashMap<Integer, Clearing>();
-		//get the actual clearings
-		for(Integer i : sClearings.keySet()){
-			clearings.put(i, new Clearing(sClearings.get(i)));
-		}		
+	public HexTile(SerializedTile serializedTile, boolean parent) {
+		if(!parent){
+			Map<Integer, SerializedClearing> sClearings = serializedTile.getClearings();
+			clearings = new HashMap<Integer, Clearing>();
+			//get the actual clearings
+			for(Integer i : sClearings.keySet()){
+				clearings.put(i, new Clearing(sClearings.get(i)));
+			}	
+		}			
 		column = serializedTile.getColumn();
 		name = serializedTile.getName();
 		rotation = serializedTile.getRotation();

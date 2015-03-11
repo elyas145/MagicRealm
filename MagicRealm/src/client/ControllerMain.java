@@ -4,19 +4,23 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.JOptionPane;
 
 import communication.ClientNetworkHandler;
 import communication.handler.client.CharacterSelected;
 import communication.handler.server.SerializedBoard;
+import communication.handler.server.SerializedClearing;
 import communication.handler.server.SerializedTile;
 import lwjglview.graphics.LWJGLGraphics;
 import lwjglview.graphics.board.LWJGLBoardDrawable;
 import lwjglview.selection.SelectionFrame;
 import model.activity.Activity;
 import model.board.Board;
+import model.board.clearing.Clearing;
 import model.character.Character;
 import model.character.CharacterFactory;
 import model.controller.ModelControlInterface;
@@ -200,8 +204,13 @@ public class ControllerMain implements ClientController {
 		BoardView bView = this.startBoardView();
 		//init theview.
 		for(SerializedTile tile : sboard.getsMapOfTiles().values()){
-			bView.setTile(tile.getName(), tile.getRow(), tile.getColumn(), tile.getRotation(), tile.getClearings().values());
+			Map<Integer, Clearing> clearings = new HashMap<Integer, Clearing>();
+			for(SerializedClearing clearing : tile.getClearings().values()){
+				clearings.put(clearing.getNumber(), new Clearing(clearing));
+			}
+			bView.setTile(tile.getName(), tile.getRow(), tile.getColumn(), tile.getRotation(), clearings.values());
 		}
+		
 		
 		System.out.println("started the view.");
 	}

@@ -106,7 +106,7 @@ public class Board implements BoardInterface {
 		Map<TileName, SerializedTile> stiles = sboard.getsMapOfTiles();
 		mapOfTiles = new HashMap<TileName, HexTile>();
 		for(TileName name : stiles.keySet()){
-			mapOfTiles.put(name, new HexTile(stiles.get(name)));
+			mapOfTiles.put(name, new HexTile(stiles.get(name), false));
 		}
 		counterPositions = sboard.getCounterPositions();
 		mapChitLocations = sboard.getMapChitLocations();
