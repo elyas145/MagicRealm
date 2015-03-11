@@ -6,6 +6,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 import model.enums.CharacterType;
+import model.enums.CounterType;
 import model.character.Character;
 import model.character.CharacterFactory;
 public class ClientThread extends Thread {
@@ -36,7 +37,7 @@ public class ClientThread extends Thread {
 			oStreamOut.flush();
 		} catch (IOException e) {
 			System.out.println(ID + "Error sending message: " + ID);
-			e.printStackTrace();
+			//e.printStackTrace();
 			server.remove(ID);
 		}
 	}
@@ -48,7 +49,7 @@ public class ClientThread extends Thread {
 				server.handle(ID, oStreamIn.readObject());
 			} catch (Exception e) {
 				System.out.println(ID + " Error reading input: ");
-				e.printStackTrace();
+				// e.printStackTrace();
 				server.remove(ID);
 				break;
 			}
@@ -77,5 +78,9 @@ public class ClientThread extends Thread {
 
 	public boolean didSelectCharacter() {
 		return this.characterPicked;
+	}
+
+	public Character getCharacter() {
+		return character;
 	}
 }

@@ -25,7 +25,7 @@ public interface ClientController {
 
 	void enterCharacterSelection();
 
-	void enterLobby(int currentPlayers);
+	void enterLobby(SerializedBoard sboard);
 
 	void exit();
 
@@ -60,5 +60,9 @@ public interface ClientController {
 	void connect(String ipaddress, int port) throws UnknownHostException, IOException;
 
 	void initializeBoard(SerializedBoard board);
+
+	void updateLobbyCount(int count);
+
+	void startGame(SerializedBoard board);
 
 }

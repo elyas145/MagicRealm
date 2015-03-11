@@ -11,6 +11,7 @@ import java.util.ArrayList;
 
 import model.controller.ModelController;
 import model.enums.CharacterType;
+import model.enums.ValleyChit;
 import communication.ClientNetworkHandler;
 import communication.ServerNetworkHandler;
 import communication.handler.server.EnterCharacterSelection;
@@ -19,6 +20,8 @@ import communication.handler.server.InitBoard;
 import communication.handler.server.MessageDisplay;
 import communication.handler.server.Reject;
 import communication.handler.server.SerializedBoard;
+import communication.handler.server.StartGame;
+import communication.handler.server.UpdateLobbyCount;
 import server.ClientThread;
 import utils.resources.ResourceHandler;
 import config.GameConfiguration;
@@ -28,12 +31,14 @@ public class ServerController {
 	private ArrayList<ClientThread> clients;
 	private int clientCount = 0;
 	private ModelController model;
-	
+	SerializedBoard sboard;
+
 	public ServerController(Server s) {
 		this.server = s;
 		clients = new ArrayList<ClientThread>();
 		model = new ModelController(new ResourceHandler());
 		model.setBoard();
+		sboard = model.getBoard().getSerializedBoard();
 	}
 
 	/**
@@ -57,10 +62,12 @@ public class ServerController {
 			temp.send(new Integer(socket.getPort()));
 			if (GameConfiguration.MAX_PLAYERS - clientCount == 0) {
 				// added last player.
+				temp.send(new EnterLobby(sboard));
 				// enter character selection.
 				sendAll(new EnterCharacterSelection());
 			} else {
-				temp.send(new EnterLobby(GameConfiguration.MAX_PLAYERS
+				temp.send(new EnterLobby(sboard));
+				sendAll(new UpdateLobbyCount(GameConfiguration.MAX_PLAYERS
 						- clientCount));
 			}
 
@@ -123,23 +130,27 @@ public class ServerController {
 	 * @param iD
 	 * @param character
 	 */
-	public void setCharacter(int iD, CharacterType character) {
+	public void setCharacter(int iD, CharacterType character,
+			ValleyChit startingLocation) {
 		int pos = findClient(iD);
 		if (pos >= 0) {
 			System.out.println("SERVER: setting client: " + iD + " character.");
 			clients.get(pos).setCharacter(character);
+			model.setPlayersInitialLocations(clients.get(pos).getCharacter()
+					.getType().toCounter(), startingLocation);
 		}
-		//wait for all clients to choose their character
-		for(ClientThread client : clients){
+		// wait for all clients to choose their character
+		for (ClientThread client : clients) {
 			System.out.println("Client request: " + iD);
-			if(! client.didSelectCharacter()){
+			if (!client.didSelectCharacter()) {
 				System.out.println("someone did not select their character");
 				return;
 			}
-				
+
 		}
-		// setup the serialized board.
-		SerializedBoard sboard = model.getBoard().getSerializedBoard();
-		sendAll(new InitBoard(sboard));
+		// TODO setup all the counters on the board.
+		model.setBoardForPlay();
+		sboard = model.getBoard().getSerializedBoard();
+		sendAll(new StartGame(sboard));
 	}
 }

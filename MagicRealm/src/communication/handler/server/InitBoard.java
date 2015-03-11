@@ -9,14 +9,14 @@ public class InitBoard implements ClientNetworkHandler{
 	 * 
 	 */
 	private static final long serialVersionUID = 8394627111897586695L;
-	private SerializedBoard board;
+	
 	
 	public InitBoard(SerializedBoard sboard){
-		board = sboard;
+		//TODO initialize the players, dwellings and map chits
 	}
 	@Override
 	public void handle(ClientController controller) {
-		controller.initializeBoard(board);
+		//controller.initializeBoard(board);
 		
 	}
 

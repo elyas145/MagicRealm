@@ -29,6 +29,7 @@ import model.counter.chit.MapChit;
 import model.enums.CharacterType;
 import model.enums.CounterType;
 import model.enums.TileName;
+import model.enums.ValleyChit;
 import model.exceptions.MRException;
 import swingview.MainView;
 import utils.resources.ResourceHandler;
@@ -130,7 +131,7 @@ public class ControllerMain implements ClientController {
 	 */
 	@Override
 	public void revealMapChits(Iterable<MapChit> chits) {
-		
+
 		boardView.revealAllMapChits(chits);
 	}
 
@@ -149,16 +150,12 @@ public class ControllerMain implements ClientController {
 
 	@Override
 	public void startSearch(CharacterType searcher) {
-		/*SearchView sv = mainView.enterSearchView(searcher);
-		synchronized (sv) {
-			while (!sv.doneSearching()) {
-				try {
-					sv.wait();
-				} catch (InterruptedException e) {
-				}
-			}
-			model.performSearch(sv.getSelectedTable(), searcher);
-		}*/
+		/*
+		 * SearchView sv = mainView.enterSearchView(searcher); synchronized (sv)
+		 * { while (!sv.doneSearching()) { try { sv.wait(); } catch
+		 * (InterruptedException e) { } }
+		 * model.performSearch(sv.getSelectedTable(), searcher); }
+		 */
 	}
 
 	@Override
@@ -198,27 +195,51 @@ public class ControllerMain implements ClientController {
 
 	}
 
+	/**
+	 * This function is called when the EnterLobby object is passed to the
+	 * client.
+	 * 
+	 * @param sboard
+	 */
 	@Override
-	public void initializeBoard(SerializedBoard sboard) {	
-		//show the board view.
-		BoardView bView = this.startBoardView();
-		//init theview.
-		for(SerializedTile tile : sboard.getsMapOfTiles().values()){
-			Map<Integer, Clearing> clearings = new HashMap<Integer, Clearing>();
-			for(SerializedClearing clearing : tile.getClearings().values()){
-				clearings.put(clearing.getNumber(), new Clearing(clearing));
+	public void initializeBoard(final SerializedBoard sboard) {
+		// show the board view.
+		boardView = this.startBoardView();
+		/**
+		 * This function runs as a thread, adding one tile to the board view at
+		 * a time.
+		 * 
+		 * needs to be a seperate thread so this class can still handle sent
+		 * objects from the server
+		 */
+		Thread t = new Thread() {
+			@Override
+			public void run() {
+				for (SerializedTile tile : sboard.getsMapOfTiles().values()) {
+					Map<Integer, Clearing> clearings = new HashMap<Integer, Clearing>();
+					for (SerializedClearing clearing : tile.getClearings()
+							.values()) {
+						clearings.put(clearing.getNumber(), new Clearing(
+								clearing));
+					}
+					boardView.setTile(tile.getName(), tile.getRow(),
+							tile.getColumn(), tile.getRotation(),
+							clearings.values());
+					try {
+						sleep(1000);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
 			}
-			bView.setTile(tile.getName(), tile.getRow(), tile.getColumn(), tile.getRotation(), clearings.values());
-		}
-		
-		
-		System.out.println("started the view.");
+		};
+		t.start();
 	}
 
 	@Override
 	public void setPlayerActivities(CharacterType character,
 			List<Activity> activities) {
-		//model.setPlayerActivities(activities, character);
+		// model.setPlayerActivities(activities, character);
 	}
 
 	/**
@@ -226,19 +247,21 @@ public class ControllerMain implements ClientController {
 	 * 
 	 * GUI should display how many more players we need.
 	 * 
+	 * GUI should display the board.
+	 * 
 	 */
 	@Override
-	public void enterLobby(int numPlayers) {
-		System.out.println("Enter lobby called. players: " + numPlayers);
-		// gfx.start();
+	public void enterLobby(SerializedBoard sboard) {
+		System.out.println("Enter lobby called.");
+		initializeBoard(sboard);
 	}
 
 	@Override
 	public void enterCharacterSelection() {
 		System.out.println("Entered player selection.");
-		
+
 		// TODO for testing purposes
-		characterSelected(CharacterType.AMAZON);
+		characterSelected(CharacterType.AMAZON, ValleyChit.HOUSE);
 		// TODO gfx.enterCharacterSelection();
 	}
 
@@ -248,9 +271,9 @@ public class ControllerMain implements ClientController {
 	 * 
 	 * @param character
 	 */
-	public void characterSelected(CharacterType character) {
+	public void characterSelected(CharacterType character, ValleyChit location) {
 		System.out.println("character selected.");
-		if(! server.send(new CharacterSelected(clientID, character))){
+		if (!server.send(new CharacterSelected(clientID, character, location))) {
 			System.out.println("failed to send selected character to server.");
 		}
 	}
@@ -292,19 +315,19 @@ public class ControllerMain implements ClientController {
 	 * @param obj
 	 */
 	public void handle(Object obj) {
-		if(obj instanceof Integer){
+		if (obj instanceof Integer) {
 			// ID
 			setID((Integer) obj);
 		}
-		if(obj instanceof ClientNetworkHandler){
+		if (obj instanceof ClientNetworkHandler) {
 			System.out.println("Client: recieved new object.");
 			((ClientNetworkHandler) obj).handle(this);
-		}		
+		}
 	}
 
 	@Override
-	public void connect(String ipaddress, int port){
-		
+	public void connect(String ipaddress, int port) {
+
 		try {
 			server.connect(ipaddress, port);
 		} catch (UnknownHostException e) {
@@ -312,6 +335,24 @@ public class ControllerMain implements ClientController {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * updates the number of players needed to start the game.
+	 * 
+	 * @param count
+	 */
+	@Override
+	public void updateLobbyCount(int count) {
+		System.out.println("update lobby count called: " + count);
+		//boardView.setLobbyCount(count);
+	}
+
+	@Override
+	public void startGame(SerializedBoard board) {
+		System.out.println("starting game.");
+		// TODO boardView.EnterGameView();
+		
 	}
 
 }
