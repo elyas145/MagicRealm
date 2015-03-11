@@ -227,6 +227,11 @@ public class LWJGLTileCollection extends LWJGLDrawableNode {
 				}
 			}
 		}
+		
+		@Override
+		public int post(int in) {
+			return in;
+		}
 
 		private TileName tileName;
 		private boolean enchanted;

@@ -25,6 +25,8 @@ import model.interfaces.HexTileInterface;
 
 public class LWJGLMenuLayer extends LWJGLContentPane {
 
+	static int fb, bb;
+
 	public static void main(String[] args) {
 		try {
 			ResourceHandler rh = new ResourceHandler();
@@ -42,7 +44,7 @@ public class LWJGLMenuLayer extends LWJGLContentPane {
 			LWJGLMenuLayer menus = new LWJGLMenuLayer(gfx, sf);
 			LWJGLTextureLoader text = new LWJGLTextureLoader(rh, "test.jpg");
 			LWJGLPanel panel1 = new LWJGLPanel(menus, text, -.8f, -.5f, 1.6f,
-					1.5f);
+					1.5f, LWJGLPanel.Type.FOREGROUND, true);
 			panel1.setCursorListener(new CursorListener() {
 				@Override
 				public void onMove(int x, int y) {
@@ -55,9 +57,10 @@ public class LWJGLMenuLayer extends LWJGLContentPane {
 					}
 				}
 			});
-			LWJGLPanel
-					.fromPicture(panel1, rh, "cards/AMAZON_F.jpg", 0f, 0f, 1f)
-					.setCursorListener(new CursorListener() {
+			panel1.setVisible(true);
+			LWJGLPanel.fromPicture(panel1, rh, "cards/AMAZON_F.jpg", 0f, 0f,
+					1f, LWJGLPanel.Type.FOREGROUND, true).setCursorListener(
+					new CursorListener() {
 						@Override
 						public void onMove(int x, int y) {
 						}
@@ -70,8 +73,8 @@ public class LWJGLMenuLayer extends LWJGLContentPane {
 							}
 						}
 					});
-			LWJGLPanel
-					.fromPicture(panel1, rh, "tiles/awfulvalley-e1.gif", 0f, 0f, 1f)
+			LWJGLPanel.fromPicture(panel1, rh, "tiles/awfulvalley-e1.gif", 0f,
+					0f, 1f, LWJGLPanel.Type.FOREGROUND, true)
 					.setCursorListener(new CursorListener() {
 						@Override
 						public void onMove(int x, int y) {
@@ -85,7 +88,9 @@ public class LWJGLMenuLayer extends LWJGLContentPane {
 							}
 						}
 					});
-			LWJGLPanel.fromString(panel1, "Start", Font.getFont("Times New Roman"), Color.GREEN, 20, 60, 0f, 0f, .2f)
+			LWJGLPanel.fromString(panel1, "Start",
+					Font.getFont("Times New Roman"), Color.GREEN, 20, 60, 0f,
+					0f, .2f, LWJGLPanel.Type.FOREGROUND, true)
 					.setCursorListener(new CursorListener() {
 						@Override
 						public void onMove(int x, int y) {
@@ -183,5 +188,9 @@ public class LWJGLMenuLayer extends LWJGLContentPane {
 
 	private SelectionFrame selectionFrame;
 	private List<LWJGLPanel> panels;
+
+	private int activeBuffer;
+	private int backBuffer;
+	private boolean swappedBuffers;
 
 }

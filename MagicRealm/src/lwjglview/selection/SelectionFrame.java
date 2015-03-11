@@ -6,6 +6,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -80,8 +81,8 @@ public class SelectionFrame {
 			@Override
 			public void handle(LWJGLGraphics gfx) {
 				if (frameBufferID < 0) {
-					textureBufferID = gfx.generateBufferTexture();
 					frameBufferID = gfx.createFrameBuffer();
+					textureBufferID = gfx.generateBufferTexture(frameBufferID);
 					gfx.bindFrameBufferTexture(frameBufferID, textureBufferID);
 				}
 				gfx.useFrameBuffer(frameBufferID);
@@ -144,10 +145,11 @@ public class SelectionFrame {
 
 	public void loadID(int id, LWJGLGraphics gfx, String name) {
 		id *= incr;
-		synchronized (buffer) {
+		synchronized (fBuffer) {
 			fBuffer.put(0, getR(id));
 			fBuffer.put(1, getG(id));
 			fBuffer.put(2, getB(id));
+			fBuffer.put(3, 1f);
 			gfx.getShaders().setUniformFloatArrayValue("color", 4, fBuffer);
 		}
 	}

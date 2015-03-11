@@ -46,6 +46,7 @@ public class LWJGLTextureLoader {
 	
 	public LWJGLTextureLoader(ImageTools.GraphicsHandler gh, int w, int h) {
 		BufferedImage bi = ImageTools.createImage(w, h, gh);
+		System.out.println(String.format("%x", bi.getRGB(0, 0)));
 		init(bi);
 		interpolate = true;
 	}
@@ -63,6 +64,11 @@ public class LWJGLTextureLoader {
 	public void useTexture(LWJGLGraphics gfx) {
 		loadTexture(gfx);
 		gfx.bindTexture(textureLocation);
+	}
+	
+	public void useTexture(LWJGLGraphics gfx, int unit) {
+		loadTexture(gfx);
+		gfx.bindTexture(textureLocation, unit);
 	}
 	
 	public int getTextureLocation() {

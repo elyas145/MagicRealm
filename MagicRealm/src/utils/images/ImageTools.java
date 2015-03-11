@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
@@ -15,13 +16,14 @@ public class ImageTools {
 
 	public static interface GraphicsHandler {
 		void draw(Graphics g, int width, int height);
+		int post(int in);
 	}
 
 	public static class StringDrawer implements GraphicsHandler {
 		public StringDrawer(String lb, Font fnt, Color col) {
 			label = lb;
 			font = fnt;
-			color = col;
+			color = col.getRGB();
 		}
 
 		@Override
@@ -31,16 +33,21 @@ public class ImageTools {
 			g.setFont(font);
 			FontMetrics fm = g.getFontMetrics();
 			Rectangle2D bounds = fm.getStringBounds(label, g);
-			g.setColor(color);
-			System.out.println(height);
+			g.setColor(FILL);
 			g.drawString(label, (int) ((width - bounds.getWidth()) * .5),
-					(int) ((height + bounds.getHeight()) * .5));
+					(int) ((height + bounds.getHeight()) * .4));
+		}
+		
+		@Override
+		public int post(int in) {
+			return (color & 0x00FFFFFF) | ((in & 0x000000FF) << 24);
 		}
 
-		private Color color;
+		private int color;
 		private String label;
 		private Font font;
 		private static Color CLEAR = new Color(0, 0, 0, 0);
+		private static Color FILL = new Color(255, 255, 255, 255);
 	}
 
 	public static BufferedImage createImage(int width, int height,
@@ -52,6 +59,12 @@ public class ImageTools {
 		Graphics g = newImage.createGraphics();
 		gh.draw(g, width, height);
 		g.dispose();
+		
+		for(int i = 0; i < newImage.getWidth(); ++i) {
+			for(int j = 0; j < newImage.getHeight(); ++j) {
+				newImage.setRGB(i, j, gh.post(newImage.getRGB(i, j)));
+			}
+		}
 		return newImage;
 	}
 
@@ -108,6 +121,11 @@ public class ImageTools {
 		}
 
 		private Image image;
+
+		@Override
+		public int post(int in) {
+			return in;
+		}
 	}
 
 }

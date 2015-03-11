@@ -38,6 +38,11 @@ public class ChitGenerator implements ImageTools.GraphicsHandler {
 		g.drawString(id, (int) ((width - rekt.getWidth()) * .5),
 				(int) (height - rekt.getHeight() * .5));
 	}
+	
+	@Override
+	public int post(int in) {
+		return in;
+	}
 
 	private String name;
 	private char identifier;

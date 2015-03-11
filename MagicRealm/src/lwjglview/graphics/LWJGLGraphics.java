@@ -19,8 +19,10 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static org.lwjgl.glfw.Callbacks.*;
@@ -181,8 +183,14 @@ public final class LWJGLGraphics {
 		glReadPixels(x, height - y, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, buff);
 	}
 
+	public int createFrameBuffer(int width, int height) {
+		int buff = glGenFramebuffersEXT();
+		frameBuffers.put(buff, new FrameBufferInfo(width, height));
+		return buff;
+	}
+
 	public int createFrameBuffer() {
-		return glGenFramebuffersEXT();
+		return createFrameBuffer(width, height);
 	}
 
 	public void bindFrameBuffer(int fb) {
@@ -215,8 +223,9 @@ public final class LWJGLGraphics {
 		releaseFrameBuffer();
 	}
 
-	public int generateBufferTexture() {
-		return createTexture(width, height, false);
+	public int generateBufferTexture(int buff) {
+		FrameBufferInfo fbi = frameBuffers.get(buff);
+		return createTexture(fbi.width, fbi.height, false);
 	}
 
 	public int createTexture(int width, int height, boolean accurate) {
@@ -235,8 +244,8 @@ public final class LWJGLGraphics {
 				accurate ? GL_LINEAR : GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
 				accurate ? GL_LINEAR : GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA,
 				GL_UNSIGNED_BYTE, rawData);
 		return texID;
@@ -268,6 +277,11 @@ public final class LWJGLGraphics {
 
 	public void bindTexture(int location) {
 		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, location);
+	}
+
+	public void bindTexture(int location, int unit) {
+		glActiveTexture(GL_TEXTURE0 + unit);
 		glBindTexture(GL_TEXTURE_2D, location);
 	}
 
@@ -529,6 +543,7 @@ public final class LWJGLGraphics {
 			}
 		});
 		buffer = Matrix.identity(4);
+		frameBuffers = new HashMap<Integer, FrameBufferInfo>();
 	}
 
 	private void checkLayer(int layer) {
@@ -643,7 +658,11 @@ public final class LWJGLGraphics {
 		glEnable(GL_TEXTURE_3D);
 
 		glEnable(GL_DEPTH_TEST);
+		
+		glEnable(GL_BLEND);
 
+		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		
 		// Make the window visible
 		glfwShowWindow(window);
 
@@ -810,6 +829,13 @@ public final class LWJGLGraphics {
 			}
 		}
 	}
+	
+	private static class FrameBufferInfo {
+		public FrameBufferInfo(int w, int h) {
+			width = w; height = h;
+		}
+		public int width, height;
+	}
 
 	private LWJGLGraphics self;
 
@@ -834,6 +860,8 @@ public final class LWJGLGraphics {
 	private GLFWWindowCloseCallback windowCloseCallback;
 	private GLFWCursorPosCallback mousePositionCallback;
 	private GLFWMouseButtonCallback mouseClickCallback;
+	
+	private Map<Integer, FrameBufferInfo> frameBuffers;
 
 	private CursorListener cursorListener;
 

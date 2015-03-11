@@ -61,4 +61,6 @@ public class GraphicsConfiguration {
 	public static final int SELECTION_START_LAYER = BOARD_SELECTION_LAYER;
 	public static final int SELECTION_END_LAYER = MENUS_SELECTION_LAYER + 1;
 	
+	public static final float PANEL_TIME = .1f;
+	
 }
