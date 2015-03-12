@@ -136,6 +136,7 @@ public class LWJGLViewController implements ViewController {
 			}
 			splash.setVisible(false);
 			birdsong = new LWJGLBirdsong(resources, menus);
+			birdsong.showPhases(9);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
