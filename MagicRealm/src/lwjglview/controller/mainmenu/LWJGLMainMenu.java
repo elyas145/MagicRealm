@@ -46,8 +46,10 @@ public class LWJGLMainMenu {
 
 			@Override
 			public void onSelection(CursorSelection select, boolean down) {
-				root.setVisible(false);
-				viewController.startNetworkGame();
+				if(down){
+					root.setVisible(false);					
+					viewController.startNetworkGame();
+				}				
 			}
 		});
 		exit = LWJGLPanel.fromString(root, "Exit", FONT, COLOR, 100, 75, .45f,

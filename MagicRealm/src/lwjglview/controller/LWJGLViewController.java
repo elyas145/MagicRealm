@@ -1,12 +1,15 @@
 package lwjglview.controller;
 
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Semaphore;
 
-import controller.ClientController;
+import config.NetworkConfiguration;
+import client.ClientController;
+import client.ControllerMain;
 import lwjglview.controller.birdsong.LWJGLBirdsong;
 import lwjglview.controller.mainmenu.LWJGLMainMenu;
 import lwjglview.graphics.LWJGLGraphics;
@@ -21,7 +24,6 @@ import model.enums.CharacterType;
 import model.enums.TileName;
 import model.interfaces.HexTileInterface;
 import model.player.PersonalHistory;
-import swingview.ControllerMain;
 import utils.resources.ResourceHandler;
 import view.controller.ViewController;
 import view.controller.search.SearchView;
@@ -29,10 +31,10 @@ import view.controller.search.SearchView;
 public class LWJGLViewController implements ViewController {
 
 	public static void main(String[] args) {
-		new LWJGLViewController(new ResourceHandler());
+		new LWJGLViewController(new ResourceHandler(), null);
 	}
 
-	public LWJGLViewController(ResourceHandler rh) {
+	public LWJGLViewController(ResourceHandler rh, ControllerMain controller) {
 		resources = rh;
 		graphics = new LWJGLGraphics(rh);
 		selections = new SelectionFrame(graphics);
@@ -42,8 +44,7 @@ public class LWJGLViewController implements ViewController {
 				ResourceHandler.joinPath("splash", "splash.jpg"), -1.78f, -1f,
 				2.3f, LWJGLPanel.Type.FOREGROUND, true);
 		board = null;
-		controller = new ControllerMain(this);
-		enterMainMenu();
+		this.controller = controller;
 	}
 
 	@Override
@@ -103,6 +104,11 @@ public class LWJGLViewController implements ViewController {
 
 	@Override
 	public void startNetworkGame() {
+		try {
+			controller.connect(NetworkConfiguration.DEFAULT_IP, NetworkConfiguration.DEFAULT_PORT);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		splash.setVisible(true);
 		new Thread() {
 			@Override
@@ -110,7 +116,7 @@ public class LWJGLViewController implements ViewController {
 				startBoard();
 			}
 		}.start();
-		controller.startGame();
+		//controller.startGame();
 	}
 
 	@Override
@@ -128,15 +134,10 @@ public class LWJGLViewController implements ViewController {
 		try {
 			board = new LWJGLBoardDrawable(resources, graphics, selections);
 			board.setDefaultClearingFocus();
-			Board tmp = new Board(resources);
-			for (TileName tn : tmp.getAllTiles()) {
-				HexTileInterface hti = tmp.getTile(tn);
-				board.setTile(tn, hti.getBoardRow(), hti.getBoardColumn(),
-						hti.getRotation(), hti.getClearings());
-			}
 			splash.setVisible(false);
 			birdsong = new LWJGLBirdsong(resources, menus);
 			birdsong.showPhases(9);
+			controller.setBoardView(board);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

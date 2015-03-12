@@ -7,6 +7,7 @@ import java.util.List;
 import communication.ClientNetworkHandler;
 import communication.handler.server.serialized.SerializedBoard;
 import view.controller.game.BoardView;
+import lwjglview.graphics.board.LWJGLBoardDrawable;
 import model.activity.Activity;
 import model.board.Board;
 import model.controller.requests.DieRequest;
@@ -66,5 +67,7 @@ public interface ClientController {
 	void startGame(SerializedBoard board);
 
 	void updateCharacterSelection(CharacterType character);
+
+	void setBoardView(LWJGLBoardDrawable board);
 
 }

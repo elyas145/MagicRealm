@@ -15,6 +15,7 @@ import communication.handler.client.CharacterSelected;
 import communication.handler.server.serialized.SerializedBoard;
 import communication.handler.server.serialized.SerializedClearing;
 import communication.handler.server.serialized.SerializedTile;
+import lwjglview.controller.LWJGLViewController;
 import lwjglview.graphics.LWJGLGraphics;
 import lwjglview.graphics.board.LWJGLBoardDrawable;
 import lwjglview.selection.SelectionFrame;
@@ -39,35 +40,32 @@ import view.controller.search.SearchView;
 
 public class ControllerMain implements ClientController {
 
-	private LWJGLGraphics gfx;
 	private ResourceHandler rh;
-	private ViewController mainView;
 	private BoardView boardView;
+	private LWJGLViewController mainView;
 	private Board board;
 	private CharacterType player;
-	private SelectionFrame selectFrame;
 	private int clientID = -1;
 	private ClientServer server;
 
 	public ControllerMain() {
 		rh = new ResourceHandler();
-		mainView = new MainView(this);
-		gfx = new LWJGLGraphics(rh, this);
-		selectFrame = new SelectionFrame(gfx);
+		mainView = new LWJGLViewController(rh, this);
 		server = new ClientServer(this);
 		goToMainMenu();
 	}
 
 	@Override
 	public BoardView startBoardView() {
-		LWJGLBoardDrawable boardDrawable;
 		try {
-			boardDrawable = new LWJGLBoardDrawable(rh, gfx, selectFrame);
-			boardView = boardDrawable;
-			gfx.addDrawable(boardDrawable);
-			gfx.start();
+			mainView.startNetworkGame();
+			synchronized (this) {
+				while (boardView == null) {
+					wait();
+				}
+			}
 			return boardView;
-		} catch (IOException e1) {
+		} catch (Exception e1) {
 			throw new RuntimeException(e1);
 		}
 	}
@@ -345,20 +343,28 @@ public class ControllerMain implements ClientController {
 	@Override
 	public void updateLobbyCount(int count) {
 		System.out.println("update lobby count called: " + count);
-		//boardView.setLobbyCount(count);
+		// boardView.setLobbyCount(count);
 	}
 
 	@Override
 	public void startGame(SerializedBoard board) {
 		System.out.println("starting game.");
 		// TODO boardView.EnterGameView();
-		
+
 	}
 
 	@Override
 	public void updateCharacterSelection(CharacterType character) {
-		//TODO mainView.updateCharacterSelection(character);
-		System.out.println("Client " + clientID + ": this character is now not selectable: " + character.toString());
+		// TODO mainView.updateCharacterSelection(character);
+		System.out.println("Client " + clientID
+				+ ": this character is now not selectable: "
+				+ character.toString());
+	}
+
+	@Override
+	public synchronized void setBoardView(LWJGLBoardDrawable board) {
+		boardView = board;
+		notify();
 	}
 
 }
