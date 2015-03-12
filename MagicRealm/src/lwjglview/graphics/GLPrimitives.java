@@ -40,13 +40,13 @@ public class GLPrimitives {
 	public void drawSquare() {
 		if(square < 0) {
 			square = graphics.startQuadList();
-				texCoord(0f, 0f);
-				vertex(-1f, -1f, 0f);
 				texCoord(0f, 1f);
+				vertex(-1f, -1f, 0f);
+				texCoord(0f, 0f);
 				vertex(-1f, 1f, 0f);
-				texCoord(1f, 1f);
-				vertex(1f, 1f, 0f);
 				texCoord(1f, 0f);
+				vertex(1f, 1f, 0f);
+				texCoord(1f, 1f);
 				vertex(1f, -1f, 0f);
 			graphics.endList();
 		}

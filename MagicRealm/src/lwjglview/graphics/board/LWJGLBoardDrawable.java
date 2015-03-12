@@ -37,7 +37,6 @@ import utils.math.linear.Matrix;
 import utils.resources.ResourceHandler;
 import utils.time.Timing;
 import view.controller.game.BoardView;
-import view.selection.CursorListener;
 
 public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 
@@ -115,7 +114,6 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 		ambientColour.start();
 		timeOfDay = TimeOfDay.DUSK;
 		setTimeOfDay(timeOfDay);
-		selectionPass = false;
 		clearingFocus = new ClearingFocusHandler() {
 
 			@Override
@@ -133,7 +131,11 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 	}
 
 	public void addTo(LWJGLGraphics gfx) {
+		gfx.enableLayerDepth(GraphicsConfiguration.BOARD_DISPLAY_LAYER);
+		gfx.clearLayerDepth(GraphicsConfiguration.BOARD_DISPLAY_LAYER);
 		gfx.addDrawable(this, GraphicsConfiguration.BOARD_DISPLAY_LAYER);
+		gfx.enableLayerDepth(GraphicsConfiguration.BOARD_SELECTION_LAYER);
+		gfx.clearLayerDepth(GraphicsConfiguration.BOARD_SELECTION_LAYER);
 		gfx.addDrawable(this, GraphicsConfiguration.BOARD_SELECTION_LAYER);
 	}
 
@@ -548,8 +550,6 @@ public class LWJGLBoardDrawable extends LWJGLDrawableNode implements BoardView {
 
 	private Matrix bufferA;
 	private Matrix bufferB;
-	
-	private boolean selectionPass;
 	
 	private ClearingFocusHandler clearingFocus;
 	

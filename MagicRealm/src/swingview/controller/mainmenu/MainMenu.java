@@ -17,7 +17,6 @@ public class MainMenu extends JPanel implements ActionListener {
 	private JButton exit;
 	private ViewController parent;
 	private Object clickSource = null;
-	private MainMenu self = this;
 	public MainMenu(ViewController par) {
 		this.parent = par;
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));

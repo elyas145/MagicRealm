@@ -58,6 +58,10 @@ public class GLShaderHandler {
 		glUniform1i(loc, value);
 	}
 	
+	public void setUniformFloatValue(String name, float value) {
+		setUniformFloatValue(getType(), name, value);
+	}
+	
 	public synchronized void setUniformFloatValue(ShaderType st, String name, float value) {
 		int loc = initUniform(st, name);
 		glUniform1f(loc, value);
@@ -109,10 +113,17 @@ public class GLShaderHandler {
 	}
 	
 	private static String getVSFname(ShaderType shader) {
-		if(shader == ShaderType.BACKGROUND_SHADER) {
+		switch(shader) {
+		case BACKGROUND_SHADER:
 			return "background.glsl";
+		case ORTHO_SHADER:
+		case MENU_SELECTION_SHADER:
+			return "ortho.glsl";
+		case TARGET_SHADER:
+			return "target.glsl";
+		default:
+			return "flat.glsl";
 		}
-		return "flat.glsl";
 	}
 	
 	private static String getFSFname(ShaderType shader) {
@@ -121,10 +132,15 @@ public class GLShaderHandler {
 			return "tile.glsl";
 		case CHIT_SHADER:
 			return "counter.glsl";
-		case SELECTION_SHADER:
-			return "selection.glsl";
 		case BACKGROUND_SHADER:
+		case ORTHO_SHADER:
+		case TARGET_SHADER:
 			return "texture.glsl";
+		case SELECTION_SHADER:
+		case MENU_SELECTION_SHADER:
+			return "selection.glsl";
+		case TILE_SELECTION_SHADER:
+			return "tileselect.glsl";
 		default:
 			return "flat.glsl";
 		}

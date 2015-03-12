@@ -22,22 +22,21 @@ import model.EnchantedHolder;
 import model.interfaces.ClearingInterface;
 import utils.math.Mathf;
 import utils.math.linear.Matrix;
-import view.selection.CursorListener;
 
 public class LWJGLTileDrawable extends LWJGLDrawableNode implements
 		MatrixCalculator {
 
-	public LWJGLTileDrawable(LWJGLTileCollection parent, Matrix pos, float rot,
-			int norm, int enchant,
-			Iterable<? extends ClearingInterface> clears,
-			Map<Integer, Integer> listeners) {
+	public LWJGLTileDrawable(LWJGLTileCollection parent, Matrix pos, float rot, int id,
+			EnchantedHolder<Integer> textureLocs, EnchantedHolder<Integer> selectLocs,
+			Iterable<? extends ClearingInterface> clears) {
 		super(parent);
 		tiles = parent;
 		position = Matrix.clone(pos);
 		translation = Matrix.translation(position);
 		rotation = Matrix.rotationZ(4, -rot);
 		transformation = translation.multiply(rotation);
-		textureLocation = new EnchantedHolder<Integer>(norm, enchant);
+		textureLocation = textureLocs;
+		selectionLocation = selectLocs;
 		enchanted = false;
 		faces = new ArrayList<LWJGLDrawableLeaf>();
 		vec3N = Matrix.zeroVector(3);
@@ -48,9 +47,9 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode implements
 		flipper.start();
 		flipper.push(new FillerAnimator(Matrix.identity(4)));
 		clearings = new HashMap<Integer, LWJGLClearingStorage>();
-		initClearings(clears, listeners);
+		initClearings(clears);
 		setCalculator(this);
-		identifier = listeners.get(0);
+		identifier = id;
 	}
 
 	public void setTextures(int norm, int ench) {
@@ -97,7 +96,10 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode implements
 	public Matrix calculateMatrix() {
 		Matrix mat = flipper.apply();
 		translation.multiply(mat, transformation);
-		transformation.multiply(rotation, transformation);
+		SelectionFrame sf = tiles.getSelectionFrame();
+		if(!sf.isSelectionPass()) {
+			transformation.multiply(rotation, transformation);
+		}
 		return transformation;
 	}
 
@@ -106,6 +108,7 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode implements
 		SelectionFrame sf = tiles.getSelectionFrame();
 		if(sf.isSelectionPass()) {
 			sf.loadID(identifier, lwgfx);
+			lwgfx.getShaders().setUniformIntValue("index", selectionLocation.get(isEnchanted()));
 		}
 	}
 
@@ -119,9 +122,7 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode implements
 
 	}
 
-	private void initClearings(Iterable<? extends ClearingInterface> clears,
-			Map<Integer, Integer> listeners) {
-		// TODO create select texture for each clearing
+	private void initClearings(Iterable<? extends ClearingInterface> clears) {
 		getPosition(vec3T);
 		for (ClearingInterface clr : clears) {
 			clr.getPosition(false, vec3N);
@@ -193,14 +194,20 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode implements
 		public HexTileFace(LWJGLDrawableNode par, Matrix mat, boolean ench) {
 			super(par, mat, GLPrimitives.HEXAGON);
 			tex = textureLocation.get(ench);
+			sel = selectionLocation.get(ench);
 		}
 
 		@Override
 		public int getIndex() {
+			SelectionFrame sf = tiles.getSelectionFrame();
+			if(sf.isSelectionPass()) {
+				return sel;
+			}
 			return tex;
 		}
 
 		private int tex;
+		private int sel;
 
 	}
 
@@ -227,6 +234,7 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode implements
 	// private Matrix vector;
 	private Matrix translation;
 	private EnchantedHolder<Integer> textureLocation;
+	private EnchantedHolder<Integer> selectionLocation;
 	private boolean enchanted;
 	private AnimationQueue flipper;
 	private int identifier;

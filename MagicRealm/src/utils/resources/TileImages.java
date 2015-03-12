@@ -10,7 +10,7 @@ public class TileImages {
 
 	public static BufferedImage getTileImage(ResourceHandler rh, TileName type,
 			boolean enchanted) throws IOException {
-		return Images.getImage(rh, ResourceHandler.joinPath("tiles",
+		return Images.getScaledImage(rh, ResourceHandler.joinPath("tiles",
 			getName(type) + (enchanted ? "-e1.gif" : "1.gif")));
 	}
 

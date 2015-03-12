@@ -24,9 +24,6 @@ public class LWJGLDrawableLeaf extends LWJGLDrawableNode {
 	public void updateNodeUniforms(LWJGLGraphics gfx) {
 	}
 	
-	private Matrix e4 = Matrix.columnVector(0f, 0f, 0f, 1f);
-	private Matrix res = Matrix.clone(e4);
-	
 	@Override
 	public final void draw(LWJGLGraphics gfx) {
 		updateTransformation();

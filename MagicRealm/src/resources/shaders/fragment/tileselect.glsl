@@ -4,13 +4,15 @@
 
 uniform int index;
 uniform sampler2DArray texture;
+uniform vec4 color;
 
 in vec2 textureCoordinate;
 
 void main() {
-	vec4 color = texture2DArray(texture, vec3(textureCoordinate, float(index)));
-	if(color.r < 1.) {
-		color = vec4(1.);
+	if(index < 0) {
+		gl_FragColor = color;
 	}
-	gl_FragColor = vec4(color.rgb, 1.);
+	else {
+		gl_FragColor = texture2DArray(texture, vec3(textureCoordinate, float(index)));
+	}
 }
