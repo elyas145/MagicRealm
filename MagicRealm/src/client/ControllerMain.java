@@ -58,7 +58,7 @@ public class ControllerMain implements ClientController {
 	@Override
 	public BoardView startBoardView() {
 		try {
-			mainView.startNetworkGame();
+			//mainView.startNetworkGame();
 			synchronized (this) {
 				while (boardView == null) {
 					wait();

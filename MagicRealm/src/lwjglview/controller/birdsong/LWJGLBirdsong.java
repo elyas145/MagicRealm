@@ -20,14 +20,12 @@ public class LWJGLBirdsong implements BirdsongView {
 
 	public LWJGLBirdsong(ResourceHandler rh, LWJGLMenuLayer par) {
 		borderPane = LWJGLPanel.fromPicture(par, rh,
-				ResourceHandler.joinPath("menus", "birdsong", "panel.png"),
-				-.76f, -1f, .4f, LWJGLPanel.Type.FOREGROUND, true);
+				ResourceHandler.joinPath("menus", "birdsong", "bottom.png"),
+				-16f / 9f, -1f, .787f, LWJGLPanel.Type.FOREGROUND, true);
 		borderPane.setCursorListener(new CursorListener() {
 
 			@Override
 			public void onMove(int x, int y) {
-				// TODO Auto-generated method stub
-				
 			}
 
 			@Override
@@ -74,7 +72,7 @@ public class LWJGLBirdsong implements BirdsongView {
 	
 	public void setVisible(boolean vis) {
 		if(visible) {
-			vec3.set(1, 0, -.28f);
+			vec3.set(1, 0, -.8f);
 			borderPane.slide(vec3, GraphicsConfiguration.PANEL_TIME);
 		}
 		else {
