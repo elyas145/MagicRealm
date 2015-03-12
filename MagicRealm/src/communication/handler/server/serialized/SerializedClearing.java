@@ -1,4 +1,4 @@
-package communication.handler.server;
+package communication.handler.server.serialized;
 
 import java.io.Serializable;
 import java.util.List;

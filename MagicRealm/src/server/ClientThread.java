@@ -37,7 +37,7 @@ public class ClientThread extends Thread {
 			oStreamOut.flush();
 		} catch (IOException e) {
 			System.out.println(ID + "Error sending message: " + ID);
-			//e.printStackTrace();
+			e.printStackTrace();
 			server.remove(ID);
 		}
 	}

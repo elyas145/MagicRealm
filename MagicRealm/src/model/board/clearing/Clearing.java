@@ -6,8 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import communication.handler.server.SerializedClearing;
-
+import communication.handler.server.serialized.SerializedClearing;
 import model.EnchantedHolder;
 import model.board.tile.HexTile;
 import model.counter.chit.Chit;

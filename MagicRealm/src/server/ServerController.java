@@ -19,9 +19,10 @@ import communication.handler.server.EnterLobby;
 import communication.handler.server.InitBoard;
 import communication.handler.server.MessageDisplay;
 import communication.handler.server.Reject;
-import communication.handler.server.SerializedBoard;
 import communication.handler.server.StartGame;
+import communication.handler.server.UpdateCharacterSelection;
 import communication.handler.server.UpdateLobbyCount;
+import communication.handler.server.serialized.SerializedBoard;
 import server.ClientThread;
 import utils.resources.ResourceHandler;
 import config.GameConfiguration;
@@ -138,12 +139,12 @@ public class ServerController {
 			clients.get(pos).setCharacter(character);
 			model.setPlayersInitialLocations(clients.get(pos).getCharacter()
 					.getType().toCounter(), startingLocation);
+			sendAll(new UpdateCharacterSelection(character));
 		}
 		// wait for all clients to choose their character
 		for (ClientThread client : clients) {
 			System.out.println("Client request: " + iD);
 			if (!client.didSelectCharacter()) {
-				System.out.println("someone did not select their character");
 				return;
 			}
 
@@ -151,6 +152,10 @@ public class ServerController {
 		// TODO setup all the counters on the board.
 		model.setBoardForPlay();
 		sboard = model.getBoard().getSerializedBoard();
+		startGame();
+		
+	}
+	public void startGame(){
 		sendAll(new StartGame(sboard));
 	}
 }

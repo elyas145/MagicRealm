@@ -2,6 +2,8 @@ package model.interfaces;
 
 import java.io.Serializable;
 
+import communication.handler.server.serialized.SerializedClearing;
+
 import utils.math.linear.Matrix;
 import model.enums.PathType;
 import model.enums.TileName;
@@ -33,5 +35,7 @@ public interface ClearingInterface extends Serializable{
 	Iterable<ClearingInterface> getSurrounding(PathType pt);
 
 	boolean isEnchanted();
+
+	SerializedClearing getSerializedClearing();
 
 }

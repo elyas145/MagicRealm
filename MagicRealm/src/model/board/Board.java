@@ -17,14 +17,16 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-import communication.handler.server.SerializedBoard;
-import communication.handler.server.SerializedTile;
+import communication.handler.server.serialized.SerializedBoard;
+import communication.handler.server.serialized.SerializedClearing;
+import communication.handler.server.serialized.SerializedTile;
 import config.BoardConfiguration;
 import config.GraphicsConfiguration;
 import utils.math.Point;
 import utils.random.Random;
 import utils.resources.ResourceHandler;
 import model.EnchantedHolder;
+import model.board.clearing.Clearing;
 import model.board.tile.HexTile;
 import model.counter.chit.MapChit;
 import model.enums.CharacterType;
@@ -49,7 +51,7 @@ public class Board implements BoardInterface {
 		mapOfTileLocations = new HashMap<Integer, Map<Integer, TileName>>();
 		mapOfTiles = new HashMap<TileName, HexTile>();
 		clearingLocations = new HashMap<TileName, Map<Integer, EnchantedHolder<Point>>>();
-		counterPositions = new HashMap<CounterType, ClearingInterface>();
+		counterPositions = new HashMap<CounterType, Clearing>();
 		try {
 			String path = rh.getResource(ResourceHandler.joinPath("data",
 					"data.json"));
@@ -108,7 +110,10 @@ public class Board implements BoardInterface {
 		for(TileName name : stiles.keySet()){
 			mapOfTiles.put(name, new HexTile(stiles.get(name), false));
 		}
-		counterPositions = sboard.getCounterPositions();
+		counterPositions = new HashMap<CounterType, Clearing>();
+		for(CounterType type : sboard.getCounterPositions().keySet()){
+			counterPositions.put(type, new Clearing(sboard.getCounterPositions().get(type)));
+		}
 		mapChitLocations = sboard.getMapChitLocations();
 		mapOfTileLocations = sboard.getMapOfTileLocations();
 		tileLocations = sboard.getTileLocations();
@@ -131,22 +136,22 @@ public class Board implements BoardInterface {
 		counterPositions.remove(character.toCounter());
 	}
 
-	public ClearingInterface getLocationOfCounter(CounterType ct) {
+	public Clearing getLocationOfCounter(CounterType ct) {
 		return counterPositions.get(ct);
 	}
 
 	public void setLocationOfCounter(CounterType ct, TileName tn, int clearing) {
 		HexTile ht = mapOfTiles.get(tn);
-		ClearingInterface cl = ht.getClearing(clearing);
+		Clearing cl = ht.getClearing(clearing);
 		setClearingOfCounter(ct, cl);
 	}
 
 	public void setLocationOfCounter(CounterType ct, ValleyChit site) {
-		ClearingInterface ci = getLocationOfCounter(site.toCounterType());
+		Clearing ci = getLocationOfCounter(site.toCounterType());
 		setClearingOfCounter(ct, ci);
 	}
 
-	public void setClearingOfCounter(CounterType ct, ClearingInterface cl) {
+	public void setClearingOfCounter(CounterType ct, Clearing cl) {
 
 		counterPositions.put(ct, cl);
 
@@ -183,7 +188,7 @@ public class Board implements BoardInterface {
 				getClearing(destTile, destClearing));
 	}
 
-	public ClearingInterface getClearing(TileName tile, int clearing) {
+	public Clearing getClearing(TileName tile, int clearing) {
 		HexTile hexTile = mapOfTiles.get(tile);
 		return hexTile.getClearing(clearing);
 	}
@@ -323,7 +328,7 @@ public class Board implements BoardInterface {
 	private Map<TileName, HexTile> mapOfTiles;
 	private Map<TileName, int[]> tileLocations;
 	private Map<MapChitType, TileName> mapChitLocations;
-	private Map<CounterType, ClearingInterface> counterPositions;
+	private Map<CounterType, Clearing> counterPositions;
 	// needs to be relocated.
 	private ArrayList<Treasure> treasures = new ArrayList<Treasure>();
 	private JSONArray arr;
@@ -338,7 +343,11 @@ public class Board implements BoardInterface {
 		sboard.setMapOfTiles(sMapOfTiles);
 		sboard.setTileLocations(tileLocations);
 		sboard.setMapChitLocations(mapChitLocations);
-		sboard.setCounterPositions(counterPositions);
+		Map<CounterType, SerializedClearing> sCounterPositions = new HashMap<CounterType, SerializedClearing>();
+		for(CounterType type : counterPositions.keySet()){
+			sCounterPositions.put(type, counterPositions.get(type).getSerializedClearing());
+		}
+		sboard.setCounterPositions(sCounterPositions);
 
 		return sboard;
 	}

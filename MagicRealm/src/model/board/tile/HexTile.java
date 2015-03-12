@@ -10,13 +10,12 @@ import model.board.clearing.Clearing;
 import model.counter.chit.Chit;
 import model.enums.PathType;
 import model.enums.TileName;
-import model.interfaces.ClearingInterface;
 import model.interfaces.HexTileInterface;
 
 import org.json.simple.JSONArray;
 
-import communication.handler.server.SerializedClearing;
-import communication.handler.server.SerializedTile;
+import communication.handler.server.serialized.SerializedClearing;
+import communication.handler.server.serialized.SerializedTile;
 import utils.math.Mathf;
 import utils.math.Point;
 import utils.math.linear.Matrix;
@@ -116,12 +115,12 @@ public class HexTile implements HexTileInterface {
 	}
 
 	@Override
-	public Collection<? extends ClearingInterface> getClearings() {
+	public Collection<Clearing> getClearings() {
 		return clearings.values();
 	}
 
 	@Override
-	public ClearingInterface getClearing(int num) {
+	public Clearing getClearing(int num) {
 		return clearings.get(num);
 	}
 

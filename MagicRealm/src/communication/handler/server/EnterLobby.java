@@ -1,6 +1,7 @@
 package communication.handler.server;
 
 import communication.ClientNetworkHandler;
+import communication.handler.server.serialized.SerializedBoard;
 import client.ClientController;
 
 public class EnterLobby implements ClientNetworkHandler {

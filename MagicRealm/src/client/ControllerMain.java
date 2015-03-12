@@ -12,9 +12,9 @@ import javax.swing.JOptionPane;
 
 import communication.ClientNetworkHandler;
 import communication.handler.client.CharacterSelected;
-import communication.handler.server.SerializedBoard;
-import communication.handler.server.SerializedClearing;
-import communication.handler.server.SerializedTile;
+import communication.handler.server.serialized.SerializedBoard;
+import communication.handler.server.serialized.SerializedClearing;
+import communication.handler.server.serialized.SerializedTile;
 import lwjglview.graphics.LWJGLGraphics;
 import lwjglview.graphics.board.LWJGLBoardDrawable;
 import lwjglview.selection.SelectionFrame;
@@ -353,6 +353,12 @@ public class ControllerMain implements ClientController {
 		System.out.println("starting game.");
 		// TODO boardView.EnterGameView();
 		
+	}
+
+	@Override
+	public void updateCharacterSelection(CharacterType character) {
+		//TODO mainView.updateCharacterSelection(character);
+		System.out.println("Client " + clientID + ": this character is now not selectable: " + character.toString());
 	}
 
 }

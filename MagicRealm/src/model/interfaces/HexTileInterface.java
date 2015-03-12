@@ -3,8 +3,7 @@ package model.interfaces;
 import java.io.Serializable;
 import java.util.Collection;
 
-import communication.handler.server.SerializedTile;
-
+import communication.handler.server.serialized.SerializedTile;
 import model.board.clearing.Clearing;
 import model.counter.chit.Chit;
 import model.enums.TileName;

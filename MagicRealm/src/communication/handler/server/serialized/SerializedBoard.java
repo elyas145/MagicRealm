@@ -1,4 +1,4 @@
-package communication.handler.server;
+package communication.handler.server.serialized;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -15,7 +15,7 @@ public class SerializedBoard implements Serializable {
 	private Map<TileName, SerializedTile> sMapOfTiles = new HashMap<TileName, SerializedTile>();
 	private Map<TileName, int[]> tileLocations;
 	private Map<MapChitType, TileName> mapChitLocations;
-	private Map<CounterType, ClearingInterface> counterPositions;
+	private Map<CounterType, SerializedClearing> counterPositions;
 
 	public Map<Integer, Map<Integer, TileName>> getMapOfTileLocations() {
 		return mapOfTileLocations;
@@ -33,7 +33,7 @@ public class SerializedBoard implements Serializable {
 		return mapChitLocations;
 	}
 
-	public Map<CounterType, ClearingInterface> getCounterPositions() {
+	public Map<CounterType, SerializedClearing> getCounterPositions() {
 		return counterPositions;
 	}
 
@@ -57,8 +57,8 @@ public class SerializedBoard implements Serializable {
 	}
 
 	public void setCounterPositions(
-			Map<CounterType, ClearingInterface> counterPositions) {
-		this.counterPositions = counterPositions;
+			Map<CounterType, SerializedClearing> sCounterPositions) {
+		this.counterPositions = sCounterPositions;
 
 	}
 
