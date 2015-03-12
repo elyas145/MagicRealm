@@ -136,7 +136,7 @@ public class LWJGLViewController implements ViewController {
 			board.setDefaultClearingFocus();
 			splash.setVisible(false);
 			birdsong = new LWJGLBirdsong(resources, menus);
-			birdsong.showPhases(9);
+			birdsong.setVisible(false);
 			controller.setBoardView(board);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
