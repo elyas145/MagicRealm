@@ -18,14 +18,17 @@ import lwjglview.menus.dropdown.LWJGLDropdown;
 
 public class LWJGLMainMenu {
 
-	private static final Font FONT = new Font("Times New Roman", Font.PLAIN, 50);
+	private static final int FONT_HEIGHT = 100;
 
-	private static final Color COLOR = Color.RED;
+	private static final Font FONT = new Font("eufm10", Font.PLAIN, FONT_HEIGHT);
+
+	private static final Color COLOR = Color.WHITE;
 
 	public LWJGLMainMenu(LWJGLViewController vc, ResourceHandler rh) {
 		viewController = vc;
 		backgroundTexture = new LWJGLTextureLoader(rh,
 				ResourceHandler.joinPath("menus", "main", "background.jpg"));
+		resources = rh;
 	}
 
 	LWJGLDropdown<String> dropdown;
@@ -36,8 +39,13 @@ public class LWJGLMainMenu {
 		root = new LWJGLPanel(menus, backgroundTexture, -ar, -1f, 2 * ar, 2f,
 				LWJGLPanel.Type.FOREGROUND, false);
 		root.setVisible(true);
-		start = LWJGLPanel.fromString(root, "Start", FONT, COLOR, 100, 75,
-				.45f, 1f, .2f, LWJGLPanel.Type.FOREGROUND, true);
+		LWJGLTextureLoader button = new LWJGLTextureLoader(resources,
+				ResourceHandler.joinPath("menus", "main", "button.png"));
+		start = new LWJGLPanel(root, button, .38f, 1f, .2f,
+				LWJGLPanel.Type.FOREGROUND, true);
+		LWJGLPanel.fromString(start, "Start", FONT, COLOR, FONT_HEIGHT * 15 / 6,
+				FONT_HEIGHT * 13 / 10, .02f, 0f, .18f,
+				LWJGLPanel.Type.FOREGROUND, false).setVisible(true);
 		start.setVisible(true);
 		start.setCursorListener(new CursorListener() {
 			@Override
@@ -46,14 +54,17 @@ public class LWJGLMainMenu {
 
 			@Override
 			public void onSelection(CursorSelection select, boolean down) {
-				if(down){
-					root.setVisible(false);					
+				if (down) {
+					root.setVisible(false);
 					viewController.startNetworkGame();
-				}				
+				}
 			}
 		});
-		exit = LWJGLPanel.fromString(root, "Exit", FONT, COLOR, 100, 75, .45f,
-				.5f, .2f, LWJGLPanel.Type.FOREGROUND, true);
+		exit = new LWJGLPanel(root, button, .38f, .5f, .2f,
+				LWJGLPanel.Type.FOREGROUND, true);
+		LWJGLPanel.fromString(exit, "Exit", FONT, COLOR, FONT_HEIGHT * 15 / 6,
+				FONT_HEIGHT * 13 / 10, .02f, 0f, .18f,
+				LWJGLPanel.Type.FOREGROUND, false).setVisible(true);
 		exit.setVisible(true);
 		exit.setCursorListener(new CursorListener() {
 			@Override
@@ -75,5 +86,6 @@ public class LWJGLMainMenu {
 	private LWJGLPanel root;
 	private LWJGLPanel start;
 	private LWJGLPanel exit;
+	private ResourceHandler resources;
 
 }
