@@ -229,6 +229,12 @@ public class ControllerMain implements ClientController {
 						e.printStackTrace();
 					}
 				}
+				
+				//TODO for testing (displays the dwellings for the character to pick a start location.)
+				Map<CounterType, SerializedClearing> temp = sboard.getCounterPositions();
+				for(CounterType counter : temp.keySet()){
+					boardView.setCounter(counter, temp.get(counter).getParent(), temp.get(counter).getNumber());
+				}				
 			}
 		};
 		t.start();

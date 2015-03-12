@@ -2,13 +2,11 @@ package model.counter.chit;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-
-import model.enums.ChitType;
 import model.enums.MapChitType;
 import model.enums.TileName;
 
 public class MapChit extends Chit implements Serializable{
-	
+	private static final long serialVersionUID = -5805890352154420133L;
 	private MapChitType type;
 	private char identifier;
 	

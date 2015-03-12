@@ -39,6 +39,9 @@ public class ServerController {
 		clients = new ArrayList<ClientThread>();
 		model = new ModelController(new ResourceHandler());
 		model.setBoard();
+		//TODO testing purposes.
+		model.setBoardForPlay();
+		
 		sboard = model.getBoard().getSerializedBoard();
 	}
 
