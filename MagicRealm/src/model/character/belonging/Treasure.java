@@ -10,48 +10,22 @@
  * We are only implementing treasures affecting the use of tables.
  * 
  */
-package model.board;
+package model.character.belonging;
 
-import model.counter.chit.Chit;
+import model.enums.CharacterType;
 import model.enums.ValleyChit;
 
-public class Treasure extends Chit {
+public class Treasure extends Belonging{
 	private int goldValue;
 	private ValleyChit site;
-
-	/*
-	private boolean enchanted = false;
-
-	public boolean isEnchanted() {
-		return enchanted;
-	}
-
-	public void setEnchanted(boolean enchanted) {
-		this.enchanted = enchanted;
-	}
-
-	public TreasureType getType() {
-		return type;
-	}
-
-	public void setType(TreasureType type) {
-		this.type = type;
-	}
-
-	private TreasureType type;
-
-	public Treasure(TileType tile, TreasureType t, boolean e) {
-		super(tile);
-		type = t;
-		enchanted = e;
-	}
-	*/
 
 	public Treasure(ValleyChit siteType, Integer gv) {
 		goldValue = gv;
 		site = siteType;
 	}
-
+	public void setOwner(CharacterType t){
+		super.setOwner(t);
+	}
 	public ValleyChit getSite() {
 		return site;
 	}

@@ -357,10 +357,12 @@ public class ControllerMain implements ClientController {
 	public void startGame(SerializedBoard board) {
 		System.out.println("starting game.");
 		sleepTime = 0;	//finish placing the tiles without waiting.
-		
+		ArrayList<MapChit> chits = new ArrayList<MapChit>();
+		boardView.loadMapChits(chits);
 		for(TileName name : board.getMapChitLocations().keySet()){
-			boardView.setMapChit(new MapChit(board.getMapChitLocations().get(name)));
+			chits.add(new MapChit(board.getMapChitLocations().get(name)));
 		}		
+		boardView.loadMapChits(chits);
 		// TODO boardView.EnterGameView();
 
 	}

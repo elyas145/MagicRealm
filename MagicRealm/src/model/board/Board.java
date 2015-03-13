@@ -29,6 +29,7 @@ import utils.resources.ResourceHandler;
 import model.EnchantedHolder;
 import model.board.clearing.Clearing;
 import model.board.tile.HexTile;
+import model.character.belonging.Treasure;
 import model.counter.chit.MapChit;
 import model.enums.CharacterType;
 import model.enums.CounterType;
