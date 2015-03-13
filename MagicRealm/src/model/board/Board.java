@@ -19,6 +19,7 @@ import org.json.simple.parser.JSONParser;
 
 import communication.handler.server.serialized.SerializedBoard;
 import communication.handler.server.serialized.SerializedClearing;
+import communication.handler.server.serialized.SerializedMapChit;
 import communication.handler.server.serialized.SerializedTile;
 import config.BoardConfiguration;
 import config.GraphicsConfiguration;
@@ -31,7 +32,6 @@ import model.board.tile.HexTile;
 import model.counter.chit.MapChit;
 import model.enums.CharacterType;
 import model.enums.CounterType;
-import model.enums.MapChitType;
 import model.enums.TileName;
 import model.enums.ValleyChit;
 import model.interfaces.BoardInterface;
@@ -45,7 +45,7 @@ public class Board implements BoardInterface {
 	}
 
 	public Board(ResourceHandler rh) {
-		mapChitLocations = new HashMap<MapChitType, TileName>();
+		mapChitLocations = new HashMap<TileName, MapChit>();
 		surround = new TileName[6];
 		tileLocations = new HashMap<TileName, int[]>();
 		mapOfTileLocations = new HashMap<Integer, Map<Integer, TileName>>();
@@ -114,7 +114,10 @@ public class Board implements BoardInterface {
 		for(CounterType type : sboard.getCounterPositions().keySet()){
 			counterPositions.put(type, new Clearing(sboard.getCounterPositions().get(type)));
 		}
-		mapChitLocations = sboard.getMapChitLocations();
+		mapChitLocations = new HashMap<TileName, MapChit>();
+		for(TileName name : sboard.getMapChitLocations().keySet()){
+			mapChitLocations.put(name, new MapChit(sboard.getMapChitLocations().get(name)));
+		}
 		mapOfTileLocations = sboard.getMapOfTileLocations();
 		tileLocations = sboard.getTileLocations();
 	}
@@ -194,7 +197,7 @@ public class Board implements BoardInterface {
 	}
 
 	public void setLocationOfMapChit(MapChit mc, TileName tile) {
-		mapChitLocations.put(mc.getType(), tile);
+		mapChitLocations.put(tile, mc);
 		mc.setTile(tile);
 	}
 
@@ -327,7 +330,7 @@ public class Board implements BoardInterface {
 	private Map<Integer, Map<Integer, TileName>> mapOfTileLocations;
 	private Map<TileName, HexTile> mapOfTiles;
 	private Map<TileName, int[]> tileLocations;
-	private Map<MapChitType, TileName> mapChitLocations;
+	private Map<TileName, MapChit> mapChitLocations;
 	private Map<CounterType, Clearing> counterPositions;
 	// needs to be relocated.
 	private ArrayList<Treasure> treasures = new ArrayList<Treasure>();
@@ -342,7 +345,11 @@ public class Board implements BoardInterface {
 		}
 		sboard.setMapOfTiles(sMapOfTiles);
 		sboard.setTileLocations(tileLocations);
-		sboard.setMapChitLocations(mapChitLocations);
+		Map<TileName, SerializedMapChit> sMapChits = new HashMap<TileName, SerializedMapChit>();
+		for(TileName name : mapChitLocations.keySet()){
+			sMapChits.put(name, mapChitLocations.get(name).getSerializedChit());
+		}
+		sboard.setMapChitLocations(sMapChits);
 		Map<CounterType, SerializedClearing> sCounterPositions = new HashMap<CounterType, SerializedClearing>();
 		for(CounterType type : counterPositions.keySet()){
 			sCounterPositions.put(type, counterPositions.get(type).getSerializedClearing());
