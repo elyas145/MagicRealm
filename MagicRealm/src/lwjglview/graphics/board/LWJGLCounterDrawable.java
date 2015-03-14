@@ -106,12 +106,12 @@ public class LWJGLCounterDrawable extends LWJGLDrawableNode implements
 
 	@Override
 	public void updateNodeUniforms(LWJGLGraphics lwgfx) {
-		lwgfx.updateModelViewUniform(SHADER, "modelViewMatrix");
-		lwgfx.updateMVPUniform(SHADER, "mvpMatrix");
+		lwgfx.updateModelViewUniform("modelViewMatrix");
+		lwgfx.updateMVPUniform("mvpMatrix");
 		lwgfx.getShaders().setUniformIntValue("index", textureIndex);
 		buffer.rewind();
 		colours.apply().toFloatBuffer(buffer);
-		lwgfx.getShaders().setUniformFloatArrayValue(SHADER, "counterColour",
+		lwgfx.getShaders().setUniformFloatArrayValue("counterColour",
 				4, buffer);
 	}
 

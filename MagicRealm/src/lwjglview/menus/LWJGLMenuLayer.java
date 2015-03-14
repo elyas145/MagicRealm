@@ -25,91 +25,6 @@ import model.interfaces.HexTileInterface;
 
 public class LWJGLMenuLayer extends LWJGLContentPane {
 
-	static int fb, bb;
-
-	public static void main(String[] args) {
-		try {
-			ResourceHandler rh = new ResourceHandler();
-			LWJGLGraphics gfx = new LWJGLGraphics(rh);
-			gfx.start();
-			SelectionFrame sf = new SelectionFrame(gfx);
-			LWJGLBoardDrawable board = new LWJGLBoardDrawable(rh, gfx, sf);
-			board.setDefaultClearingFocus();
-			Board mBoard = new Board(rh);
-			for (TileName tn : mBoard.getAllTiles()) {
-				HexTileInterface hti = mBoard.getTile(tn);
-				board.setTile(tn, hti.getBoardRow(), hti.getBoardColumn(),
-						hti.getRotation(), hti.getClearings());
-			}
-			LWJGLMenuLayer menus = new LWJGLMenuLayer(gfx, sf);
-			LWJGLTextureLoader text = new LWJGLTextureLoader(rh, "test.jpg");
-			LWJGLPanel panel1 = new LWJGLPanel(menus, text, -.8f, -.5f, 1.6f,
-					1.5f, LWJGLPanel.Type.FOREGROUND, true);
-			panel1.setCursorListener(new CursorListener() {
-				@Override
-				public void onMove(int x, int y) {
-				}
-
-				@Override
-				public void onSelection(CursorSelection select, boolean down) {
-					if (down) {
-						System.out.println("Panel 1 was selected");
-					}
-				}
-			});
-			panel1.setVisible(true);
-			LWJGLPanel.fromPicture(panel1, rh, "cards/AMAZON_F.jpg", 0f, 0f,
-					1f, LWJGLPanel.Type.FOREGROUND, true).setCursorListener(
-					new CursorListener() {
-						@Override
-						public void onMove(int x, int y) {
-						}
-
-						@Override
-						public void onSelection(CursorSelection select,
-								boolean down) {
-							if (down) {
-								System.out.println("Panel 2 was selected");
-							}
-						}
-					});
-			LWJGLPanel.fromPicture(panel1, rh, "tiles/awfulvalley-e1.gif", 0f,
-					0f, 1f, LWJGLPanel.Type.FOREGROUND, true)
-					.setCursorListener(new CursorListener() {
-						@Override
-						public void onMove(int x, int y) {
-						}
-
-						@Override
-						public void onSelection(CursorSelection select,
-								boolean down) {
-							if (down) {
-								System.out.println("Panel 3 was selected");
-							}
-						}
-					});
-			LWJGLPanel.fromString(panel1, "Start",
-					Font.getFont("Times New Roman"), Color.GREEN, 20, 60, 0f,
-					0f, .2f, LWJGLPanel.Type.FOREGROUND, true)
-					.setCursorListener(new CursorListener() {
-						@Override
-						public void onMove(int x, int y) {
-						}
-
-						@Override
-						public void onSelection(CursorSelection select,
-								boolean down) {
-							if (down) {
-								System.out.println("Start was selected");
-							}
-						}
-					});
-			;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
 	public LWJGLMenuLayer(LWJGLGraphics gfx, SelectionFrame frame) {
 		super(null, new AspectCalculator(gfx));
 		selectionFrame = frame;
@@ -152,6 +67,11 @@ public class LWJGLMenuLayer extends LWJGLContentPane {
 	public void add(LWJGLPanel pane) {
 		panels.add(pane);
 		pane.setParent(this);
+	}
+
+	@Override
+	public void remove(LWJGLPanel pane) {
+		panels.remove(pane);
 	}
 
 	@Override

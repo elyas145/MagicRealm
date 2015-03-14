@@ -15,6 +15,8 @@ public abstract class LWJGLContentPane extends LWJGLDrawableNode {
 	}
 
 	public abstract void add(LWJGLPanel pane);
+
+	public abstract void remove(LWJGLPanel pane);
 	
 	protected abstract SelectionFrame getSelectionFrame();
 

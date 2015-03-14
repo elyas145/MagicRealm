@@ -83,7 +83,6 @@ public class SelectionFrame {
 				if (frameBufferID < 0) {
 					frameBufferID = gfx.createFrameBuffer();
 					textureBufferID = gfx.generateBufferTexture(frameBufferID);
-					gfx.bindFrameBufferTexture(frameBufferID, textureBufferID);
 				}
 				gfx.useFrameBuffer(frameBufferID);
 				gfx.setClearColor(0f, 0f, 0f, 0f);

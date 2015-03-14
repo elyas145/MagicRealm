@@ -37,16 +37,17 @@ public class LWJGLMainMenu {
 		float ar = backgroundTexture.getWidth()
 				/ (float) backgroundTexture.getHeight();
 		root = new LWJGLPanel(menus, backgroundTexture, -ar, -1f, 2 * ar, 2f,
-				LWJGLPanel.Type.FOREGROUND, false);
+				false);
+		menus.add(root);
 		root.setVisible(true);
 		LWJGLTextureLoader button = new LWJGLTextureLoader(resources,
 				ResourceHandler.joinPath("menus", "main", "button.png"));
-		start = new LWJGLPanel(root, button, .38f, 1f, .2f,
-				LWJGLPanel.Type.FOREGROUND, true);
-		LWJGLPanel.fromString(start, "Start", FONT, COLOR, FONT_HEIGHT * 15 / 6,
-				FONT_HEIGHT * 13 / 10, .02f, 0f, .18f,
-				LWJGLPanel.Type.FOREGROUND, false).setVisible(true);
-		start.setVisible(true);
+		start = new LWJGLPanel(root, button, .38f, 1f, .2f, true);
+		LWJGLPanel text = LWJGLPanel.fromString(start, "Start", FONT, COLOR,
+				FONT_HEIGHT * 15 / 6, FONT_HEIGHT * 13 / 10, .02f, 0f, .18f,
+				false);
+		start.add(text);
+		text.setVisible(true);
 		start.setCursorListener(new CursorListener() {
 			@Override
 			public void onMove(int x, int y) {
@@ -60,12 +61,13 @@ public class LWJGLMainMenu {
 				}
 			}
 		});
-		exit = new LWJGLPanel(root, button, .38f, .5f, .2f,
-				LWJGLPanel.Type.FOREGROUND, true);
-		LWJGLPanel.fromString(exit, "Exit", FONT, COLOR, FONT_HEIGHT * 15 / 6,
-				FONT_HEIGHT * 13 / 10, .02f, 0f, .18f,
-				LWJGLPanel.Type.FOREGROUND, false).setVisible(true);
-		exit.setVisible(true);
+		root.add(start);
+		start.setVisible(true);
+		exit = new LWJGLPanel(root, button, .38f, .5f, .2f, true);
+		text = LWJGLPanel.fromString(exit, "Exit", FONT, COLOR, FONT_HEIGHT * 15 / 6,
+				FONT_HEIGHT * 13 / 10, .02f, 0f, .18f, false);
+		exit.add(text);
+		text.setVisible(true);
 		exit.setCursorListener(new CursorListener() {
 			@Override
 			public void onMove(int x, int y) {
@@ -76,6 +78,8 @@ public class LWJGLMainMenu {
 				viewController.exit();
 			}
 		});
+		root.add(exit);
+		exit.setVisible(true);
 		List<String> selections = new ArrayList<String>();
 		selections.add("Hello");
 		selections.add("Goodbye");

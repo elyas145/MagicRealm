@@ -48,6 +48,8 @@ public class GraphicsConfiguration {
 
 	public static final boolean SIMPLE_COUNTERS = true;
 	
+	public static final int PRE_RENDER_LAYER = LWJGLGraphics.LAYER0;
+	
 	public static final int BOARD_DISPLAY_LAYER = LWJGLGraphics.LAYER1;
 	
 	public static final int BOARD_SELECTION_LAYER = LWJGLGraphics.LAYER3;

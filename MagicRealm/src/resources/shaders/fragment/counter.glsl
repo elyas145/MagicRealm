@@ -35,5 +35,5 @@ void main() {
 	color += vec3(1. - fade);
 	color *= counterColour.rgb;
 	color *= ambientColour.rgb;
-	gl_FragColor = vec4(color.rgb * scale, 1.);
+	gl_FragColor = vec4(1., 1., 0., 1.);//color.rgb * scale, 1.);
 }

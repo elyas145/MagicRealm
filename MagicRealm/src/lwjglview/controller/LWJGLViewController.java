@@ -40,9 +40,14 @@ public class LWJGLViewController implements ViewController {
 		selections = new SelectionFrame(graphics);
 		menus = new LWJGLMenuLayer(graphics, selections);
 		mainMenu = new LWJGLMainMenu(this, resources);
+		LWJGLCharacterView character = new LWJGLCharacterView(resources, graphics);
+		LWJGLPanel pane = character.getPanel(menus, 0f, 0f, 1f, false);
+		menus.add(pane);
+		pane.setVisible(true);
 		splash = LWJGLPanel.fromPicture(menus, resources,
 				ResourceHandler.joinPath("splash", "splash.jpg"), -1.78f, -1f,
-				2.3f, LWJGLPanel.Type.FOREGROUND, true);
+				2.3f, true);
+		menus.add(splash);
 		board = null;
 		this.controller = controller;
 	}
@@ -136,7 +141,6 @@ public class LWJGLViewController implements ViewController {
 			board.setDefaultClearingFocus();
 			splash.setVisible(false);
 			birdsong = new LWJGLBirdsong(resources, menus);
-			birdsong.setVisible(false);
 			controller.setBoardView(board);
 		} catch (Exception e) {
 			throw new RuntimeException(e);

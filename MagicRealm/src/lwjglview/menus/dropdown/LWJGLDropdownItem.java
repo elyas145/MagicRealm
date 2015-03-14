@@ -5,8 +5,6 @@ import java.awt.Font;
 
 import config.GraphicsConfiguration;
 import utils.math.linear.Matrix;
-import view.selection.CursorListener;
-import view.selection.CursorSelection;
 import lwjglview.graphics.LWJGLTextureLoader;
 import lwjglview.menus.LWJGLPanel;
 
@@ -14,32 +12,18 @@ public class LWJGLDropdownItem<T> extends LWJGLPanel {
 
 	public LWJGLDropdownItem(LWJGLDropdown<T> par, LWJGLTextureLoader bg, T it,
 			float w, float h, int idx) {
-		super(par, bg, 0f, 0f, w, h, LWJGLPanel.Type.FOREGROUND, true);
+		super(par, bg, 0f, 0f, w, h, true);
 		index = idx;
 		buffer = Matrix.zeroVector(3);
 		parent = par;
 		item = it;
-		int height = 50;
+		int height = 60;
 		Font fnt = new Font("Times New Roman", Font.PLAIN, height);
-		LWJGLPanel text = LWJGLPanel.fromString(this, it.toString(), fnt,
-				Color.RED, (int) (height * w / h), 50, 0f, 0f, h,
-				LWJGLPanel.Type.FOREGROUND, false);
-		text.setVisible(true);
-		add(text);
-		setCursorListener(new CursorListener() {
-
-			@Override
-			public void onMove(int x, int y) {
-			}
-
-			@Override
-			public void onSelection(CursorSelection select, boolean down) {
-				if (down) {
-					parent.onSelect(item);
-				}
-			}
-
-		});
+		LWJGLPanel pane = LWJGLPanel.fromString(this, it.toString(), fnt,
+				Color.RED, (int) (height * w / h), height * 7 / 5, 0f, 0f, h, false);
+		text = pane.getTexture();
+		pane.setVisible(true);
+		add(pane);
 	}
 
 	public void expand(LWJGLDropdown.Type dir) {
@@ -67,9 +51,18 @@ public class LWJGLDropdownItem<T> extends LWJGLPanel {
 		resetPosition();
 	}
 
+	public T getItem() {
+		return item;
+	}
+
+	public LWJGLTextureLoader getText() {
+		return text;
+	}
+
 	private int index;
 	private Matrix buffer;
 	private LWJGLDropdown<T> parent;
 	private T item;
+	private LWJGLTextureLoader text;
 
 }

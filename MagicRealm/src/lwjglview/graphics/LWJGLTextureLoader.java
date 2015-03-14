@@ -50,6 +50,12 @@ public class LWJGLTextureLoader {
 		interpolate = true;
 	}
 	
+	public LWJGLTextureLoader(int loc, int w, int h) {
+		height = h;
+		width = w;
+		textureLocation = loc;
+	}
+	
 	public boolean isLoaded() {
 		return textureLocation >= 0;
 	}

@@ -203,7 +203,8 @@ public final class LWJGLGraphics {
 
 	public void useFrameBuffer(int fb) {
 		bindFrameBuffer(fb);
-		onResize(width, height);
+		FrameBufferInfo info = frameBuffers.get(fb);
+		onResize(info.width, info.height);
 	}
 
 	public void releaseFrameBuffer() {
@@ -225,7 +226,9 @@ public final class LWJGLGraphics {
 
 	public int generateBufferTexture(int buff) {
 		FrameBufferInfo fbi = frameBuffers.get(buff);
-		return createTexture(fbi.width, fbi.height, false);
+		int id = createTexture(fbi.width, fbi.height, false);
+		bindFrameBufferTexture(buff, id);
+		return id;
 	}
 
 	public int createTexture(int width, int height, boolean accurate) {
@@ -573,6 +576,7 @@ public final class LWJGLGraphics {
 		// Create the window
 		width = GLFWvidmode.width(vidmode);
 		height = GLFWvidmode.height(vidmode);
+		frameBuffers.put(0, new FrameBufferInfo(width, height));
 		window = glfwCreateWindow(width, height, "LWJGLGraphics",
 				glfwGetPrimaryMonitor(), NULL);
 		if (window == NULL)
