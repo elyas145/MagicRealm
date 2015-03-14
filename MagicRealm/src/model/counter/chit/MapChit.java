@@ -2,6 +2,9 @@ package model.counter.chit;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+
+import communication.handler.server.serialized.SerializedMapChit;
+
 import model.enums.MapChitType;
 import model.enums.TileName;
 
@@ -50,6 +53,12 @@ public class MapChit extends Chit implements Serializable{
 		this.identifier = identifier;
 	}
 	
+	public MapChit(SerializedMapChit sChit) {
+		this.type = sChit.getType();
+		this.identifier = sChit.getIdentifier();
+		setTile(sChit.getTile());
+	}
+
 	public ArrayList<MapChit> getWarningAndSite() {
 		return new ArrayList<MapChit>();
 	}
@@ -78,5 +87,13 @@ public class MapChit extends Chit implements Serializable{
 			str += super.toString();
 		}
 		return str;
+	}
+
+	public SerializedMapChit getSerializedChit() {
+		SerializedMapChit sChit = new SerializedMapChit();
+		sChit.setType(type);
+		sChit.setIdentifier(identifier);
+		sChit.setTile(getTile());
+		return sChit;
 	}
 }

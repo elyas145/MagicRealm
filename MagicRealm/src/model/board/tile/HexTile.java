@@ -148,7 +148,7 @@ public class HexTile implements HexTileInterface {
 
 	@Override
 	public boolean isEnchanted() {
-		// TODO Auto-generated method stub
+		// TODO implement enchanted tile
 		return false;
 	}
 

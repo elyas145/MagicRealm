@@ -14,6 +14,7 @@ import communication.ClientNetworkHandler;
 import communication.handler.client.CharacterSelected;
 import communication.handler.server.serialized.SerializedBoard;
 import communication.handler.server.serialized.SerializedClearing;
+import communication.handler.server.serialized.SerializedMapChit;
 import communication.handler.server.serialized.SerializedTile;
 import lwjglview.controller.LWJGLViewController;
 import lwjglview.graphics.LWJGLGraphics;
@@ -47,7 +48,7 @@ public class ControllerMain implements ClientController {
 	private CharacterType player;
 	private int clientID = -1;
 	private ClientServer server;
-
+	private int sleepTime = 2000;
 	public ControllerMain() {
 		rh = new ResourceHandler();
 		mainView = new LWJGLViewController(rh, this);
@@ -183,13 +184,13 @@ public class ControllerMain implements ClientController {
 
 	@Override
 	public void performPeerChoice() {
-		// TODO Auto-generated method stub
+		// TODO perform peer choice
 
 	}
 
 	@Override
 	public void rollDie(CharacterType actor, DieRequest peerTable) {
-		// TODO Auto-generated method stub
+		// TODO rollDie
 
 	}
 
@@ -224,17 +225,17 @@ public class ControllerMain implements ClientController {
 							tile.getColumn(), tile.getRotation(),
 							clearings.values());
 					try {
-						sleep(1000);
+						sleep(sleepTime);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
 				}
 				
-				//TODO for testing (displays the dwellings for the character to pick a start location.)
-				Map<CounterType, SerializedClearing> temp = sboard.getCounterPositions();
+				//TODO displays the dwellings for the character to pick a start location.
+				/*Map<CounterType, SerializedClearing> temp = sboard.getCounterPositions();
 				for(CounterType counter : temp.keySet()){
 					boardView.setCounter(counter, temp.get(counter).getParent(), temp.get(counter).getNumber());
-				}				
+				}*/				
 			}
 		};
 		t.start();
@@ -355,6 +356,13 @@ public class ControllerMain implements ClientController {
 	@Override
 	public void startGame(SerializedBoard board) {
 		System.out.println("starting game.");
+		sleepTime = 0;	//finish placing the tiles without waiting.
+		ArrayList<MapChit> chits = new ArrayList<MapChit>();
+		boardView.loadMapChits(chits);
+		for(TileName name : board.getMapChitLocations().keySet()){
+			chits.add(new MapChit(board.getMapChitLocations().get(name)));
+		}		
+		boardView.loadMapChits(chits);
 		// TODO boardView.EnterGameView();
 
 	}

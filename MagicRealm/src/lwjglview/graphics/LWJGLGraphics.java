@@ -259,8 +259,12 @@ public final class LWJGLGraphics {
 		int texID = glGenTextures();
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D_ARRAY, texID);
-		glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_RGBA8, width, height, number);
-		glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, 0, width, height, number,
+		/*
+		 * glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_RGBA8, width, height,
+		 * number); glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, 0, width,
+		 * height, number, GL_RGBA, GL_UNSIGNED_BYTE, rawData);
+		 */
+		glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGB8, width, height, number, 0,
 				GL_RGBA, GL_UNSIGNED_BYTE, rawData);
 		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER,
 				accurate ? GL_LINEAR : GL_NEAREST);
@@ -445,8 +449,7 @@ public final class LWJGLGraphics {
 		drawables[layer].addPreparation(handle);
 	}
 
-	public void finishLayer(Handler<LWJGLGraphics> handle,
-			int layer) {
+	public void finishLayer(Handler<LWJGLGraphics> handle, int layer) {
 		checkLayer(layer);
 		drawables[layer].addFinalization(handle);
 	}
@@ -459,7 +462,7 @@ public final class LWJGLGraphics {
 			public void handle(LWJGLGraphics gfx) {
 				gfx.enableDepth();
 			}
-			
+
 		});
 	}
 
@@ -471,7 +474,7 @@ public final class LWJGLGraphics {
 			public void handle(LWJGLGraphics gfx) {
 				gfx.disableDepth();
 			}
-			
+
 		});
 	}
 
@@ -662,11 +665,11 @@ public final class LWJGLGraphics {
 		glEnable(GL_TEXTURE_3D);
 
 		glEnable(GL_DEPTH_TEST);
-		
+
 		glEnable(GL_BLEND);
 
-		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 		// Make the window visible
 		glfwShowWindow(window);
 
@@ -792,52 +795,54 @@ public final class LWJGLGraphics {
 		}
 
 		public void addFinalization(Handler<LWJGLGraphics> fin) {
-			synchronized(finalize) {
+			synchronized (finalize) {
 				finalize.add(fin);
 			}
 		}
 
 		public void addPreparation(Handler<LWJGLGraphics> prep) {
-			synchronized(prepare) {
+			synchronized (prepare) {
 				prepare.add(prep);
 			}
 		}
 
 		public void addDrawable(LWJGLDrawable drble) {
-			synchronized(drawables) {
+			synchronized (drawables) {
 				drawables.add(drble);
 			}
 		}
 
 		public void removeDrawable(LWJGLDrawable drble) {
-			synchronized(drawables) {
+			synchronized (drawables) {
 				drawables.remove(drble);
 			}
 		}
 
 		public void draw() {
-			synchronized(prepare) {
+			synchronized (prepare) {
 				for (Handler<LWJGLGraphics> prep : prepare) {
 					prep.handle(self);
 				}
 			}
-			synchronized(drawables) {
+			synchronized (drawables) {
 				for (LWJGLDrawable drble : drawables) {
 					drble.draw(self);
 				}
 			}
-			synchronized(finalize) {
+			synchronized (finalize) {
 				for (Handler<LWJGLGraphics> fin : finalize) {
 					fin.handle(self);
 				}
 			}
 		}
 	}
-	
+
 	private static class FrameBufferInfo {
 		public FrameBufferInfo(int w, int h) {
-			width = w; height = h;
+			width = w;
+			height = h;
 		}
+
 		public int width, height;
 	}
 
@@ -864,7 +869,7 @@ public final class LWJGLGraphics {
 	private GLFWWindowCloseCallback windowCloseCallback;
 	private GLFWCursorPosCallback mousePositionCallback;
 	private GLFWMouseButtonCallback mouseClickCallback;
-	
+
 	private Map<Integer, FrameBufferInfo> frameBuffers;
 
 	private CursorListener cursorListener;

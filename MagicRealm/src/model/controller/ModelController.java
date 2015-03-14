@@ -62,8 +62,6 @@ public class ModelController {
 
 		lostCity = new LostSite(MapChitType.LOST_CITY);
 		lostCastle = new LostSite(MapChitType.LOST_CASTLE);
-
-		gameStarted = false;
 	}
 
 	// TODO belongs in ClientThread.
@@ -480,8 +478,6 @@ public class ModelController {
 	private Set<MapChit> mapChits;
 
 	private HashMap<CharacterType, ClientController> playingCharacters;
-
-	private boolean gameStarted;
 
 	Map<Integer, Boolean> characterSelectionMap = new HashMap<Integer, Boolean>();
 

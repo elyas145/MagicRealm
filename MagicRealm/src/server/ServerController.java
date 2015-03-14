@@ -142,21 +142,24 @@ public class ServerController {
 			clients.get(pos).setCharacter(character);
 			model.setPlayersInitialLocations(clients.get(pos).getCharacter()
 					.getType().toCounter(), startingLocation);
-			sendAll(new UpdateCharacterSelection(character));
 		}
+		boolean everyoneSelected = true;
 		// wait for all clients to choose their character
 		for (ClientThread client : clients) {
 			System.out.println("Client request: " + iD);
 			if (!client.didSelectCharacter()) {
+				everyoneSelected = false;
 				return;
 			}
 
 		}
-		// TODO setup all the counters on the board.
-		model.setBoardForPlay();
-		sboard = model.getBoard().getSerializedBoard();
-		startGame();
-		
+		if(!everyoneSelected){
+			sendAll(new UpdateCharacterSelection(character));
+		}else{
+			model.setBoardForPlay();
+			sboard = model.getBoard().getSerializedBoard();
+			startGame();
+		}		
 	}
 	public void startGame(){
 		sendAll(new StartGame(sboard));
