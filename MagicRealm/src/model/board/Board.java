@@ -92,8 +92,6 @@ public class Board implements BoardInterface {
 			e.printStackTrace();
 		}
 		hardCodeTiles();
-		initTreasures();
-		initSound();
 
 	}
 
@@ -108,16 +106,18 @@ public class Board implements BoardInterface {
 	public Board(SerializedBoard sboard) {
 		Map<TileName, SerializedTile> stiles = sboard.getsMapOfTiles();
 		mapOfTiles = new HashMap<TileName, HexTile>();
-		for(TileName name : stiles.keySet()){
+		for (TileName name : stiles.keySet()) {
 			mapOfTiles.put(name, new HexTile(stiles.get(name), false));
 		}
 		counterPositions = new HashMap<CounterType, Clearing>();
-		for(CounterType type : sboard.getCounterPositions().keySet()){
-			counterPositions.put(type, new Clearing(sboard.getCounterPositions().get(type)));
+		for (CounterType type : sboard.getCounterPositions().keySet()) {
+			counterPositions.put(type, new Clearing(sboard
+					.getCounterPositions().get(type)));
 		}
 		mapChitLocations = new HashMap<TileName, MapChit>();
-		for(TileName name : sboard.getMapChitLocations().keySet()){
-			mapChitLocations.put(name, new MapChit(sboard.getMapChitLocations().get(name)));
+		for (TileName name : sboard.getMapChitLocations().keySet()) {
+			mapChitLocations.put(name, new MapChit(sboard.getMapChitLocations()
+					.get(name)));
 		}
 		mapOfTileLocations = sboard.getMapOfTileLocations();
 		tileLocations = sboard.getTileLocations();
@@ -125,10 +125,6 @@ public class Board implements BoardInterface {
 
 	public HexTile getTile(TileName tile) {
 		return mapOfTiles.get(tile);
-	}
-
-	private void initSound() {
-
 	}
 
 	public void moveCharacter(CharacterType character, TileName tt, int clearing) {
@@ -205,24 +201,6 @@ public class Board implements BoardInterface {
 	@Override
 	public Iterable<? extends HexTileInterface> iterateTiles() {
 		return mapOfTiles.values();
-	}
-
-	private void initTreasures() {
-		ArrayList<Integer> possibleValues = new ArrayList<Integer>();
-
-		for (int i = 1; i <= BoardConfiguration.MAX_TREASURES; i++) {
-			possibleValues.add(i * 10);
-		}
-
-		ArrayList<ValleyChit> sites = new ArrayList<ValleyChit>();
-		for (ValleyChit tt : ValleyChit.values()) {
-			sites.add(tt);
-		}
-
-		while (!possibleValues.isEmpty()) {
-			treasures.add(new Treasure(Random.choose(sites), Random
-					.remove(possibleValues)));
-		}
 	}
 
 	private void hardCodeTiles() {
@@ -347,13 +325,14 @@ public class Board implements BoardInterface {
 		sboard.setMapOfTiles(sMapOfTiles);
 		sboard.setTileLocations(tileLocations);
 		Map<TileName, SerializedMapChit> sMapChits = new HashMap<TileName, SerializedMapChit>();
-		for(TileName name : mapChitLocations.keySet()){
+		for (TileName name : mapChitLocations.keySet()) {
 			sMapChits.put(name, mapChitLocations.get(name).getSerializedChit());
 		}
 		sboard.setMapChitLocations(sMapChits);
 		Map<CounterType, SerializedClearing> sCounterPositions = new HashMap<CounterType, SerializedClearing>();
-		for(CounterType type : counterPositions.keySet()){
-			sCounterPositions.put(type, counterPositions.get(type).getSerializedClearing());
+		for (CounterType type : counterPositions.keySet()) {
+			sCounterPositions.put(type, counterPositions.get(type)
+					.getSerializedClearing());
 		}
 		sboard.setCounterPositions(sCounterPositions);
 

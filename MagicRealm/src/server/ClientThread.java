@@ -7,6 +7,7 @@ import java.net.Socket;
 
 import model.enums.CharacterType;
 import model.enums.CounterType;
+import model.enums.ValleyChit;
 import model.character.Character;
 import model.character.CharacterFactory;
 public class ClientThread extends Thread {
@@ -71,8 +72,8 @@ public class ClientThread extends Thread {
 			oStreamIn.close();
 	}
 
-	public void setCharacter(CharacterType character) {
-		this.character = CharacterFactory.create(character);
+	public void setCharacter(CharacterType character, ValleyChit location) {
+		this.character = CharacterFactory.create(character, location);
 		characterPicked = true;
 	}
 

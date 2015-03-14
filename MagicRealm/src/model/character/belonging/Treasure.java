@@ -15,23 +15,15 @@ package model.character.belonging;
 import model.enums.CharacterType;
 import model.enums.ValleyChit;
 
-public class Treasure extends Belonging{
+public class Treasure extends Belonging {
 	private int goldValue;
-	private ValleyChit site;
 
-	public Treasure(ValleyChit siteType, Integer gv) {
+	public Treasure(Integer gv) {
 		goldValue = gv;
-		site = siteType;
-	}
-	public void setOwner(CharacterType t){
-		super.setOwner(t);
-	}
-	public ValleyChit getSite() {
-		return site;
 	}
 
-	public void setSite(ValleyChit site) {
-		this.site = site;
+	public void setOwner(CharacterType t) {
+		super.setOwner(t);
 	}
 
 	public int getGoldValue() {

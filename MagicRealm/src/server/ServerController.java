@@ -39,9 +39,9 @@ public class ServerController {
 		clients = new ArrayList<ClientThread>();
 		model = new ModelController(new ResourceHandler());
 		model.setBoard();
-		//TODO testing purposes.
+		// TODO testing purposes.
 		model.setBoardForPlay();
-		
+
 		sboard = model.getBoard().getSerializedBoard();
 	}
 
@@ -139,7 +139,7 @@ public class ServerController {
 		int pos = findClient(iD);
 		if (pos >= 0) {
 			System.out.println("SERVER: setting client: " + iD + " character.");
-			clients.get(pos).setCharacter(character);
+			clients.get(pos).setCharacter(character, startingLocation);
 			model.setPlayersInitialLocations(clients.get(pos).getCharacter()
 					.getType().toCounter(), startingLocation);
 		}
@@ -153,15 +153,16 @@ public class ServerController {
 			}
 
 		}
-		if(!everyoneSelected){
+		if (!everyoneSelected) {
 			sendAll(new UpdateCharacterSelection(character));
-		}else{
+		} else {
 			model.setBoardForPlay();
 			sboard = model.getBoard().getSerializedBoard();
 			startGame();
-		}		
+		}
 	}
-	public void startGame(){
+
+	public void startGame() {
 		sendAll(new StartGame(sboard));
 	}
 }
