@@ -184,7 +184,7 @@ public final class LWJGLGraphics {
 	}
 
 	public int createFrameBuffer(int width, int height) {
-		int buff = glGenFramebuffersEXT();
+		int buff = glGenFramebuffers();
 		frameBuffers.put(buff, new FrameBufferInfo(width, height));
 		return buff;
 	}
@@ -194,7 +194,7 @@ public final class LWJGLGraphics {
 	}
 
 	public void bindFrameBuffer(int fb) {
-		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fb);
+		glBindFramebuffer(GL_FRAMEBUFFER, fb);
 	}
 
 	public void bindMainBuffer() {
@@ -213,14 +213,14 @@ public final class LWJGLGraphics {
 
 	public void bindFrameBufferTexture(int fb, int texID) {
 		bindFrameBuffer(fb);
-		glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
 				GL_TEXTURE_2D, texID, 0);
-		int depth = glGenRenderbuffersEXT();
-		glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, depth);
-		glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT24,
+		int depth = glGenRenderbuffers();
+		glBindRenderbuffer(GL_RENDERBUFFER, depth);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24,
 				width, height);
-		glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT,
-				GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, depth);
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER,
+				GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depth);
 		releaseFrameBuffer();
 	}
 

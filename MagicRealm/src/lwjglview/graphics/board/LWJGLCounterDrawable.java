@@ -132,10 +132,6 @@ public class LWJGLCounterDrawable extends LWJGLDrawableNode implements
 	}
 
 	private void move() {
-		System.out.println(vec3);
-		if(vec3.get(2, 0) > 0f) {
-			throw new RuntimeException(this.toString());
-		}
 		if (position == null) {
 			position = Matrix.zeroVector(3);
 		} else {

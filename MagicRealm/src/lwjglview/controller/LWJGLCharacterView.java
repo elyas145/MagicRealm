@@ -1,7 +1,5 @@
 package lwjglview.controller;
 
-import java.io.IOException;
-
 import utils.handler.Handler;
 import utils.resources.ResourceHandler;
 import config.GraphicsConfiguration;
