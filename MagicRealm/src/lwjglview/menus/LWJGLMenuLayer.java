@@ -54,13 +54,17 @@ public class LWJGLMenuLayer extends LWJGLContentPane {
 
 	@Override
 	public void add(LWJGLPanel pane) {
-		panels.add(pane);
+		synchronized(panels) {
+			panels.add(pane);
+		}
 		pane.setParent(this);
 	}
 
 	@Override
 	public void remove(LWJGLPanel pane) {
-		panels.remove(pane);
+		synchronized(panels) {
+			panels.remove(pane);
+		}
 	}
 
 	@Override
@@ -71,7 +75,7 @@ public class LWJGLMenuLayer extends LWJGLContentPane {
 	public void draw(LWJGLGraphics gfx) {
 		updateTransformation();
 
-		synchronized(panels) {
+		synchronized (panels) {
 			for (LWJGLPanel pane : panels) {
 				pane.draw(gfx);
 			}

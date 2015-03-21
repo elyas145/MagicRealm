@@ -1,54 +1,24 @@
 package lwjglview.graphics.animator;
 
-import utils.math.linear.Matrix;
-import utils.time.Timing;
-
-public abstract class TimedAnimator extends Animator {
+public abstract class TimedAnimator extends TimeAnimator {
 
 	// implement apply and whenFinished for a full class
 	
 	public TimedAnimator(float time) {
-		paused = true;
+		super(1f);
 		length = time;
-		currentTime = Timing.getSeconds();
-		pauseTime = currentTime;
-		endTime = pauseTime + length;
 	}
 
 	@Override
 	public boolean isFinished() {
-		return paused ? pauseTime > endTime : currentTime > endTime;
-	}
-
-	@Override
-	public void pause() {
-		paused = true;
-		pauseTime = Timing.getSeconds();
-	}
-
-	@Override
-	public void resume() {
-		if (paused) {
-			paused = false;
-			currentTime = Timing.getSeconds();
-			endTime += currentTime - pauseTime;
-		}
-	}
-	
-	@Override
-	public Matrix apply() {
-		currentTime = Timing.getSeconds();
-		return super.apply();
+		return getTime() > length;
 	}
 
 	protected float getInterval() {
 		if(isFinished()) {
 			return 1f;
 		}
-		if(paused) {
-			return 1f - (endTime - pauseTime) / length;
-		}
-		return 1f - (endTime - currentTime) / length;
+		return getTime() / length;
 	}
 	
 	protected float getLength() {
@@ -56,9 +26,6 @@ public abstract class TimedAnimator extends Animator {
 	}
 
 	private float length;
-	private float currentTime;
 	private float endTime;
-	private float pauseTime;
-	private boolean paused;
 
 }

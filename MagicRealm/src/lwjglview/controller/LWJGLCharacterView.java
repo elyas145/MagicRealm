@@ -2,6 +2,8 @@ package lwjglview.controller;
 
 import java.nio.FloatBuffer;
 
+import org.lwjgl.BufferUtils;
+
 import utils.handler.Handler;
 import utils.math.Mathf;
 import utils.math.linear.Matrix;
@@ -10,6 +12,11 @@ import config.GraphicsConfiguration;
 import lwjglview.graphics.LWJGLGraphics;
 import lwjglview.graphics.counters.LWJGLCounterDrawable;
 import lwjglview.graphics.counters.LWJGLCounterLocator;
+import lwjglview.graphics.LWJGLTextureLoader;
+import lwjglview.graphics.animator.Animator;
+import lwjglview.graphics.animator.TimeAnimator;
+import lwjglview.graphics.animator.matrixcalculator.MatrixCalculator;
+import lwjglview.graphics.model.ModelData;
 import lwjglview.graphics.shader.GLShaderHandler;
 import lwjglview.graphics.shader.ShaderType;
 import lwjglview.graphics.textures.LWJGLSingleTextureLoader;
@@ -19,8 +26,8 @@ import model.enums.CharacterType;
 
 public class LWJGLCharacterView extends LWJGLCounterLocator {
 
-	private static final int WIDTH = 500;
-	private static final int HEIGHT = 500;
+	private static final int WIDTH = 700;
+	private static final int HEIGHT = 700;
 
 	public LWJGLCharacterView(CharacterType character, ResourceHandler rh,
 			LWJGLGraphics gfx) {
@@ -32,6 +39,40 @@ public class LWJGLCharacterView extends LWJGLCounterLocator {
 				character.toCounter(), this);
 		counter.moveTo(Matrix.columnVector(0f, 0f, 0f));
 		graphics.addDrawable(this, GraphicsConfiguration.PRE_RENDER_LAYER);
+		matrix = Matrix.identity(4);
+		rotation = new TimeAnimator(1f) {
+
+			@Override
+			public boolean isFinished() {
+				return false;
+			}
+
+			@Override
+			public void finish() {
+			}
+
+			@Override
+			protected Matrix calculateTransform() {
+				matrix.rotateZ(getTime());
+				return matrix;
+			}
+
+		};
+		rotation.start();
+		graphics.finishLayer(new Handler<LWJGLGraphics>() {
+
+			@Override
+			public void handle(LWJGLGraphics gfx) {
+				gfx.releaseFrameBuffer();
+			}
+			
+		}, GraphicsConfiguration.PRE_RENDER_LAYER);
+		setCalculator(new MatrixCalculator() {
+			@Override
+			public Matrix calculateMatrix() {
+				return rotation.apply();
+			}
+		});
 	}
 
 	public LWJGLPanel getPanel(LWJGLContentPane parent, float x, float y,
@@ -59,7 +100,6 @@ public class LWJGLCharacterView extends LWJGLCounterLocator {
 		gfx.rotateCameraX(-Mathf.PI / 4);
 		updateTransformation();
 		counter.draw(gfx);
-		gfx.releaseFrameBuffer();
 	}
 
 	@Override
@@ -90,5 +130,7 @@ public class LWJGLCharacterView extends LWJGLCounterLocator {
 	private LWJGLCounterDrawable counter;
 	private int bufferLoc;
 	private int textureLoc;
+	private Animator rotation;
+	private Matrix matrix;
 
 }

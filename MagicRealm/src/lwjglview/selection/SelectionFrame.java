@@ -25,28 +25,7 @@ import model.enums.TileName;
 import model.interfaces.HexTileInterface;
 
 public class SelectionFrame {
-	static LWJGLBoardDrawable board;
-	static LWJGLGraphics graphics;
-
-	public static void main(String[] args) {
-		try {
-			ResourceHandler rh = new ResourceHandler();
-			graphics = new LWJGLGraphics(rh);
-			graphics.start();
-			SelectionFrame selectFrame = new SelectionFrame(graphics);
-			board = new LWJGLBoardDrawable(rh, graphics, selectFrame);
-			board.setDefaultClearingFocus();
-			Board mBoard = new Board(rh);
-			for (TileName tn : mBoard.getAllTiles()) {
-				HexTileInterface hti = mBoard.getTile(tn);
-				board.setTile(tn, hti.getBoardRow(), hti.getBoardColumn(),
-						hti.getRotation(), hti.getClearings());
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
+	
 	public SelectionFrame(LWJGLGraphics gfx) {
 		numIDs = 0;
 		listeners = new HashMap<Integer, CursorListener>();
@@ -100,25 +79,8 @@ public class SelectionFrame {
 			}
 
 		}, GraphicsConfiguration.SELECTION_END_LAYER);
-		gfx.clearLayerDepth(LWJGLGraphics.LAYER9);
-		/*gfx.prepareLayer(new Handler<LWJGLGraphics>() {
-
-			@Override
-			public void handle(LWJGLGraphics gfx) {
-				int stop = 1000;
-				if(integer * 2 < stop) {
-					gfx.bindTexture(textureBufferID);
-					gfx.getShaders().useShaderProgram(ShaderType.TARGET_SHADER);
-					gfx.getPrimitiveTool().drawSquare();
-				}
-				integer = (integer + 1) % stop;
-			}
-
-		}, LWJGLGraphics.LAYER9);*/
 	}
 
-	//int integer = 0;
-	
 	static final int incr = 1;
 
 	public int getNewID(CursorListener listen) {

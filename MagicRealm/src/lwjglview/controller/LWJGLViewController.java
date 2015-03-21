@@ -19,15 +19,12 @@ import model.character.Phase;
 import model.enums.CharacterType;
 import model.enums.TileName;
 import model.player.PersonalHistory;
+import utils.handler.Handler;
 import utils.resources.ResourceHandler;
 import view.controller.ViewController;
 import view.controller.search.SearchView;
 
 public class LWJGLViewController implements ViewController {
-
-	public static void main(String[] args) {
-		new LWJGLViewController(new ResourceHandler(), null);
-	}
 
 	public LWJGLViewController(ResourceHandler rh, ControllerMain controller) {
 		resources = rh;
@@ -36,9 +33,9 @@ public class LWJGLViewController implements ViewController {
 		menus = new LWJGLMenuLayer(graphics, selections);
 		mainMenu = new LWJGLMainMenu(this, resources);
 		LWJGLCharacterView character = new LWJGLCharacterView(CharacterType.AMAZON, resources, graphics);
-		LWJGLPanel pane = character.getPanel(menus, 0f, 0f, 1f, false);
-		menus.add(pane);
-		pane.setVisible(true);
+		characterView = character.getPanel(menus, 0f, 0f, 1f, false);
+		menus.add(characterView);
+		characterView.setVisible(true);
 		splash = LWJGLPanel.fromPicture(menus, resources,
 				ResourceHandler.joinPath("splash", "splash.jpg"), -1.78f, -1f,
 				2.3f, true);
@@ -150,6 +147,7 @@ public class LWJGLViewController implements ViewController {
 	private LWJGLMainMenu mainMenu;
 	private LWJGLBirdsong birdsong;
 	private LWJGLPanel splash;
+	private LWJGLPanel characterView;
 
 	private ClientController controller;
 
