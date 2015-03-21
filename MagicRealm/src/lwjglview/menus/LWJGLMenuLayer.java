@@ -1,27 +1,16 @@
 package lwjglview.menus;
 
-import java.awt.Color;
-import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
 
 import utils.handler.Handler;
 import utils.math.linear.Matrix;
-import utils.resources.ResourceHandler;
-import view.selection.CursorListener;
-import view.selection.CursorSelection;
 import config.GraphicsConfiguration;
-import lwjglview.graphics.LWJGLDrawableNode;
 import lwjglview.graphics.LWJGLGraphics;
-import lwjglview.graphics.LWJGLTextureLoader;
 import lwjglview.graphics.animator.matrixcalculator.MatrixCalculator;
-import lwjglview.graphics.board.LWJGLBoardDrawable;
 import lwjglview.graphics.shader.ShaderType;
 import lwjglview.selection.SelectionFrame;
 import lwjglview.selection.SelectionShaderType;
-import model.board.Board;
-import model.enums.TileName;
-import model.interfaces.HexTileInterface;
 
 public class LWJGLMenuLayer extends LWJGLContentPane {
 
@@ -65,13 +54,17 @@ public class LWJGLMenuLayer extends LWJGLContentPane {
 
 	@Override
 	public void add(LWJGLPanel pane) {
-		panels.add(pane);
+		synchronized(panels) {
+			panels.add(pane);
+		}
 		pane.setParent(this);
 	}
 
 	@Override
 	public void remove(LWJGLPanel pane) {
-		panels.remove(pane);
+		synchronized(panels) {
+			panels.remove(pane);
+		}
 	}
 
 	@Override
@@ -82,8 +75,10 @@ public class LWJGLMenuLayer extends LWJGLContentPane {
 	public void draw(LWJGLGraphics gfx) {
 		updateTransformation();
 
-		for (LWJGLPanel pane : panels) {
-			pane.draw(gfx);
+		synchronized (panels) {
+			for (LWJGLPanel pane : panels) {
+				pane.draw(gfx);
+			}
 		}
 	}
 

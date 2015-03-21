@@ -15,7 +15,6 @@ in vec2 textureCoordinate;
 void main() {
 	vec3 diff = position - eye;
 	float scale = abs(dot(diff, normal) / length(diff) / length(normal));
-	scale = pow(scale, 3.) + .5;
 	vec3 color;
 	vec4 raw;
 	if(index < 0) {
@@ -35,5 +34,5 @@ void main() {
 	color += vec3(1. - fade);
 	color *= counterColour.rgb;
 	color *= ambientColour.rgb;
-	gl_FragColor = vec4(1., 1., 0., 1.);//color.rgb * scale, 1.);
+	gl_FragColor = vec4(color * scale, 1.);
 }

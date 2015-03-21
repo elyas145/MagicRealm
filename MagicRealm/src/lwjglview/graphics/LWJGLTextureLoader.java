@@ -57,7 +57,7 @@ public class LWJGLTextureLoader {
 	}
 	
 	public boolean isLoaded() {
-		return textureLocation >= 0;
+		return getTextureLocation() >= 0;
 	}
 	
 	public void loadTexture(LWJGLGraphics gfx) {
@@ -68,12 +68,12 @@ public class LWJGLTextureLoader {
 	
 	public void useTexture(LWJGLGraphics gfx) {
 		loadTexture(gfx);
-		gfx.bindTexture(textureLocation);
+		gfx.bindTexture(getTextureLocation());
 	}
 	
 	public void useTexture(LWJGLGraphics gfx, int unit) {
 		loadTexture(gfx);
-		gfx.bindTexture(textureLocation, unit);
+		gfx.bindTexture(getTextureLocation(), unit);
 	}
 	
 	public int getTextureLocation() {
