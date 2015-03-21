@@ -1,27 +1,16 @@
 package lwjglview.menus;
 
-import java.awt.Color;
-import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
 
 import utils.handler.Handler;
 import utils.math.linear.Matrix;
-import utils.resources.ResourceHandler;
-import view.selection.CursorListener;
-import view.selection.CursorSelection;
 import config.GraphicsConfiguration;
-import lwjglview.graphics.LWJGLDrawableNode;
 import lwjglview.graphics.LWJGLGraphics;
-import lwjglview.graphics.LWJGLTextureLoader;
 import lwjglview.graphics.animator.matrixcalculator.MatrixCalculator;
-import lwjglview.graphics.board.LWJGLBoardDrawable;
 import lwjglview.graphics.shader.ShaderType;
 import lwjglview.selection.SelectionFrame;
 import lwjglview.selection.SelectionShaderType;
-import model.board.Board;
-import model.enums.TileName;
-import model.interfaces.HexTileInterface;
 
 public class LWJGLMenuLayer extends LWJGLContentPane {
 
@@ -82,8 +71,10 @@ public class LWJGLMenuLayer extends LWJGLContentPane {
 	public void draw(LWJGLGraphics gfx) {
 		updateTransformation();
 
-		for (LWJGLPanel pane : panels) {
-			pane.draw(gfx);
+		synchronized(panels) {
+			for (LWJGLPanel pane : panels) {
+				pane.draw(gfx);
+			}
 		}
 	}
 
@@ -91,8 +82,7 @@ public class LWJGLMenuLayer extends LWJGLContentPane {
 
 		public AspectCalculator(LWJGLGraphics gfx) {
 			graphics = gfx;
-			buffer = Matrix
-					.dilation(1f / graphics.getAspectRatio(), 1f, 1f, 1f);
+			buffer = Matrix.identity(4);
 		}
 
 		@Override
@@ -108,9 +98,5 @@ public class LWJGLMenuLayer extends LWJGLContentPane {
 
 	private SelectionFrame selectionFrame;
 	private List<LWJGLPanel> panels;
-
-	private int activeBuffer;
-	private int backBuffer;
-	private boolean swappedBuffers;
 
 }

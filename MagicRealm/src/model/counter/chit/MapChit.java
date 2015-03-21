@@ -4,15 +4,14 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 import communication.handler.server.serialized.SerializedMapChit;
-
 import model.enums.MapChitType;
 import model.enums.TileName;
 
-public class MapChit extends Chit implements Serializable{
+public class MapChit extends Chit implements Serializable, Comparable<MapChit> {
 	private static final long serialVersionUID = -5805890352154420133L;
 	private MapChitType type;
 	private char identifier;
-	
+
 	public char getIdentifier() {
 		return identifier;
 	}
@@ -35,24 +34,24 @@ public class MapChit extends Chit implements Serializable{
 		this.type = type;
 		setClearing(this.type.getClearing());
 	}
-	
+
 	public MapChit(MapChitType type) {
 		setFlipped(false);
 		this.type = type;
 		setClearing(this.type.getClearing());
 	}
-	
+
 	public MapChit(MapChitType type, int clearing) {
 		setFlipped(false);
 		this.type = type;
 		setClearing(clearing);
 	}
-	
+
 	public MapChit(MapChitType type, char identifier) {
 		this.type = type;
 		this.identifier = identifier;
 	}
-	
+
 	public MapChit(SerializedMapChit sChit) {
 		this.type = sChit.getType();
 		this.identifier = sChit.getIdentifier();
@@ -62,11 +61,11 @@ public class MapChit extends Chit implements Serializable{
 	public ArrayList<MapChit> getWarningAndSite() {
 		return new ArrayList<MapChit>();
 	}
-	
+
 	@Override
 	public void setClearing(int clear) {
 		super.setClearing(clear);
-		switch(type.type()) {
+		switch (type.type()) {
 		case SITE:
 		case LOST_CITY:
 		case LOST_CASTLE:
@@ -76,11 +75,11 @@ public class MapChit extends Chit implements Serializable{
 			break;
 		}
 	}
-	
+
 	@Override
-	public String toString(){
+	public String toString() {
 		String str = "";
-		if(this.type != null){
+		if (this.type != null) {
 			str += type.type().toString() + ": ";
 			str += this.type.toString() + ". ";
 			str += this.identifier + ", ";
@@ -89,11 +88,27 @@ public class MapChit extends Chit implements Serializable{
 		return str;
 	}
 
+	@Override
+	public int hashCode() {
+		return type.hashCode() + identifier * MapChitType.values().length;
+	}
+
 	public SerializedMapChit getSerializedChit() {
 		SerializedMapChit sChit = new SerializedMapChit();
 		sChit.setType(type);
 		sChit.setIdentifier(identifier);
 		sChit.setTile(getTile());
 		return sChit;
+	}
+
+	@Override
+	public int compareTo(MapChit other) {
+		int mine, theirs;
+		mine = type.ordinal();
+		theirs = other.type.ordinal();
+		if(mine == theirs) {
+			return identifier - other.identifier;
+		}
+		return mine - theirs;
 	}
 }

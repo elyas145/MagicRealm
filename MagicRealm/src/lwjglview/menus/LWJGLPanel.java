@@ -15,16 +15,23 @@ import lwjglview.graphics.GLPrimitives;
 import lwjglview.graphics.LWJGLDrawableLeaf;
 import lwjglview.graphics.LWJGLDrawableNode;
 import lwjglview.graphics.LWJGLGraphics;
-import lwjglview.graphics.LWJGLTextureLoader;
 import lwjglview.graphics.animator.AnimationQueue;
 import lwjglview.graphics.animator.FadeAnimator;
 import lwjglview.graphics.animator.matrixcalculator.MatrixCalculator;
+import lwjglview.graphics.textures.LWJGLSingleTextureLoader;
+import lwjglview.graphics.textures.LWJGLTextureLoader;
 import lwjglview.selection.SelectionFrame;
 
 public class LWJGLPanel extends LWJGLContentPane {
 
 	public enum Type {
 		FOREGROUND, BACKGROUND
+	}
+
+	public static LWJGLPanel alertDialog(LWJGLContentPane cp,
+			LWJGLTextureLoader texture, float xi, float yi, float xf, float yf,
+			float size) {
+		return null;
 	}
 
 	public static LWJGLPanel fromTextureLoader(LWJGLContentPane cp,
@@ -34,15 +41,17 @@ public class LWJGLPanel extends LWJGLContentPane {
 	}
 
 	public static LWJGLPanel fromPicture(LWJGLContentPane cp,
-			ResourceHandler rh, String path, float x, float y, float size, boolean sel) {
-		LWJGLTextureLoader texture = new LWJGLTextureLoader(rh, path);
+			ResourceHandler rh, String path, float x, float y, float size,
+			boolean sel) {
+		LWJGLTextureLoader texture = new LWJGLSingleTextureLoader(rh, path);
 		return LWJGLPanel.fromTextureLoader(cp, texture, x, y, size, sel);
 	}
 
 	public static LWJGLPanel fromGraphics(LWJGLContentPane cp,
 			ImageTools.GraphicsHandler gh, int width, int height, float x,
 			float y, float size, boolean sel) {
-		LWJGLTextureLoader texture = new LWJGLTextureLoader(gh, width, height);
+		LWJGLTextureLoader texture = new LWJGLSingleTextureLoader(gh, width,
+				height);
 		return LWJGLPanel.fromTextureLoader(cp, texture, x, y, size, sel);
 	}
 
@@ -105,9 +114,9 @@ public class LWJGLPanel extends LWJGLContentPane {
 	public void add(LWJGLPanel other) {
 		add(other, Type.FOREGROUND);
 	}
-	
+
 	public void remove(LWJGLPanel other, Type tp) {
-		switch(tp) {
+		switch (tp) {
 		case BACKGROUND:
 			synchronized (bgChildren) {
 				bgChildren.remove(other);
@@ -147,7 +156,7 @@ public class LWJGLPanel extends LWJGLContentPane {
 					representation.draw(gfx);
 				}
 			} else {
-				texture.useTexture(gfx, 0);
+				texture.useTexture(gfx);
 				representation.draw(gfx);
 			}
 
@@ -187,7 +196,8 @@ public class LWJGLPanel extends LWJGLContentPane {
 	}
 
 	private void init(LWJGLContentPane pane, SelectionFrame select,
-			LWJGLTextureLoader text, float xPos, float yPos, float w, float h, boolean sel) {
+			LWJGLTextureLoader text, float xPos, float yPos, float w, float h,
+			boolean sel) {
 		selectable = sel;
 		width = w;
 		height = h;

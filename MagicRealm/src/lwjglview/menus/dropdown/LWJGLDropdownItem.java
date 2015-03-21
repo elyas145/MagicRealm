@@ -5,7 +5,7 @@ import java.awt.Font;
 
 import config.GraphicsConfiguration;
 import utils.math.linear.Matrix;
-import lwjglview.graphics.LWJGLTextureLoader;
+import lwjglview.graphics.textures.LWJGLTextureLoader;
 import lwjglview.menus.LWJGLPanel;
 
 public class LWJGLDropdownItem<T> extends LWJGLPanel {

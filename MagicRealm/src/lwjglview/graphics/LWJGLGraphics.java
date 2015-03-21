@@ -278,13 +278,16 @@ public final class LWJGLGraphics {
 	}
 
 	public void bindTextureArray(int location) {
-		glActiveTexture(GL_TEXTURE0);
+		bindTextureArray(location, 0);
+	}
+
+	public void bindTextureArray(int location, int unit) {
+		glActiveTexture(GL_TEXTURE0 + unit);
 		glBindTexture(GL_TEXTURE_2D_ARRAY, location);
 	}
 
 	public void bindTexture(int location) {
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, location);
+		bindTexture(location, 0);
 	}
 
 	public void bindTexture(int location, int unit) {

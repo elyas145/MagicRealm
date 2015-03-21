@@ -26,26 +26,17 @@ public class ResourceHandler {
 	public ResourceHandler() {
 		files = new HashMap<String, String>();
 		images = new HashMap<String, BufferedImage>();
+		counterGenerator = new LWJGLCounterGenerator(this);
+	}
+	
+	public LWJGLCounterGenerator getCounterGenerator() {
+		return counterGenerator;
 	}
 
 	public String getResource(String fname) throws IOException {
-		/*String path = ResourceHandler.class.getProtectionDomain()
-				.getCodeSource().getLocation().getPath();
-		System.out.println(ResourceHandler.joinPath(decodedPath, "resources", fname).toString());
-		
-		String ret = ResourceHandler.joinPath(decodedPath, "resources", fname);
-		
-		if (ret == null) {
-			throw new IOException("The file " + fname + " could not be found, "
-					+ "try refreshing the project (F5)");
-		}
-		return ret;
-		URL ur = getClass().getClassLoader().getResource(ResourceHandler.joinPath("resources", fname));
-		String decodedPath = URLDecoder.decode(ur.getPath(), "UTF-8");
-		System.out.println(decodedPath);
-		return decodedPath;*/
-		if(GameConfiguration.DEBUG_MODE) {
-			String path = ResourceHandler.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+		if (GameConfiguration.DEBUG_MODE) {
+			String path = ResourceHandler.class.getProtectionDomain()
+					.getCodeSource().getLocation().getPath();
 			return ResourceHandler.joinPath(path, "resources", fname);
 		} else {
 			return ResourceHandler.joinPath(path(), "resources", fname);
@@ -54,7 +45,8 @@ public class ResourceHandler {
 
 	public String readFile(String fname) throws IOException {
 		String ur = getResource(fname);
-			// System.out.println("Reading file: " + rep);
+		// System.out.println("Reading file: " + rep);
+		if (!files.containsKey(ur)) {
 			BufferedReader br;
 			br = new BufferedReader(new FileReader(ur));
 			char[] charbuf = new char[1024];
@@ -65,6 +57,7 @@ public class ResourceHandler {
 			}
 			files.put(ur, sb.toString());
 			br.close();
+		}
 		String loaded = files.get(ur);
 		// System.out.println("Retreived file: " + rep);
 		// System.out.println(loaded);
@@ -75,13 +68,9 @@ public class ResourceHandler {
 		String ur = getResource(fname);
 		String rep = ur.toString();
 		if (!images.containsKey(rep)) {
-			// System.out.println("Reading image: " + rep);
 			images.put(rep, ImageIO.read(new File(ur)));
 		}
-		// System.out.println("Retreived image: " + rep);
 		BufferedImage bi = images.get(rep);
-		// System.out.println("Dimensions: " + bi.getWidth() + ", "
-		// + bi.getHeight());
 		return bi;
 	}
 
@@ -103,9 +92,9 @@ public class ResourceHandler {
 		if (paths.isEmpty()) {
 			return path;
 		}
-		return new File(path , joinPath(paths.remove(0), paths)).toString();
+		return new File(path, joinPath(paths.remove(0), paths)).toString();
 	}
-	
+
 	private String path() throws UnsupportedEncodingException {
 		URL url1 = getClass().getResource("");
 		String ur = url1.toString();
@@ -117,5 +106,6 @@ public class ResourceHandler {
 
 	private Map<String, String> files;
 	private Map<String, BufferedImage> images;
+	private LWJGLCounterGenerator counterGenerator;
 
 }

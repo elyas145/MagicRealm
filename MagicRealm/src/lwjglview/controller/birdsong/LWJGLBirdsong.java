@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import config.GraphicsConfiguration;
-import lwjglview.graphics.LWJGLTextureLoader;
+import lwjglview.graphics.textures.LWJGLSingleTextureLoader;
+import lwjglview.graphics.textures.LWJGLTextureLoader;
 import lwjglview.menus.LWJGLMenuLayer;
 import lwjglview.menus.LWJGLPanel;
 import lwjglview.menus.dropdown.LWJGLDropdown;
@@ -58,9 +59,9 @@ public class LWJGLBirdsong implements BirdsongView {
 		float width = COMBO_WIDTH;
 		float height = COMBO_HEIGHT;
 		LWJGLTextureLoader stat, dyn;
-		stat = new LWJGLTextureLoader(rh,
+		stat = new LWJGLSingleTextureLoader(rh,
 				ResourceHandler.joinPath("menus", "birdsong", "comboStatic.png"));
-		dyn = new LWJGLTextureLoader(rh,
+		dyn = new LWJGLSingleTextureLoader(rh,
 				ResourceHandler.joinPath("menus", "birdsong", "comboCell.png"));
 		for (int i = 0; i < 9; ++i) {
 			LWJGLDropdown<String> select = new LWJGLDropdown<String>(borderPane, stat, dyn, options,

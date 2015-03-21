@@ -40,18 +40,30 @@ import view.controller.game.BoardView;
 import view.controller.search.SearchView;
 
 public class ControllerMain implements ClientController {
+	
+	public enum ViewType {
+		SWING,
+		LWJGL
+	}
 
 	private ResourceHandler rh;
 	private BoardView boardView;
-	private LWJGLViewController mainView;
+	private ViewController mainView;
 	private Board board;
 	private CharacterType player;
 	private int clientID = -1;
 	private ClientServer server;
 	private int sleepTime = 2000;
-	public ControllerMain() {
+	public ControllerMain(ViewType vt) {
 		rh = new ResourceHandler();
-		mainView = new LWJGLViewController(rh, this);
+		switch(vt) {
+		case SWING:
+			mainView = new MainView(this);
+			break;
+		case LWJGL:
+			mainView = new LWJGLViewController(rh, this);
+			break;
+		}
 		server = new ClientServer(this);
 		goToMainMenu();
 	}
@@ -258,6 +270,7 @@ public class ControllerMain implements ClientController {
 	@Override
 	public void enterLobby(SerializedBoard sboard) {
 		System.out.println("Enter lobby called.");
+		mainView.enterLobby();
 		initializeBoard(sboard);
 	}
 

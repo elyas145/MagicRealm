@@ -11,13 +11,13 @@ import config.GraphicsConfiguration;
 import utils.images.ImageTools;
 import model.counter.chit.MapChit;
 
-public class ChitGenerator implements ImageTools.GraphicsHandler {
-	public ChitGenerator(MapChit mc) {
+public class MapChitImageGenerator implements ImageTools.GraphicsHandler {
+	public MapChitImageGenerator(MapChit mc) {
 		name = mc.getType().toString();
 		identifier = mc.getIdentifier();
 	}
 	
-	public ChitGenerator(String nm, char id) {
+	public MapChitImageGenerator(String nm, char id) {
 		name = nm;
 		identifier = id;
 	}

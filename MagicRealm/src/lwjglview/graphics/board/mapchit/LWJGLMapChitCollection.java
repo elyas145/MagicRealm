@@ -3,19 +3,21 @@ package lwjglview.graphics.board.mapchit;
 import java.awt.Color;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
 import config.GraphicsConfiguration;
 import utils.math.linear.Matrix;
-import utils.resources.ChitGenerator;
+import utils.resources.LWJGLCounterGenerator;
+import utils.resources.MapChitImageGenerator;
+import utils.resources.ResourceHandler;
 import lwjglview.graphics.LWJGLDrawableNode;
 import lwjglview.graphics.LWJGLGraphics;
-import lwjglview.graphics.LWJGLTextureArrayLoader;
 import lwjglview.graphics.board.LWJGLBoardDrawable;
-import lwjglview.graphics.board.LWJGLCounterDrawable;
+import lwjglview.graphics.counters.LWJGLCounterDrawable;
+import lwjglview.graphics.counters.LWJGLCounterLocator;
 import lwjglview.graphics.shader.ShaderType;
+import lwjglview.graphics.textures.LWJGLTextureArrayLoader;
 import model.counter.chit.MapChit;
 import model.enums.MapChitType;
 
@@ -24,11 +26,12 @@ public class LWJGLMapChitCollection extends LWJGLDrawableNode {
 	private static final Color BLANK = GraphicsConfiguration.MAP_CHIT_HIDE_COLOUR;
 	private static final Color SHOW = GraphicsConfiguration.MAP_CHIT_SHOW_COLOUR;
 
-	public LWJGLMapChitCollection(LWJGLBoardDrawable par,
+	public LWJGLMapChitCollection(LWJGLCounterLocator par, ResourceHandler rh,
 			Iterable<MapChit> avail) {
 		super(par);
-		board = par;
-		mapChits = new HashMap<MapChitType, Map<Character, LWJGLCounterDrawable>>();
+		locations = par;
+		resources = rh.getCounterGenerator();
+		mapChits = new HashMap<MapChit, LWJGLCounterDrawable>();
 		drawables = new HashSet<LWJGLCounterDrawable>();
 		textureLocations = new HashMap<MapChitType, Map<Character, Integer>>();
 		textures = new LWJGLTextureArrayLoader(
@@ -38,46 +41,24 @@ public class LWJGLMapChitCollection extends LWJGLDrawableNode {
 	}
 
 	public LWJGLCounterDrawable get(MapChit mc) {
-		return get(mc.getType(), mc.getIdentifier());
+		return mapChits.get(mc);
 	}
 
-	public LWJGLCounterDrawable get(MapChitType type, char identifier) {
-		return mapChits.get(type).get(identifier);
-	}
-
-	public LWJGLCounterDrawable create(MapChit chit, LWJGLDrawableNode repr) {
-		return create(chit.getType(), chit.getIdentifier(), repr);
-	}
-
-	public LWJGLCounterDrawable create(MapChitType type, char identifier,
-			LWJGLDrawableNode repr) {
-		LWJGLCounterDrawable drbl = new LWJGLCounterDrawable(board, repr,
-				textureLocations.get(type).get(identifier), BLANK);
+	public LWJGLCounterDrawable create(MapChit chit) {
+		LWJGLCounterDrawable drbl = resources.generate(chit, locations);
 		synchronized (mapChits) {
-			if (!mapChits.containsKey(type)) {
-				mapChits.put(type,
-						new HashMap<Character, LWJGLCounterDrawable>());
-			}
-			Map<Character, LWJGLCounterDrawable> typeMap = mapChits.get(type);
-			typeMap.put(identifier, drbl);
+			mapChits.put(chit, drbl);
 		}
 		synchronized (drawables) {
 			drawables.add(drbl);
 		}
-		return get(type, identifier);
+		return drbl;
 	}
 
 	public boolean contains(MapChit mc) {
-		return contains(mc.getType(), mc.getIdentifier());
-	}
-
-	public boolean contains(MapChitType mct, char identifier) {
 		synchronized (mapChits) {
-			if (mapChits.containsKey(mct)) {
-				return mapChits.get(mct).containsKey(identifier);
-			}
+			return mapChits.containsKey(mc);
 		}
-		return false;
 	}
 
 	public void hideAll() {
@@ -98,20 +79,14 @@ public class LWJGLMapChitCollection extends LWJGLDrawableNode {
 		LWJGLDrawableNode repr = count.getRepresentation();
 		remove(chit);
 		for (MapChit mc : replacements) {
-			create(mc, repr);
+			create(mc);
 		}
 	}
 
 	public void remove(MapChit chit) {
-		remove(chit.getType(), chit.getIdentifier());
-	}
-
-	public void remove(MapChitType type, char id) {
 		LWJGLCounterDrawable drbl;
 		synchronized (mapChits) {
-			Map<Character, LWJGLCounterDrawable> row = mapChits.get(type);
-			drbl = row.get(id);
-			row.remove(id);
+			drbl = mapChits.remove(chit);
 		}
 		synchronized (drawables) {
 			drawables.remove(drbl);
@@ -125,24 +100,12 @@ public class LWJGLMapChitCollection extends LWJGLDrawableNode {
 		get(mc).getVector(dest);
 	}
 
-	public void getVector(MapChitType mct, char identifier, Matrix dest) {
-		get(mct, identifier).getVector(dest);
-	}
-
 	public void changeColour(MapChit mc, Color col) {
 		get(mc).changeColour(col);
 	}
 
-	public void changeColour(MapChitType mct, char id, Color col) {
-		get(mct, id).changeColour(col);
-	}
-
 	public int getID(MapChit mc) {
 		return get(mc).getID();
-	}
-
-	public int getID(MapChitType mct, char id) {
-		return get(mct, id).getID();
 	}
 
 	@Override
@@ -175,12 +138,14 @@ public class LWJGLMapChitCollection extends LWJGLDrawableNode {
 		}
 		Map<Character, Integer> typeLocations = textureLocations.get(mct);
 		char mcid = mc.getIdentifier();
-		typeLocations.put(mcid, textures.addImage(new ChitGenerator(mc)));
+		typeLocations.put(mcid, textures.addImage(new MapChitImageGenerator(mc)));
 	}
 	
-	private LWJGLBoardDrawable board;
+	private LWJGLCounterGenerator resources;
+	
+	private LWJGLCounterLocator locations;
 	private LWJGLTextureArrayLoader textures;
-	private Map<MapChitType, Map<Character, LWJGLCounterDrawable>> mapChits;
+	private Map<MapChit, LWJGLCounterDrawable> mapChits;
 	private Set<LWJGLCounterDrawable> drawables;
 	private Map<MapChitType, Map<Character, Integer>> textureLocations;
 

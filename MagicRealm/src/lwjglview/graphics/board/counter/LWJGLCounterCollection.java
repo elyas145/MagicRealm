@@ -10,26 +10,27 @@ import java.util.Map;
 import config.GraphicsConfiguration;
 import utils.math.linear.Matrix;
 import utils.resources.CounterImages;
+import utils.resources.LWJGLCounterGenerator;
+import utils.resources.ResourceHandler;
 import lwjglview.graphics.LWJGLDrawableNode;
 import lwjglview.graphics.LWJGLGraphics;
-import lwjglview.graphics.LWJGLTextureArrayLoader;
 import lwjglview.graphics.board.LWJGLBoardDrawable;
-import lwjglview.graphics.board.LWJGLCounterDrawable;
+import lwjglview.graphics.counters.LWJGLCounterDrawable;
+import lwjglview.graphics.counters.LWJGLCounterLocator;
 import lwjglview.graphics.shader.ShaderType;
+import lwjglview.graphics.textures.LWJGLTextureArrayLoader;
+import lwjglview.graphics.textures.LWJGLTextureLoader;
 import model.enums.CharacterType;
 import model.enums.CounterType;
 import model.enums.ValleyChit;
 
 public class LWJGLCounterCollection extends LWJGLDrawableNode {
 
-	public LWJGLCounterCollection(LWJGLBoardDrawable par) throws IOException {
+	public LWJGLCounterCollection(LWJGLCounterLocator par, ResourceHandler res) throws IOException {
 		super(par);
-		board = par;
+		locations = par;
+		resources = res.getCounterGenerator();
 		counters = new HashMap<CounterType, LWJGLCounterDrawable>();
-		textureLocations = new HashMap<CounterType, Integer>();
-		textures = new LWJGLTextureArrayLoader(
-				GraphicsConfiguration.IMAGE_SCALE_WIDTH,
-				GraphicsConfiguration.IMAGE_SCALE_HEIGHT);
 		List<CounterType> counters = new ArrayList<CounterType>();
 		for (CharacterType ct : CharacterType.values()) {
 			counters.add(ct.toCounter());
@@ -37,17 +38,14 @@ public class LWJGLCounterCollection extends LWJGLDrawableNode {
 		for (ValleyChit vc : ValleyChit.values()) {
 			counters.add(vc.toCounterType());
 		}
-		loadImages(counters);
 	}
 
 	public LWJGLCounterDrawable get(CounterType counter) {
 		return counters.get(counter);
 	}
 
-	public LWJGLCounterDrawable create(CounterType tp, LWJGLDrawableNode repr) {
-		counters.put(tp,
-				new LWJGLCounterDrawable(board, repr, textureLocations.get(tp),
-						Color.WHITE));
+	public LWJGLCounterDrawable create(CounterType tp) {
+		counters.put(tp, resources.generate(tp, locations));
 		return get(tp);
 	}
 
@@ -79,30 +77,14 @@ public class LWJGLCounterCollection extends LWJGLDrawableNode {
 	public void draw(LWJGLGraphics gfx) {
 		updateTransformation();
 		gfx.getShaders().useShaderProgram(ShaderType.CHIT_SHADER);
-		textures.useTextures(gfx);
 		// draw all counters
 		for (LWJGLCounterDrawable counter : counters.values()) {
 			counter.draw(gfx);
 		}
 	}
 
-	private void loadImages(Iterable<CounterType> counters) throws IOException {
-		for (CounterType ct : counters) {
-			loadImage(ct);
-		}
-		textures.loadImages();
-	}
-
-	private void loadImage(CounterType ct) throws IOException {
-		textureLocations.put(
-				ct,
-				textures.addImage(CounterImages.getCounterImage(
-						board.getResourceHandler(), ct)));
-	}
-
-	private Map<CounterType, Integer> textureLocations;
-	private LWJGLBoardDrawable board;
-	private LWJGLTextureArrayLoader textures;
+	private LWJGLCounterLocator locations;
 	private Map<CounterType, LWJGLCounterDrawable> counters;
+	private LWJGLCounterGenerator resources;
 
 }

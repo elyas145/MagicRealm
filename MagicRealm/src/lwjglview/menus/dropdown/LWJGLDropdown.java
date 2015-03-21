@@ -6,7 +6,7 @@ import java.util.List;
 import utils.handler.Handler;
 import view.selection.CursorListener;
 import view.selection.CursorSelection;
-import lwjglview.graphics.LWJGLTextureLoader;
+import lwjglview.graphics.textures.LWJGLTextureLoader;
 import lwjglview.menus.LWJGLContentPane;
 import lwjglview.menus.LWJGLPanel;
 

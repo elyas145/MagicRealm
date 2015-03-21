@@ -1,12 +1,9 @@
 package lwjglview.selection;
 
 import java.awt.Color;
-import java.awt.color.ColorSpace;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,8 +11,6 @@ import org.lwjgl.BufferUtils;
 
 import config.GraphicsConfiguration;
 import utils.handler.Handler;
-import utils.images.ImageTools;
-import utils.resources.Images;
 import utils.resources.ResourceHandler;
 import utils.structures.LinkedQueue;
 import utils.structures.Queue;
@@ -60,7 +55,6 @@ public class SelectionFrame {
 		queued = new LinkedQueue<CursorListenerInvoker>();
 		selectionPass = false;
 		frameBufferID = -1;
-		textureBufferID = -1;
 		gfx.setCursorListener(new CursorListener() {
 
 			@Override
@@ -82,7 +76,7 @@ public class SelectionFrame {
 			public void handle(LWJGLGraphics gfx) {
 				if (frameBufferID < 0) {
 					frameBufferID = gfx.createFrameBuffer();
-					textureBufferID = gfx.generateBufferTexture(frameBufferID);
+					gfx.generateBufferTexture(frameBufferID);
 				}
 				gfx.useFrameBuffer(frameBufferID);
 				gfx.setClearColor(0f, 0f, 0f, 0f);
@@ -139,7 +133,11 @@ public class SelectionFrame {
 	}
 
 	public void loadID(int id, LWJGLGraphics gfx) {
-		loadID(id, gfx, "color");
+		loadID("color", id, gfx);
+	}
+	
+	public void loadID(String uniform, int id, LWJGLGraphics gfx) {
+		loadID(id, gfx, uniform);
 	}
 
 	public void loadID(int id, LWJGLGraphics gfx, String name) {
@@ -267,7 +265,6 @@ public class SelectionFrame {
 	}
 
 	private int frameBufferID;
-	private int textureBufferID;
 
 	private ByteBuffer buffer;
 	private FloatBuffer fBuffer;

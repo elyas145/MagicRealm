@@ -20,6 +20,9 @@ import javax.swing.JOptionPane;
 
 import client.ClientController;
 import client.ControllerMain;
+import lwjglview.graphics.LWJGLGraphics;
+import lwjglview.graphics.board.LWJGLBoardDrawable;
+import lwjglview.selection.SelectionFrame;
 import model.activity.Activity;
 import model.character.Phase;
 import model.enums.CharacterType;
@@ -28,6 +31,7 @@ import model.player.PersonalHistory;
 import swingview.controller.birdsong.BirdSongView;
 import swingview.controller.mainmenu.MainMenu;
 import swingview.controller.search.SearchView;
+import utils.resources.ResourceHandler;
 import utils.time.Timing;
 import view.controller.ViewController;
 import config.GraphicsConfiguration;
@@ -37,6 +41,11 @@ import config.NetworkConfiguration;
 public class MainView extends JFrame implements ViewController,
 		Runnable {
 	private ClientController gameController;
+	
+	private LWJGLBoardDrawable board;
+	private LWJGLGraphics gfx;
+	private ResourceHandler rh;
+	private SelectionFrame sf;
 
 	private static Toolkit tk = Toolkit.getDefaultToolkit();
 	private static int xSize = ((int) tk.getScreenSize().getWidth());
@@ -146,7 +155,6 @@ public class MainView extends JFrame implements ViewController,
 
 	public void displayMessage(String string) {
 		JOptionPane.showMessageDialog(this, string);
-
 	}
 
 	@Override
@@ -171,8 +179,15 @@ public class MainView extends JFrame implements ViewController,
 
 	@Override
 	public void enterLobby() {
-		// TODO Auto-generated method stub
-		
+		rh = new ResourceHandler();
+		gfx = new LWJGLGraphics(rh);
+		sf = new SelectionFrame(gfx);
+		try {
+			board = new LWJGLBoardDrawable(rh, gfx, sf);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		gfx.start();
 	}
 
 	@Override
@@ -182,14 +197,12 @@ public class MainView extends JFrame implements ViewController,
 
 	@Override
 	public void focusOnBoard(TileName selectedTile) {
-		// TODO Auto-generated method stub
-		
+		board.focusOn(selectedTile);
 	}
 
 	@Override
 	public void focusOnBoard(TileName selectedTile, Integer selectedClearing) {
-		// TODO Auto-generated method stub
-		
+		board.focusOn(selectedTile, selectedClearing);
 	}
 
 	@Override

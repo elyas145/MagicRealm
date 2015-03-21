@@ -1,9 +1,9 @@
 package entry; import client.ControllerMain;
 
-class ClientMain {
+class OldClientMain {
 
 	public static void main(String[] args) {
-		new ControllerMain(ControllerMain.ViewType.LWJGL);
+		new ControllerMain(ControllerMain.ViewType.SWING);
 	}
 
 }

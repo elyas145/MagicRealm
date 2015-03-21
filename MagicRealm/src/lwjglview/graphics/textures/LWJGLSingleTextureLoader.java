@@ -1,25 +1,25 @@
-package lwjglview.graphics;
+package lwjglview.graphics.textures;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import org.lwjgl.BufferUtils;
+import lwjglview.graphics.LWJGLGraphics;
 
 import utils.images.ImageTools;
 import utils.resources.Images;
 import utils.resources.ResourceHandler;
 
-public class LWJGLTextureLoader {
+public class LWJGLSingleTextureLoader implements LWJGLTextureLoader {
 	
-	public LWJGLTextureLoader(int w, int h, boolean inter) {
+	public LWJGLSingleTextureLoader(int w, int h, boolean inter) {
 		width = w;
 		height = h;
 		init(null);
 		interpolate = inter;
 	}
 	
-	public LWJGLTextureLoader(ResourceHandler rh, String fileName) {
+	public LWJGLSingleTextureLoader(ResourceHandler rh, String fileName) {
 		BufferedImage bi;
 		try {
 			bi = Images.getImage(rh, fileName);
@@ -31,7 +31,7 @@ public class LWJGLTextureLoader {
 		interpolate = true;
 	}
 	
-	public LWJGLTextureLoader(ResourceHandler rh, String fileName, int w, int h) {
+	public LWJGLSingleTextureLoader(ResourceHandler rh, String fileName, int w, int h) {
 		BufferedImage bi;
 		try {
 			bi = Images.getImage(rh, fileName);
@@ -44,46 +44,54 @@ public class LWJGLTextureLoader {
 		interpolate = true;
 	}
 	
-	public LWJGLTextureLoader(ImageTools.GraphicsHandler gh, int w, int h) {
+	public LWJGLSingleTextureLoader(ImageTools.GraphicsHandler gh, int w, int h) {
 		BufferedImage bi = ImageTools.createImage(w, h, gh);
 		init(bi);
 		interpolate = true;
 	}
 	
-	public LWJGLTextureLoader(int loc, int w, int h) {
+	public LWJGLSingleTextureLoader(int loc, int w, int h) {
 		height = h;
 		width = w;
 		textureLocation = loc;
 	}
 	
+	@Override
 	public boolean isLoaded() {
-		return textureLocation >= 0;
+		return getTextureLocation() >= 0;
 	}
-	
+
+	@Override
 	public void loadTexture(LWJGLGraphics gfx) {
 		if(!isLoaded()) {
 			textureLocation = gfx.loadTexture(rawData, height, width, interpolate);
 		}
 	}
-	
+
+	@Override
 	public void useTexture(LWJGLGraphics gfx) {
 		loadTexture(gfx);
-		gfx.bindTexture(textureLocation);
+		gfx.bindTexture(getTextureLocation());
 	}
-	
-	public void useTexture(LWJGLGraphics gfx, int unit) {
+
+	@Override
+	public void useTexture(LWJGLGraphics gfx, String uniform, int unit) {
 		loadTexture(gfx);
-		gfx.bindTexture(textureLocation, unit);
+		gfx.bindTexture(getTextureLocation(), unit);
+		gfx.getShaders().setUniformIntValue(uniform, unit);
 	}
-	
+
+	@Override
 	public int getTextureLocation() {
 		return textureLocation;
 	}
-	
+
+	@Override
 	public int getWidth() {
 		return width;
 	}
-	
+
+	@Override
 	public int getHeight() {
 		return height;
 	}

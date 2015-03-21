@@ -28,6 +28,7 @@ public enum CounterType {
 	SITE_SHRINE,
 	SITE_LOST_CITY,
 	SITE_LOST_CASTLE,
+	MAP_CHIT,
 	NONE;
 	
 	public boolean isCharacter() {

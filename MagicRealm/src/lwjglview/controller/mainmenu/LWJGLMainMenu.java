@@ -5,13 +5,13 @@ import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
 
-import utils.handler.Handler;
 import utils.resources.ResourceHandler;
 import view.controller.ViewController;
 import view.selection.CursorListener;
 import view.selection.CursorSelection;
 import lwjglview.controller.LWJGLViewController;
-import lwjglview.graphics.LWJGLTextureLoader;
+import lwjglview.graphics.textures.LWJGLSingleTextureLoader;
+import lwjglview.graphics.textures.LWJGLTextureLoader;
 import lwjglview.menus.LWJGLMenuLayer;
 import lwjglview.menus.LWJGLPanel;
 import lwjglview.menus.dropdown.LWJGLDropdown;
@@ -26,7 +26,7 @@ public class LWJGLMainMenu {
 
 	public LWJGLMainMenu(LWJGLViewController vc, ResourceHandler rh) {
 		viewController = vc;
-		backgroundTexture = new LWJGLTextureLoader(rh,
+		backgroundTexture = new LWJGLSingleTextureLoader(rh,
 				ResourceHandler.joinPath("menus", "main", "background.jpg"));
 		resources = rh;
 	}
@@ -40,7 +40,7 @@ public class LWJGLMainMenu {
 				false);
 		menus.add(root);
 		root.setVisible(true);
-		LWJGLTextureLoader button = new LWJGLTextureLoader(resources,
+		LWJGLTextureLoader button = new LWJGLSingleTextureLoader(resources,
 				ResourceHandler.joinPath("menus", "main", "button.png"));
 		start = new LWJGLPanel(root, button, .38f, 1f, .2f, true);
 		LWJGLPanel text = LWJGLPanel.fromString(start, "Start", FONT, COLOR,

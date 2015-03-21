@@ -1,4 +1,4 @@
-package lwjglview.graphics.board;
+package lwjglview.graphics.counters;
 
 import java.awt.Color;
 import java.nio.FloatBuffer;
@@ -12,7 +12,7 @@ import lwjglview.graphics.animator.FadeAnimator;
 import lwjglview.graphics.animator.MovementAnimator;
 import lwjglview.graphics.animator.matrixcalculator.MatrixCalculator;
 import lwjglview.graphics.shader.ShaderType;
-import model.enums.CounterType;
+import lwjglview.graphics.textures.LWJGLTextureLoader;
 import config.GraphicsConfiguration;
 import utils.math.linear.Matrix;
 
@@ -21,14 +21,13 @@ public class LWJGLCounterDrawable extends LWJGLDrawableNode implements
 
 	public static final ShaderType SHADER = ShaderType.CHIT_SHADER;
 
-	public LWJGLCounterDrawable(LWJGLBoardDrawable bd,
-			LWJGLDrawableNode chitBlock, int texid, Color col) {
-		super(bd);
-		board = bd;
-		textureIndex = texid;
-		identifier = board.addCounterDrawable(this);
+	public LWJGLCounterDrawable(LWJGLCounterLocator locs,
+			LWJGLDrawableNode chitBlock, LWJGLTextureLoader texture, Color col) {
+		super(locs);
+		locations = locs;
+		textureLoader = texture;
+		identifier = locs.addCounterDrawable(this);
 		representation = chitBlock;
-		textureIndex = texid;
 		position = null;
 		vec3 = Matrix.empty(3, 1);
 		buffer = BufferUtils.createFloatBuffer(4);
@@ -55,7 +54,7 @@ public class LWJGLCounterDrawable extends LWJGLDrawableNode implements
 	}
 
 	public void forget() {
-		board.removeCounterDrawable(getID());
+		locations.removeCounterDrawable(this);
 	}
 
 	public synchronized void changeColour(Color col) {
@@ -108,7 +107,7 @@ public class LWJGLCounterDrawable extends LWJGLDrawableNode implements
 	public void updateNodeUniforms(LWJGLGraphics lwgfx) {
 		lwgfx.updateModelViewUniform("modelViewMatrix");
 		lwgfx.updateMVPUniform("mvpMatrix");
-		lwgfx.getShaders().setUniformIntValue("index", textureIndex);
+		textureLoader.useTexture(lwgfx);
 		buffer.rewind();
 		colours.apply().toFloatBuffer(buffer);
 		lwgfx.getShaders().setUniformFloatArrayValue("counterColour",
@@ -145,7 +144,7 @@ public class LWJGLCounterDrawable extends LWJGLDrawableNode implements
 		position.copyFrom(vec3);
 	}
 
-	private LWJGLBoardDrawable board;
+	private LWJGLCounterLocator locations;
 
 	private float[] colourBuffer;
 
@@ -169,7 +168,7 @@ public class LWJGLCounterDrawable extends LWJGLDrawableNode implements
 
 	private LWJGLDrawableNode representation;
 
-	private int textureIndex;
+	private LWJGLTextureLoader textureLoader;
 
 	private int identifier;
 

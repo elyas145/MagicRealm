@@ -1,15 +1,62 @@
-package lwjglview.graphics;
+package lwjglview.graphics.textures;
 
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.lwjgl.BufferUtils;
+import lwjglview.graphics.LWJGLGraphics;
 
 import utils.images.ImageTools;
 
 public class LWJGLTextureArrayLoader {
+	
+	public class UnitLoader implements LWJGLTextureLoader {
+		
+		protected UnitLoader(int loc) {
+			location = loc;
+		}
+
+		@Override
+		public boolean isLoaded() {
+			return loadedTextures();
+		}
+
+		@Override
+		public void loadTexture(LWJGLGraphics gfx) {
+			loadTextures(gfx);
+		}
+
+		@Override
+		public void useTexture(LWJGLGraphics gfx) {
+			useTextures(gfx);
+			gfx.getShaders().setUniformIntValue("index", location);
+		}
+
+		@Override
+		public void useTexture(LWJGLGraphics gfx, String uniform, int unit) {
+			useTextures(gfx, uniform, unit);
+			gfx.getShaders().setUniformIntValue("index" + unit, location);
+		}
+
+		@Override
+		public int getTextureLocation() {
+			return textureIndex;
+		}
+
+		@Override
+		public int getWidth() {
+			return width;
+		}
+
+		@Override
+		public int getHeight() {
+			return height;
+		}
+		
+		private int location;
+		
+	}
 
 	public LWJGLTextureArrayLoader(int w, int h) {
 		width = w;
@@ -58,10 +105,14 @@ public class LWJGLTextureArrayLoader {
 	}
 	
 	public void useTextures(LWJGLGraphics gfx) {
-		if(!loadedTextures()) {
-			loadTextures(gfx);
-		}
+		loadTextures(gfx);
 		gfx.bindTextureArray(textureIndex);
+	}
+	
+	public void useTextures(LWJGLGraphics gfx, String uniform, int unit) {
+		loadTextures(gfx);
+		gfx.bindTextureArray(textureIndex, unit);
+		gfx.getShaders().setUniformIntValue(uniform, unit);
 	}
 
 	private int width;

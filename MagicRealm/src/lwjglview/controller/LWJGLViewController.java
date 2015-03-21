@@ -1,11 +1,8 @@
 package lwjglview.controller;
 
-import java.io.IOException;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Semaphore;
 
 import config.NetworkConfiguration;
 import client.ClientController;
@@ -18,11 +15,9 @@ import lwjglview.menus.LWJGLMenuLayer;
 import lwjglview.menus.LWJGLPanel;
 import lwjglview.selection.SelectionFrame;
 import model.activity.Activity;
-import model.board.Board;
 import model.character.Phase;
 import model.enums.CharacterType;
 import model.enums.TileName;
-import model.interfaces.HexTileInterface;
 import model.player.PersonalHistory;
 import utils.resources.ResourceHandler;
 import view.controller.ViewController;
@@ -40,7 +35,7 @@ public class LWJGLViewController implements ViewController {
 		selections = new SelectionFrame(graphics);
 		menus = new LWJGLMenuLayer(graphics, selections);
 		mainMenu = new LWJGLMainMenu(this, resources);
-		LWJGLCharacterView character = new LWJGLCharacterView(resources, graphics);
+		LWJGLCharacterView character = new LWJGLCharacterView(CharacterType.AMAZON, resources, graphics);
 		LWJGLPanel pane = character.getPanel(menus, 0f, 0f, 1f, false);
 		menus.add(pane);
 		pane.setVisible(true);
