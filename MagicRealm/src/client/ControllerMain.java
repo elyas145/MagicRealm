@@ -34,10 +34,6 @@ import view.controller.game.BoardView;
 
 public class ControllerMain implements ClientController {
 
-	public enum ViewType {
-		SWING, LWJGL
-	}
-
 	private ResourceHandler rh;
 	private BoardView boardView;
 	private LWJGLViewController mainView;
@@ -47,7 +43,7 @@ public class ControllerMain implements ClientController {
 	private ClientServer server;
 	private int sleepTime = 2000;
 
-	public ControllerMain(ViewType vt) {
+	public ControllerMain() {
 		rh = new ResourceHandler();
 		mainView = new LWJGLViewController(rh, this);
 
