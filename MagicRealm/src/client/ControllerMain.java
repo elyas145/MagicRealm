@@ -1,7 +1,6 @@
 package client;
 
 import java.io.IOException;
-import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,18 +13,14 @@ import communication.ClientNetworkHandler;
 import communication.handler.client.CharacterSelected;
 import communication.handler.server.serialized.SerializedBoard;
 import communication.handler.server.serialized.SerializedClearing;
-import communication.handler.server.serialized.SerializedMapChit;
 import communication.handler.server.serialized.SerializedTile;
 import lwjglview.controller.LWJGLViewController;
-import lwjglview.graphics.LWJGLGraphics;
 import lwjglview.graphics.board.LWJGLBoardDrawable;
-import lwjglview.selection.SelectionFrame;
 import model.activity.Activity;
 import model.board.Board;
 import model.board.clearing.Clearing;
 import model.character.Character;
 import model.character.CharacterFactory;
-import model.controller.ModelControlInterface;
 import model.controller.requests.DieRequest;
 import model.counter.chit.MapChit;
 import model.enums.CharacterType;
@@ -35,35 +30,27 @@ import model.enums.ValleyChit;
 import model.exceptions.MRException;
 import swingview.MainView;
 import utils.resources.ResourceHandler;
-import view.controller.ViewController;
 import view.controller.game.BoardView;
-import view.controller.search.SearchView;
 
 public class ControllerMain implements ClientController {
-	
+
 	public enum ViewType {
-		SWING,
-		LWJGL
+		SWING, LWJGL
 	}
 
 	private ResourceHandler rh;
 	private BoardView boardView;
-	private ViewController mainView;
+	private LWJGLViewController mainView;
 	private Board board;
-	private CharacterType player;
+	private Character character;
 	private int clientID = -1;
 	private ClientServer server;
 	private int sleepTime = 2000;
+
 	public ControllerMain(ViewType vt) {
 		rh = new ResourceHandler();
-		switch(vt) {
-		case SWING:
-			mainView = new MainView(this);
-			break;
-		case LWJGL:
-			mainView = new LWJGLViewController(rh, this);
-			break;
-		}
+		mainView = new LWJGLViewController(rh, this);
+
 		server = new ClientServer(this);
 		goToMainMenu();
 	}
@@ -71,7 +58,7 @@ public class ControllerMain implements ClientController {
 	@Override
 	public BoardView startBoardView() {
 		try {
-			//mainView.startNetworkGame();
+			// mainView.startNetworkGame();
 			synchronized (this) {
 				while (boardView == null) {
 					wait();
@@ -242,12 +229,16 @@ public class ControllerMain implements ClientController {
 						e.printStackTrace();
 					}
 				}
-				
-				//TODO displays the dwellings for the character to pick a start location.
-				/*Map<CounterType, SerializedClearing> temp = sboard.getCounterPositions();
-				for(CounterType counter : temp.keySet()){
-					boardView.setCounter(counter, temp.get(counter).getParent(), temp.get(counter).getNumber());
-				}*/				
+
+				// TODO displays the dwellings for the character to pick a start
+				// location.
+				/*
+				 * Map<CounterType, SerializedClearing> temp =
+				 * sboard.getCounterPositions(); for(CounterType counter :
+				 * temp.keySet()){ boardView.setCounter(counter,
+				 * temp.get(counter).getParent(),
+				 * temp.get(counter).getNumber()); }
+				 */
 			}
 		};
 		t.start();
@@ -369,12 +360,12 @@ public class ControllerMain implements ClientController {
 	@Override
 	public void startGame(SerializedBoard board) {
 		System.out.println("starting game.");
-		sleepTime = 0;	//finish placing the tiles without waiting.
+		sleepTime = 0; // finish placing the tiles without waiting.
 		ArrayList<MapChit> chits = new ArrayList<MapChit>();
 		boardView.loadMapChits(chits);
-		for(TileName name : board.getMapChitLocations().keySet()){
+		for (TileName name : board.getMapChitLocations().keySet()) {
 			chits.add(new MapChit(board.getMapChitLocations().get(name)));
-		}		
+		}
 		boardView.loadMapChits(chits);
 		// TODO boardView.EnterGameView();
 
@@ -392,6 +383,12 @@ public class ControllerMain implements ClientController {
 	public synchronized void setBoardView(LWJGLBoardDrawable board) {
 		boardView = board;
 		notify();
+	}
+
+	@Override
+	public void setCharacter(Character character) {
+		this.character = character;
+
 	}
 
 }

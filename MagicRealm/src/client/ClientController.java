@@ -10,6 +10,7 @@ import view.controller.game.BoardView;
 import lwjglview.graphics.board.LWJGLBoardDrawable;
 import model.activity.Activity;
 import model.board.Board;
+import model.character.Character;
 import model.controller.requests.DieRequest;
 import model.counter.chit.MapChit;
 import model.enums.CharacterType;
@@ -69,5 +70,7 @@ public interface ClientController {
 	void updateCharacterSelection(CharacterType character);
 
 	void setBoardView(LWJGLBoardDrawable board);
+
+	void setCharacter(Character character);
 
 }
