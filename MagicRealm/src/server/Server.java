@@ -12,10 +12,17 @@ public class Server implements Runnable {
 	private Thread thread = null;
 	private ClientThread clients[] = new ClientThread[GameConfiguration.MAX_PLAYERS];
 	private int clientCount = 0;
-	boolean gameStarted = false;
+	private boolean gameStarted = false;
 	private ServerController controller;
+	private int port;
 
 	public Server(int port) {
+		this.port = port;
+		ServerView view = new ServerView(this);
+		view.start();
+	}
+
+	public void startServer(){
 		System.out.println("Binding server to port " + port + "...");
 		try {
 			server = new ServerSocket(port);
@@ -26,7 +33,6 @@ public class Server implements Runnable {
 			System.out.println("unable to start server with given port.");
 		}
 	}
-
 	public void addThread(Socket socket) {
 		System.out.println("client request: " + socket);
 		controller.addClient(socket);
