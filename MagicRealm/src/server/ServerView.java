@@ -20,9 +20,9 @@ public class ServerView extends JFrame implements ActionListener{
 
 	private static final long serialVersionUID = -8228884624338159162L;
 	private Server server;
-	private static Toolkit tk = Toolkit.getDefaultToolkit();
-	private static int xSize = ((int) tk.getScreenSize().getWidth());
-	private static int ySize = ((int) tk.getScreenSize().getHeight());
+	private Toolkit tk = Toolkit.getDefaultToolkit();
+	private int xSize = ((int) tk.getScreenSize().getWidth());
+	private int ySize = ((int) tk.getScreenSize().getHeight());
 	private JButton yes;
 	private JButton no;
 	
@@ -59,7 +59,9 @@ public class ServerView extends JFrame implements ActionListener{
 		if(e.getSource().equals(yes)){
 			//show the cheat mode view.
 			GameConfiguration.Cheat = true;
-			this.setContentPane(new CheatView(server));
+			setVisible(false);
+			new CheatView(server);
+			server.startServer();
 			pack();
 		}else{
 			JOptionPane.showMessageDialog(this, "This window will now close, and the server will start without cheat mode.");

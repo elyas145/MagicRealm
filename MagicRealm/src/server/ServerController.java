@@ -11,6 +11,8 @@ import java.util.ArrayList;
 
 import model.controller.ModelController;
 import model.enums.CharacterType;
+import model.enums.MapChitType;
+import model.enums.TileName;
 import model.enums.ValleyChit;
 import communication.ClientNetworkHandler;
 import communication.ServerNetworkHandler;
@@ -164,5 +166,10 @@ public class ServerController {
 
 	public void startGame() {
 		sendAll(new StartGame(sboard));
+	}
+
+	public void addTreasure(MapChitType site, TileName tile, Integer clearing) {
+		model.addTreasure(site, tile, clearing);
+
 	}
 }

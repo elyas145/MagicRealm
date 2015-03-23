@@ -311,8 +311,6 @@ public class Board implements BoardInterface {
 	private Map<TileName, int[]> tileLocations;
 	private Map<TileName, MapChit> mapChitLocations;
 	private Map<CounterType, Clearing> counterPositions;
-	// needs to be relocated.
-	private ArrayList<Treasure> treasures = new ArrayList<Treasure>();
 	private JSONArray arr;
 
 	public SerializedBoard getSerializedBoard() {

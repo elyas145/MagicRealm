@@ -4,17 +4,17 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import model.enums.MapChitType;
+import model.enums.TileName;
 import client.ClientThread;
 import config.GameConfiguration;
 
 public class Server implements Runnable {
 	private ServerSocket server = null;
 	private Thread thread = null;
-	private ClientThread clients[] = new ClientThread[GameConfiguration.MAX_PLAYERS];
-	private int clientCount = 0;
-	private boolean gameStarted = false;
 	private ServerController controller;
 	private int port;
+	private boolean ready = false;
 
 	public Server(int port) {
 		this.port = port;
@@ -27,6 +27,7 @@ public class Server implements Runnable {
 		try {
 			server = new ServerSocket(port);
 			server.setReuseAddress(true);
+			controller = new ServerController(this);
 			start();
 		} catch (IOException e) {
 			// Trace.exception(e);
@@ -35,7 +36,11 @@ public class Server implements Runnable {
 	}
 	public void addThread(Socket socket) {
 		System.out.println("client request: " + socket);
-		controller.addClient(socket);
+		if(ready){
+			controller.addClient(socket);
+		}else{
+			System.out.println("Client Rejected. server not ready.");
+		}		
 	}
 
 	public void start() {
@@ -44,7 +49,6 @@ public class Server implements Runnable {
 			thread.start();
 			System.out.println("server started: " + server + ": "
 					+ thread.getId());
-			controller = new ServerController(this);
 		}
 	}
 
@@ -78,5 +82,18 @@ public class Server implements Runnable {
 	}
 	public synchronized void remove(int ID) {
 		controller.remove(ID);
+	}
+
+	public void addTreasure(MapChitType site, TileName tile,
+			Integer clearing) {
+		if(controller == null){
+			System.out.println("Server controller not initialized.");
+			return;
+		}
+		controller.addTreasure(site, tile, clearing);
+	}
+
+	public void doneSettingCheatMode() {
+		ready  = true;		
 	}
 }

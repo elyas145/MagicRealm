@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import client.ClientController;
 import config.BoardConfiguration;
 import config.GameConfiguration;
@@ -36,6 +37,7 @@ import model.player.Player;
 import model.character.CharacterFactory;
 import model.character.Character;
 import model.character.Phase;
+import model.character.belonging.Treasure;
 import model.controller.requests.DieRequest;
 import model.counter.chit.LostSite;
 import model.counter.chit.MapChit;
@@ -44,6 +46,7 @@ import model.counter.chit.MapChit;
  * Meant to be a container for the entire model
  */
 public class ModelController {
+
 	public ModelController(ResourceHandler rh) {
 		this.rh = rh;
 		currentDay = 1;
@@ -59,6 +62,8 @@ public class ModelController {
 			mapChits.add(new MapChit(type, 'W'));
 			mapChits.add(new MapChit(type, 'M'));
 		}
+
+		treasures = new HashMap<MapChitType, ArrayList<Treasure>>();
 
 		lostCity = new LostSite(MapChitType.LOST_CITY);
 		lostCastle = new LostSite(MapChitType.LOST_CASTLE);
@@ -134,8 +139,10 @@ public class ModelController {
 	public Board setBoard() {
 		if (board == null) {
 			board = new Board(rh);
-			setUpWarning();
-			setUpSoundAndSite();
+			if (!GameConfiguration.Cheat) {
+				setUpWarning();
+				setUpSoundAndSite();
+			}
 		}
 		return board;
 	}
@@ -145,9 +152,11 @@ public class ModelController {
 	 * chits and counters visible on the board.
 	 */
 	public void setBoardForPlay() {
-		setUpSoundAndSite();
-		setUpWarning();
-		setSiteLocations();
+		if (!GameConfiguration.Cheat) {
+			setUpSoundAndSite();
+			setUpWarning();
+			setSiteLocations();
+		}
 	}
 
 	/**
@@ -476,6 +485,7 @@ public class ModelController {
 	private Queue<CharacterType> orderOfPlay;
 	private boolean currentPlayerDone = false;
 	private Set<MapChit> mapChits;
+	private Map<MapChitType, ArrayList<Treasure>> treasures;
 
 	private HashMap<CharacterType, ClientController> playingCharacters;
 
@@ -484,4 +494,13 @@ public class ModelController {
 	private static final RuntimeException noPlayersException = new RuntimeException(
 			"There are no players in the queue");
 
+	public void addTreasure(MapChitType site, TileName tile, int value) {
+		board.setLocationOfMapChit(new MapChit(site), tile);
+		if(treasures.get(site) == null){
+			treasures.put(site, new ArrayList<Treasure>());
+		}
+		treasures.get(site).add(new Treasure(value));
+		System.out.println("added treasure with value: " + value + " at "
+				+ site + " " + tile);
+	}
 }
