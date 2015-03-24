@@ -1,4 +1,4 @@
-package lwjglview.controller;
+package lwjglview.menus;
 
 import java.nio.FloatBuffer;
 
@@ -20,8 +20,6 @@ import lwjglview.graphics.model.ModelData;
 import lwjglview.graphics.shader.GLShaderHandler;
 import lwjglview.graphics.shader.ShaderType;
 import lwjglview.graphics.textures.LWJGLSingleTextureLoader;
-import lwjglview.menus.LWJGLContentPane;
-import lwjglview.menus.LWJGLPanel;
 import model.enums.CharacterType;
 
 public class LWJGLCharacterView extends LWJGLCounterLocator {
