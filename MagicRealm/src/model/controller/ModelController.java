@@ -503,4 +503,39 @@ public class ModelController {
 		System.out.println("added treasure with value: " + value + " at "
 				+ site + " " + tile);
 	}
+
+	public void addSound(MapChitType sound, TileName tile, Integer clearing) {
+		MapChit mc = new MapChit(sound, clearing);
+		mapChits.add(mc);
+		board.setLocationOfMapChit(mc, tile);
+		System.out.println("added sound chit: " + sound + " " + tile + " with clearing: " + clearing);
+	}
+
+	public void addWarning(MapChitType type, TileName tile) {
+		MapChit mc = null;
+		char t = ' ';
+		switch (tile.getType()){
+		case CAVE:
+			t = 'C';
+			break;
+		case MOUNTAIN:
+			t = 'M';
+			break;
+		case VALLEY:
+			t = 'V';
+			break;
+		case WOODS:
+			t = 'W';
+			break;
+		default:
+			break;
+		}
+		for(MapChit m : mapChits){
+			if(m.getIdentifier() == t && m.getType().equals(type)){
+				mc = m;
+			}
+		}
+		board.setLocationOfMapChit(mc, tile);
+		
+	}
 }

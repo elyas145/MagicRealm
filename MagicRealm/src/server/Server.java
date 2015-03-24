@@ -85,15 +85,31 @@ public class Server implements Runnable {
 	}
 
 	public void addTreasure(MapChitType site, TileName tile,
-			Integer clearing) {
+			Integer value) {
 		if(controller == null){
 			System.out.println("Server controller not initialized.");
 			return;
 		}
-		controller.addTreasure(site, tile, clearing);
+		controller.addTreasure(site, tile, value);
 	}
 
 	public void doneSettingCheatMode() {
 		ready  = true;		
+	}
+
+	public void addSound(MapChitType sound, TileName tile, Integer clearing) {
+		if(controller == null){
+			System.out.println("Server controller not initialized.");
+			return;
+		}
+		controller.addSound(sound, tile, clearing);		
+	}
+
+	public void addWarning(MapChitType type, TileName tile) {
+		if(controller == null){
+			System.out.println("Server controller not initialized.");
+			return;
+		}
+		controller.addWarning(type, tile);	
 	}
 }

@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.BoxLayout;
+import javax.swing.ComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -43,6 +44,7 @@ public class CheatView extends JFrame implements ActionListener {
 	private JComboBox<TileName> comboTiles;
 	private JComboBox<MapChitType> comboSounds;
 	private JComboBox<MapChitType> comboWarnings;
+	private JComboBox<Integer> comboClearings;
 
 	public CheatView(Server ser) {
 		super("Cheat View");
@@ -64,7 +66,12 @@ public class CheatView extends JFrame implements ActionListener {
 		treasureValue = new JTextField();
 		comboSites = new JComboBox<MapChitType>(MapChitType.SITES);
 		comboTiles = new JComboBox<TileName>(TileName.values());
-
+		comboTiles.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				setClearings();
+			}
+		});
 		setTreasure.addActionListener(this);
 		setSound.addActionListener(this);
 		setWarning.addActionListener(this);
@@ -82,43 +89,83 @@ public class CheatView extends JFrame implements ActionListener {
 		comboContainer.add(comboTiles);
 		treasurePane = new Container();
 		treasurePane.setLayout(new BoxLayout(treasurePane, BoxLayout.Y_AXIS));
-		treasurePane.add(comboContainer);
-		treasurePane.add(new JLabel("Value: "));
-		treasurePane.add(treasureValue);
-		treasurePane.add(ok);
 
 		comboSounds = new JComboBox<MapChitType>(MapChitType.SOUNDS);
 		comboWarnings = new JComboBox<MapChitType>(MapChitType.WARNINGS);
-
+		comboClearings = new JComboBox<Integer>();
 		soundPane = new Container();
 		soundPane.setLayout(new BoxLayout(soundPane, BoxLayout.Y_AXIS));
 		soundPane.add(comboContainer);
 		soundPane.add(ok);
+		setClearings();
 		setContentPane(defaultPane);
+
 		pack();
 		setVisible(true);
+	}
+
+	private void setClearings() {
+		ArrayList<Integer> list = new ArrayList<Integer>();
+		switch (((TileName) comboTiles.getSelectedItem()).getType()) {
+		case CAVE:
+			for (int i = 0; i < 6; i++) {
+				list.add(i + 1);
+			}
+			break;
+		case VALLEY:
+			for (int i = 0; i < 5; i++) {
+				if (i != 2)
+					list.add(i + 1);
+			}
+			break;
+		case MOUNTAIN:
+		case WOODS:
+			for (int i = 0; i < 6; i++) {
+				list.add(i + 1);
+			}
+			break;
+		default:
+			break;
+		}
+		Integer arr[] = new Integer[list.size()];
+		for (int i = 0; i < arr.length; i++) {
+			arr[i] = list.get(i);
+		}
+		comboClearings.setModel((new JComboBox<Integer>(arr)).getModel());
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource().equals(setTreasure)) {
 			// init and start the treasure pane.
+			treasurePane.removeAll();
 			comboContainer.removeAll();
 			comboContainer.add(comboSites);
 			comboContainer.add(comboTiles);
+			treasurePane.add(comboContainer);
+			treasurePane.add(new JLabel("Value: "));
+			treasurePane.add(treasureValue);
+			treasurePane.add(ok);
 			setContentPane(treasurePane);
 			pack();
 		} else if (e.getSource().equals(setSound)) {
+			soundPane.removeAll();
 			comboContainer.removeAll();
 			comboContainer.add(comboSounds);
 			comboContainer.add(comboTiles);
+			comboContainer.add(comboClearings);
+			soundPane.add(comboContainer);
+			soundPane.add(ok);
 			setContentPane(soundPane);
 			pack();
 		} else if (e.getSource().equals(setWarning)) {
+			warningPane.removeAll();
 			comboContainer.removeAll();
 			comboContainer.add(comboWarnings);
 			comboContainer.add(comboTiles);
-			setContentPane(soundPane);
+			warningPane.add(comboContainer);
+			warningPane.add(ok);
+			setContentPane(warningPane);
 			pack();
 		} else if (e.getSource().equals(ok)) {
 			// check which pane is set.
@@ -127,17 +174,26 @@ public class CheatView extends JFrame implements ActionListener {
 				server.addTreasure((MapChitType) comboSites.getSelectedItem(),
 						(TileName) comboTiles.getSelectedItem(),
 						Integer.parseInt(treasureValue.getText()));
+
+			} else if (getContentPane().equals(soundPane)) {
+				server.addSound((MapChitType) comboSounds.getSelectedItem(),
+						(TileName) comboTiles.getSelectedItem(),
+						(Integer) comboClearings.getSelectedItem());
+			} else if (getContentPane().equals(warningPane)) {
+				server.addWarning(
+						(MapChitType) comboWarnings.getSelectedItem(),
+						(TileName) comboTiles.getSelectedItem());
 				setContentPane(defaultPane);
 				pack();
 
+			} else if (e.getSource().equals(start)) {
+				server.doneSettingCheatMode();
+				JOptionPane
+						.showMessageDialog(
+								this,
+								"This window will now close. the only things setup are those you have set manually. nothing else is set.");
+				this.setVisible(false);
 			}
-		} else if (e.getSource().equals(start)) {
-			server.doneSettingCheatMode();
-			JOptionPane
-					.showMessageDialog(
-							this,
-							"This window will now close. the only things setup are those you have set manually. nothing else is set.");
-			this.setVisible(false);
 		}
 	}
 }

@@ -168,8 +168,17 @@ public class ServerController {
 		sendAll(new StartGame(sboard));
 	}
 
-	public void addTreasure(MapChitType site, TileName tile, Integer clearing) {
-		model.addTreasure(site, tile, clearing);
+	public void addTreasure(MapChitType site, TileName tile, Integer value) {
+		model.addTreasure(site, tile, value);
 
+	}
+
+	public void addSound(MapChitType sound, TileName tile, Integer clearing) {
+		model.addSound(sound, tile, clearing);		
+	}
+
+	public void addWarning(MapChitType type, TileName tile) {
+		model.addWarning(type, tile);
+		
 	}
 }
