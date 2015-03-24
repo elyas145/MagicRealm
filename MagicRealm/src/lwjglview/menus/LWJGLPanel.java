@@ -28,12 +28,6 @@ public class LWJGLPanel extends LWJGLContentPane {
 		FOREGROUND, BACKGROUND
 	}
 
-	public static LWJGLPanel alertDialog(LWJGLContentPane cp,
-			LWJGLTextureLoader texture, float xi, float yi, float xf, float yf,
-			float size) {
-		return null;
-	}
-
 	public static LWJGLPanel fromTextureLoader(LWJGLContentPane cp,
 			LWJGLTextureLoader texture, float x, float y, float size,
 			boolean sel) {
@@ -94,7 +88,7 @@ public class LWJGLPanel extends LWJGLContentPane {
 		return height;
 	}
 
-	public void add(LWJGLPanel other, Type tp) {
+	public void add(LWJGLContentPane other, Type tp) {
 		switch (tp) {
 		case BACKGROUND:
 			synchronized (bgChildren) {
@@ -111,11 +105,11 @@ public class LWJGLPanel extends LWJGLContentPane {
 	}
 
 	@Override
-	public void add(LWJGLPanel other) {
+	public void add(LWJGLContentPane other) {
 		add(other, Type.FOREGROUND);
 	}
 
-	public void remove(LWJGLPanel other, Type tp) {
+	public void remove(LWJGLContentPane other, Type tp) {
 		switch (tp) {
 		case BACKGROUND:
 			synchronized (bgChildren) {
@@ -131,7 +125,7 @@ public class LWJGLPanel extends LWJGLContentPane {
 	}
 
 	@Override
-	public void remove(LWJGLPanel other) {
+	public void remove(LWJGLContentPane other) {
 		remove(other, Type.FOREGROUND);
 		remove(other, Type.BACKGROUND);
 	}

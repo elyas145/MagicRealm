@@ -17,7 +17,7 @@ public class LWJGLMenuLayer extends LWJGLContentPane {
 	public LWJGLMenuLayer(LWJGLGraphics gfx, SelectionFrame frame) {
 		super(null, new AspectCalculator(gfx));
 		selectionFrame = frame;
-		panels = new ArrayList<LWJGLPanel>();
+		panels = new ArrayList<LWJGLContentPane>();
 
 		gfx.disableLayerDepth(GraphicsConfiguration.MENUS_DISPLAY_LAYER);
 		gfx.prepareLayer(new Handler<LWJGLGraphics>() {
@@ -53,7 +53,7 @@ public class LWJGLMenuLayer extends LWJGLContentPane {
 	}
 
 	@Override
-	public void add(LWJGLPanel pane) {
+	public void add(LWJGLContentPane pane) {
 		synchronized(panels) {
 			panels.add(pane);
 		}
@@ -61,7 +61,7 @@ public class LWJGLMenuLayer extends LWJGLContentPane {
 	}
 
 	@Override
-	public void remove(LWJGLPanel pane) {
+	public void remove(LWJGLContentPane pane) {
 		synchronized(panels) {
 			panels.remove(pane);
 		}
@@ -76,7 +76,7 @@ public class LWJGLMenuLayer extends LWJGLContentPane {
 		updateTransformation();
 
 		synchronized (panels) {
-			for (LWJGLPanel pane : panels) {
+			for (LWJGLContentPane pane : panels) {
 				pane.draw(gfx);
 			}
 		}
@@ -101,6 +101,6 @@ public class LWJGLMenuLayer extends LWJGLContentPane {
 	}
 
 	private SelectionFrame selectionFrame;
-	private List<LWJGLPanel> panels;
+	private List<LWJGLContentPane> panels;
 
 }

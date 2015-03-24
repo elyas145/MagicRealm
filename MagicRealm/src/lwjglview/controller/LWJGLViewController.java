@@ -11,6 +11,8 @@ import lwjglview.controller.birdsong.LWJGLBirdsong;
 import lwjglview.controller.mainmenu.LWJGLMainMenu;
 import lwjglview.graphics.LWJGLGraphics;
 import lwjglview.graphics.board.LWJGLBoardDrawable;
+import lwjglview.menus.LWJGLAlertDialog;
+import lwjglview.menus.LWJGLCharacterView;
 import lwjglview.menus.LWJGLMenuLayer;
 import lwjglview.menus.LWJGLPanel;
 import lwjglview.selection.SelectionFrame;
@@ -40,6 +42,9 @@ public class LWJGLViewController implements ViewController {
 				ResourceHandler.joinPath("splash", "splash.jpg"), -1.78f, -1f,
 				2.3f, true);
 		menus.add(splash);
+		LWJGLAlertDialog ald = new LWJGLAlertDialog(menus, resources, "this is a very very long message to fill the alert!", -.5f, 1f, -.5f, 0f, .5f);
+		menus.add(ald);
+		ald.show();
 		board = null;
 		this.controller = controller;
 	}
