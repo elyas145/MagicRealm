@@ -41,6 +41,8 @@ public class CheatView extends JFrame implements ActionListener {
 
 	private JComboBox<MapChitType> comboSites;
 	private JComboBox<TileName> comboTiles;
+	private JComboBox<MapChitType> comboSounds;
+	private JComboBox<MapChitType> comboWarnings;
 
 	public CheatView(Server ser) {
 		super("Cheat View");
@@ -52,8 +54,7 @@ public class CheatView extends JFrame implements ActionListener {
 
 		defaultPane = new Container();
 		server = ser;
-		defaultPane.setLayout(
-				new BoxLayout(defaultPane, BoxLayout.Y_AXIS));
+		defaultPane.setLayout(new BoxLayout(defaultPane, BoxLayout.Y_AXIS));
 		defaultPane.add(new JLabel("CHEAT MODE"));
 		setTreasure = new JButton("Set Treasure Site");
 		setSound = new JButton("Set Sound");
@@ -69,7 +70,7 @@ public class CheatView extends JFrame implements ActionListener {
 		setWarning.addActionListener(this);
 		start.addActionListener(this);
 		ok.addActionListener(this);
-		
+
 		defaultPane.add(setTreasure);
 		defaultPane.add(setSound);
 		defaultPane.add(setWarning);
@@ -85,7 +86,14 @@ public class CheatView extends JFrame implements ActionListener {
 		treasurePane.add(new JLabel("Value: "));
 		treasurePane.add(treasureValue);
 		treasurePane.add(ok);
-		
+
+		comboSounds = new JComboBox<MapChitType>(MapChitType.SOUNDS);
+		comboWarnings = new JComboBox<MapChitType>(MapChitType.WARNINGS);
+
+		soundPane = new Container();
+		soundPane.setLayout(new BoxLayout(soundPane, BoxLayout.Y_AXIS));
+		soundPane.add(comboContainer);
+		soundPane.add(ok);
 		setContentPane(defaultPane);
 		pack();
 		setVisible(true);
@@ -95,12 +103,23 @@ public class CheatView extends JFrame implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource().equals(setTreasure)) {
 			// init and start the treasure pane.
+			comboContainer.removeAll();
+			comboContainer.add(comboSites);
+			comboContainer.add(comboTiles);
 			setContentPane(treasurePane);
 			pack();
 		} else if (e.getSource().equals(setSound)) {
-
+			comboContainer.removeAll();
+			comboContainer.add(comboSounds);
+			comboContainer.add(comboTiles);
+			setContentPane(soundPane);
+			pack();
 		} else if (e.getSource().equals(setWarning)) {
-
+			comboContainer.removeAll();
+			comboContainer.add(comboWarnings);
+			comboContainer.add(comboTiles);
+			setContentPane(soundPane);
+			pack();
 		} else if (e.getSource().equals(ok)) {
 			// check which pane is set.
 			if (getContentPane().equals(treasurePane)) {
@@ -110,11 +129,14 @@ public class CheatView extends JFrame implements ActionListener {
 						Integer.parseInt(treasureValue.getText()));
 				setContentPane(defaultPane);
 				pack();
-				
+
 			}
-		}else if(e.getSource().equals(start)){
+		} else if (e.getSource().equals(start)) {
 			server.doneSettingCheatMode();
-			JOptionPane.showMessageDialog(this, "This window will now close. the only things setup are those you have set manually. nothing else is set.");
+			JOptionPane
+					.showMessageDialog(
+							this,
+							"This window will now close. the only things setup are those you have set manually. nothing else is set.");
 			this.setVisible(false);
 		}
 	}
