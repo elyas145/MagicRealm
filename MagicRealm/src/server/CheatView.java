@@ -85,8 +85,6 @@ public class CheatView extends JFrame implements ActionListener {
 		comboContainer = new Container();
 		comboContainer
 				.setLayout(new BoxLayout(comboContainer, BoxLayout.X_AXIS));
-		comboContainer.add(comboSites);
-		comboContainer.add(comboTiles);
 		treasurePane = new Container();
 		treasurePane.setLayout(new BoxLayout(treasurePane, BoxLayout.Y_AXIS));
 
@@ -95,8 +93,8 @@ public class CheatView extends JFrame implements ActionListener {
 		comboClearings = new JComboBox<Integer>();
 		soundPane = new Container();
 		soundPane.setLayout(new BoxLayout(soundPane, BoxLayout.Y_AXIS));
-		soundPane.add(comboContainer);
-		soundPane.add(ok);
+		
+		warningPane = new Container();
 		setClearings();
 		setContentPane(defaultPane);
 
@@ -162,6 +160,7 @@ public class CheatView extends JFrame implements ActionListener {
 			warningPane.removeAll();
 			comboContainer.removeAll();
 			comboContainer.add(comboWarnings);
+			setWarningTiles();
 			comboContainer.add(comboTiles);
 			warningPane.add(comboContainer);
 			warningPane.add(ok);
@@ -183,17 +182,38 @@ public class CheatView extends JFrame implements ActionListener {
 				server.addWarning(
 						(MapChitType) comboWarnings.getSelectedItem(),
 						(TileName) comboTiles.getSelectedItem());
-				setContentPane(defaultPane);
-				pack();
+					resetComboTiles();
 
-			} else if (e.getSource().equals(start)) {
-				server.doneSettingCheatMode();
-				JOptionPane
-						.showMessageDialog(
-								this,
-								"This window will now close. the only things setup are those you have set manually. nothing else is set.");
-				this.setVisible(false);
+			}
+			setContentPane(defaultPane);
+			pack();
+		} else if (e.getSource().equals(start)) {
+			server.doneSettingCheatMode();
+			JOptionPane
+					.showMessageDialog(
+							this,
+							"This window will now close. the only things setup are those you have set manually. nothing else is set.");
+			this.setVisible(false);
+		}
+	}
+
+	private void resetComboTiles() {
+		comboTiles.setModel(new JComboBox<TileName>(TileName.values()).getModel());
+		
+	}
+
+	private void setWarningTiles() {
+		ArrayList<TileName> list = new ArrayList<TileName>();
+		for(TileName n : TileName.values()){
+			if(n.getType() != LandType.VALLEY){
+				list.add(n);
 			}
 		}
+		TileName arr[] = new TileName[list.size()];
+		for(int i = 0; i < arr.length; ++i){
+			arr[i] = list.get(i);
+		}
+		comboTiles.setModel(new JComboBox<TileName>(arr).getModel());
+		
 	}
 }

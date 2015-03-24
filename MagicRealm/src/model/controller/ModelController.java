@@ -522,8 +522,7 @@ public class ModelController {
 			t = 'M';
 			break;
 		case VALLEY:
-			t = 'V';
-			break;
+			return;
 		case WOODS:
 			t = 'W';
 			break;
@@ -531,9 +530,11 @@ public class ModelController {
 			break;
 		}
 		for(MapChit m : mapChits){
-			if(m.getIdentifier() == t && m.getType().equals(type)){
-				mc = m;
-			}
+			if(m.getType().type() == ChitType.WARNING){
+				if(m.getIdentifier() == t && m.getType().equals(type)){
+					mc = m;
+				}
+			}			
 		}
 		board.setLocationOfMapChit(mc, tile);
 		
