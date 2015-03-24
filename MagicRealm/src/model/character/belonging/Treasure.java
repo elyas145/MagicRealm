@@ -14,6 +14,7 @@ package model.character.belonging;
 
 import model.enums.CharacterType;
 import model.enums.ValleyChit;
+import model.interfaces.BelongingType;
 
 public class Treasure extends Belonging {
 	private int goldValue;
@@ -22,16 +23,24 @@ public class Treasure extends Belonging {
 		goldValue = gv;
 	}
 
-	public void setOwner(CharacterType t) {
-		super.setOwner(t);
-	}
-
 	public int getGoldValue() {
 		return goldValue;
 	}
 
 	public void setGoldValue(int goldValue) {
 		this.goldValue = goldValue;
+	}
+
+	@Override
+	public BelongingType getType() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setType(BelongingType type) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

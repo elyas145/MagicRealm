@@ -66,6 +66,7 @@ public class ServerView extends JFrame implements ActionListener{
 		}else{
 			JOptionPane.showMessageDialog(this, "This window will now close, and the server will start without cheat mode.");
 			this.setVisible(false);
+			server.doneSettingCheatMode();
 			server.startServer();
 		}
 		

@@ -61,4 +61,16 @@ public class Weapon extends Belonging {
 	public void setSharpness(int sharpness) {
 		this.sharpness = sharpness;
 	}
+
+	@Override
+	public BelongingType getType() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setType(BelongingType type) {
+		// TODO Auto-generated method stub
+		
+	}
 }

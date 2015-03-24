@@ -1,13 +1,14 @@
 package model.character.belonging;
 
 import model.enums.ArmorType;
+import model.interfaces.BelongingType;
 
 public class Armor extends Belonging{
 	private char toughness;
-	private ArmorType armorType;
+	private ArmorType type;
 
-	public Armor(ArmorType helmet, char toughness){
-		this.armorType = helmet;
+	public Armor(ArmorType t, char toughness){
+		this.type = t;
 		this.toughness = toughness;		
 	}
 
@@ -16,7 +17,7 @@ public class Armor extends Belonging{
 	}
 
 	public ArmorType getArmorType() {
-		return armorType;
+		return type;
 	}
 
 	public void setToughness(char toughness) {
@@ -24,7 +25,18 @@ public class Armor extends Belonging{
 	}
 	
 	public void setArmorType(ArmorType type) {
-		this.armorType = type;
+		this.type = type;
+	}
+
+	@Override
+	public BelongingType getType() {
+		return null;// type.toBelonging();
+	}
+
+	@Override
+	public void setType(BelongingType type) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

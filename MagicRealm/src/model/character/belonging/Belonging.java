@@ -7,16 +7,10 @@ import model.interfaces.BelongingType;
 public abstract class Belonging {
 	private Chit chit;
 	private boolean active;
-	private CharacterType owner;
-	private BelongingType type;
 	
-	public BelongingType getType() {
-		return type;
-	}
+	public abstract BelongingType getType();
 
-	public void setType(BelongingType type) {
-		this.type = type;
-	}
+	public abstract void setType(BelongingType type);
 
 	public boolean isActive() {
 		return active;
@@ -28,13 +22,5 @@ public abstract class Belonging {
 
 	public void setChit(Chit c) {
 		chit = c;
-	}
-
-	public void setOwner(CharacterType t) {
-		owner = t;
-	}
-
-	public CharacterType getOwner() {
-		return owner;
 	}
 }
