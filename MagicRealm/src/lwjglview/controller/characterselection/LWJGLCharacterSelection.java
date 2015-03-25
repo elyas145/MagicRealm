@@ -1,4 +1,4 @@
-package lwjglview.menus.characterselection;
+package lwjglview.controller.characterselection;
 
 import java.util.ArrayList;
 import java.util.List;
