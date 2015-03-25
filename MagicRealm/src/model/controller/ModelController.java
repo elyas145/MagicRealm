@@ -537,6 +537,5 @@ public class ModelController {
 			}			
 		}
 		board.setLocationOfMapChit(mc, tile);
-		
 	}
 }
