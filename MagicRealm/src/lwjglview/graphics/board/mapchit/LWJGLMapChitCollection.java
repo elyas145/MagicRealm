@@ -75,11 +75,9 @@ public class LWJGLMapChitCollection extends LWJGLDrawableNode {
 	}
 
 	public void replace(MapChit chit, Iterable<MapChit> replacements) {
-		LWJGLCounterDrawable count = get(chit);
-		LWJGLDrawableNode repr = count.getRepresentation();
-		remove(chit);
+		get(chit).setVisible(false);
 		for (MapChit mc : replacements) {
-			create(mc);
+			get(mc).setVisible(true);
 		}
 	}
 
