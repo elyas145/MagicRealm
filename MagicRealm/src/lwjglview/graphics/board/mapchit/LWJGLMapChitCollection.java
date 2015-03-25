@@ -108,6 +108,14 @@ public class LWJGLMapChitCollection extends LWJGLDrawableNode {
 		return get(mc).getID();
 	}
 
+	public void show(MapChit mc) {
+		get(mc).setVisible(true);
+	}
+	
+	public void hide(MapChit mc) {
+		get(mc).setVisible(false);
+	}
+
 	@Override
 	public void updateNodeUniforms(LWJGLGraphics gfx) {
 	}

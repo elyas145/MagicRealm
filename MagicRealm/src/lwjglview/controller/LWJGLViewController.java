@@ -12,9 +12,10 @@ import lwjglview.controller.mainmenu.LWJGLMainMenu;
 import lwjglview.graphics.LWJGLGraphics;
 import lwjglview.graphics.board.LWJGLBoardDrawable;
 import lwjglview.menus.LWJGLAlertDialog;
-import lwjglview.menus.LWJGLCharacterView;
+import lwjglview.menus.LWJGLCounterView;
 import lwjglview.menus.LWJGLMenuLayer;
 import lwjglview.menus.LWJGLPanel;
+import lwjglview.menus.characterselection.LWJGLCharacterSelection;
 import lwjglview.selection.SelectionFrame;
 import model.activity.Activity;
 import model.character.Phase;
@@ -31,13 +32,19 @@ public class LWJGLViewController implements ViewController {
 	public LWJGLViewController(ResourceHandler rh, ControllerMain controller) {
 		resources = rh;
 		graphics = new LWJGLGraphics(rh);
+		graphics.prepareLayer(new Handler<LWJGLGraphics>() {
+
+			@Override
+			public void handle(LWJGLGraphics gfx) {
+				gfx.clearColourBuffer();
+			}
+			
+		}, LWJGLGraphics.LAYER0);
 		selections = new SelectionFrame(graphics);
 		menus = new LWJGLMenuLayer(graphics, selections);
 		mainMenu = new LWJGLMainMenu(this, resources);
-		LWJGLCharacterView character = new LWJGLCharacterView(CharacterType.AMAZON, resources, graphics);
-		characterView = character.getPanel(menus, 0f, 0f, 1f, false);
-		menus.add(characterView);
-		characterView.setVisible(true);
+		LWJGLCharacterSelection character = new LWJGLCharacterSelection(rh, graphics, menus);
+		menus.add(character);
 		splash = LWJGLPanel.fromPicture(menus, resources,
 				ResourceHandler.joinPath("splash", "splash.jpg"), -1.78f, -1f,
 				2.3f, true);
@@ -152,7 +159,6 @@ public class LWJGLViewController implements ViewController {
 	private LWJGLMainMenu mainMenu;
 	private LWJGLBirdsong birdsong;
 	private LWJGLPanel splash;
-	private LWJGLPanel characterView;
 
 	private ClientController controller;
 

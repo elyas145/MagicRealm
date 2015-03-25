@@ -21,20 +21,21 @@ import lwjglview.graphics.shader.GLShaderHandler;
 import lwjglview.graphics.shader.ShaderType;
 import lwjglview.graphics.textures.LWJGLSingleTextureLoader;
 import model.enums.CharacterType;
+import model.enums.CounterType;
 
-public class LWJGLCharacterView extends LWJGLCounterLocator {
+public class LWJGLCounterView extends LWJGLCounterLocator {
 
 	private static final int WIDTH = 700;
 	private static final int HEIGHT = 700;
 
-	public LWJGLCharacterView(CharacterType character, ResourceHandler rh,
+	public LWJGLCounterView(CounterType ct, ResourceHandler rh,
 			LWJGLGraphics gfx) {
 		super(null);
 		graphics = gfx;
 		bufferLoc = -1;
 		textureLoc = -1;
 		counter = rh.getCounterGenerator().generate(
-				character.toCounter(), this);
+				ct, this);
 		counter.moveTo(Matrix.columnVector(0f, 0f, 0f));
 		graphics.addDrawable(this, GraphicsConfiguration.PRE_RENDER_LAYER);
 		matrix = Matrix.identity(4);

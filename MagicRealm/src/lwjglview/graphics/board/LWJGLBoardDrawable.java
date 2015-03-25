@@ -166,13 +166,14 @@ public class LWJGLBoardDrawable extends LWJGLCounterLocator implements BoardView
 	public void loadMapChits(Iterable<MapChit> chits) {
 		mapChits = new LWJGLMapChitCollection(this, resources, chits);
 		for (MapChit mc : chits) {
-			mapChits.create(mc);
+			mapChits.create(mc).setVisible(false);
 		}
 	}
 
 	@Override
 	public synchronized void setMapChit(MapChit mc) {
 		setCounter(mapChits.getID(mc), mc.getTile(), 0);
+		mapChits.show(mc);
 	}
 
 	@Override
