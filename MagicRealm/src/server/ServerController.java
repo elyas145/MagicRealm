@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
 
+import model.activity.Activity;
 import model.controller.ModelController;
 import model.enums.CharacterType;
 import model.enums.MapChitType;
@@ -179,6 +180,11 @@ public class ServerController {
 
 	public void addWarning(MapChitType type, TileName tile) {
 		model.addWarning(type, tile);
+		
+	}
+
+	public void submitActivities(int id, Iterable<Activity> activities) {
+		// TODO Auto-generated method stub
 		
 	}
 }

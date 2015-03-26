@@ -11,6 +11,7 @@ import javax.swing.JOptionPane;
 
 import communication.ClientNetworkHandler;
 import communication.handler.client.CharacterSelected;
+import communication.handler.server.SubmitActivities;
 import communication.handler.server.serialized.SerializedBoard;
 import communication.handler.server.serialized.SerializedClearing;
 import communication.handler.server.serialized.SerializedTile;
@@ -299,8 +300,8 @@ public class ControllerMain implements ClientController {
 	 * activities to the server. client should have a message displayed saying
 	 * "waiting for other players" after this method is called.
 	 */
-	public void endBirdSong() {
-
+	public void endBirdSong(Iterable<Activity> activities) {
+		server.send(new SubmitActivities(this.clientID, activities));
 	}
 
 	/**
