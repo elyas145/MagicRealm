@@ -359,7 +359,6 @@ public class ControllerMain implements ClientController {
 		System.out.println("starting game.");
 		sleepTime = 0; // finish placing the tiles without waiting.
 		ArrayList<MapChit> chits = new ArrayList<MapChit>();
-		boardView.loadMapChits(chits);
 		for (TileName name : board.getMapChitLocations().keySet()) {
 			chits.add(new MapChit(board.getMapChitLocations().get(name)));
 		}

@@ -70,7 +70,7 @@ public class LWJGLAlertDialog extends LWJGLContentPane {
 	}
 
 	@Override
-	protected SelectionFrame getSelectionFrame() {
+	public SelectionFrame getSelectionFrame() {
 		return selectFrame;
 	}
 

@@ -95,6 +95,8 @@ public class CheatView extends JFrame implements ActionListener {
 		soundPane.setLayout(new BoxLayout(soundPane, BoxLayout.Y_AXIS));
 		
 		warningPane = new Container();
+		warningPane.add(comboContainer);
+		warningPane.add(ok);
 		setClearings();
 		setContentPane(defaultPane);
 

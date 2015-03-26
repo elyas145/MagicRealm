@@ -46,6 +46,7 @@ public class LWJGLCounterDrawable extends LWJGLDrawableNode implements
 		bufferMatrix = Matrix.identity(4);
 		movements = new AnimationQueue();
 		movements.start();
+		visible = true;
 		setCalculator(this);
 	}
 
@@ -103,6 +104,10 @@ public class LWJGLCounterDrawable extends LWJGLDrawableNode implements
 		return representation;
 	}
 
+	public void setVisible(boolean vis) {
+		visible = vis;
+	}
+
 	@Override
 	public void updateNodeUniforms(LWJGLGraphics lwgfx) {
 		lwgfx.updateModelViewUniform("modelViewMatrix");
@@ -116,11 +121,14 @@ public class LWJGLCounterDrawable extends LWJGLDrawableNode implements
 
 	@Override
 	public void draw(LWJGLGraphics lwgfx) {
-		updateTransformation();
-		
-		representation.setParent(this);
-		representation.draw(lwgfx);
-
+		if(visible) {
+			
+			updateTransformation();
+			
+			representation.setParent(this);
+			representation.draw(lwgfx);
+			
+		}
 	}
 
 	@Override
@@ -171,5 +179,7 @@ public class LWJGLCounterDrawable extends LWJGLDrawableNode implements
 	private LWJGLTextureLoader textureLoader;
 
 	private int identifier;
+	
+	private boolean visible;
 
 }
