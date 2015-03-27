@@ -1,12 +1,10 @@
 package communication.handler.server;
 
 import client.ClientController;
-import server.ServerController;
 import communication.ClientNetworkHandler;
-import communication.ServerNetworkHandler;
 
-public class CheckSwordsmanPlay implements ClientNetworkHandler{
-	private static final long serialVersionUID = 1652736329815439402L;
+public class CheckSwordsmanPlay implements ClientNetworkHandler {
+	private static final long serialVersionUID = -8174217892766593866L;
 
 	@Override
 	public void handle(ClientController controller) {

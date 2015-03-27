@@ -11,7 +11,7 @@ import javax.swing.JOptionPane;
 
 import communication.ClientNetworkHandler;
 import communication.handler.client.CharacterSelected;
-import communication.handler.server.SubmitActivities;
+import communication.handler.client.SubmitActivities;
 import communication.handler.server.serialized.SerializedBoard;
 import communication.handler.server.serialized.SerializedClearing;
 import communication.handler.server.serialized.SerializedTile;
