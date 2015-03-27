@@ -387,4 +387,9 @@ public class ControllerMain implements ClientController {
 
 	}
 
+	@Override
+	public void checkSwordsmanTurn() {
+		mainView.displayMessage("Would you like to take your turn now?");
+	}
+
 }

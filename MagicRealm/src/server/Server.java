@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import communication.ServerNetworkHandler;
+
 import model.enums.MapChitType;
 import model.enums.TileName;
 import client.ClientThread;
@@ -78,7 +80,10 @@ public class Server implements Runnable {
 	}
 
 	public synchronized void handle(int ID, Object input) {
-		controller.handle(input);
+		if (input instanceof ServerNetworkHandler) {
+			System.out.println("SERVER: recieved object from client.");
+			((ServerNetworkHandler) input).handle(controller);
+		}
 	}
 	public synchronized void remove(int ID) {
 		controller.remove(ID);

@@ -8,6 +8,7 @@ import java.net.Socket;
 import model.enums.CharacterType;
 import model.enums.CounterType;
 import model.enums.ValleyChit;
+import model.activity.Activity;
 import model.character.Character;
 import model.character.CharacterFactory;
 public class ClientThread extends Thread {
@@ -19,6 +20,7 @@ public class ClientThread extends Thread {
 	private boolean done = false;
 	private Character character;
 	private boolean characterPicked = false;
+	private Iterable<Activity> currentActivities;
 	
 	public ClientThread(Server server, Socket socket) {
 		super();
@@ -83,5 +85,14 @@ public class ClientThread extends Thread {
 
 	public Character getCharacter() {
 		return character;
+	}
+
+	public void setCurrentActivities(Iterable<Activity> activities) {
+		currentActivities = activities;		
+	}
+
+	public Object getCurrentActivities() {
+		// TODO Auto-generated method stub
+		return currentActivities == null;
 	}
 }

@@ -73,4 +73,6 @@ public interface ClientController {
 
 	void setCharacter(Character character);
 
+	void checkSwordsmanTurn();
+
 }

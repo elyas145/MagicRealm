@@ -17,6 +17,7 @@ import model.enums.TileName;
 import model.enums.ValleyChit;
 import communication.ClientNetworkHandler;
 import communication.ServerNetworkHandler;
+import communication.handler.server.CheckSwordsmanPlay;
 import communication.handler.server.EnterCharacterSelection;
 import communication.handler.server.EnterLobby;
 import communication.handler.server.InitBoard;
@@ -35,7 +36,8 @@ public class ServerController {
 	private ArrayList<ClientThread> clients;
 	private int clientCount = 0;
 	private ModelController model;
-	SerializedBoard sboard;
+	private SerializedBoard sboard;
+	private boolean swordsmanTurn = false;
 
 	public ServerController(Server s) {
 		this.server = s;
@@ -118,20 +120,6 @@ public class ServerController {
 	}
 
 	/**
-	 * called when a client sends something to the server.
-	 * 
-	 * @param iD
-	 * @param input
-	 */
-	public void handle(Object input) {
-		if (input instanceof ServerNetworkHandler) {
-			System.out.println("SERVER: recieved object from client.");
-			((ServerNetworkHandler) input).handle(this);
-		}
-
-	}
-
-	/**
 	 * called when the client selects their character
 	 * 
 	 * @param iD
@@ -175,16 +163,57 @@ public class ServerController {
 	}
 
 	public void addSound(MapChitType sound, TileName tile, Integer clearing) {
-		model.addSound(sound, tile, clearing);		
+		model.addSound(sound, tile, clearing);
 	}
 
 	public void addWarning(MapChitType type, TileName tile) {
 		model.addWarning(type, tile);
-		
+
 	}
 
 	public void submitActivities(int id, Iterable<Activity> activities) {
-		// TODO Auto-generated method stub
-		
+		clients.get(findClient(id)).setCurrentActivities(activities);
+		boolean done = true;
+		// check if birdsong is done.
+		for (ClientThread client : clients) {
+			if (client.getCurrentActivities() == null) {
+				done = false;
+				return;
+			}
+		}
+		if (done) {
+			// start playing the phases. (daylight)
+			startDayLight();
+		}
+	}
+
+	private void startDayLight() {
+		ClientThread swordsmanPlayer = null;
+		boolean waiting = true;
+		// check if a client has a swordsman.
+		for (ClientThread client : clients) {
+			if (client.getCharacter().getType() == CharacterType.SWORDSMAN) {
+				swordsmanPlayer = client;
+				break;
+			}
+		}
+		// check if the swords man wants to play.
+		if (swordsmanPlayer != null) {
+			swordsmanPlayer.send(new CheckSwordsmanPlay());
+			synchronized (this) {
+				try {
+					wait();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			if(swordsmanTurn){
+				
+			}
+		}
+	}
+	public void setSwordsManTurn(boolean playing){
+		swordsmanTurn = playing;
 	}
 }
