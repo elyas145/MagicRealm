@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lwjglview.graphics.LWJGLGraphics;
-
 import utils.images.ImageTools;
+import utils.images.ImageTools.GraphicsHandler;
 
 public class LWJGLTextureArrayLoader {
 	
@@ -15,6 +15,7 @@ public class LWJGLTextureArrayLoader {
 		
 		protected UnitLoader(int loc) {
 			location = loc;
+			refresh = false;
 		}
 
 		@Override
@@ -29,6 +30,10 @@ public class LWJGLTextureArrayLoader {
 
 		@Override
 		public void useTexture(LWJGLGraphics gfx) {
+			if(refresh) {
+				updateUnit(location, graphics);
+				refresh = false;
+			}
 			useTextures(gfx);
 			gfx.getShaders().setUniformIntValue("index", location);
 		}
@@ -54,7 +59,15 @@ public class LWJGLTextureArrayLoader {
 			return height;
 		}
 		
+		@Override
+		public void updateFromGraphicsHandler(GraphicsHandler gh) {
+			refresh = true;
+			graphics = gh;
+		}
+		
 		private int location;
+		private boolean refresh;
+		private GraphicsHandler graphics;
 		
 	}
 
@@ -66,18 +79,18 @@ public class LWJGLTextureArrayLoader {
 		rawData = null;
 	}
 
-	public int addImage(BufferedImage bi) {
+	public UnitLoader addImage(BufferedImage bi) {
 		if (bi.getHeight() == height && bi.getWidth() == width) {
 			images.add(bi);
 		} else {
 			images.add(ImageTools.scaleImage(bi, width, height));
 		}
-		return images.size() - 1;
+		return new UnitLoader(images.size() - 1);
 	}
 
-	public int addImage(ImageTools.GraphicsHandler gh) {
+	public UnitLoader addImage(ImageTools.GraphicsHandler gh) {
 		images.add(ImageTools.createImage(width, height, gh));
-		return images.size() - 1;
+		return new UnitLoader(images.size() - 1);
 	}
 
 	public void loadImages() {//BufferUtils.createByteBuffer
@@ -113,6 +126,10 @@ public class LWJGLTextureArrayLoader {
 		loadTextures(gfx);
 		gfx.bindTextureArray(textureIndex, unit);
 		gfx.getShaders().setUniformIntValue(uniform, unit);
+	}
+	
+	public void updateUnit(int loc, GraphicsHandler gh) {
+		
 	}
 
 	private int width;

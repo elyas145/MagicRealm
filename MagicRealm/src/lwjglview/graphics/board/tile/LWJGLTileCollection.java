@@ -24,6 +24,7 @@ import lwjglview.graphics.LWJGLGraphics;
 import lwjglview.graphics.board.LWJGLBoardDrawable;
 import lwjglview.graphics.shader.ShaderType;
 import lwjglview.graphics.textures.LWJGLTextureArrayLoader;
+import lwjglview.graphics.textures.LWJGLTextureLoader;
 import lwjglview.selection.SelectionFrame;
 import lwjglview.selection.SelectionShaderType;
 import model.EnchantedHolder;
@@ -43,8 +44,8 @@ public class LWJGLTileCollection extends LWJGLDrawableNode {
 		selectionTextures = new LWJGLTextureArrayLoader(selectWidth,
 				selectHeight);
 		tiles = new HashMap<TileName, LWJGLTileDrawable>();
-		textureLocations = new HashMap<TileName, EnchantedHolder<Integer>>();
-		selectionLocations = new HashMap<TileName, EnchantedHolder<Integer>>();
+		textureLocations = new HashMap<TileName, EnchantedHolder<LWJGLTextureLoader>>();
+		selectionLocations = new HashMap<TileName, EnchantedHolder<LWJGLTextureLoader>>();
 		buffer3 = Matrix.zeroVector(3);
 		buffer3A = Matrix.zeroVector(3);
 		remaining = new HashSet<TileName>();
@@ -74,9 +75,9 @@ public class LWJGLTileCollection extends LWJGLDrawableNode {
 
 	public void setTile(TileName tile, int rw, int cl, int rot,
 			Iterable<? extends ClearingInterface> clears) {
-		EnchantedHolder<Integer> loc = textureLocations.get(tile);
-		selectionLocations.put(tile, new EnchantedHolder<Integer>());
-		EnchantedHolder<Integer> sel = selectionLocations.get(tile);
+		EnchantedHolder<LWJGLTextureLoader> loc = textureLocations.get(tile);
+		selectionLocations.put(tile, new EnchantedHolder<LWJGLTextureLoader>());
+		EnchantedHolder<LWJGLTextureLoader> sel = selectionLocations.get(tile);
 		ClearingSelectionGenerator selectionGen = new ClearingSelectionGenerator(
 				tile, clears);
 		selectionGen.setEnchanted(false);
@@ -146,7 +147,7 @@ public class LWJGLTileCollection extends LWJGLDrawableNode {
 		for (TileName type : TileName.values()) {
 			textureLocations
 					.put(type,
-							new EnchantedHolder<Integer>(textures
+							new EnchantedHolder<LWJGLTextureLoader>(textures
 									.addImage(TileImages.getTileImage(rh, type,
 											false)), textures
 									.addImage(TileImages.getTileImage(rh, type,
@@ -245,8 +246,8 @@ public class LWJGLTileCollection extends LWJGLDrawableNode {
 	
 	private Set<TileName> remaining;
 
-	private Map<TileName, EnchantedHolder<Integer>> textureLocations;
-	private Map<TileName, EnchantedHolder<Integer>> selectionLocations;
+	private Map<TileName, EnchantedHolder<LWJGLTextureLoader>> textureLocations;
+	private Map<TileName, EnchantedHolder<LWJGLTextureLoader>> selectionLocations;
 	private Map<TileName, LWJGLTileDrawable> tiles;
 	private LWJGLTextureArrayLoader textures;
 	private LWJGLTextureArrayLoader selectionTextures;

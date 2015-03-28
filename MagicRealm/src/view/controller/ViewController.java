@@ -9,6 +9,7 @@ import model.character.Phase;
 import model.enums.CharacterType;
 import model.enums.TileName;
 import model.player.PersonalHistory;
+import utils.handler.Handler;
 import view.controller.search.SearchView;
 
 public interface ViewController {
@@ -28,6 +29,7 @@ public interface ViewController {
 	
 	void enterMainMenu();
 	void enterLobby();
+	void enterCharacterSelection(List<CharacterType> characters, Handler<CharacterType> onselect);
 	void enterSplashScreen();
 	void exit();
 	SearchView enterSearchView(CharacterType character);

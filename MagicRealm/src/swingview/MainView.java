@@ -31,6 +31,7 @@ import model.player.PersonalHistory;
 import swingview.controller.birdsong.BirdSongView;
 import swingview.controller.mainmenu.MainMenu;
 import swingview.controller.search.SearchView;
+import utils.handler.Handler;
 import utils.resources.ResourceHandler;
 import utils.time.Timing;
 import view.controller.ViewController;
@@ -215,6 +216,13 @@ public class MainView extends JFrame implements ViewController,
 	@Override
 	public void setPlayerActivities(CharacterType character,
 			List<Activity> activities) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void enterCharacterSelection(List<CharacterType> characters,
+			Handler<CharacterType> onselect) {
 		// TODO Auto-generated method stub
 		
 	}

@@ -1,5 +1,6 @@
 package lwjglview.graphics.textures;
 
+import utils.images.ImageTools.GraphicsHandler;
 import lwjglview.graphics.LWJGLGraphics;
 
 public interface LWJGLTextureLoader {
@@ -17,5 +18,7 @@ public interface LWJGLTextureLoader {
 	int getWidth();
 	
 	int getHeight();
+
+	void updateFromGraphicsHandler(GraphicsHandler gh);
 
 }

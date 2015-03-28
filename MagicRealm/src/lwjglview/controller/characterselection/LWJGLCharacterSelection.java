@@ -3,6 +3,8 @@ package lwjglview.controller.characterselection;
 import java.util.ArrayList;
 import java.util.List;
 
+import config.GraphicsConfiguration;
+import utils.math.linear.Matrix;
 import utils.resources.ResourceHandler;
 import lwjglview.graphics.LWJGLGraphics;
 import lwjglview.menus.LWJGLContentPane;
@@ -23,6 +25,24 @@ public class LWJGLCharacterSelection extends LWJGLContentPane {
 			f += .7f;
 			characterViews.add(cv);
 			cv.setVisible(true);
+		}
+		position = Matrix.columnVector(0f, 1f, 0f);
+		visible = true;
+		setVisible(false);
+	}
+	
+	public void setVisible(boolean vis) {
+		if(vis ^ visible) {
+			if(vis) {
+				for(LWJGLPanel pane: characterViews) {
+					pane.resetPosition();
+				}
+			}
+			else {
+				for(LWJGLPanel pane: characterViews) {
+					pane.slide(position, GraphicsConfiguration.PANEL_TIME);
+				}
+			}
 		}
 	}
 
@@ -54,7 +74,9 @@ public class LWJGLCharacterSelection extends LWJGLContentPane {
 	public void updateNodeUniforms(LWJGLGraphics gfx) {
 	}
 	
+	private boolean visible;
 	private List<LWJGLPanel> characterViews;
 	private LWJGLContentPane parent;
+	private Matrix position;
 
 }

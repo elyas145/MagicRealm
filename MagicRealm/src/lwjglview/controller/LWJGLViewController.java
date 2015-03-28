@@ -1,5 +1,7 @@
 package lwjglview.controller;
 
+import java.awt.Color;
+import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -42,15 +44,15 @@ public class LWJGLViewController implements ViewController {
 		selections = new SelectionFrame(graphics);
 		menus = new LWJGLMenuLayer(graphics, selections);
 		mainMenu = new LWJGLMainMenu(this, resources);
-		LWJGLCharacterSelection character = new LWJGLCharacterSelection(rh, graphics, menus);
-		menus.add(character);
+		characterSelection = new LWJGLCharacterSelection(rh, graphics, menus);
+		menus.add(characterSelection);
 		splash = LWJGLPanel.fromPicture(menus, resources,
 				ResourceHandler.joinPath("splash", "splash.jpg"), -1.78f, -1f,
 				2.3f, true);
 		menus.add(splash);
 		LWJGLAlertDialog ald = new LWJGLAlertDialog(menus, resources, "this is a very very long message to fill the alert!", -.5f, 1f, -.5f, 0f, .5f);
 		menus.add(ald);
-		ald.show();
+		birdsong = new LWJGLBirdsong(resources, menus);
 		board = null;
 		this.controller = controller;
 	}
@@ -83,7 +85,7 @@ public class LWJGLViewController implements ViewController {
 	public void enterBirdSong(CharacterType type, int day, List<Phase> phases,
 			PersonalHistory personalHistory,
 			Map<TileName, List<Integer>> tileClrs) {
-
+		birdsong.setVisible(true);
 	}
 
 	@Override
@@ -100,8 +102,15 @@ public class LWJGLViewController implements ViewController {
 
 	@Override
 	public void enterLobby() {
-		// TODO Auto-generated method stub
+		LWJGLPanel lobbyPanel = LWJGLPanel.fromString(menus, "THIS IS THE LOBBY", new Font("Times New Roman", Font.PLAIN, 100), Color.WHITE, 1200, 120, -1f, -1f, .1f, false);
+		lobbyPanel.setVisible(true);
+		menus.add(lobbyPanel);
+	}
 
+	@Override
+	public void enterCharacterSelection(List<CharacterType> characters,
+			Handler<CharacterType> onselect) {
+		characterSelection.setVisible(true);
 	}
 
 	@Override
@@ -143,7 +152,6 @@ public class LWJGLViewController implements ViewController {
 			board = new LWJGLBoardDrawable(resources, graphics, selections);
 			board.setDefaultClearingFocus();
 			splash.setVisible(false);
-			birdsong = new LWJGLBirdsong(resources, menus);
 			controller.setBoardView(board);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -156,6 +164,7 @@ public class LWJGLViewController implements ViewController {
 	private LWJGLGraphics graphics;
 	private LWJGLMenuLayer menus;
 	private LWJGLMainMenu mainMenu;
+	private LWJGLCharacterSelection characterSelection;
 	private LWJGLBirdsong birdsong;
 	private LWJGLPanel splash;
 

@@ -5,8 +5,8 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import lwjglview.graphics.LWJGLGraphics;
-
 import utils.images.ImageTools;
+import utils.images.ImageTools.GraphicsHandler;
 import utils.resources.Images;
 import utils.resources.ResourceHandler;
 
@@ -94,6 +94,12 @@ public class LWJGLSingleTextureLoader implements LWJGLTextureLoader {
 	@Override
 	public int getHeight() {
 		return height;
+	}
+	
+	@Override
+	public void updateFromGraphicsHandler(GraphicsHandler gh) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 	private void init(BufferedImage bi) {

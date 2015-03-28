@@ -2,8 +2,6 @@ package lwjglview.menus;
 
 import java.nio.FloatBuffer;
 
-import org.lwjgl.BufferUtils;
-
 import utils.handler.Handler;
 import utils.math.Mathf;
 import utils.math.linear.Matrix;
@@ -12,15 +10,12 @@ import config.GraphicsConfiguration;
 import lwjglview.graphics.LWJGLGraphics;
 import lwjglview.graphics.counters.LWJGLCounterDrawable;
 import lwjglview.graphics.counters.LWJGLCounterLocator;
-import lwjglview.graphics.LWJGLTextureLoader;
 import lwjglview.graphics.animator.Animator;
 import lwjglview.graphics.animator.TimeAnimator;
 import lwjglview.graphics.animator.matrixcalculator.MatrixCalculator;
-import lwjglview.graphics.model.ModelData;
 import lwjglview.graphics.shader.GLShaderHandler;
 import lwjglview.graphics.shader.ShaderType;
 import lwjglview.graphics.textures.LWJGLSingleTextureLoader;
-import model.enums.CharacterType;
 import model.enums.CounterType;
 
 public class LWJGLCounterView extends LWJGLCounterLocator {

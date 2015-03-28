@@ -188,6 +188,16 @@ public class LWJGLPanel extends LWJGLContentPane {
 	public LWJGLTextureLoader getTexture() {
 		return texture;
 	}
+	
+	public void updateFromString(String message, Font font, Color color) {
+		// TODO Auto-generated method stub
+		updateFromGraphics(new ImageTools.StringDrawer(message,
+				font, color));
+	}
+	
+	public void updateFromGraphics(ImageTools.GraphicsHandler gh) {
+		getTexture().updateFromGraphicsHandler(gh);
+	}
 
 	private void init(LWJGLContentPane pane, SelectionFrame select,
 			LWJGLTextureLoader text, float xPos, float yPos, float w, float h,

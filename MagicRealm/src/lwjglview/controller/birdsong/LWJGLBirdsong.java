@@ -88,6 +88,7 @@ public class LWJGLBirdsong implements BirdsongView {
 			phases.add(select);
 		}
 		visible = true;
+		setVisible(false);
 		showPhases(7);
 	}
 

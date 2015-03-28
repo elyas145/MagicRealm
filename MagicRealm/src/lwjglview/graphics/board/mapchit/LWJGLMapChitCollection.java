@@ -18,6 +18,7 @@ import lwjglview.graphics.counters.LWJGLCounterDrawable;
 import lwjglview.graphics.counters.LWJGLCounterLocator;
 import lwjglview.graphics.shader.ShaderType;
 import lwjglview.graphics.textures.LWJGLTextureArrayLoader;
+import lwjglview.graphics.textures.LWJGLTextureLoader;
 import model.counter.chit.MapChit;
 import model.enums.MapChitType;
 
@@ -33,7 +34,7 @@ public class LWJGLMapChitCollection extends LWJGLDrawableNode {
 		resources = rh.getCounterGenerator();
 		mapChits = new HashMap<MapChit, LWJGLCounterDrawable>();
 		drawables = new HashSet<LWJGLCounterDrawable>();
-		textureLocations = new HashMap<MapChitType, Map<Character, Integer>>();
+		textureLocations = new HashMap<MapChit, LWJGLTextureLoader>();
 		textures = new LWJGLTextureArrayLoader(
 				GraphicsConfiguration.IMAGE_SCALE_WIDTH,
 				GraphicsConfiguration.IMAGE_SCALE_HEIGHT);
@@ -138,13 +139,7 @@ public class LWJGLMapChitCollection extends LWJGLDrawableNode {
 	}
 
 	private void loadImage(MapChit mc) {
-		MapChitType mct = mc.getType();
-		if (!textureLocations.containsKey(mct)) {
-			textureLocations.put(mct, new HashMap<Character, Integer>());
-		}
-		Map<Character, Integer> typeLocations = textureLocations.get(mct);
-		char mcid = mc.getIdentifier();
-		typeLocations.put(mcid, textures.addImage(new MapChitImageGenerator(mc)));
+		textureLocations.put(mc, textures.addImage(new MapChitImageGenerator(mc)));
 	}
 	
 	private LWJGLCounterGenerator resources;
@@ -153,6 +148,6 @@ public class LWJGLMapChitCollection extends LWJGLDrawableNode {
 	private LWJGLTextureArrayLoader textures;
 	private Map<MapChit, LWJGLCounterDrawable> mapChits;
 	private Set<LWJGLCounterDrawable> drawables;
-	private Map<MapChitType, Map<Character, Integer>> textureLocations;
+	private Map<MapChit, LWJGLTextureLoader> textureLocations;
 
 }

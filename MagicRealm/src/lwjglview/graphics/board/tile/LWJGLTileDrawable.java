@@ -17,6 +17,7 @@ import lwjglview.graphics.animator.FillerAnimator;
 import lwjglview.graphics.animator.TimedAnimator;
 import lwjglview.graphics.animator.matrixcalculator.MatrixCalculator;
 import lwjglview.graphics.board.tile.clearing.LWJGLClearingStorage;
+import lwjglview.graphics.textures.LWJGLTextureLoader;
 import lwjglview.selection.SelectionFrame;
 import model.EnchantedHolder;
 import model.interfaces.ClearingInterface;
@@ -26,8 +27,9 @@ import utils.math.linear.Matrix;
 public class LWJGLTileDrawable extends LWJGLDrawableNode implements
 		MatrixCalculator {
 
-	public LWJGLTileDrawable(LWJGLTileCollection parent, Matrix pos, float rot, int id,
-			EnchantedHolder<Integer> textureLocs, EnchantedHolder<Integer> selectLocs,
+	public LWJGLTileDrawable(LWJGLTileCollection parent, Matrix pos, float rot,
+			int id, EnchantedHolder<LWJGLTextureLoader> textureLocs,
+			EnchantedHolder<LWJGLTextureLoader> selectLocs,
 			Iterable<? extends ClearingInterface> clears) {
 		super(parent);
 		tiles = parent;
@@ -52,7 +54,7 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode implements
 		identifier = id;
 	}
 
-	public void setTextures(int norm, int ench) {
+	public void setTextures(LWJGLTextureLoader norm, LWJGLTextureLoader ench) {
 		textureLocation.set(false, norm);
 		textureLocation.set(true, ench);
 	}
@@ -97,7 +99,7 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode implements
 		Matrix mat = flipper.apply();
 		translation.multiply(mat, transformation);
 		SelectionFrame sf = tiles.getSelectionFrame();
-		if(!sf.isSelectionPass()) {
+		if (!sf.isSelectionPass()) {
 			transformation.multiply(rotation, transformation);
 		}
 		return transformation;
@@ -106,9 +108,9 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode implements
 	@Override
 	public void updateNodeUniforms(LWJGLGraphics lwgfx) {
 		SelectionFrame sf = tiles.getSelectionFrame();
-		if(sf.isSelectionPass()) {
+		if (sf.isSelectionPass()) {
 			sf.loadID(identifier, lwgfx);
-			lwgfx.getShaders().setUniformIntValue("index", selectionLocation.get(isEnchanted()));
+			selectionLocation.get(isEnchanted()).useTexture(lwgfx);
 		}
 	}
 
@@ -175,7 +177,7 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode implements
 
 	private abstract class TileFace extends LWJGLDrawableLeaf {
 
-		public abstract int getIndex();
+		public abstract void loadTexture(LWJGLGraphics gfx);
 
 		public TileFace(LWJGLDrawableNode parent, Matrix mat, LWJGLDrawable repr) {
 			super(parent, mat, repr);
@@ -185,7 +187,7 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode implements
 		public void updateNodeUniforms(LWJGLGraphics lwgfx) {
 			lwgfx.updateModelViewUniform("modelViewMatrix");
 			lwgfx.updateMVPUniform("mvpMatrix");
-			lwgfx.getShaders().setUniformIntValue("index", getIndex());
+			loadTexture(lwgfx);
 		}
 	}
 
@@ -198,16 +200,17 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode implements
 		}
 
 		@Override
-		public int getIndex() {
+		public void loadTexture(LWJGLGraphics gfx) {
 			SelectionFrame sf = tiles.getSelectionFrame();
-			if(sf.isSelectionPass()) {
-				return sel;
+			if (sf.isSelectionPass()) {
+				sel.useTexture(gfx);
+			} else {
+				tex.useTexture(gfx);
 			}
-			return tex;
 		}
 
-		private int tex;
-		private int sel;
+		private LWJGLTextureLoader tex;
+		private LWJGLTextureLoader sel;
 
 	}
 
@@ -218,8 +221,8 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode implements
 		}
 
 		@Override
-		public int getIndex() {
-			return -1;
+		public void loadTexture(LWJGLGraphics gfx) {
+			gfx.getShaders().setUniformIntValue("index", -1);
 		}
 
 	}
@@ -233,8 +236,8 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode implements
 	private Matrix position;
 	// private Matrix vector;
 	private Matrix translation;
-	private EnchantedHolder<Integer> textureLocation;
-	private EnchantedHolder<Integer> selectionLocation;
+	private EnchantedHolder<LWJGLTextureLoader> textureLocation;
+	private EnchantedHolder<LWJGLTextureLoader> selectionLocation;
 	private boolean enchanted;
 	private AnimationQueue flipper;
 	private int identifier;
