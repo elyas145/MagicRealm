@@ -69,7 +69,7 @@ public interface ClientController {
 
 	void updateCharacterSelection(CharacterType character);
 
-	void setBoardView(LWJGLBoardDrawable board);
+	void setBoardView(BoardView board);
 
 	void setCharacter(Character character);
 

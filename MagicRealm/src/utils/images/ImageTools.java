@@ -50,22 +50,27 @@ public class ImageTools {
 		private static Color FILL = new Color(255, 255, 255, 255);
 	}
 
+	public static BufferedImage createImage(BufferedImage buffer, int width, int height,
+			GraphicsHandler gh) {
+
+		Graphics g = buffer.createGraphics();
+		gh.draw(g, width, height);
+		g.dispose();
+		
+		for(int i = 0; i < buffer.getWidth(); ++i) {
+			for(int j = 0; j < buffer.getHeight(); ++j) {
+				buffer.setRGB(i, j, gh.post(buffer.getRGB(i, j)));
+			}
+		}
+		return buffer;
+	}
+
 	public static BufferedImage createImage(int width, int height,
 			GraphicsHandler gh) {
 
 		BufferedImage newImage = new BufferedImage(width, height,
 				BufferedImage.TYPE_INT_ARGB);
-
-		Graphics g = newImage.createGraphics();
-		gh.draw(g, width, height);
-		g.dispose();
-		
-		for(int i = 0; i < newImage.getWidth(); ++i) {
-			for(int j = 0; j < newImage.getHeight(); ++j) {
-				newImage.setRGB(i, j, gh.post(newImage.getRGB(i, j)));
-			}
-		}
-		return newImage;
+		return createImage(newImage, width, height, gh);
 	}
 
 	public static BufferedImage createScaledImage(int width, int height,

@@ -7,6 +7,6 @@ import model.enums.CharacterType;
 
 public interface CharacterSelectionView {
 	
-	void selectCharacter(List<CharacterType> characters, Handler<CharacterType> onselect);
+	void selectCharacter(List<CharacterType> characters, CharacterSelectionListener onselect);
 
 }

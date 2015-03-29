@@ -10,6 +10,8 @@ import model.enums.CharacterType;
 import model.enums.TileName;
 import model.player.PersonalHistory;
 import utils.handler.Handler;
+import view.controller.characterselection.CharacterSelectionListener;
+import view.controller.mainmenu.MenuItemListener;
 import view.controller.search.SearchView;
 
 public interface ViewController {
@@ -27,11 +29,14 @@ public interface ViewController {
 	
 	void displayMessage(String string);
 	
-	void enterMainMenu();
+	void enterMainMenu(MenuItemListener mil);
+	
 	void enterLobby();
-	void enterCharacterSelection(List<CharacterType> characters, Handler<CharacterType> onselect);
+	void waitingForPlayers(int count);
+	
+	void enterCharacterSelection(List<CharacterType> characters, CharacterSelectionListener onselect);
 	void enterSplashScreen();
 	void exit();
 	SearchView enterSearchView(CharacterType character);
-	void startNetworkGame();
+	void startGame(BoardReadyListener brl);
 }

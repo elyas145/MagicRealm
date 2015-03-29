@@ -215,10 +215,10 @@ public final class LWJGLGraphics {
 				GL_TEXTURE_2D, texID, 0);
 		int depth = glGenRenderbuffers();
 		glBindRenderbuffer(GL_RENDERBUFFER, depth);
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24,
-				width, height);
-		glFramebufferRenderbuffer(GL_FRAMEBUFFER,
-				GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depth);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, width,
+				height);
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
+				GL_RENDERBUFFER, depth);
 		releaseFrameBuffer();
 	}
 
@@ -252,16 +252,18 @@ public final class LWJGLGraphics {
 		return texID;
 	}
 
+	public void updateTexture(int location, ByteBuffer rawData, int height,
+			int width) {
+		bindTexture(location);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA,
+				GL_UNSIGNED_BYTE, rawData);
+	}
+
 	public int loadTextureArray(ByteBuffer rawData, int number, int height,
 			int width, boolean accurate) {
 		int texID = glGenTextures();
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D_ARRAY, texID);
-		/*
-		 * glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_RGBA8, width, height,
-		 * number); glTexSubImage3D(GL_TEXTURE_2D_ARRAY, 0, 0, 0, 0, width,
-		 * height, number, GL_RGBA, GL_UNSIGNED_BYTE, rawData);
-		 */
 		glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGB8, width, height, number, 0,
 				GL_RGBA, GL_UNSIGNED_BYTE, rawData);
 		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER,

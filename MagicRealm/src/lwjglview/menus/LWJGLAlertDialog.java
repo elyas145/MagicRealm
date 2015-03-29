@@ -4,48 +4,45 @@ import java.awt.Color;
 import java.awt.Font;
 
 import config.GraphicsConfiguration;
-import lwjglview.graphics.LWJGLGraphics;
-import lwjglview.selection.SelectionFrame;
+import lwjglview.graphics.textures.LWJGLSingleTextureLoader;
+import lwjglview.graphics.textures.LWJGLTextureLoader;
 import utils.math.linear.Matrix;
 import utils.resources.ResourceHandler;
-import view.selection.CursorListener;
-import view.selection.CursorSelection;
 
-public class LWJGLAlertDialog extends LWJGLContentPane {
+public class LWJGLAlertDialog {
 
 	private static final Font FONT = new Font("Times New Roman", Font.PLAIN, 80);
+	private static final Color COLOR = Color.GRAY;
 
 	public LWJGLAlertDialog(LWJGLContentPane cp, ResourceHandler rh,
 			String msg, float xi, float yi, float xf, float yf, float size) {
-		super(cp);
-		selectFrame = cp.getSelectionFrame();
 		showPosition = Matrix.columnVector(xf, yf, 0f);
-		root = LWJGLPanel.fromPicture(this, rh,
+		root = LWJGLPanel.fromPicture(cp, rh,
 				ResourceHandler.joinPath("menus", "alert", "bg.gif"), xi, yi,
 				size, true);
-		message = LWJGLPanel.fromString(root, msg, FONT, Color.GRAY, 1800, 100,
-				0f, size * .6f, size * .1f, false);
+		message = LWJGLPanel.fromString(root, msg, FONT, COLOR, 1800, 100, 0f,
+				size * .6f, size * .1f, false);
 		root.add(message);
-		button = LWJGLPanel.fromString(root, "OK", FONT, Color.GRAY, 140, 100,
-				size * .85f, size * .3f, size * .1f, true);
-		root.add(button);
-		button.setCursorListener(new CursorListener() {
+		LWJGLTextureLoader buttonBG = new LWJGLSingleTextureLoader(rh,
+				ResourceHandler.joinPath("menus", "main", "button.png"));
+		button = new LWJGLButton(root, "OK", buttonBG, size * .85f, size * .3f,
+				size * .1f);
+		button.setListener(new Runnable() {
 
 			@Override
-			public void onMove(int x, int y) {
-			}
-
-			@Override
-			public void onSelection(CursorSelection select, boolean down) {
-				if (down && select == CursorSelection.PRIMARY) {
-					hide();
-				}
+			public void run() {
+				hide();
 			}
 
 		});
 		root.setVisible(true);
 		message.setVisible(true);
 		button.setVisible(true);
+		cp.add(root);
+	}
+
+	public void setMessage(String msg) {
+		message.updateFromString(msg, FONT, COLOR);
 	}
 
 	public void hide() {
@@ -55,33 +52,10 @@ public class LWJGLAlertDialog extends LWJGLContentPane {
 	public void show() {
 		root.moveTo(showPosition, GraphicsConfiguration.PANEL_TIME);
 	}
-
-	@Override
-	public void draw(LWJGLGraphics gfx) {
-		root.draw(gfx);
-	}
-
-	@Override
-	public void add(LWJGLContentPane pane) {
-	}
-
-	@Override
-	public void remove(LWJGLContentPane pane) {
-	}
-
-	@Override
-	public SelectionFrame getSelectionFrame() {
-		return selectFrame;
-	}
-
-	@Override
-	public void updateNodeUniforms(LWJGLGraphics gfx) {
-	}
-
-	private SelectionFrame selectFrame;
+	
 	private Matrix showPosition;
 	private LWJGLPanel root;
 	private LWJGLPanel message;
-	private LWJGLPanel button;
+	private LWJGLButton button;
 
 }

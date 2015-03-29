@@ -15,8 +15,8 @@ import communication.handler.client.SubmitActivities;
 import communication.handler.server.serialized.SerializedBoard;
 import communication.handler.server.serialized.SerializedClearing;
 import communication.handler.server.serialized.SerializedTile;
+import config.NetworkConfiguration;
 import lwjglview.controller.LWJGLViewController;
-import lwjglview.graphics.board.LWJGLBoardDrawable;
 import model.activity.Activity;
 import model.board.Board;
 import model.board.clearing.Clearing;
@@ -29,26 +29,48 @@ import model.enums.CounterType;
 import model.enums.TileName;
 import model.enums.ValleyChit;
 import model.exceptions.MRException;
-import swingview.MainView;
 import utils.resources.ResourceHandler;
+import view.controller.BoardReadyListener;
+import view.controller.ViewController;
 import view.controller.game.BoardView;
+import view.controller.mainmenu.MenuItem;
+import view.controller.mainmenu.MenuItemListener;
 
 public class ControllerMain implements ClientController {
 
 	private ResourceHandler rh;
 	private BoardView boardView;
-	private LWJGLViewController mainView;
+	private ViewController mainView;
 	private Board board;
 	private Character character;
 	private int clientID = -1;
 	private ClientServer server;
 	private int sleepTime = 2000;
+	
+	private MenuItemListener mainMenuListener;
 
 	public ControllerMain() {
 		rh = new ResourceHandler();
-		mainView = new LWJGLViewController(rh, this);
+		mainView = new LWJGLViewController(rh);
 
 		server = new ClientServer(this);
+		
+		mainMenuListener = new MenuItemListener() {
+
+			@Override
+			public void onItemSelect(MenuItem item) {
+				switch (item) {
+				case START_GAME:
+					startNetworkGame();
+					break;
+				case EXIT:
+					exit();
+					break;
+				}
+			}
+
+		};
+		
 		goToMainMenu();
 	}
 
@@ -79,7 +101,7 @@ public class ControllerMain implements ClientController {
 	 * called when the client launches the game (controller constructor)
 	 */
 	public void goToMainMenu() {
-		mainView.enterMainMenu();
+		mainView.enterMainMenu(mainMenuListener);
 	}
 
 	@Override
@@ -268,7 +290,6 @@ public class ControllerMain implements ClientController {
 
 		// TODO for testing purposes
 		characterSelected(CharacterType.AMAZON, ValleyChit.HOUSE);
-		// TODO gfx.enterCharacterSelection();
 	}
 
 	/**
@@ -292,7 +313,8 @@ public class ControllerMain implements ClientController {
 	@Override
 	public void enterBirdSong() {
 		System.out.println("Entering bird song.");
-		// TODO gfx.enterBirdSong();
+		// TODO mainView.enterBirdSong(type, day, phases, personalHistory,
+		// tileClrs);
 	}
 
 	/**
@@ -332,15 +354,10 @@ public class ControllerMain implements ClientController {
 	}
 
 	@Override
-	public void connect(String ipaddress, int port) {
+	public void connect(String ipaddress, int port)
+			throws UnknownHostException, IOException {
 
-		try {
-			server.connect(ipaddress, port);
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		server.connect(ipaddress, port);
 	}
 
 	/**
@@ -351,7 +368,7 @@ public class ControllerMain implements ClientController {
 	@Override
 	public void updateLobbyCount(int count) {
 		System.out.println("update lobby count called: " + count);
-		// boardView.setLobbyCount(count);
+		mainView.waitingForPlayers(count);
 	}
 
 	@Override
@@ -376,7 +393,7 @@ public class ControllerMain implements ClientController {
 	}
 
 	@Override
-	public synchronized void setBoardView(LWJGLBoardDrawable board) {
+	public synchronized void setBoardView(BoardView board) {
 		boardView = board;
 		notify();
 	}
@@ -390,6 +407,25 @@ public class ControllerMain implements ClientController {
 	@Override
 	public void checkSwordsmanTurn() {
 		mainView.displayMessage("Would you like to take your turn now?");
+	}
+
+	private void startNetworkGame() {
+		try {
+			connect(NetworkConfiguration.DEFAULT_IP,
+					NetworkConfiguration.DEFAULT_PORT);
+			mainView.startGame(new BoardReadyListener() {
+
+				@Override
+				public void boardReady(BoardView bv) {
+					setBoardView(bv);
+				}
+
+			});
+		} catch (Exception e) {
+			e.printStackTrace();
+			mainView.displayMessage("The server is not available");
+			mainView.enterMainMenu(mainMenuListener);
+		}
 	}
 
 }

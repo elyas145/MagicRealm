@@ -34,7 +34,10 @@ import swingview.controller.search.SearchView;
 import utils.handler.Handler;
 import utils.resources.ResourceHandler;
 import utils.time.Timing;
+import view.controller.BoardReadyListener;
 import view.controller.ViewController;
+import view.controller.characterselection.CharacterSelectionListener;
+import view.controller.mainmenu.MenuItemListener;
 import config.GraphicsConfiguration;
 import config.NetworkConfiguration;
 
@@ -91,14 +94,6 @@ public class MainView extends JFrame implements ViewController,
 
 	@Override
 	public void run() {
-	}
-
-	@Override
-	public void enterMainMenu() {
-		MainMenu mainMenu = new MainMenu(this);
-		setContentPane(mainMenu);
-		pack();
-		setVisible(true);
 	}
 
 	public void enterBirdSong(CharacterType player, int day, List<Phase> phases,
@@ -168,14 +163,8 @@ public class MainView extends JFrame implements ViewController,
 	}
 
 	@Override
-	public void startNetworkGame() {
-		try {
-			gameController.connect(NetworkConfiguration.DEFAULT_IP, NetworkConfiguration.DEFAULT_PORT);
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	public void startGame(BoardReadyListener brl) {
+		brl.boardReady(board);
 	}
 
 	@Override
@@ -221,8 +210,23 @@ public class MainView extends JFrame implements ViewController,
 	}
 
 	@Override
+	public void enterMainMenu(MenuItemListener mil) {
+		MainMenu mainMenu = new MainMenu(this);
+		setContentPane(mainMenu);
+		pack();
+		setVisible(true);
+		System.out.println("MainMenu should implement MenuView!");
+	}
+
+	@Override
 	public void enterCharacterSelection(List<CharacterType> characters,
-			Handler<CharacterType> onselect) {
+			CharacterSelectionListener onselect) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void waitingForPlayers(int count) {
 		// TODO Auto-generated method stub
 		
 	}

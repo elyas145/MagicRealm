@@ -6,6 +6,9 @@ import java.util.List;
 import config.GraphicsConfiguration;
 import utils.math.linear.Matrix;
 import utils.resources.ResourceHandler;
+import view.controller.characterselection.CharacterSelectionListener;
+import view.controller.characterselection.CharacterSelectionView;
+import view.selection.PrimaryClickListener;
 import lwjglview.graphics.LWJGLGraphics;
 import lwjglview.menus.LWJGLContentPane;
 import lwjglview.menus.LWJGLCounterView;
@@ -13,7 +16,7 @@ import lwjglview.menus.LWJGLPanel;
 import lwjglview.selection.SelectionFrame;
 import model.enums.CharacterType;
 
-public class LWJGLCharacterSelection extends LWJGLContentPane {
+public class LWJGLCharacterSelection extends LWJGLContentPane implements CharacterSelectionView {
 
 	public LWJGLCharacterSelection(ResourceHandler rh, LWJGLGraphics gfx, LWJGLContentPane par) {
 		super(par);
@@ -22,6 +25,7 @@ public class LWJGLCharacterSelection extends LWJGLContentPane {
 		float f = -1f;
 		for(CharacterType ct: CharacterType.values()) {
 			LWJGLPanel cv = new LWJGLCounterView(ct.toCounter(), rh, gfx).getPanel(par, f, 0f, .5f, false);
+			cv.setCursorListener(new CharacterClick(ct));
 			f += .7f;
 			characterViews.add(cv);
 			cv.setVisible(true);
@@ -45,6 +49,12 @@ public class LWJGLCharacterSelection extends LWJGLContentPane {
 			}
 		}
 	}
+	
+	@Override
+	public void selectCharacter(List<CharacterType> characters,
+			CharacterSelectionListener onselect) {
+		onSelect = onselect;
+	}
 
 	@Override
 	public void draw(LWJGLGraphics gfx) {
@@ -55,14 +65,10 @@ public class LWJGLCharacterSelection extends LWJGLContentPane {
 
 	@Override
 	public void add(LWJGLContentPane pane) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void remove(LWJGLContentPane pane) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
@@ -74,9 +80,26 @@ public class LWJGLCharacterSelection extends LWJGLContentPane {
 	public void updateNodeUniforms(LWJGLGraphics gfx) {
 	}
 	
+	private class CharacterClick extends PrimaryClickListener {
+		
+		public CharacterClick(CharacterType ct) {
+			character = ct;
+		}
+
+		@Override
+		public void onClick() {
+			onSelect.onCharacterSelected(character);
+		}
+		
+		private CharacterType character;
+		
+	}
+	
 	private boolean visible;
 	private List<LWJGLPanel> characterViews;
 	private LWJGLContentPane parent;
 	private Matrix position;
+	
+	private CharacterSelectionListener onSelect;
 
 }
