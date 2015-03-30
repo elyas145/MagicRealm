@@ -190,7 +190,6 @@ public class LWJGLPanel extends LWJGLContentPane {
 	}
 	
 	public void updateFromString(String message, Font font, Color color) {
-		// TODO Auto-generated method stub
 		updateFromGraphics(new ImageTools.StringDrawer(message,
 				font, color));
 	}

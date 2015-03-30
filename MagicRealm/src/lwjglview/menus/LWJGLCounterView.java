@@ -83,15 +83,14 @@ public class LWJGLCounterView extends LWJGLCounterLocator {
 	@Override
 	public void draw(LWJGLGraphics gfx) {
 		if (bufferLoc < 0) {
-			bufferLoc = gfx.createFrameBuffer(WIDTH, HEIGHT);
+			bufferLoc = gfx.createFrameBuffer(WIDTH, HEIGHT, Mathf.PI / 8); // 22 degs FOV
 			textureLoc = gfx.generateBufferTexture(bufferLoc);
 		}
 		gfx.useFrameBuffer(bufferLoc);
 		gfx.setClearColor(0f, 1f, 1f, .8f);
 		gfx.clearActiveBuffers();
 		gfx.resetViewMatrix();
-		gfx.translateCamera(0f, 0f, -0.3f);
-		gfx.rotateCameraX(-Mathf.PI / 4);
+		gfx.translateCamera(0f, 0f, -0.2f);
 		updateTransformation();
 		counter.draw(gfx);
 	}

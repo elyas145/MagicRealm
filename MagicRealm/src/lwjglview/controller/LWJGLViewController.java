@@ -1,20 +1,17 @@
 package lwjglview.controller;
 
-import java.awt.Color;
-import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import config.NetworkConfiguration;
-import client.ClientController;
-import client.ControllerMain;
 import lwjglview.controller.birdsong.LWJGLBirdsong;
+import lwjglview.controller.lobby.LWJGLLobbyView;
 import lwjglview.controller.mainmenu.LWJGLMainMenu;
 import lwjglview.controller.characterselection.LWJGLCharacterSelection;
 import lwjglview.graphics.LWJGLGraphics;
 import lwjglview.graphics.board.LWJGLBoardDrawable;
 import lwjglview.menus.LWJGLAlertDialog;
+import lwjglview.menus.LWJGLConfirmationDialog;
 import lwjglview.menus.LWJGLMenuLayer;
 import lwjglview.menus.LWJGLPanel;
 import lwjglview.selection.SelectionFrame;
@@ -25,12 +22,16 @@ import model.enums.TileName;
 import model.player.PersonalHistory;
 import utils.handler.Handler;
 import utils.resources.ResourceHandler;
+import view.controller.BoardReadyListener;
 import view.controller.ViewController;
+import view.controller.birdsong.ActivitiesListener;
+import view.controller.characterselection.CharacterSelectionListener;
+import view.controller.mainmenu.MenuItemListener;
 import view.controller.search.SearchView;
 
 public class LWJGLViewController implements ViewController {
 
-	public LWJGLViewController(ResourceHandler rh, ControllerMain controller) {
+	public LWJGLViewController(ResourceHandler rh) {
 		resources = rh;
 		graphics = new LWJGLGraphics(rh);
 		graphics.prepareLayer(new Handler<LWJGLGraphics>() {
@@ -39,22 +40,28 @@ public class LWJGLViewController implements ViewController {
 			public void handle(LWJGLGraphics gfx) {
 				gfx.clearColourBuffer();
 			}
-			
+
 		}, LWJGLGraphics.LAYER0);
 		selections = new SelectionFrame(graphics);
 		menus = new LWJGLMenuLayer(graphics, selections);
-		mainMenu = new LWJGLMainMenu(this, resources);
+		mainMenu = new LWJGLMainMenu(menus, resources);
 		characterSelection = new LWJGLCharacterSelection(rh, graphics, menus);
 		menus.add(characterSelection);
 		splash = LWJGLPanel.fromPicture(menus, resources,
 				ResourceHandler.joinPath("splash", "splash.jpg"), -1.78f, -1f,
 				2.3f, true);
 		menus.add(splash);
-		LWJGLAlertDialog ald = new LWJGLAlertDialog(menus, resources, "this is a very very long message to fill the alert!", -.5f, 1f, -.5f, 0f, .5f);
-		menus.add(ald);
+		alert = new LWJGLAlertDialog(menus, resources,
+				"this is a very very long message to fill the alert!", -.73f,
+				1f, -.73f, -.4f, .8f);
+		confirmation = new LWJGLConfirmationDialog(menus, resources,
+				"Will you join the dark side?", "Yes master", "Never!", -.73f,
+				1f, -.73f, -.4f, .8f);
 		birdsong = new LWJGLBirdsong(resources, menus);
 		board = null;
-		this.controller = controller;
+		messageOverlay = new LWJGLWaitingView(menus, "Waiting");
+		lobbyView = new LWJGLLobbyView(messageOverlay);
+		graphics.start();
 	}
 
 	@Override
@@ -85,32 +92,54 @@ public class LWJGLViewController implements ViewController {
 	public void enterBirdSong(CharacterType type, int day, List<Phase> phases,
 			PersonalHistory personalHistory,
 			Map<TileName, List<Integer>> tileClrs) {
+		lobbyView.setVisible(false);
+		birdsong.setActivitiesListener(new ActivitiesListener() {
+
+			@Override
+			public void onActivitiesChosen(List<Activity> acts) {
+				// TODO Auto-generated method stub
+				System.out.println("Activities chosen " + acts);
+			}
+
+		});
 		birdsong.setVisible(true);
 	}
 
 	@Override
 	public void displayMessage(String string) {
-		// TODO Auto-generated method stub
-
+		alert.setMessage(string);
+		alert.show();
+	}
+	
+	@Override
+	public boolean confirm(String message, String confirm, String deny) {
+		boolean ret = confirmation.ask(message, confirm, deny);
+		return ret;
 	}
 
 	@Override
-	public void enterMainMenu() {
-		mainMenu.start(menus);
-		graphics.start();
+	public void enterMainMenu(MenuItemListener mil) {
+		mainMenu.setVisible(true);
+		mainMenu.setMenuItemListener(mil);
 	}
 
 	@Override
 	public void enterLobby() {
-		LWJGLPanel lobbyPanel = LWJGLPanel.fromString(menus, "THIS IS THE LOBBY", new Font("Times New Roman", Font.PLAIN, 100), Color.WHITE, 1200, 120, -1f, -1f, .1f, false);
-		lobbyPanel.setVisible(true);
-		menus.add(lobbyPanel);
+		mainMenu.setVisible(false);
+		lobbyView.setVisible(true);
+	}
+
+	@Override
+	public void waitingForPlayers(int count) {
+		lobbyView.waitingForPlayers(count);
 	}
 
 	@Override
 	public void enterCharacterSelection(List<CharacterType> characters,
-			Handler<CharacterType> onselect) {
-		characterSelection.setVisible(true);
+			CharacterSelectionListener onselect) {
+		lobbyView.setVisible(false);
+		characterSelection.selectCharacter(characters, onselect);
+		displayMessage("Please select your character");
 	}
 
 	@Override
@@ -120,20 +149,15 @@ public class LWJGLViewController implements ViewController {
 	}
 
 	@Override
-	public void startNetworkGame() {
-		try {
-			controller.connect(NetworkConfiguration.DEFAULT_IP, NetworkConfiguration.DEFAULT_PORT);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	public void startGame(final BoardReadyListener brl) {
 		splash.setVisible(true);
 		new Thread() {
 			@Override
 			public void run() {
-				startBoard();
+				startBoard(brl);
 			}
 		}.start();
-		//controller.startGame();
+		// controller.startGame();
 	}
 
 	@Override
@@ -147,12 +171,12 @@ public class LWJGLViewController implements ViewController {
 		return null;
 	}
 
-	private void startBoard() {
+	private void startBoard(BoardReadyListener brl) {
 		try {
 			board = new LWJGLBoardDrawable(resources, graphics, selections);
 			board.setDefaultClearingFocus();
 			splash.setVisible(false);
-			controller.setBoardView(board);
+			brl.boardReady(board);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -167,9 +191,9 @@ public class LWJGLViewController implements ViewController {
 	private LWJGLCharacterSelection characterSelection;
 	private LWJGLBirdsong birdsong;
 	private LWJGLPanel splash;
-
-	private ClientController controller;
-
-	private int frontBuffer, backBuffer;
+	private LWJGLAlertDialog alert;
+	private LWJGLConfirmationDialog confirmation;
+	private LWJGLWaitingView messageOverlay;
+	private LWJGLLobbyView lobbyView;
 
 }

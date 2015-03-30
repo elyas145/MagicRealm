@@ -46,7 +46,7 @@ public class MainMenu extends JPanel implements ActionListener {
 					}
 					if(clickSource.equals(start)){
 						//start game
-						parent.startNetworkGame();
+						parent.startGame(null);
 					}else if(clickSource.equals(exit)){
 						//exit game.
 						parent.exit();

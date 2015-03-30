@@ -11,61 +11,72 @@ import utils.resources.Images;
 import utils.resources.ResourceHandler;
 
 public class LWJGLSingleTextureLoader implements LWJGLTextureLoader {
-	
+
 	public LWJGLSingleTextureLoader(int w, int h, boolean inter) {
 		width = w;
 		height = h;
-		init(null);
+		imageBuffer = null;
+		init();
 		interpolate = inter;
+		refresh = false;
 	}
-	
+
 	public LWJGLSingleTextureLoader(ResourceHandler rh, String fileName) {
-		BufferedImage bi;
 		try {
-			bi = Images.getImage(rh, fileName);
-		}
-		catch(IOException ioe) {
+			imageBuffer = Images.getImage(rh, fileName);
+			width = imageBuffer.getWidth();
+			height = imageBuffer.getHeight();
+		} catch (IOException ioe) {
 			throw new RuntimeException(ioe);
 		}
-		init(bi);
+		init();
 		interpolate = true;
 	}
-	
-	public LWJGLSingleTextureLoader(ResourceHandler rh, String fileName, int w, int h) {
-		BufferedImage bi;
+
+	public LWJGLSingleTextureLoader(ResourceHandler rh, String fileName, int w,
+			int h) {
 		try {
-			bi = Images.getImage(rh, fileName);
-		}
-		catch(IOException ioe) {
+			imageBuffer = Images.getImage(rh, fileName);
+			width = imageBuffer.getWidth();
+			height = imageBuffer.getHeight();
+		} catch (IOException ioe) {
 			throw new RuntimeException(ioe);
 		}
-		bi = ImageTools.scaleImage(bi, w, h);
-		init(bi);
+		imageBuffer = ImageTools.scaleImage(imageBuffer, w, h);
+		init();
 		interpolate = true;
 	}
-	
+
 	public LWJGLSingleTextureLoader(ImageTools.GraphicsHandler gh, int w, int h) {
-		BufferedImage bi = ImageTools.createImage(w, h, gh);
-		init(bi);
+		imageBuffer = ImageTools.createImage(w, h, gh);
+		width = imageBuffer.getWidth();
+		height = imageBuffer.getHeight();
+		init();
 		interpolate = true;
 	}
-	
+
 	public LWJGLSingleTextureLoader(int loc, int w, int h) {
 		height = h;
 		width = w;
 		textureLocation = loc;
 	}
-	
+
 	@Override
 	public boolean isLoaded() {
-		return getTextureLocation() >= 0;
+		return getTextureLocation() >= 0 && !refresh;
 	}
 
 	@Override
 	public void loadTexture(LWJGLGraphics gfx) {
-		if(!isLoaded()) {
-			textureLocation = gfx.loadTexture(rawData, height, width, interpolate);
+		if (!isLoaded()) {
+			if (getTextureLocation() < 0) {
+				textureLocation = gfx.loadTexture(rawData, height, width,
+						interpolate);
+			} else {
+				gfx.updateTexture(textureLocation, rawData, height, width);
+			}
 		}
+		refresh = false;
 	}
 
 	@Override
@@ -95,29 +106,40 @@ public class LWJGLSingleTextureLoader implements LWJGLTextureLoader {
 	public int getHeight() {
 		return height;
 	}
-	
+
 	@Override
 	public void updateFromGraphicsHandler(GraphicsHandler gh) {
-		// TODO Auto-generated method stub
-		
+		rawData.rewind();
+		checkBuffer();
+		ImageTools.createImage(imageBuffer, width, height, gh);
+		ImageTools.loadRawImage(imageBuffer, 0, width, height, rawData);
+		refresh = true;
 	}
-	
-	private void init(BufferedImage bi) {
-		if(bi != null) {
-			height = bi.getHeight();
-			width = bi.getWidth();
+
+	private void checkBuffer() {
+		boolean wasNull = imageBuffer == null;
+		if (wasNull) {
+			imageBuffer = new BufferedImage(height, height, height);
 		}
-		rawData = ByteBuffer.allocateDirect(4 * width * height);
-		if(bi != null) {
-			ImageTools.loadRawImage(bi, 0, width, height, rawData);
+		if (rawData == null) {
+			rawData = ByteBuffer.allocateDirect(4 * width * height);
+			if (!wasNull) {
+				ImageTools.loadRawImage(imageBuffer, 0, width, height, rawData);
+			}
 		}
+	}
+
+	private void init() {
+		checkBuffer();
 		textureLocation = -1;
 	}
-	
+
 	private boolean interpolate;
+	private boolean refresh;
 	private int height;
 	private int width;
 	private ByteBuffer rawData;
+	private BufferedImage imageBuffer;
 	private int textureLocation;
 
 }
