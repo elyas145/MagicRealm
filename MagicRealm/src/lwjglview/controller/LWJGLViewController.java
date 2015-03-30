@@ -11,6 +11,7 @@ import lwjglview.controller.characterselection.LWJGLCharacterSelection;
 import lwjglview.graphics.LWJGLGraphics;
 import lwjglview.graphics.board.LWJGLBoardDrawable;
 import lwjglview.menus.LWJGLAlertDialog;
+import lwjglview.menus.LWJGLConfirmationDialog;
 import lwjglview.menus.LWJGLMenuLayer;
 import lwjglview.menus.LWJGLPanel;
 import lwjglview.selection.SelectionFrame;
@@ -39,7 +40,7 @@ public class LWJGLViewController implements ViewController {
 			public void handle(LWJGLGraphics gfx) {
 				gfx.clearColourBuffer();
 			}
-			
+
 		}, LWJGLGraphics.LAYER0);
 		selections = new SelectionFrame(graphics);
 		menus = new LWJGLMenuLayer(graphics, selections);
@@ -50,7 +51,12 @@ public class LWJGLViewController implements ViewController {
 				ResourceHandler.joinPath("splash", "splash.jpg"), -1.78f, -1f,
 				2.3f, true);
 		menus.add(splash);
-		alert = new LWJGLAlertDialog(menus, resources, "this is a very very long message to fill the alert!", -.5f, 1f, -.5f, 0f, .5f);
+		alert = new LWJGLAlertDialog(menus, resources,
+				"this is a very very long message to fill the alert!", -.73f,
+				1f, -.73f, -.4f, .8f);
+		confirmation = new LWJGLConfirmationDialog(menus, resources,
+				"Will you join the dark side?", "Yes master", "Never!", -.73f,
+				1f, -.73f, -.4f, .8f);
 		birdsong = new LWJGLBirdsong(resources, menus);
 		board = null;
 		messageOverlay = new LWJGLWaitingView(menus, "Waiting");
@@ -94,7 +100,7 @@ public class LWJGLViewController implements ViewController {
 				// TODO Auto-generated method stub
 				System.out.println("Activities chosen " + acts);
 			}
-			
+
 		});
 		birdsong.setVisible(true);
 	}
@@ -103,6 +109,12 @@ public class LWJGLViewController implements ViewController {
 	public void displayMessage(String string) {
 		alert.setMessage(string);
 		alert.show();
+	}
+	
+	@Override
+	public boolean confirm(String message, String confirm, String deny) {
+		boolean ret = confirmation.ask(message, confirm, deny);
+		return ret;
 	}
 
 	@Override
@@ -125,7 +137,9 @@ public class LWJGLViewController implements ViewController {
 	@Override
 	public void enterCharacterSelection(List<CharacterType> characters,
 			CharacterSelectionListener onselect) {
-		characterSelection.setVisible(true);
+		lobbyView.setVisible(false);
+		characterSelection.selectCharacter(characters, onselect);
+		displayMessage("Please select your character");
 	}
 
 	@Override
@@ -143,7 +157,7 @@ public class LWJGLViewController implements ViewController {
 				startBoard(brl);
 			}
 		}.start();
-		//controller.startGame();
+		// controller.startGame();
 	}
 
 	@Override
@@ -178,6 +192,7 @@ public class LWJGLViewController implements ViewController {
 	private LWJGLBirdsong birdsong;
 	private LWJGLPanel splash;
 	private LWJGLAlertDialog alert;
+	private LWJGLConfirmationDialog confirmation;
 	private LWJGLWaitingView messageOverlay;
 	private LWJGLLobbyView lobbyView;
 

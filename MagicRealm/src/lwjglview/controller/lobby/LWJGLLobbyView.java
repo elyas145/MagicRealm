@@ -11,8 +11,10 @@ public class LWJGLLobbyView implements LobbyView {
 
 	@Override
 	public void setVisible(boolean vis) {
-		waiting.setText("Waiting for players");
-		waiting.setVisible(true);
+		if(vis) {
+			waiting.setText("Waiting for players");
+		}
+		waiting.setVisible(vis);
 	}
 
 	@Override

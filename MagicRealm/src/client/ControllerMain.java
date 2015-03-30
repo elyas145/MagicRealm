@@ -7,8 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.JOptionPane;
-
 import communication.ClientNetworkHandler;
 import communication.handler.client.CharacterSelected;
 import communication.handler.client.SubmitActivities;
@@ -32,6 +30,7 @@ import model.exceptions.MRException;
 import utils.resources.ResourceHandler;
 import view.controller.BoardReadyListener;
 import view.controller.ViewController;
+import view.controller.characterselection.CharacterSelectionListener;
 import view.controller.game.BoardView;
 import view.controller.mainmenu.MenuItem;
 import view.controller.mainmenu.MenuItemListener;
@@ -46,7 +45,7 @@ public class ControllerMain implements ClientController {
 	private int clientID = -1;
 	private ClientServer server;
 	private int sleepTime = 2000;
-	
+
 	private MenuItemListener mainMenuListener;
 
 	public ControllerMain() {
@@ -54,7 +53,7 @@ public class ControllerMain implements ClientController {
 		mainView = new LWJGLViewController(rh);
 
 		server = new ClientServer(this);
-		
+
 		mainMenuListener = new MenuItemListener() {
 
 			@Override
@@ -70,7 +69,7 @@ public class ControllerMain implements ClientController {
 			}
 
 		};
-		
+
 		goToMainMenu();
 	}
 
@@ -101,17 +100,32 @@ public class ControllerMain implements ClientController {
 	 * called when the client launches the game (controller constructor)
 	 */
 	public void goToMainMenu() {
-		mainView.enterMainMenu(mainMenuListener);
+		try {
+			mainView.enterMainMenu(mainMenuListener); // this is the only required line
+			Thread.sleep(2000);
+			mainView.enterLobby();
+			Thread.sleep(2000);
+			mainView.waitingForPlayers(5);
+			Thread.sleep(2000);
+			ArrayList<CharacterType> avail = new ArrayList<CharacterType>();
+			avail.add(CharacterType.AMAZON);
+			mainView.enterCharacterSelection(avail, new CharacterSelectionListener() {
+
+				@Override
+				public void onCharacterSelected(CharacterType character) {
+					mainView.displayMessage("You have selected " + character);
+				}
+				
+			});
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	@Override
 	public void exit() {
-		String ObjButtons[] = { "Yes", "No" };
-		int PromptResult = JOptionPane.showOptionDialog(null,
-				"Are you sure you want to exit?", "Magic Realm",
-				JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null,
-				ObjButtons, ObjButtons[1]);
-		if (PromptResult == JOptionPane.YES_OPTION) {
+		if (mainView.confirm("Do you really want to exit?", "Yes", "No")) {
 			System.exit(0);
 		}
 	}

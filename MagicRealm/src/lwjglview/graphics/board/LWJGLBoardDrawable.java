@@ -9,10 +9,7 @@ import java.util.Map;
 import org.lwjgl.BufferUtils;
 
 import config.GraphicsConfiguration;
-import lwjglview.graphics.LWJGLDrawableLeaf;
-import lwjglview.graphics.LWJGLDrawableNode;
 import lwjglview.graphics.LWJGLGraphics;
-import lwjglview.graphics.TransformationDrawable;
 import lwjglview.graphics.animator.AnimationQueue;
 import lwjglview.graphics.animator.FadeAnimator;
 import lwjglview.graphics.animator.FollowAnimator;
@@ -25,7 +22,6 @@ import lwjglview.graphics.board.tile.LWJGLTileCollection;
 import lwjglview.graphics.board.tile.LWJGLTileDrawable;
 import lwjglview.graphics.counters.LWJGLCounterDrawable;
 import lwjglview.graphics.counters.LWJGLCounterLocator;
-import lwjglview.graphics.model.ModelData;
 import lwjglview.graphics.shader.GLShaderHandler;
 import lwjglview.selection.SelectionFrame;
 import model.EnchantedHolder;

@@ -231,4 +231,10 @@ public class MainView extends JFrame implements ViewController,
 		
 	}
 
+	@Override
+	public boolean confirm(String message, String confirm, String deny) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

@@ -35,6 +35,8 @@ import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
 public final class LWJGLGraphics {
+	
+	public static final float FOV = Mathf.PI / 2;
 
 	public static final int LAYER0 = 0;
 	public static final int LAYER1 = LAYER0 + 1;
@@ -181,14 +183,22 @@ public final class LWJGLGraphics {
 		glReadPixels(x, height - y, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, buff);
 	}
 
+	public int createFrameBuffer() {
+		return createFrameBuffer(FOV);
+	}
+	
+	public int createFrameBuffer(float fov) {
+		return createFrameBuffer(width, height, fov);
+	}
+	
 	public int createFrameBuffer(int width, int height) {
-		int buff = glGenFramebuffers();
-		frameBuffers.put(buff, new FrameBufferInfo(width, height));
-		return buff;
+		return createFrameBuffer(width, height, FOV);
 	}
 
-	public int createFrameBuffer() {
-		return createFrameBuffer(width, height);
+	public int createFrameBuffer(int width, int height, float fov) {
+		int buff = glGenFramebuffers();
+		frameBuffers.put(buff, new FrameBufferInfo(width, height, fov));
+		return buff;
 	}
 
 	public void bindFrameBuffer(int fb) {
@@ -202,7 +212,7 @@ public final class LWJGLGraphics {
 	public void useFrameBuffer(int fb) {
 		bindFrameBuffer(fb);
 		FrameBufferInfo info = frameBuffers.get(fb);
-		onResize(info.width, info.height);
+		onResize(info.width, info.height, info.fov);
 	}
 
 	public void releaseFrameBuffer() {
@@ -582,7 +592,7 @@ public final class LWJGLGraphics {
 		// Create the window
 		width = GLFWvidmode.width(vidmode);
 		height = GLFWvidmode.height(vidmode);
-		frameBuffers.put(0, new FrameBufferInfo(width, height));
+		frameBuffers.put(0, new FrameBufferInfo(width, height, FOV));
 		window = glfwCreateWindow(width, height, "LWJGLGraphics",
 				glfwGetPrimaryMonitor(), NULL);
 		if (window == NULL)
@@ -604,7 +614,7 @@ public final class LWJGLGraphics {
 		windowSizeCallback = new GLFWWindowSizeCallback() {
 			@Override
 			public void invoke(long window, int width, int height) {
-				onResize(width, height);
+				onResize(width, height, FOV);
 			}
 		};
 
@@ -676,7 +686,7 @@ public final class LWJGLGraphics {
 		// Make the window visible
 		glfwShowWindow(window);
 
-		onResize(width, height);
+		onResize(width, height, FOV);
 
 		// Set the clear color
 		setClearColor(.1f, .2f, 1f, 0f);
@@ -722,13 +732,13 @@ public final class LWJGLGraphics {
 		updateMVP();
 	}
 
-	private void onResize(int w, int h) {
+	private void onResize(int w, int h, float fov) {
 		width = w;
 		height = h;
 		glViewport(0, 0, width, height);
 		float ar = getAspectRatio();
 		synchronized (state) {
-			state.projectionMatrix.perspective(Mathf.PI * .5f, ar, .1f, 10f);
+			state.projectionMatrix.perspective(fov, ar, .1f, 10f);
 			updateMVP();
 		}
 	}
@@ -841,12 +851,14 @@ public final class LWJGLGraphics {
 	}
 
 	private static class FrameBufferInfo {
-		public FrameBufferInfo(int w, int h) {
+		public FrameBufferInfo(int w, int h, float fv) {
 			width = w;
 			height = h;
+			fov = fv;
 		}
 
 		public int width, height;
+		public float fov;
 	}
 
 	private LWJGLGraphics self;

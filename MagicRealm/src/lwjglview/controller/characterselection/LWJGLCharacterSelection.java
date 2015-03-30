@@ -1,7 +1,8 @@
 package lwjglview.controller.characterselection;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import config.GraphicsConfiguration;
 import utils.math.linear.Matrix;
@@ -16,50 +17,48 @@ import lwjglview.menus.LWJGLPanel;
 import lwjglview.selection.SelectionFrame;
 import model.enums.CharacterType;
 
-public class LWJGLCharacterSelection extends LWJGLContentPane implements CharacterSelectionView {
+public class LWJGLCharacterSelection extends LWJGLContentPane implements
+		CharacterSelectionView {
 
-	public LWJGLCharacterSelection(ResourceHandler rh, LWJGLGraphics gfx, LWJGLContentPane par) {
+	public LWJGLCharacterSelection(ResourceHandler rh, LWJGLGraphics gfx,
+			LWJGLContentPane par) {
 		super(par);
 		parent = par;
-		characterViews = new ArrayList<LWJGLPanel>();
+		characterViews = new HashMap<CharacterType, LWJGLPanel>();
 		float f = -1f;
-		for(CharacterType ct: CharacterType.values()) {
-			LWJGLPanel cv = new LWJGLCounterView(ct.toCounter(), rh, gfx).getPanel(par, f, 0f, .5f, false);
+		for (CharacterType ct : CharacterType.values()) {
+			LWJGLPanel cv = new LWJGLCounterView(ct.toCounter(), rh, gfx)
+					.getPanel(par, f, 1f, .6f, true);
 			cv.setCursorListener(new CharacterClick(ct));
 			f += .7f;
-			characterViews.add(cv);
+			characterViews.put(ct, cv);
 			cv.setVisible(true);
 		}
-		position = Matrix.columnVector(0f, 1f, 0f);
-		visible = true;
-		setVisible(false);
+		position = Matrix.columnVector(0f, -1.3f, 0f);
+		visible = false;
 	}
-	
+
 	public void setVisible(boolean vis) {
-		if(vis ^ visible) {
-			if(vis) {
-				for(LWJGLPanel pane: characterViews) {
-					pane.resetPosition();
-				}
-			}
-			else {
-				for(LWJGLPanel pane: characterViews) {
-					pane.slide(position, GraphicsConfiguration.PANEL_TIME);
-				}
-			}
-		}
+		visible = vis;
 	}
-	
+
 	@Override
 	public void selectCharacter(List<CharacterType> characters,
 			CharacterSelectionListener onselect) {
+		hideAll();
+		for (CharacterType ct : characters) {
+			show(ct);
+		}
 		onSelect = onselect;
+		setVisible(true);
 	}
 
 	@Override
 	public void draw(LWJGLGraphics gfx) {
-		for(LWJGLPanel cv: characterViews) {
-			cv.draw(gfx);
+		if(visible) {
+			for (LWJGLPanel cv : characterViews.values()) {
+				cv.draw(gfx);
+			}
 		}
 	}
 
@@ -79,9 +78,20 @@ public class LWJGLCharacterSelection extends LWJGLContentPane implements Charact
 	@Override
 	public void updateNodeUniforms(LWJGLGraphics gfx) {
 	}
+
+	private void show(CharacterType ct) {
+		characterViews.get(ct)
+				.slide(position, GraphicsConfiguration.PANEL_TIME);
+	}
 	
+	private void hideAll() {
+		for (LWJGLPanel pane : characterViews.values()) {
+			pane.resetPosition();
+		}
+	}
+
 	private class CharacterClick extends PrimaryClickListener {
-		
+
 		public CharacterClick(CharacterType ct) {
 			character = ct;
 		}
@@ -90,16 +100,16 @@ public class LWJGLCharacterSelection extends LWJGLContentPane implements Charact
 		public void onClick() {
 			onSelect.onCharacterSelected(character);
 		}
-		
+
 		private CharacterType character;
-		
+
 	}
-	
+
 	private boolean visible;
-	private List<LWJGLPanel> characterViews;
+	private Map<CharacterType, LWJGLPanel> characterViews;
 	private LWJGLContentPane parent;
 	private Matrix position;
-	
+
 	private CharacterSelectionListener onSelect;
 
 }

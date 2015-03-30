@@ -9,7 +9,6 @@ import model.character.Phase;
 import model.enums.CharacterType;
 import model.enums.TileName;
 import model.player.PersonalHistory;
-import utils.handler.Handler;
 import view.controller.characterselection.CharacterSelectionListener;
 import view.controller.mainmenu.MenuItemListener;
 import view.controller.search.SearchView;
@@ -28,6 +27,8 @@ public interface ViewController {
 			Map<TileName, List<Integer>> tileClrs);
 	
 	void displayMessage(String string);
+	
+	boolean confirm(String message, String confirm, String deny);
 	
 	void enterMainMenu(MenuItemListener mil);
 	

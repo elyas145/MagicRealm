@@ -6,6 +6,11 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.lwjgl.BufferUtils;
 
@@ -25,7 +30,7 @@ import model.enums.TileName;
 import model.interfaces.HexTileInterface;
 
 public class SelectionFrame {
-	
+
 	public SelectionFrame(LWJGLGraphics gfx) {
 		numIDs = 0;
 		listeners = new HashMap<Integer, CursorListener>();
@@ -34,6 +39,9 @@ public class SelectionFrame {
 		queued = new LinkedQueue<CursorListenerInvoker>();
 		selectionPass = false;
 		frameBufferID = -1;
+		runQueue = new LinkedBlockingQueue<Runnable>();
+		threadPool = new ThreadPoolExecutor(20, 50, 1000,
+				TimeUnit.MILLISECONDS, runQueue);
 		gfx.setCursorListener(new CursorListener() {
 
 			@Override
@@ -97,7 +105,7 @@ public class SelectionFrame {
 	public void loadID(int id, LWJGLGraphics gfx) {
 		loadID("color", id, gfx);
 	}
-	
+
 	public void loadID(String uniform, int id, LWJGLGraphics gfx) {
 		loadID(id, gfx, uniform);
 	}
@@ -112,9 +120,9 @@ public class SelectionFrame {
 			gfx.getShaders().setUniformFloatArrayValue("color", 4, fBuffer);
 		}
 	}
-	
+
 	public void useShader(GLShaderHandler shaders, SelectionShaderType shade) {
-		switch(shade) {
+		switch (shade) {
 		case TILE:
 			shaders.useShaderProgram(ShaderType.TILE_SELECTION_SHADER);
 			break;
@@ -161,14 +169,14 @@ public class SelectionFrame {
 
 	private int join() {
 		int col = 0;
-		for (int i = 2; i >=0; --i) {
+		for (int i = 2; i >= 0; --i) {
 			col <<= 8;
 			col |= buffer.get(i) & 0xFF;
 		}
 		return (col + incr - 1) / incr;
 	}
 
-	private abstract class CursorListenerInvoker {
+	private abstract class CursorListenerInvoker implements Runnable {
 		public CursorListenerInvoker(int x, int y) {
 			xpos = x;
 			ypos = y;
@@ -180,15 +188,18 @@ public class SelectionFrame {
 				gfx.getPixel(xpos, ypos, buffer);
 				id = join();
 			}
-			CursorListener listener = listeners.get(id);
+			listener = listeners.get(id);
 			if (listener != null) {
-				invoke(listener);
+				threadPool.execute(this);
 			}
 		}
-
-		public abstract void invoke(CursorListener cl);
+		
+		public CursorListener getListener() {
+			return listener;
+		}
 
 		int xpos, ypos;
+		private CursorListener listener;
 	}
 
 	private class MovementInvoker extends CursorListenerInvoker {
@@ -198,10 +209,10 @@ public class SelectionFrame {
 			xpos = x;
 			ypos = y;
 		}
-
+		
 		@Override
-		public void invoke(CursorListener cl) {
-			cl.onMove(xpos, ypos);
+		public void run() {
+			getListener().onMove(xpos, ypos);
 		}
 
 		int xpos, ypos;
@@ -217,8 +228,8 @@ public class SelectionFrame {
 		}
 
 		@Override
-		public void invoke(CursorListener cl) {
-			cl.onSelection(selection, down);
+		public void run() {
+			getListener().onSelection(selection, down);
 		}
 
 		CursorSelection selection;
@@ -231,9 +242,11 @@ public class SelectionFrame {
 	private ByteBuffer buffer;
 	private FloatBuffer fBuffer;
 	private Queue<CursorListenerInvoker> queued;
+	private BlockingQueue<Runnable> runQueue;
 	private int xPosition;
 	private int yPosition;
 	private int numIDs;
 	private Map<Integer, CursorListener> listeners;
 	private boolean selectionPass;
+	private ThreadPoolExecutor threadPool;
 }

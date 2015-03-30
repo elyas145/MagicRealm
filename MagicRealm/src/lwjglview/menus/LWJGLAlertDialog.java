@@ -25,8 +25,8 @@ public class LWJGLAlertDialog {
 		root.add(message);
 		LWJGLTextureLoader buttonBG = new LWJGLSingleTextureLoader(rh,
 				ResourceHandler.joinPath("menus", "main", "button.png"));
-		button = new LWJGLButton(root, "OK", buttonBG, size * .85f, size * .3f,
-				size * .1f);
+		button = new LWJGLButton(root, "OK", buttonBG, size * .76f, size * .25f,
+				size * .15f);
 		button.setListener(new Runnable() {
 
 			@Override

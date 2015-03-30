@@ -13,14 +13,12 @@ import utils.resources.MapChitImageGenerator;
 import utils.resources.ResourceHandler;
 import lwjglview.graphics.LWJGLDrawableNode;
 import lwjglview.graphics.LWJGLGraphics;
-import lwjglview.graphics.board.LWJGLBoardDrawable;
 import lwjglview.graphics.counters.LWJGLCounterDrawable;
 import lwjglview.graphics.counters.LWJGLCounterLocator;
 import lwjglview.graphics.shader.ShaderType;
 import lwjglview.graphics.textures.LWJGLTextureArrayLoader;
 import lwjglview.graphics.textures.LWJGLTextureLoader;
 import model.counter.chit.MapChit;
-import model.enums.MapChitType;
 
 public class LWJGLMapChitCollection extends LWJGLDrawableNode {
 
