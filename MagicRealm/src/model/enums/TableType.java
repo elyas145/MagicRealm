@@ -1,3 +1,4 @@
+
 package model.enums;
 
 public enum TableType {

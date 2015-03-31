@@ -3,6 +3,7 @@ package client;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.List;
+import java.util.Map;
 
 import communication.ClientNetworkHandler;
 import communication.handler.server.serialized.SerializedBoard;
@@ -47,7 +48,7 @@ public interface ClientController {
 
 	void revealMapChits(Iterable<MapChit> chits);
 
-	void rollDie(CharacterType actor, DieRequest peerTable);
+	void rollDie();
 
 	void setHiding(CharacterType character, boolean hid);
 
@@ -74,5 +75,7 @@ public interface ClientController {
 	void setCharacter(Character character);
 
 	void checkSwordsmanTurn();
+
+	void setAllCharacters(Map<Integer, Character> characters);
 
 }

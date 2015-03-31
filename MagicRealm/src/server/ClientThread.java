@@ -8,6 +8,7 @@ import java.net.Socket;
 import model.enums.CharacterType;
 import model.enums.CounterType;
 import model.enums.ValleyChit;
+import model.player.Player;
 import model.activity.Activity;
 import model.character.Character;
 import model.character.CharacterFactory;
@@ -18,7 +19,7 @@ public class ClientThread extends Thread {
 	private ObjectInputStream oStreamIn = null;
 	private ObjectOutputStream oStreamOut = null;
 	private boolean done = false;
-	private Character character;
+	private Player player;
 	private boolean characterPicked = false;
 	private Iterable<Activity> currentActivities;
 	private boolean playedTurn;
@@ -77,7 +78,7 @@ public class ClientThread extends Thread {
 	}
 
 	public void setCharacter(CharacterType character, ValleyChit location) {
-		this.character = CharacterFactory.create(character, location);
+		player.setCharacter(CharacterFactory.create(character, location));
 		characterPicked = true;
 	}
 
@@ -86,7 +87,7 @@ public class ClientThread extends Thread {
 	}
 
 	public Character getCharacter() {
-		return character;
+		return player.getCharacter();
 	}
 
 	public void setCurrentActivities(Iterable<Activity> activities) {
@@ -108,6 +109,10 @@ public class ClientThread extends Thread {
 	
 	public boolean hasPlayed() {
 		return playedTurn;
+	}
+
+	public Player getPlayer() {
+		return player;
 	}
 	
 }

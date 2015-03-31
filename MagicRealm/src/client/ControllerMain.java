@@ -9,6 +9,7 @@ import java.util.Map;
 
 import communication.ClientNetworkHandler;
 import communication.handler.client.CharacterSelected;
+import communication.handler.client.DieRoll;
 import communication.handler.client.SetSwordsmanPlay;
 import communication.handler.client.SubmitActivities;
 import communication.handler.server.serialized.SerializedBoard;
@@ -44,7 +45,7 @@ public class ControllerMain implements ClientController {
 	private BoardView boardView;
 	private ViewController mainView;
 	private Board board;
-	private Character character;
+	private Map<Integer, Character> characters;
 	private int clientID = -1;
 	private ClientServer server;
 	private int sleepTime = 2000;
@@ -57,6 +58,7 @@ public class ControllerMain implements ClientController {
 
 		server = new ClientServer(this);
 
+		characters = new HashMap<Integer, Character>();
 		mainMenuListener = new MenuItemListener() {
 
 			@Override
@@ -205,9 +207,10 @@ public class ControllerMain implements ClientController {
 	}
 
 	@Override
-	public void rollDie(CharacterType actor, DieRequest peerTable) {
-		// TODO rollDie
-
+	public void rollDie() {
+		int i = 5;
+		// TODO  i = mainView.rollDice();
+		server.send(new DieRoll(i));
 	}
 
 	/**
@@ -415,7 +418,7 @@ public class ControllerMain implements ClientController {
 
 	@Override
 	public void setCharacter(Character character) {
-		this.character = character;
+		characters.put(clientID, character);
 
 	}
 
@@ -442,6 +445,14 @@ public class ControllerMain implements ClientController {
 			mainView.displayMessage("The server is not available");
 			mainView.enterMainMenu(mainMenuListener);
 		}
+	}
+
+	@Override
+	public void setAllCharacters(Map<Integer, Character> characters) {
+		for(Integer i : characters.keySet()){
+			this.characters.put(i, characters.get(i));
+		}
+		
 	}
 
 }
