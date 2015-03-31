@@ -100,27 +100,7 @@ public class ControllerMain implements ClientController {
 	 * called when the client launches the game (controller constructor)
 	 */
 	public void goToMainMenu() {
-		try {
-			mainView.enterMainMenu(mainMenuListener); // this is the only required line
-			Thread.sleep(2000);
-			mainView.enterLobby();
-			Thread.sleep(2000);
-			mainView.waitingForPlayers(5);
-			Thread.sleep(2000);
-			ArrayList<CharacterType> avail = new ArrayList<CharacterType>();
-			avail.add(CharacterType.AMAZON);
-			mainView.enterCharacterSelection(avail, new CharacterSelectionListener() {
-
-				@Override
-				public void onCharacterSelected(CharacterType character) {
-					mainView.displayMessage("You have selected " + character);
-				}
-				
-			});
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		mainView.enterMainMenu(mainMenuListener); // this is the only required line
 	}
 
 	@Override
