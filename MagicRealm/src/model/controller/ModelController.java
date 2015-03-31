@@ -11,6 +11,7 @@ import java.util.Set;
 import client.ClientController;
 import config.BoardConfiguration;
 import config.GameConfiguration;
+import server.ClientThread;
 import utils.random.Random;
 import utils.resources.ResourceHandler;
 import utils.structures.LinkedQueue;
@@ -42,10 +43,25 @@ import model.controller.requests.DieRequest;
 import model.counter.chit.LostSite;
 import model.counter.chit.MapChit;
 
-/*
- * Meant to be a container for the entire model
- */
 public class ModelController {
+
+	private ResourceHandler rh;
+	private int numPlayers = 0;
+	private ArrayList<ValleyChit> sites;
+	private int currentDay = 0;
+	private LostSite lostCity;
+	private LostSite lostCastle;
+
+	private Board board = null;
+	private Map<CharacterType, Character> characters;
+	private Map<CharacterType, Player> players;
+	private Queue<CharacterType> orderOfPlay;
+	private boolean currentPlayerDone = false;
+	private Set<MapChit> mapChits;
+	private Map<MapChitType, ArrayList<Treasure>> treasures;
+
+	private static final RuntimeException noPlayersException = new RuntimeException(
+			"There are no players in the queue");
 
 	public ModelController(ResourceHandler rh) {
 		this.rh = rh;
@@ -71,9 +87,8 @@ public class ModelController {
 
 	// TODO belongs in ClientThread.
 
-	public void setCharacterHidden(CharacterType character, boolean hid) {
-		getCharacter(character).setHiding(hid);
-		getClient(character).setHiding(character, hid);
+	public void setCharacterHidden(Player player, boolean hid) {
+		player.getCharacter().setHiding(hid);
 	}
 
 	// TODO belongs in ClientThread.
@@ -107,28 +122,25 @@ public class ModelController {
 
 	// TODO belongs in ClientThread.
 
-	public void hideCharacter(int chance, CharacterType character) {
+	public void hideCharacter(int chance, Player player) {
 		if (chance <= 5) {
-			setCharacterHidden(character, true);
+			setCharacterHidden(player, true);
 		} else {
-			setCharacterHidden(character, false);
+			setCharacterHidden(player, false);
 		}
 	}
 
-	public void moveCharacter(CharacterType characterType, TileName tt,
-			int clearing) {
-		Player ct = players.get(characterType);
-		ClearingInterface cl1 = board.getLocationOfCounter(characterType
-				.toCounter());
+	public boolean moveCharacter(Player ct, TileName tt, int clearing) {
+		ClearingInterface cl1 = board.getLocationOfCounter(ct.getCharacter()
+				.getType().toCounter());
 		ClearingInterface cl2 = board.getClearing(tt, clearing);
 		if (cl1.isConnectedTo(cl2, PathType.NORMAL)
 				|| ct.hasDiscoveredPath(cl1, cl2)) {
-			board.moveCharacter(characterType, tt, clearing);
-			getClient(characterType).moveCounter(characterType.toCounter(), tt,
-					clearing);
+			board.moveCharacter(ct.getCharacter()
+					.getType(), tt, clearing);
+			return true;
 		} else {
-			getClient(characterType).raiseException(
-					new IllegalMoveException(tt, clearing, characterType));
+			return false;
 		}
 	}
 
@@ -210,19 +222,6 @@ public class ModelController {
 	private Map<CharacterType, List<Activity>> activities;
 	private Set<CharacterType> waitingCharacters;
 
-	// TODO belongs in clientThread
-	public void setPlayerActivities(CharacterType player, List<Activity> a) {
-		if (waitingCharacters.contains(player)) {
-			waitingCharacters.remove(player);
-			activities.put(player, a);
-			if (waitingCharacters.isEmpty()) {
-			}
-		} else {
-			getClient(player).raiseException(
-					new PhasesAlreadySubmitedException());
-		}
-	}
-
 	public List<Activity> getCurrentActivities() {
 		try {
 			return players.get(orderOfPlay.top()).getPersonalHistory()
@@ -269,9 +268,10 @@ public class ModelController {
 		return characters.get(ct);
 	}
 
-	public void startSearching(CharacterType actor) {
-		getClient(actor).startSearch(actor);
-	}
+	/*
+	 * public void startSearching(CharacterType actor) {
+	 * getClient(actor).startSearch(actor); }
+	 */
 
 	// TODO belongs in clientThread
 	/*
@@ -419,11 +419,6 @@ public class ModelController {
 	 * showMessage(character, "Peer has failed"); break; } }
 	 */
 
-	private ClientController getClient(CharacterType character) {
-		// TODO get specific game client to character
-		return playingCharacters.get(character);
-	}
-
 	/*
 	 * private void peerC(CharacterType character) { // Player gets to look at
 	 * the map chits in their tile. // they do not discover any sites, but just
@@ -469,34 +464,9 @@ public class ModelController {
 	 * }
 	 */
 
-	private ResourceHandler rh;
-	private int numPlayers = 0;
-	private ArrayList<ValleyChit> sites;
-	private int currentDay = 0;
-	private LostSite lostCity;
-	private LostSite lostCastle;
-
-	private Board board = null;
-	// private ArrayList<Character> characters = null;
-	private Map<CharacterType, Character> characters;
-	// private ArrayList<Player> players = null;
-	private Map<CharacterType, Player> players;
-	private List<CharacterType> randomOrder;
-	private Queue<CharacterType> orderOfPlay;
-	private boolean currentPlayerDone = false;
-	private Set<MapChit> mapChits;
-	private Map<MapChitType, ArrayList<Treasure>> treasures;
-
-	private HashMap<CharacterType, ClientController> playingCharacters;
-
-	Map<Integer, Boolean> characterSelectionMap = new HashMap<Integer, Boolean>();
-
-	private static final RuntimeException noPlayersException = new RuntimeException(
-			"There are no players in the queue");
-
 	public void addTreasure(MapChitType site, TileName tile, int value) {
 		board.setLocationOfMapChit(new MapChit(site), tile);
-		if(treasures.get(site) == null){
+		if (treasures.get(site) == null) {
 			treasures.put(site, new ArrayList<Treasure>());
 		}
 		treasures.get(site).add(new Treasure(value));
@@ -508,13 +478,14 @@ public class ModelController {
 		MapChit mc = new MapChit(sound, clearing);
 		mapChits.add(mc);
 		board.setLocationOfMapChit(mc, tile);
-		System.out.println("added sound chit: " + sound + " " + tile + " with clearing: " + clearing);
+		System.out.println("added sound chit: " + sound + " " + tile
+				+ " with clearing: " + clearing);
 	}
 
 	public void addWarning(MapChitType type, TileName tile) {
 		MapChit mc = null;
 		char t = ' ';
-		switch (tile.getType()){
+		switch (tile.getType()) {
 		case CAVE:
 			t = 'C';
 			break;
@@ -529,12 +500,12 @@ public class ModelController {
 		default:
 			break;
 		}
-		for(MapChit m : mapChits){
-			if(m.getType().type() == ChitType.WARNING){
-				if(m.getIdentifier() == t && m.getType().equals(type)){
+		for (MapChit m : mapChits) {
+			if (m.getType().type() == ChitType.WARNING) {
+				if (m.getIdentifier() == t && m.getType().equals(type)) {
 					mc = m;
 				}
-			}			
+			}
 		}
 		board.setLocationOfMapChit(mc, tile);
 	}

@@ -8,6 +8,7 @@ package server;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.concurrent.Semaphore;
 
 import model.activity.Activity;
@@ -22,12 +23,14 @@ import communication.ServerNetworkHandler;
 import communication.handler.server.CheckSwordsmanPlay;
 import communication.handler.server.EnterCharacterSelection;
 import communication.handler.server.EnterLobby;
+import communication.handler.server.IllegalMove;
 import communication.handler.server.InitBoard;
 import communication.handler.server.MessageDisplay;
 import communication.handler.server.Reject;
 import communication.handler.server.StartGame;
 import communication.handler.server.UpdateCharacterSelection;
 import communication.handler.server.UpdateLobbyCount;
+import communication.handler.server.UpdateLocationOfCharacter;
 import communication.handler.server.serialized.SerializedBoard;
 import server.ClientThread;
 import utils.resources.ResourceHandler;
@@ -191,7 +194,7 @@ public class ServerController {
 
 	private void startDayLight() {
 		ClientThread swordsmanPlayer = null;
-		boolean waiting = true;
+		Collections.shuffle(clients);
 		// check if a client has a swordsman.
 		for (ClientThread client : clients) {
 			if (client.getCharacter().getType() == CharacterType.SWORDSMAN) {
@@ -200,18 +203,24 @@ public class ServerController {
 			}
 		}
 		// check if the swords man wants to play.
-		// for each player
-			// check if swordsman wants to play
-				if (swordsmanPlayer != null && !swordsmanPlayer.hasPlayed()) {
-					swordsmanPlayer.send(new CheckSwordsmanPlay());
-					try {
-						playSync.acquire();
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
+		for (ClientThread player : clients){
+			if (swordsmanPlayer != null && !swordsmanPlayer.hasPlayed()) {
+				swordsmanPlayer.send(new CheckSwordsmanPlay());
+				try {
+					playSync.acquire();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
 				}
-			// play player's turn
-		// end loop
+			}
+			if(player.getCharacter().getType() != CharacterType.SWORDSMAN){
+				playTurn(player);
+			}
+		}
+		
+		//check if swodsman played. if not, they have to play now.
+		if(swordsmanPlayer != null && !swordsmanPlayer.hasPlayed()){
+			playTurn(swordsmanPlayer);
+		}
 	}
 	
 	private void playTurn(ClientThread player) { //TODO this
@@ -233,11 +242,15 @@ public class ServerController {
 	}
 
 	public void hideCharacter(CharacterType actor) {
-		model.hideCharacter(5, actor);
+		model.hideCharacter(5, getPlayerOf(actor).getPlayer());
 	}
 
 	public void moveCharacter(CharacterType actor, TileName tile, int clearing) {
-		model.moveCharacter(actor, tile, clearing);
+		if (model.moveCharacter(this.getPlayerOf(actor).getPlayer(), tile, clearing)){
+			sendAll(new UpdateLocationOfCharacter(actor, tile, clearing));
+		}else{
+			getPlayerOf(actor).send(new IllegalMove(tile, clearing));
+		}
 	}
 
 	public void startSearching(CharacterType actor) {
