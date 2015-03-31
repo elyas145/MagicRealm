@@ -21,12 +21,14 @@ public class ClientThread extends Thread {
 	private Character character;
 	private boolean characterPicked = false;
 	private Iterable<Activity> currentActivities;
+	private boolean playedTurn;
 	
 	public ClientThread(Server server, Socket socket) {
 		super();
 		this.server = server;
 		this.socket = socket;
 		this.ID = socket.getPort();
+		playedTurn = false;
 	}
 	
 	public Integer getID() {
@@ -91,8 +93,21 @@ public class ClientThread extends Thread {
 		currentActivities = activities;		
 	}
 
-	public Object getCurrentActivities() {
+	public Iterable<Activity> getCurrentActivities() {
 		// TODO Auto-generated method stub
-		return currentActivities == null;
+		return currentActivities;
 	}
+	
+	public void playTurn() {
+		playedTurn = true;
+	}
+	
+	public void newTurn() {
+		playedTurn = false;
+	}
+	
+	public boolean hasPlayed() {
+		return playedTurn;
+	}
+	
 }

@@ -9,6 +9,7 @@ import java.util.Map;
 
 import communication.ClientNetworkHandler;
 import communication.handler.client.CharacterSelected;
+import communication.handler.client.SetSwordsmanPlay;
 import communication.handler.client.SubmitActivities;
 import communication.handler.server.serialized.SerializedBoard;
 import communication.handler.server.serialized.SerializedClearing;
@@ -22,12 +23,14 @@ import model.character.Character;
 import model.character.CharacterFactory;
 import model.controller.requests.DieRequest;
 import model.counter.chit.MapChit;
+import model.enums.ActivityType;
 import model.enums.CharacterType;
 import model.enums.CounterType;
 import model.enums.TileName;
 import model.enums.ValleyChit;
 import model.exceptions.MRException;
 import utils.resources.ResourceHandler;
+import view.controller.BirdsongFinishedListener;
 import view.controller.BoardReadyListener;
 import view.controller.ViewController;
 import view.controller.characterselection.CharacterSelectionListener;
@@ -100,27 +103,8 @@ public class ControllerMain implements ClientController {
 	 * called when the client launches the game (controller constructor)
 	 */
 	public void goToMainMenu() {
-		try {
-			mainView.enterMainMenu(mainMenuListener); // this is the only required line
-			Thread.sleep(2000);
-			mainView.enterLobby();
-			Thread.sleep(2000);
-			mainView.waitingForPlayers(5);
-			Thread.sleep(2000);
-			ArrayList<CharacterType> avail = new ArrayList<CharacterType>();
-			avail.add(CharacterType.AMAZON);
-			mainView.enterCharacterSelection(avail, new CharacterSelectionListener() {
-
-				@Override
-				public void onCharacterSelected(CharacterType character) {
-					mainView.displayMessage("You have selected " + character);
-				}
-				
-			});
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		mainView.enterMainMenu(mainMenuListener); // this is the only required
+													// line
 	}
 
 	@Override
@@ -302,8 +286,19 @@ public class ControllerMain implements ClientController {
 	public void enterCharacterSelection() {
 		System.out.println("Entered player selection.");
 
-		// TODO for testing purposes
-		characterSelected(CharacterType.AMAZON, ValleyChit.HOUSE);
+		ArrayList<CharacterType> characters = new ArrayList<CharacterType>();
+		for (CharacterType ct : CharacterType.values()) {
+			characters.add(ct);
+		}
+		mainView.enterCharacterSelection(characters,
+				new CharacterSelectionListener() {
+
+					@Override
+					public void onCharacterSelected(CharacterType character) {
+						characterSelected(character, ValleyChit.HOUSE);
+					}
+
+				});
 	}
 
 	/**
@@ -327,8 +322,15 @@ public class ControllerMain implements ClientController {
 	@Override
 	public void enterBirdSong() {
 		System.out.println("Entering bird song.");
-		// TODO mainView.enterBirdSong(type, day, phases, personalHistory,
-		// tileClrs);
+		mainView.enterBirdSong(1, null, new BirdsongFinishedListener() {
+
+			@Override
+			public void onFinish(List<ActivityType> activities) {
+				// TODO Auto-generated method stub
+				System.out.println(activities);
+			}
+
+		});
 	}
 
 	/**
@@ -394,8 +396,7 @@ public class ControllerMain implements ClientController {
 			chits.add(new MapChit(board.getMapChitLocations().get(name)));
 		}
 		boardView.loadMapChits(chits);
-		// TODO boardView.EnterGameView();
-
+		this.enterBirdSong();
 	}
 
 	@Override
@@ -420,7 +421,8 @@ public class ControllerMain implements ClientController {
 
 	@Override
 	public void checkSwordsmanTurn() {
-		mainView.displayMessage("Would you like to take your turn now?");
+		server.send(new SetSwordsmanPlay(mainView.confirm(
+				"Would you like to take your turn now?", "Yes ", "No")));
 	}
 
 	private void startNetworkGame() {

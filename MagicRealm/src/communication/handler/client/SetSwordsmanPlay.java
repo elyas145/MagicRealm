@@ -14,7 +14,6 @@ public class SetSwordsmanPlay implements ServerNetworkHandler {
 	@Override
 	public void handle(ServerController controller) {
 		controller.setSwordsManTurn(turn);
-		controller.notify();
 	}
 
 }

@@ -1,5 +1,6 @@
 package model.activity;
 
+import server.ServerController;
 import model.controller.ModelControlInterface;
 import model.controller.ModelController;
 import model.enums.ActivityType;
@@ -34,7 +35,7 @@ public class Move extends Activity {
 	}
 
 	@Override
-	public void perform(ModelControlInterface controller) {
+	public void perform(ServerController controller) {
 		// set location on the board.
 		controller.moveCharacter(getActor(), getTile(), getClearing());
 	}

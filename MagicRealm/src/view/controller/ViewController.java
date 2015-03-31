@@ -22,9 +22,7 @@ public interface ViewController {
 			ArrayList<Activity> activities);
 	void setPlayerActivities(CharacterType character, List<Activity> activities);
 	
-	void enterBirdSong(CharacterType type, int day, List<Phase> phases,
-			PersonalHistory personalHistory,
-			Map<TileName, List<Integer>> tileClrs);
+	void enterBirdSong(int day, List<Phase> phases, BirdsongFinishedListener onfinish);
 	
 	void displayMessage(String string);
 	

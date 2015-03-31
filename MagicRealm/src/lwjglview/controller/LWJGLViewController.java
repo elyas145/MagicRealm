@@ -17,11 +17,13 @@ import lwjglview.menus.LWJGLPanel;
 import lwjglview.selection.SelectionFrame;
 import model.activity.Activity;
 import model.character.Phase;
+import model.enums.ActivityType;
 import model.enums.CharacterType;
 import model.enums.TileName;
 import model.player.PersonalHistory;
 import utils.handler.Handler;
 import utils.resources.ResourceHandler;
+import view.controller.BirdsongFinishedListener;
 import view.controller.BoardReadyListener;
 import view.controller.ViewController;
 import view.controller.birdsong.ActivitiesListener;
@@ -89,16 +91,13 @@ public class LWJGLViewController implements ViewController {
 	}
 
 	@Override
-	public void enterBirdSong(CharacterType type, int day, List<Phase> phases,
-			PersonalHistory personalHistory,
-			Map<TileName, List<Integer>> tileClrs) {
+	public void enterBirdSong(int day, List<Phase> phases, final BirdsongFinishedListener onfinish) {
 		lobbyView.setVisible(false);
 		birdsong.setActivitiesListener(new ActivitiesListener() {
 
 			@Override
-			public void onActivitiesChosen(List<Activity> acts) {
-				// TODO Auto-generated method stub
-				System.out.println("Activities chosen " + acts);
+			public void onActivitiesChosen(List<ActivityType> acts) {
+				onfinish.onFinish(acts);
 			}
 
 		});

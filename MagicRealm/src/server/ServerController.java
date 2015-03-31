@@ -8,11 +8,13 @@ package server;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.concurrent.Semaphore;
 
 import model.activity.Activity;
 import model.controller.ModelController;
 import model.enums.CharacterType;
 import model.enums.MapChitType;
+import model.enums.TableType;
 import model.enums.TileName;
 import model.enums.ValleyChit;
 import communication.ClientNetworkHandler;
@@ -198,22 +200,69 @@ public class ServerController {
 			}
 		}
 		// check if the swords man wants to play.
-		if (swordsmanPlayer != null) {
-			swordsmanPlayer.send(new CheckSwordsmanPlay());
-			synchronized (this) {
-				try {
-					wait();
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+		// for each player
+			// check if swordsman wants to play
+				if (swordsmanPlayer != null && !swordsmanPlayer.hasPlayed()) {
+					swordsmanPlayer.send(new CheckSwordsmanPlay());
+					try {
+						playSync.acquire();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
 				}
-			}
-			if(swordsmanTurn){
-				
-			}
+			// play player's turn
+		// end loop
+	}
+	
+	private void playTurn(ClientThread player) { //TODO this
+		for(Activity act: player.getCurrentActivities()) {
+			act.perform(this);
+		}
+		player.playTurn();
+	}
+
+	private Semaphore playSync = new Semaphore(0);
+
+	public synchronized void setSwordsManTurn(boolean playing) {
+		//swordsmanTurn = playing;
+		if (playing) {
+			ClientThread ct = getPlayerOf(CharacterType.SWORDSMAN);
+			playTurn(ct);
+		}
+		playSync.release();
+	}
+
+	public void hideCharacter(CharacterType actor) {
+		model.hideCharacter(5, actor);
+	}
+
+	public void moveCharacter(CharacterType actor, TileName tile, int clearing) {
+		model.moveCharacter(actor, tile, clearing);
+	}
+
+	public void startSearching(CharacterType actor) {
+		ClientThread ct = getPlayerOf(actor);
+		ct.send(null); // TODO send a search initiated handler
+		try {
+			playSync.acquire();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
 	}
-	public void setSwordsManTurn(boolean playing){
-		swordsmanTurn = playing;
+	
+	public void searchChosen(CharacterType car, TableType tbl, int rv) {
+		// TODO do the search activity with the player
+		ClientThread ct = getPlayerOf(car);
+		playSync.release();
 	}
+	
+	private ClientThread getPlayerOf(CharacterType ct) {
+		for(ClientThread cli: clients) {
+			if(cli.getCharacter().getType() == ct) {
+				return cli;
+			}
+		}
+		throw new RuntimeException("The character " + ct + " is not being played!");
+	}
+	
 }

@@ -1,5 +1,6 @@
 package model.activity;
 
+import server.ServerController;
 import model.controller.ModelControlInterface;
 import model.enums.ActivityType;
 import model.enums.CharacterType;
@@ -7,7 +8,7 @@ import model.enums.CharacterType;
 public abstract class Activity {
 
 	// perform the action on the model controller
-	public abstract void perform(ModelControlInterface controller);
+	public abstract void perform(ServerController serverController);
 
 	public ActivityType getType() {
 		return type;
