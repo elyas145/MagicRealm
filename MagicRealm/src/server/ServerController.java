@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.concurrent.Semaphore;
 
 import model.activity.Activity;
@@ -21,8 +22,11 @@ import model.enums.ValleyChit;
 import communication.ClientNetworkHandler;
 import communication.ServerNetworkHandler;
 import communication.handler.server.CheckSwordsmanPlay;
+import communication.handler.server.DiceRequest;
 import communication.handler.server.EnterCharacterSelection;
 import communication.handler.server.EnterLobby;
+import communication.handler.server.SetAllCharacters;
+import communication.handler.server.UpdateHiding;
 import communication.handler.server.IllegalMove;
 import communication.handler.server.InitBoard;
 import communication.handler.server.MessageDisplay;
@@ -32,6 +36,7 @@ import communication.handler.server.UpdateCharacterSelection;
 import communication.handler.server.UpdateLobbyCount;
 import communication.handler.server.UpdateLocationOfCharacter;
 import communication.handler.server.serialized.SerializedBoard;
+import model.character.Character;
 import server.ClientThread;
 import utils.resources.ResourceHandler;
 import config.GameConfiguration;
@@ -160,6 +165,11 @@ public class ServerController {
 
 	public void startGame() {
 		sendAll(new StartGame(sboard));
+		HashMap<Integer, Character> characters = new HashMap<Integer, Character>();
+		for(ClientThread c : clients){
+			characters.put(c.getID(), c.getCharacter());
+		}
+		sendAll(new SetAllCharacters(characters));
 	}
 
 	public void addTreasure(MapChitType site, TileName tile, Integer value) {
@@ -223,7 +233,9 @@ public class ServerController {
 		}
 	}
 	
-	private void playTurn(ClientThread player) { //TODO this
+	private void playTurn(ClientThread player) { 
+		player.getCharacter().setHiding(false);
+		sendAll(new UpdateHiding(player.getCharacter().getType(), false));
 		for(Activity act: player.getCurrentActivities()) {
 			act.perform(this);
 		}
@@ -231,6 +243,7 @@ public class ServerController {
 	}
 
 	private Semaphore playSync = new Semaphore(0);
+	private int currentDieRoll;
 
 	public synchronized void setSwordsManTurn(boolean playing) {
 		//swordsmanTurn = playing;
@@ -242,7 +255,18 @@ public class ServerController {
 	}
 
 	public void hideCharacter(CharacterType actor) {
-		model.hideCharacter(5, getPlayerOf(actor).getPlayer());
+		getPlayerOf(actor).send(new DiceRequest());
+		try {
+			playSync.acquire();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		if(model.hideCharacter(currentDieRoll, getPlayerOf(actor).getPlayer())){
+			sendAll(new UpdateHiding(actor, true));
+		}else{
+			getPlayerOf(actor).send(new MessageDisplay("Hide Failed."));
+		}
 	}
 
 	public void moveCharacter(CharacterType actor, TileName tile, int clearing) {
@@ -276,6 +300,11 @@ public class ServerController {
 			}
 		}
 		throw new RuntimeException("The character " + ct + " is not being played!");
+	}
+
+	public void setDieRoll(int roll) {
+		currentDieRoll = roll;
+		playSync.release();		
 	}
 	
 }

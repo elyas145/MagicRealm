@@ -122,11 +122,13 @@ public class ModelController {
 
 	// TODO belongs in ClientThread.
 
-	public void hideCharacter(int chance, Player player) {
+	public boolean hideCharacter(int chance, Player player) {
 		if (chance <= 5) {
 			setCharacterHidden(player, true);
+			return true;
 		} else {
 			setCharacterHidden(player, false);
+			return false;
 		}
 	}
 
