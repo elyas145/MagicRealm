@@ -1,5 +1,7 @@
 package model.character.belonging;
 
+import java.io.Serializable;
+
 import model.enums.ArmorType;
 import model.interfaces.BelongingType;
 
