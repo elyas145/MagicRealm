@@ -69,7 +69,7 @@ public class JogAmpAudio {
 		buffers = new ArrayList<Integer>();
 		//dataBuffer = new int[MAX_SOUNDS];
 		//sourceBuffer = new int[MAX_SOUNDS];
-		al.alGenBuffers(dataBuffer.length, dataBuffer, 0);
+		//al.alGenBuffers(dataBuffer.length, dataBuffer, 0);
 	}
 
 	private int loadALData(String fname) {
@@ -151,7 +151,7 @@ public class JogAmpAudio {
 	private Map<String, Integer> sounds;
 	private List<Integer> buffers;
 	
-	private int[] dataBuffer;
+	//private int[] dataBuffer;
 	//private int[] sourceBuffer;
 	//private int numSounds;
 
