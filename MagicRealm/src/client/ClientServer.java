@@ -58,13 +58,15 @@ public class ClientServer {
 		}
 	}
 
-	public boolean send(ServerNetworkHandler o) {
+	public synchronized boolean send(ServerNetworkHandler o) {
 		if (streamOut != null) {
 			try {
-				streamOut.reset();
+				System.out.println("sending object to server: " + o.toString());
+				//streamOut.reset();
 				streamOut.writeObject(o);
-				streamOut.flush();
+				//streamOut.flush();
 			} catch (IOException e) {
+				System.out.println("failed to send object.");
 				return false;
 			}
 			return true;

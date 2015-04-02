@@ -2,6 +2,7 @@ package client;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -16,8 +17,10 @@ import model.controller.requests.DieRequest;
 import model.counter.chit.MapChit;
 import model.enums.CharacterType;
 import model.enums.CounterType;
+import model.enums.SearchType;
 import model.enums.TileName;
 import model.exceptions.MRException;
+import model.interfaces.ClearingInterface;
 import model.interfaces.HexTileInterface;
 
 public interface ClientController {
@@ -77,5 +80,16 @@ public interface ClientController {
 	void checkSwordsmanTurn();
 
 	void setAllCharacters(Map<Integer, Character> characters);
+
+	void requestSearchInformation();
+
+	void displayFinishedSearch(SearchType type, ArrayList<MapChit> peek);
+
+	void displayFinishedSearch(SearchType type,
+			Map<ClearingInterface, ClearingInterface> discoveredPaths);
+
+	void displayFinishedSearch(SearchType type,
+			Map<ClearingInterface, ClearingInterface> discoveredPaths,
+			ArrayList<MapChit> peek);
 
 }

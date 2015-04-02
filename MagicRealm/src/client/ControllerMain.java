@@ -8,8 +8,10 @@ import java.util.List;
 import java.util.Map;
 
 import communication.ClientNetworkHandler;
+import communication.ServerNetworkHandler;
 import communication.handler.client.CharacterSelected;
 import communication.handler.client.DieRoll;
+import communication.handler.client.SearchCriteria;
 import communication.handler.client.SetSwordsmanPlay;
 import communication.handler.client.SubmitActivities;
 import communication.handler.server.serialized.SerializedBoard;
@@ -27,9 +29,12 @@ import model.counter.chit.MapChit;
 import model.enums.ActivityType;
 import model.enums.CharacterType;
 import model.enums.CounterType;
+import model.enums.SearchType;
+import model.enums.TableType;
 import model.enums.TileName;
 import model.enums.ValleyChit;
 import model.exceptions.MRException;
+import model.interfaces.ClearingInterface;
 import utils.resources.ResourceHandler;
 import view.controller.BirdsongFinishedListener;
 import view.controller.BoardReadyListener;
@@ -209,7 +214,7 @@ public class ControllerMain implements ClientController {
 	@Override
 	public void rollDie() {
 		int i = 5;
-		// TODO  i = mainView.rollDice();
+		// TODO i = mainView.rollDice();
 		server.send(new DieRoll(i));
 	}
 
@@ -449,10 +454,44 @@ public class ControllerMain implements ClientController {
 
 	@Override
 	public void setAllCharacters(Map<Integer, Character> characters) {
-		for(Integer i : characters.keySet()){
+		for (Integer i : characters.keySet()) {
 			this.characters.put(i, characters.get(i));
 		}
+
+	}
+
+	@Override
+	public void requestSearchInformation() {
+		// TODO ServerNetworkHandler toSend = mainView.getSearchCriteria();
+		ServerNetworkHandler toSend = new SearchCriteria(getCharacter().getType(),
+				TableType.PEER, 2);
+		server.send(toSend);
+	}
+
+	private Character getCharacter() {
 		
+		return characters.get(clientID);
+	}
+
+	@Override
+	public void displayFinishedSearch(SearchType type, ArrayList<MapChit> peek) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void displayFinishedSearch(SearchType type,
+			Map<ClearingInterface, ClearingInterface> discoveredPaths) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void displayFinishedSearch(SearchType type,
+			Map<ClearingInterface, ClearingInterface> discoveredPaths,
+			ArrayList<MapChit> peek) {
+		// TODO Auto-generated method stub
+
 	}
 
 }

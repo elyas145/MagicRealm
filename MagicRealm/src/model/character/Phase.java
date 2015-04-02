@@ -1,5 +1,6 @@
 package model.character;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,7 +8,11 @@ import model.enums.ActivityType;
 import model.enums.CharacterType;
 import model.enums.PhaseType;
 
-public class Phase {
+public class Phase implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7192013520095214358L;
 	private List<ActivityType> possibleActivities;
 	private PhaseType type;
 	private CharacterType character;

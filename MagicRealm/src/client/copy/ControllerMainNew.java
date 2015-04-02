@@ -30,9 +30,11 @@ import model.counter.chit.MapChit;
 import model.enums.ActivityType;
 import model.enums.CharacterType;
 import model.enums.CounterType;
+import model.enums.SearchType;
 import model.enums.TileName;
 import model.enums.ValleyChit;
 import model.exceptions.MRException;
+import model.interfaces.ClearingInterface;
 import utils.resources.ResourceHandler;
 import view.audio.SoundController;
 import view.controller.BirdsongFinishedListener;
@@ -461,6 +463,33 @@ public class ControllerMainNew implements ClientController {
 		for(Integer i : characters.keySet()){
 			this.characters.put(i, characters.get(i));
 		}
+		
+	}
+
+	@Override
+	public void requestSearchInformation() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void displayFinishedSearch(SearchType type, ArrayList<MapChit> peek) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void displayFinishedSearch(SearchType type,
+			Map<ClearingInterface, ClearingInterface> discoveredPaths) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void displayFinishedSearch(SearchType type,
+			Map<ClearingInterface, ClearingInterface> discoveredPaths,
+			ArrayList<MapChit> peek) {
+		// TODO Auto-generated method stub
 		
 	}
 

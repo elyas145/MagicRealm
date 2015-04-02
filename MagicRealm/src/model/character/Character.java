@@ -1,5 +1,6 @@
 package model.character;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -17,7 +18,11 @@ import model.enums.ValleyChit;
 import model.interfaces.CharacterInterface;
 import model.interfaces.ClearingInterface;
 
-public class Character implements CharacterInterface {
+public class Character implements CharacterInterface, Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 3972396707482617354L;
 	private ArrayList<Belonging> belongings;
 	private boolean hiding;
 	private ValleyChit initialLocation;
