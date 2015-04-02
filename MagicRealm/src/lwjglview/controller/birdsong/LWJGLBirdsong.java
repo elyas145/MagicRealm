@@ -11,6 +11,7 @@ import lwjglview.graphics.textures.LWJGLTextureLoader;
 import lwjglview.menus.LWJGLMenuLayer;
 import lwjglview.menus.LWJGLPanel;
 import lwjglview.menus.dropdown.LWJGLDropdown;
+import model.character.Phase;
 import model.enums.ActivityType;
 import model.player.PersonalHistory;
 import utils.handler.Handler;
@@ -21,6 +22,8 @@ import view.controller.birdsong.BirdsongView;
 import view.selection.PrimaryClickListener;
 
 public class LWJGLBirdsong implements BirdsongView {
+	
+	private static final int MAX_PHASES = 9;
 
 	private static final float COMBO_WIDTH = .6f;
 	private static final float COMBO_HEIGHT = .18f;
@@ -47,7 +50,16 @@ public class LWJGLBirdsong implements BirdsongView {
 
 			@Override
 			public void onClick() {
-				System.out.println("TODO ready clicked in birdsong view"); // TODO
+				readyButton.setVisible(false);
+				List<ActivityType> acts = new ArrayList<ActivityType>();
+				for(int i = 0; i < numPhases; ++i) {
+					ActivityType add = selections[i];
+					if(add == null) {
+						add = ActivityType.NONE;
+					}
+					acts.add(add);
+				}
+				madeChoice.onActivitiesChosen(acts);
 			}
 			
 		});
@@ -70,33 +82,40 @@ public class LWJGLBirdsong implements BirdsongView {
 				"menus", "birdsong", "comboStatic.png"));
 		dyn = new LWJGLSingleTextureLoader(rh, ResourceHandler.joinPath(
 				"menus", "birdsong", "comboCell.png"));
-		for (int i = 0; i < 9; ++i) {
+		for (int i = 0; i < MAX_PHASES; ++i) {
 			LWJGLDropdown<ActivityType> select = new LWJGLDropdown<ActivityType>(
 					borderPane, stat, dyn, options, LWJGLDropdown.Type.UP, 0f,
 					0f, width, height);
+			final int j = i;
 			select.setSelectionListener(new Handler<ActivityType>() {
 
 				@Override
 				public void handle(ActivityType select) {
-					System.out.println("TODO selected " + select); // TODO
+					synchronized(selections) {
+						selections[j] = select;
+					}
 				}
 				
 			});
 			borderPane.add(select);
 			phases.add(select);
 		}
+		numPhases = 0;
+		selections = new ActivityType[MAX_PHASES];
 		visible = true;
 		setVisible(false);
-		showPhases(7);
 	}
 
-	public void showPhases(int number) {
-		resize(number);
-		int i = 0;
+	public void showPhases(List<Phase> phss) {
+		int i = 0, n = phss.size();
+		numPhases = n;
+		resize();
 		for (LWJGLDropdown<ActivityType> pane : phases) {
-			pane.setVisible(i < number);
-			++i;
+			selections[i] = null;
+			pane.setVisible(i++ < n);
 		}
+		readyButton.setVisible(true);
+		setVisible(true);
 	}
 
 	@Override
@@ -122,7 +141,8 @@ public class LWJGLBirdsong implements BirdsongView {
 		madeChoice = nal;
 	}
 
-	private void resize(int n) {
+	private void resize() {
+		int n = numPhases;
 		int k = n / 2 + 1;
 		int i = 0;
 		for (int j = 1; j < k; ++j) {
@@ -147,5 +167,8 @@ public class LWJGLBirdsong implements BirdsongView {
 	private List<LWJGLDropdown<ActivityType>> phases;
 	private Matrix vec3;
 	private boolean visible;
+	
+	private int numPhases;
+	private ActivityType[] selections;
 
 }

@@ -24,6 +24,8 @@ public interface ViewController {
 	
 	void enterBirdSong(int day, List<Phase> phases, BirdsongFinishedListener onfinish);
 	
+	void selectClearing(ClearingSelectedListener csl);
+	
 	void displayMessage(String string);
 	
 	boolean confirm(String message, String confirm, String deny);

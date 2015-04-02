@@ -12,6 +12,8 @@ import java.util.Map;
 import utils.resources.ResourceHandler;
 
 public class JogAmpAudio {
+	
+	//private static final int MAX_SOUNDS = 10;
 
 	public static JogAmpAudio getInstance() {
 		if (instance == null) {
@@ -25,6 +27,7 @@ public class JogAmpAudio {
 		buffer = new int[n];
 		for (int id : buffers) {
 			buffer[i++] = id;
+			al.alSourceStop(id);
 		}
 		al.alDeleteBuffers(n, buffer, 0);
 		i = 0;
@@ -49,17 +52,24 @@ public class JogAmpAudio {
 	}
 
 	public void pauseSound(String file) {
-		al.alSourcePause(sounds.get(file));
+		if(sounds.containsKey(file)) {
+			al.alSourcePause(sounds.get(file));
+		}
 	}
 
 	public void stopSound(String file) {
-		al.alSourceStop(sounds.get(file));
+		if(sounds.containsKey(file)) {
+			al.alSourceStop(sounds.get(file));
+		}
 	}
 
 	private JogAmpAudio() {
 		ALut.alutInit();
 		sounds = new HashMap<String, Integer>();
 		buffers = new ArrayList<Integer>();
+		//dataBuffer = new int[MAX_SOUNDS];
+		//sourceBuffer = new int[MAX_SOUNDS];
+		al.alGenBuffers(dataBuffer.length, dataBuffer, 0);
 	}
 
 	private int loadALData(String fname) {
@@ -140,5 +150,9 @@ public class JogAmpAudio {
 	// filename to source identifier
 	private Map<String, Integer> sounds;
 	private List<Integer> buffers;
+	
+	private int[] dataBuffer;
+	//private int[] sourceBuffer;
+	//private int numSounds;
 
 }

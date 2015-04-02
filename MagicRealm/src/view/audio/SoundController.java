@@ -12,6 +12,8 @@ public interface SoundController {
 	
 	void pauseGameSounds();
 	
+	void alert();
+	
 	void revealSoundChit(MapChitType sct);
 	
 	void cleanUp();

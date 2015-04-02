@@ -1,4 +1,6 @@
-package entry; import client.ControllerMain;
+package entry;
+
+import client.ControllerMain;
 
 class ClientMain {
 

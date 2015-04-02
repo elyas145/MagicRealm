@@ -11,11 +11,14 @@ public class JogAmpSoundController implements SoundController {
 	
 	private String playingTheme;
 	
+	private String alertSound;
+	
 	public JogAmpSoundController() {
 		audio = JogAmpAudio.getInstance();
-		mainTheme = "spell_fury_final_mix.wav";
-		lobbyTheme = "BeforeTheBattle.wav";
+		mainTheme = "VictoryMarch.wav";
+		lobbyTheme = "spell_fury_final_mix.wav";
 		playingTheme = null;
+		alertSound = "alert1.wav";
 	}
 	
 	@Override
@@ -49,6 +52,8 @@ public class JogAmpSoundController implements SoundController {
 	
 	@Override
 	public void cleanUp() {
+		audio.stopSound(playingTheme);
+		audio.stopSound(alertSound);
 		audio.killALData();
 	}
 	
@@ -58,6 +63,11 @@ public class JogAmpSoundController implements SoundController {
 		}
 		audio.playSound(fl);
 		playingTheme = fl;
+	}
+
+	@Override
+	public void alert() {
+		audio.playSound(alertSound);
 	}
 
 }

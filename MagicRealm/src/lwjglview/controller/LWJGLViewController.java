@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import jogamp.audio.JogAmpSoundController;
 import lwjglview.controller.birdsong.LWJGLBirdsong;
 import lwjglview.controller.lobby.LWJGLLobbyView;
 import lwjglview.controller.mainmenu.LWJGLMainMenu;
 import lwjglview.controller.characterselection.LWJGLCharacterSelection;
 import lwjglview.graphics.LWJGLGraphics;
+import lwjglview.graphics.board.ClearingFocusHandler;
 import lwjglview.graphics.board.LWJGLBoardDrawable;
 import lwjglview.menus.LWJGLAlertDialog;
 import lwjglview.menus.LWJGLConfirmationDialog;
@@ -23,8 +25,10 @@ import model.enums.TileName;
 import model.player.PersonalHistory;
 import utils.handler.Handler;
 import utils.resources.ResourceHandler;
+import view.audio.SoundController;
 import view.controller.BirdsongFinishedListener;
 import view.controller.BoardReadyListener;
+import view.controller.ClearingSelectedListener;
 import view.controller.ViewController;
 import view.controller.birdsong.ActivitiesListener;
 import view.controller.characterselection.CharacterSelectionListener;
@@ -34,36 +38,11 @@ import view.controller.search.SearchView;
 public class LWJGLViewController implements ViewController {
 
 	public LWJGLViewController(ResourceHandler rh) {
-		resources = rh;
-		graphics = new LWJGLGraphics(rh);
-		graphics.prepareLayer(new Handler<LWJGLGraphics>() {
+		init(rh, null);
+	}
 
-			@Override
-			public void handle(LWJGLGraphics gfx) {
-				gfx.clearColourBuffer();
-			}
-
-		}, LWJGLGraphics.LAYER0);
-		selections = new SelectionFrame(graphics);
-		menus = new LWJGLMenuLayer(graphics, selections);
-		mainMenu = new LWJGLMainMenu(menus, resources);
-		characterSelection = new LWJGLCharacterSelection(rh, graphics, menus);
-		menus.add(characterSelection);
-		splash = LWJGLPanel.fromPicture(menus, resources,
-				ResourceHandler.joinPath("splash", "splash.jpg"), -1.78f, -1f,
-				2.3f, true);
-		menus.add(splash);
-		alert = new LWJGLAlertDialog(menus, resources,
-				"this is a very very long message to fill the alert!", -.73f,
-				1f, -.73f, -.4f, .8f);
-		confirmation = new LWJGLConfirmationDialog(menus, resources,
-				"Will you join the dark side?", "Yes master", "Never!", -.73f,
-				1f, -.73f, -.4f, .8f);
-		birdsong = new LWJGLBirdsong(resources, menus);
-		board = null;
-		messageOverlay = new LWJGLWaitingView(menus, "Waiting");
-		lobbyView = new LWJGLLobbyView(messageOverlay);
-		graphics.start();
+	public LWJGLViewController(ResourceHandler rh, SoundController sc) {
+		init(rh, sc);
 	}
 
 	@Override
@@ -101,31 +80,37 @@ public class LWJGLViewController implements ViewController {
 			}
 
 		});
-		birdsong.setVisible(true);
+		birdsong.showPhases(phases);
 	}
 
 	@Override
 	public void displayMessage(String string) {
+		sounds.alert();
 		alert.setMessage(string);
 		alert.show();
 	}
 	
 	@Override
 	public boolean confirm(String message, String confirm, String deny) {
-		boolean ret = confirmation.ask(message, confirm, deny);
-		return ret;
+		return confirmation.ask(message, confirm, deny);
 	}
 
 	@Override
 	public void enterMainMenu(MenuItemListener mil) {
 		mainMenu.setVisible(true);
 		mainMenu.setMenuItemListener(mil);
+		if(sounds != null) {
+			sounds.playMainTheme();
+		}
 	}
 
 	@Override
 	public void enterLobby() {
 		mainMenu.setVisible(false);
 		lobbyView.setVisible(true);
+		if(sounds != null) {
+			sounds.playLobbyTheme();
+		}
 	}
 
 	@Override
@@ -169,6 +154,56 @@ public class LWJGLViewController implements ViewController {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	@Override
+	public void selectClearing(final ClearingSelectedListener csl) {
+		board.setCleaingFocus(new ClearingFocusHandler() {
+
+			@Override
+			public void onFocus(TileName tile, int clearing) {
+				board.focusOn(tile, clearing);
+				if(clearing > 0) {
+					csl.onClearingSelection(tile, clearing);
+				}
+				board.setDefaultClearingFocus();
+			}
+			
+		});
+	}
+	
+	private void init(ResourceHandler rh, SoundController sc) {
+		resources = rh;
+		sounds = new JogAmpSoundController();//sc;
+		graphics = new LWJGLGraphics(rh);
+		graphics.prepareLayer(new Handler<LWJGLGraphics>() {
+
+			@Override
+			public void handle(LWJGLGraphics gfx) {
+				gfx.clearColourBuffer();
+			}
+
+		}, LWJGLGraphics.LAYER0);
+		selections = new SelectionFrame(graphics);
+		menus = new LWJGLMenuLayer(graphics, selections);
+		mainMenu = new LWJGLMainMenu(menus, resources);
+		characterSelection = new LWJGLCharacterSelection(rh, graphics, menus);
+		menus.add(characterSelection);
+		splash = LWJGLPanel.fromPicture(menus, resources,
+				ResourceHandler.joinPath("splash", "splash.jpg"), -1.78f, -1f,
+				2.3f, true);
+		menus.add(splash);
+		alert = new LWJGLAlertDialog(menus, resources,
+				"this is a very very long message to fill the alert!", -.73f,
+				1f, -.73f, -.4f, .8f);
+		confirmation = new LWJGLConfirmationDialog(menus, resources,
+				"Will you join the dark side?", "Yes master", "Never!", -.73f,
+				1f, -.73f, -.4f, .8f);
+		birdsong = new LWJGLBirdsong(resources, menus);
+		board = null;
+		messageOverlay = new LWJGLWaitingView(menus, "Waiting");
+		lobbyView = new LWJGLLobbyView(messageOverlay);
+		graphics.start();
+	}
 
 	private void startBoard(BoardReadyListener brl) {
 		try {
@@ -182,6 +217,7 @@ public class LWJGLViewController implements ViewController {
 	}
 
 	private ResourceHandler resources;
+	private SoundController sounds;
 	private LWJGLBoardDrawable board;
 	private SelectionFrame selections;
 	private LWJGLGraphics graphics;

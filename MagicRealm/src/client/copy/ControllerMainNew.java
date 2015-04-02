@@ -266,11 +266,11 @@ public class ControllerMainNew implements ClientController {
 				 * temp.get(counter).getParent(),
 				 * temp.get(counter).getNumber()); }
 				 */
-				
-				sounds.playLobbyTheme();
 			}
 		};
 		t.start();
+		
+		sounds.playLobbyTheme();
 	}
 
 	@Override
