@@ -50,6 +50,26 @@ public class LWJGLDropdown<T> extends LWJGLPanel {
 		});
 		text = null;
 	}
+	
+	public void disableAll() {
+		for(LWJGLDropdownItem<T> drop: selections) {
+			drop.setVisible(false);
+		}
+	}
+	
+	public void enableAll(List<T> items) {
+		for(T item: items) {
+			enable(item);
+		}
+	}
+	
+	public void enable(T item) {
+		for(LWJGLDropdownItem<T> drop: selections) {
+			if(item.equals(drop.getItem())) {
+				drop.setVisible(true);
+			}
+		}
+	}
 
 	public void setSelectionListener(Handler<T> selection) {
 		selectionListener = selection;

@@ -112,7 +112,14 @@ public class LWJGLBirdsong implements BirdsongView {
 		resize();
 		for (LWJGLDropdown<ActivityType> pane : phases) {
 			selections[i] = null;
-			pane.setVisible(i++ < n);
+			if(i < n) {
+				pane.setVisible(true);
+				pane.disableAll();
+				Phase phs = phss.get(i);
+				pane.enableAll(phs.getPossibleActivities());
+			} else {
+				pane.setVisible(false);
+			}
 		}
 		readyButton.setVisible(true);
 		setVisible(true);
