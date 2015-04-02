@@ -28,9 +28,11 @@ public class Phase implements Serializable{
 	public Phase(PhaseType t, CharacterType ct) {
 		type = t;
 		character = ct;
+		setActivities();
 	}
 	public Phase(PhaseType t) {
 		type = t;
+		setActivities();
 	}
 
 	public List<ActivityType> getPossibleActivities() {
@@ -55,5 +57,20 @@ public class Phase implements Serializable{
 			possibleActivities.add(type);
 		}
 		
+	}
+	private void setActivities(){
+		possibleActivities = new ArrayList<ActivityType>();
+		switch(type){
+		case DEFAULT:
+			
+		case SUNLIGHT:
+			possibleActivities.add(ActivityType.NONE);
+			possibleActivities.add(ActivityType.HIDE);
+			possibleActivities.add(ActivityType.MOVE);
+			possibleActivities.add(ActivityType.SEARCH);
+			break;
+		case SPECIAL:
+			break;
+		}
 	}
 }

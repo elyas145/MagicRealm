@@ -336,11 +336,12 @@ public class ControllerMain implements ClientController {
 		System.out.println("Entering bird song.");
 		//phases:
 		ArrayList<Phase> phases = new ArrayList<Phase>();
-		phases.add(new Phase(PhaseType.DEFAULT));
-		phases.add(new Phase(PhaseType.DEFAULT));
+		
+		phases.add(new Phase(PhaseType.DEFAULT, characters.get(clientID).getType()));
+		phases.add(new Phase(PhaseType.DEFAULT, characters.get(clientID).getType()));
 		phases.addAll(characters.get(clientID).getSpecialPhases());
-		phases.add(new Phase(PhaseType.SUNLIGHT));
-		phases.add(new Phase(PhaseType.SUNLIGHT));
+		phases.add(new Phase(PhaseType.SUNLIGHT, characters.get(clientID).getType()));
+		phases.add(new Phase(PhaseType.SUNLIGHT, characters.get(clientID).getType()));
 		mainView.enterBirdSong(1, phases, new BirdsongFinishedListener() {
 
 			@Override
