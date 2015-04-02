@@ -20,16 +20,13 @@ import model.enums.TableType;
 import model.enums.TileName;
 import model.enums.ValleyChit;
 import communication.ClientNetworkHandler;
-import communication.ServerNetworkHandler;
 import communication.handler.server.CheckSwordsmanPlay;
 import communication.handler.server.DiceRequest;
 import communication.handler.server.EnterCharacterSelection;
 import communication.handler.server.EnterLobby;
 import communication.handler.server.RequestSearchInformation;
-import communication.handler.server.SetAllCharacters;
 import communication.handler.server.UpdateHiding;
 import communication.handler.server.IllegalMove;
-import communication.handler.server.InitBoard;
 import communication.handler.server.MessageDisplay;
 import communication.handler.server.Reject;
 import communication.handler.server.StartGame;
@@ -151,7 +148,7 @@ public class ServerController {
 			System.out.println("Client request: " + iD);
 			if (!client.didSelectCharacter()) {
 				everyoneSelected = false;
-				return;
+				break;
 			}
 
 		}
@@ -164,13 +161,12 @@ public class ServerController {
 		}
 	}
 
-	public void startGame() {
-		sendAll(new StartGame(sboard));
+	public void startGame() {		
 		HashMap<Integer, Character> characters = new HashMap<Integer, Character>();
 		for(ClientThread c : clients){
 			characters.put(c.getID(), c.getCharacter());
 		}
-		sendAll(new SetAllCharacters(characters));
+		sendAll(new StartGame(sboard, characters));
 	}
 
 	public void addTreasure(MapChitType site, TileName tile, Integer value) {
