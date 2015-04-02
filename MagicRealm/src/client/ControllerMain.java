@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import jogamp.audio.JogAmpSoundController;
 import communication.ClientNetworkHandler;
 import communication.ServerNetworkHandler;
 import communication.handler.client.CharacterSelected;
@@ -59,7 +60,7 @@ public class ControllerMain implements ClientController {
 
 	public ControllerMain() {
 		rh = new ResourceHandler();
-		mainView = new LWJGLViewController(rh);
+		mainView = new LWJGLViewController(rh, new JogAmpSoundController());
 
 		server = new ClientServer(this);
 

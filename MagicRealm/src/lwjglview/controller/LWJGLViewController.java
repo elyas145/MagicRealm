@@ -173,7 +173,7 @@ public class LWJGLViewController implements ViewController {
 	
 	private void init(ResourceHandler rh, SoundController sc) {
 		resources = rh;
-		sounds = new JogAmpSoundController();//sc;
+		sounds = sc;
 		graphics = new LWJGLGraphics(rh);
 		graphics.prepareLayer(new Handler<LWJGLGraphics>() {
 
