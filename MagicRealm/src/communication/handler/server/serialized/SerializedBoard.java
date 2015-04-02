@@ -63,4 +63,12 @@ public class SerializedBoard implements Serializable {
 
 	}
 
+	public TileName getTileOfCounter(CounterType counter) {
+		return counterPositions.get(counter).getParent();
+	}
+
+	public int getClearingOfCounter(CounterType counter) {
+		return counterPositions.get(counter).getNumber();
+	}
+
 }

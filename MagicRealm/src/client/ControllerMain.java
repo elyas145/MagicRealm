@@ -25,17 +25,20 @@ import model.board.Board;
 import model.board.clearing.Clearing;
 import model.character.Character;
 import model.character.CharacterFactory;
+import model.character.Phase;
 import model.controller.requests.DieRequest;
 import model.counter.chit.MapChit;
 import model.enums.ActivityType;
 import model.enums.CharacterType;
 import model.enums.CounterType;
+import model.enums.PhaseType;
 import model.enums.SearchType;
 import model.enums.TableType;
 import model.enums.TileName;
 import model.enums.ValleyChit;
 import model.exceptions.MRException;
 import model.interfaces.ClearingInterface;
+import model.interfaces.HexTileInterface;
 import utils.resources.ResourceHandler;
 import view.controller.BirdsongFinishedListener;
 import view.controller.BoardReadyListener;
@@ -331,7 +334,14 @@ public class ControllerMain implements ClientController {
 	@Override
 	public void enterBirdSong() {
 		System.out.println("Entering bird song.");
-		mainView.enterBirdSong(1, null, new BirdsongFinishedListener() {
+		//phases:
+		ArrayList<Phase> phases = new ArrayList<Phase>();
+		phases.add(new Phase(PhaseType.DEFAULT));
+		phases.add(new Phase(PhaseType.DEFAULT));
+		phases.addAll(characters.get(clientID).getSpecialPhases());
+		phases.add(new Phase(PhaseType.SUNLIGHT));
+		phases.add(new Phase(PhaseType.SUNLIGHT));
+		mainView.enterBirdSong(1, phases, new BirdsongFinishedListener() {
 
 			@Override
 			public void onFinish(List<ActivityType> activities) {
@@ -405,6 +415,12 @@ public class ControllerMain implements ClientController {
 			chits.add(new MapChit(board.getMapChitLocations().get(name)));
 		}
 		boardView.loadMapChits(chits);
+		for(Character c : characters.values()){
+			TileName tile = board.getTileOfCounter(c.getType().toCounter());
+			int clearing = board.getClearingOfCounter(c.getType().toCounter());
+			boardView.setCounter(c.getType().toCounter(),tile, clearing);
+		}
+		
 		this.enterBirdSong();
 	}
 
