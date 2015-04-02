@@ -30,17 +30,19 @@ public class ClientThread extends Thread {
 		this.socket = socket;
 		this.ID = socket.getPort();
 		playedTurn = false;
+		player = new Player(ID, "player");
 	}
 	
 	public Integer getID() {
 		return this.ID;
 	}
 	
-	public void send(Object o) {
+	public synchronized void send(Object o) {
 		try {
-			oStreamOut.reset();
+			System.out.println("sending object to: " + ID);
+			//oStreamOut.reset();
 			oStreamOut.writeObject(o);
-			oStreamOut.flush();
+			//oStreamOut.flush();
 		} catch (IOException e) {
 			System.out.println(ID + "Error sending message: " + ID);
 			e.printStackTrace();
@@ -55,7 +57,7 @@ public class ClientThread extends Thread {
 				server.handle(ID, oStreamIn.readObject());
 			} catch (Exception e) {
 				System.out.println(ID + " Error reading input: ");
-				// e.printStackTrace();
+				e.printStackTrace();
 				server.remove(ID);
 				break;
 			}

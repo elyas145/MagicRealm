@@ -144,6 +144,7 @@ public class ServerController {
 		}
 		boolean everyoneSelected = true;
 		// wait for all clients to choose their character
+		
 		for (ClientThread client : clients) {
 			System.out.println("Client request: " + iD);
 			if (!client.didSelectCharacter()) {
