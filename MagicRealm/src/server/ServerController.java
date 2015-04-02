@@ -25,6 +25,7 @@ import communication.handler.server.CheckSwordsmanPlay;
 import communication.handler.server.DiceRequest;
 import communication.handler.server.EnterCharacterSelection;
 import communication.handler.server.EnterLobby;
+import communication.handler.server.RequestSearchInformation;
 import communication.handler.server.SetAllCharacters;
 import communication.handler.server.UpdateHiding;
 import communication.handler.server.IllegalMove;
@@ -279,7 +280,7 @@ public class ServerController {
 
 	public void startSearching(CharacterType actor) {
 		ClientThread ct = getPlayerOf(actor);
-		ct.send(null); // TODO send a search initiated handler
+		ct.send(new RequestSearchInformation());
 		try {
 			playSync.acquire();
 		} catch (InterruptedException e) {
@@ -288,8 +289,9 @@ public class ServerController {
 	}
 	
 	public void searchChosen(CharacterType car, TableType tbl, int rv) {
-		// TODO do the search activity with the player
+		// do the search activity with the player
 		ClientThread ct = getPlayerOf(car);
+		model.performSearch(ct.getPlayer(), tbl, rv);
 		playSync.release();
 	}
 	
@@ -306,5 +308,5 @@ public class ServerController {
 		currentDieRoll = roll;
 		playSync.release();		
 	}
-	
+
 }

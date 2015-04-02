@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import communication.ClientNetworkHandler;
+import communication.handler.server.SearchResults;
 import client.ClientController;
 import config.BoardConfiguration;
 import config.GameConfiguration;
@@ -27,6 +29,7 @@ import model.enums.MapChitType;
 import model.enums.PathType;
 import model.enums.PeerType;
 import model.enums.PhaseType;
+import model.enums.SearchType;
 import model.enums.TableType;
 import model.enums.TileName;
 import model.enums.ValleyChit;
@@ -93,13 +96,6 @@ public class ModelController {
 
 	// TODO belongs in ClientThread.
 	/*
-	 * @Override public void performSearch(TableType selectedTable,
-	 * CharacterType chr) { // TODO add other search table options switch
-	 * (selectedTable) { default: // peer table. peerTableSearch(chr); } }
-	 */
-
-	// TODO belongs in ClientThread.
-	/*
 	 * @Override public void peerChoice(PeerType choice, CharacterType actor) {
 	 * // choice of // peer if (choice == null) {
 	 * System.out.println("PEER CHOICE WAS NULL"); return; } switch (choice) {
@@ -138,8 +134,7 @@ public class ModelController {
 		ClearingInterface cl2 = board.getClearing(tt, clearing);
 		if (cl1.isConnectedTo(cl2, PathType.NORMAL)
 				|| ct.hasDiscoveredPath(cl1, cl2)) {
-			board.moveCharacter(ct.getCharacter()
-					.getType(), tt, clearing);
+			board.moveCharacter(ct.getCharacter().getType(), tt, clearing);
 			return true;
 		} else {
 			return false;
@@ -270,12 +265,6 @@ public class ModelController {
 		return characters.get(ct);
 	}
 
-	/*
-	 * public void startSearching(CharacterType actor) {
-	 * getClient(actor).startSearch(actor); }
-	 */
-
-	// TODO belongs in clientThread
 	/*
 	 * private void playActivities(CharacterType chr) { Player plr =
 	 * getPlayerOf(chr); for (Activity act :
@@ -408,57 +397,84 @@ public class ModelController {
 		return mapChits;
 	}
 
-	/*
-	 * private void peerTableSearch(CharacterType character) { int roll = 2;//
-	 * Random.dieRoll(); TODO cheat mode TileName ct =
-	 * getTileOf(character).getName(); switch (roll) { case 1:
-	 * getClient(character).performPeerChoice(); break; case 2:
-	 * peerCP(character); showMessage(character,
-	 * "Found hidden paths and clues in " + ct); break; case 3:
-	 * peerHP(character); showMessage(character, "Found hidden paths in " + ct);
-	 * break; case 4: peerH(character); break; case 5: peerC(character);
-	 * showMessage(character, "Found hidden clues in " + ct); break; default:
-	 * showMessage(character, "Peer has failed"); break; } }
-	 */
+	public void performSearch(Player player, TableType selectedTable,
+			int rollValue) {
+		// TODO add other search table options
+		switch (selectedTable) {
+		default:
+			peerTableSearch(player, rollValue);
+		}
+	}
 
-	/*
-	 * private void peerC(CharacterType character) { // Player gets to look at
-	 * the map chits in their tile. // they do not discover any sites, but just
-	 * get to see that they are // there. // TODO clearing type affects peer
-	 * ArrayList<MapChit> peek = new ArrayList<MapChit>(); for (MapChit chit :
-	 * mapChits) { if (chit.getTile() == board .getLocationOfCounter(
-	 * getCurrentCharacter().getType().toCounter()) .getParentTile().getName())
-	 * { peek.add(chit); } } getPlayerOf(character).discoverAllMapChits(peek);
-	 * getClient(character).revealMapChits(peek); }
-	 */
+	private ClientNetworkHandler peerTableSearch(Player player, int roll) {
 
-	/*
-	 * private Player getPlayerOf(CharacterType character) { return
-	 * players.get(character); }
-	 * 
-	 * private void peerH(CharacterType character) { // TODO we don't have any
-	 * enemies yet.
-	 * 
-	 * }
-	 * 
-	 * private void peerHP(CharacterType character) { // hidden enemies and
-	 * paths // TODO Auto-generated method stub peerP(character); }
-	 * 
-	 * // PEER SEARCH: clues and paths search private void peerCP(CharacterType
-	 * character) { peerC(character); peerP(character); }
-	 * 
-	 * private void peerP(CharacterType character) { // peer paths CounterType
-	 * playerCounter = character.toCounter(); ClearingInterface clearing =
-	 * board.getLocationOfCounter(playerCounter); ClearingInterface source =
-	 * board.getLocationOfCounter(playerCounter); for (ClearingInterface cl :
-	 * clearing.getSurrounding(PathType.HIDDEN)) {
-	 * getPlayerOf(character).addDiscoveredPath(source, cl); } }
-	 */
+		TileName ct = getTileOf(player.getCharacter().getType()).getName();
+		switch (roll) {
+		case 1:
+			// TODO player chooses what they want to do in the table.
+			roll = 2;
+		case 2:
+			return peerCP(player);
+		case 3:
+			return peerHP(player);
+		case 4:
+			return peerH(player);
+		case 5:
+			return peerC(player);
+		default:
+			return new SearchResults(SearchType.NONE);
+		}
+	}
 
-	/*
-	 * private HexTileInterface getTileOf(CharacterType chr) { return
-	 * board.getLocationOfCounter(chr.toCounter()).getParentTile(); }
-	 */
+	private SearchResults peerH(Player player) { // TODO we don't have any enemies yet.
+		return new SearchResults(SearchType.NONE);
+	}
+
+	private SearchResults peerHP(Player player) { // hidden enemies and paths
+		return peerP(player);
+	}
+
+	// PEER SEARCH: clues and paths search
+	private ClientNetworkHandler peerCP(Player player) {
+		SearchResults cResult = peerC(player);
+		SearchResults pResults = peerP(player);
+
+		return new SearchResults(SearchType.CLUES_PATHS, cResult.getPeek(),
+				pResults.getPaths());
+	}
+
+	private SearchResults peerC(Player player) {
+		// Player gets to look at the map chits in their tile.
+		// they do not discover any sites, but just get to see that they are
+		// there.
+		// TODO clearing type affects peer
+		ArrayList<MapChit> peek = new ArrayList<MapChit>();
+		for (MapChit chit : mapChits) {
+			if (chit.getTile() == board
+					.getLocationOfCounter(
+							player.getCharacter().getType().toCounter())
+					.getParentTile().getName()) {
+				peek.add(chit);
+			}
+		}
+		return new SearchResults(SearchType.CLUES, peek);
+	}
+
+	private SearchResults peerP(Player player) { // peer paths
+		CounterType playerCounter = player.getCharacter().getType().toCounter();
+		ClearingInterface clearing = board.getLocationOfCounter(playerCounter);
+		ClearingInterface source = board.getLocationOfCounter(playerCounter);
+		Map<ClearingInterface, ClearingInterface> discoveredPaths = new HashMap<ClearingInterface, ClearingInterface>();
+		for (ClearingInterface cl : clearing.getSurrounding(PathType.HIDDEN)) {
+			player.addDiscoveredPath(source, cl);
+			discoveredPaths.put(source, cl);
+		}
+		return new SearchResults(SearchType.PATHS, discoveredPaths);
+	}
+
+	private HexTileInterface getTileOf(CharacterType chr) {
+		return board.getLocationOfCounter(chr.toCounter()).getParentTile();
+	}
 
 	/*
 	 * private TileName getCurrentTile() { return board .getLocationOfCounter(
