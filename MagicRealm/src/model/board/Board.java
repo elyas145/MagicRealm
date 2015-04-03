@@ -33,6 +33,7 @@ import model.character.belonging.Treasure;
 import model.counter.chit.MapChit;
 import model.enums.CharacterType;
 import model.enums.CounterType;
+import model.enums.LandType;
 import model.enums.TileName;
 import model.enums.ValleyChit;
 import model.interfaces.BoardInterface;
@@ -51,7 +52,7 @@ public class Board implements BoardInterface {
 		tileLocations = new HashMap<TileName, int[]>();
 		mapOfTileLocations = new HashMap<Integer, Map<Integer, TileName>>();
 		mapOfTiles = new HashMap<TileName, HexTile>();
-		clearingLocations = new HashMap<TileName, Map<Integer, EnchantedHolder<Point>>>();
+		clearingLocations = new HashMap<TileName, Map<Integer, EnchantedHolder<ClearingData>>>();
 		counterPositions = new HashMap<CounterType, Clearing>();
 		try {
 			String path = rh.getResource(ResourceHandler.joinPath("data",
@@ -63,28 +64,30 @@ public class Board implements BoardInterface {
 				JSONObject js = (JSONObject) ob;
 				boolean en = (Boolean) js.get("enchanted");
 				TileName tn = TileName.valueOf((String) js.get("tileName"));
+				Object tmp = js.get("type");
+				String terrain = (String) tmp;
 				{
 					JSONObject ns = (JSONObject) js.get("numbers");
 					if (!clearingLocations.containsKey(tn)) {
 						clearingLocations.put(tn,
-								new HashMap<Integer, EnchantedHolder<Point>>());
+								new HashMap<Integer, EnchantedHolder<ClearingData>>());
 					}
-					Map<Integer, EnchantedHolder<Point>> pts = clearingLocations
+					Map<Integer, EnchantedHolder<ClearingData>> pts = clearingLocations
 							.get(tn);
 					for (Object key : ns.keySet()) {
 						int val = Integer.parseInt((String) key);
 						if (!pts.containsKey(val)) {
-							pts.put(val, new EnchantedHolder<Point>());
+							pts.put(val, new EnchantedHolder<ClearingData>());
 						}
-						EnchantedHolder<Point> pt = pts.get(val);
+						EnchantedHolder<ClearingData> pt = pts.get(val);
 						JSONObject jpt = (JSONObject) ns.get(key);
 						long x = (Long) jpt.get("x");
 						long y = (Long) jpt.get("y");
-						float a = x
-								/ (float) GraphicsConfiguration.TILE_IMAGE_WIDTH;
-						float b = y
-								/ (float) GraphicsConfiguration.TILE_IMAGE_HEIGHT;
-						pt.set(en, new Point(a, b));
+						tmp = jpt.get("type");
+						if(tmp != null) {
+							terrain = (String) tmp;
+						}
+						pt.set(en, new ClearingData(x, y, terrain));
 					}
 				}
 			}
@@ -146,8 +149,8 @@ public class Board implements BoardInterface {
 		setClearingOfCounter(ct, cl);
 	}
 
-	public void setLocationOfCounter(CounterType ct, ValleyChit site) {
-		Clearing ci = getLocationOfCounter(site.toCounterType());
+	public void setLocationOfCounter(CounterType ct, CounterType counterType) {
+		Clearing ci = getLocationOfCounter(counterType);
 		setClearingOfCounter(ct, ci);
 	}
 
@@ -243,7 +246,7 @@ public class Board implements BoardInterface {
 
 	private void setTile(TileName tile, int x, int y, int rot) {
 		getSurround(x, y, tile);
-		Map<Integer, EnchantedHolder<Point>> locs = clearingLocations.get(tile);
+		Map<Integer, EnchantedHolder<ClearingData>> locs = clearingLocations.get(tile);
 		HexTile ht = new HexTile(this, tile, x, y, rot, locs, surround);
 		mapOfTiles.put(tile, ht);
 		tileLocations.put(tile, new int[] { x, y });
@@ -302,8 +305,21 @@ public class Board implements BoardInterface {
 			surround[rot] = row.get(nx);
 		}
 	}
+	
+	public class ClearingData {
+		public ClearingData(long x, long y, String tp) {
+			float a = x
+					/ (float) GraphicsConfiguration.TILE_IMAGE_WIDTH;
+			float b = y
+					/ (float) GraphicsConfiguration.TILE_IMAGE_HEIGHT;
+			point = new Point(a, b);
+			type = LandType.valueOf(tp);
+		}
+		public final Point point;
+		public final LandType type;
+	}
 
-	private Map<TileName, Map<Integer, EnchantedHolder<Point>>> clearingLocations;
+	private Map<TileName, Map<Integer, EnchantedHolder<ClearingData>>> clearingLocations;
 	private TileName[] surround;
 	// row column
 	private Map<Integer, Map<Integer, TileName>> mapOfTileLocations;
@@ -335,6 +351,16 @@ public class Board implements BoardInterface {
 		sboard.setCounterPositions(sCounterPositions);
 
 		return sboard;
+	}
+
+	public CounterType confirmLocationOfDwelling(TileName tile, int clearing) {
+		for(CounterType ct : counterPositions.keySet()){
+			Clearing c = counterPositions.get(ct);
+			if(c.getClearingNumber() == clearing && c.getParentTile().getName() == tile){
+				return ct;
+			}
+		}
+		return null;
 	}
 
 }

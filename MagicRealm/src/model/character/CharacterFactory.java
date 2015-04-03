@@ -8,6 +8,7 @@ import model.character.belonging.Weapon;
 import model.enums.ActivityType;
 import model.enums.ArmorType;
 import model.enums.CharacterType;
+import model.enums.CounterType;
 import model.enums.PhaseType;
 import model.enums.ValleyChit;
 import model.enums.WeaponType;
@@ -18,13 +19,13 @@ public class CharacterFactory {
 
 	public static ArrayList<Character> getPossibleCharacters() {
 		ArrayList<Character> a = new ArrayList<Character>();
-		a.add(create(CharacterType.AMAZON, ValleyChit.INN));
-		a.add(create(CharacterType.CAPTAIN, ValleyChit.INN));
-		a.add(create(CharacterType.SWORDSMAN, ValleyChit.INN));
+		a.add(create(CharacterType.AMAZON, CounterType.VALLEY_INN));
+		a.add(create(CharacterType.CAPTAIN, CounterType.VALLEY_INN));
+		a.add(create(CharacterType.SWORDSMAN, CounterType.VALLEY_INN));
 		return a;
 	}
 
-	public static Character create(CharacterType ct, ValleyChit location) {
+	public static Character create(CharacterType ct, CounterType location) {
 		Character c = new Character(ct);
 		// init belongings
 		// init special phases ONLY based on special character traits. 
@@ -40,7 +41,7 @@ public class CharacterFactory {
 			possibleActivities.add(ActivityType.MOVE);
 			specialPhases.get(0).setPossibleActivities(possibleActivities);
 			//has to start at the inn
-			c.setInitialLocation(ValleyChit.INN);
+			c.setInitialLocation(CounterType.VALLEY_INN);
 			//initial belongings
 			belongings.add(new Weapon(WeaponType.SHORT_SWORD, 1, false, 0, 'L'));
 			belongings.add(new Armor(ArmorType.HELMET, 'M'));
@@ -70,6 +71,27 @@ public class CharacterFactory {
 		c.setSpecialPhases(specialPhases);
 		c.setBelongings(belongings);
 		return c;
+	}
+
+	public static ArrayList<CounterType> getPossibleStartingLocations(
+			CharacterType character) {
+		ArrayList<CounterType> locations = new ArrayList<CounterType>();
+		switch(character){
+		case AMAZON:
+			locations.add(CounterType.VALLEY_INN);
+			break;
+		case CAPTAIN:
+			locations.add(CounterType.VALLEY_INN);
+			locations.add(CounterType.VALLEY_HOUSE);
+			locations.add(CounterType.VALLEY_GUARD_HOUSE);
+			break;
+		case SWORDSMAN:
+			locations.add(CounterType.VALLEY_INN);
+			break;
+		default:
+			break;
+		}
+		return locations;
 	}
 
 }

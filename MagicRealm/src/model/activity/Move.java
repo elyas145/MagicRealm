@@ -5,6 +5,7 @@ import model.controller.ModelControlInterface;
 import model.controller.ModelController;
 import model.enums.ActivityType;
 import model.enums.CharacterType;
+import model.enums.PhaseType;
 import model.enums.TileName;
 import model.exceptions.IllegalMoveException;
 
@@ -12,8 +13,8 @@ public class Move extends Activity {
 	private TileName tile;
 	private int clearing;
 
-	public Move(CharacterType actor, TileName tileName, int c) {
-		super(ActivityType.MOVE, actor);
+	public Move(CharacterType actor, TileName tileName, int c, PhaseType type) {
+		super(ActivityType.MOVE, actor, type);
 		tile = tileName;
 		clearing = c;
 	}

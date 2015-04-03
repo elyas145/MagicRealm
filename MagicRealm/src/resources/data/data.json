@@ -19,7 +19,8 @@
             }
         }, 
         "tileName": "AWFUL_VALLEY", 
-        "enchanted": true
+        "enchanted": true,
+        "type": "VALLEY"
     }, 
     {
         "numbers": {
@@ -33,7 +34,7 @@
             }, 
             "4": {
                 "y": 253, 
-                "x": 306
+                "x": 306,
             }, 
             "5": {
                 "y": 88, 
@@ -41,7 +42,8 @@
             }
         }, 
         "tileName": "AWFUL_VALLEY", 
-        "enchanted": false
+        "enchanted": false,
+        "type": "VALLEY"
     }, 
     {
         "numbers": {
@@ -64,6 +66,7 @@
         }, 
         "tileName": "BAD_VALLEY", 
         "enchanted": true
+        "type": "VALLEY"
     }, 
     {
         "numbers": {
@@ -86,32 +89,39 @@
         }, 
         "tileName": "BAD_VALLEY", 
         "enchanted": false
+        "type": "VALLEY"
     }, 
     {
         "numbers": {
             "1": {
                 "y": 71, 
-                "x": 199
+                "x": 199,
+                "type": "VALLEY"
             }, 
             "2": {
                 "y": 217, 
-                "x": 413
+                "x": 413,
+                "type": "VALLEY"
             }, 
             "3": {
                 "y": 200, 
-                "x": 320
+                "x": 320,
+                "type": "VALLEY"
             }, 
             "4": {
                 "y": 324, 
-                "x": 235
+                "x": 235,
+                "type": "CAVE"
             }, 
             "5": {
                 "y": 264, 
-                "x": 147
+                "x": 147,
+                "type": "CAVE"
             }, 
             "6": {
                 "y": 188, 
-                "x": 202
+                "x": 202,
+                "type": "CAVE"
             }
         }, 
         "tileName": "BORDERLAND", 
@@ -121,27 +131,33 @@
         "numbers": {
             "1": {
                 "y": 77, 
-                "x": 170
+                "x": 170,
+                "type": "VALLEY"
             }, 
             "2": {
                 "y": 204, 
-                "x": 386
+                "x": 386,
+                "type": "VALLEY"
             }, 
             "3": {
                 "y": 93, 
-                "x": 316
+                "x": 316,
+                "type": "VALLEY"
             }, 
             "4": {
                 "y": 363, 
-                "x": 170
+                "x": 170,
+                "type": "CAVE"
             }, 
             "5": {
                 "y": 271, 
-                "x": 187
+                "x": 187,
+                "type": "CAVE"
             }, 
             "6": {
                 "y": 183, 
-                "x": 224
+                "x": 224,
+                "type": "CAVE"
             }
         }, 
         "tileName": "BORDERLAND", 
@@ -175,7 +191,8 @@
             }
         }, 
         "tileName": "CAVERN", 
-        "enchanted": true
+        "enchanted": true,
+        "type": "CAVE"
     }, 
     {
         "numbers": {
@@ -205,7 +222,8 @@
             }
         }, 
         "tileName": "CAVERN", 
-        "enchanted": false
+        "enchanted": false,
+        "type": "CAVE"
     }, 
     {
         "numbers": {
@@ -235,7 +253,8 @@
             }
         }, 
         "tileName": "CAVES", 
-        "enchanted": true
+        "enchanted": true,
+        "type": "CAVE"
     }, 
     {
         "numbers": {
@@ -265,7 +284,8 @@
             }
         }, 
         "tileName": "CAVES", 
-        "enchanted": false
+        "enchanted": false,
+        "type": "CAVE"
     }, 
     {
         "numbers": {
@@ -295,7 +315,8 @@
             }
         }, 
         "tileName": "CLIFF", 
-        "enchanted": true
+        "enchanted": true,
+        "type": "VALLEY"
     }, 
     {
         "numbers": {
@@ -325,7 +346,8 @@
             }
         }, 
         "tileName": "CLIFF", 
-        "enchanted": false
+        "enchanted": false,
+        "type": "VALLEY"
     }, 
     {
         "numbers": {
@@ -355,7 +377,8 @@
             }
         }, 
         "tileName": "CRAG", 
-        "enchanted": true
+        "enchanted": true,
+        "type": "MOUNTAIN"
     }, 
     {
         "numbers": {
@@ -385,7 +408,8 @@
             }
         }, 
         "tileName": "CRAG", 
-        "enchanted": false
+        "enchanted": false,
+        "type": "MOUNTAIN"
     }, 
     {
         "numbers": {
@@ -407,7 +431,8 @@
             }
         }, 
         "tileName": "CURST_VALLEY", 
-        "enchanted": true
+        "enchanted": true,
+        "type": "VALLEY"
     }, 
     {
         "numbers": {
@@ -429,7 +454,8 @@
             }
         }, 
         "tileName": "CURST_VALLEY", 
-        "enchanted": false
+        "enchanted": false,
+        "type": "VALLEY"
     }, 
     {
         "numbers": {
@@ -451,7 +477,8 @@
             }
         }, 
         "tileName": "DARK_VALLEY", 
-        "enchanted": true
+        "enchanted": true,
+        "type": "VALLEY"
     }, 
     {
         "numbers": {
@@ -473,7 +500,8 @@
             }
         }, 
         "tileName": "DARK_VALLEY", 
-        "enchanted": false
+        "enchanted": false,
+        "type": "VALLEY"
     }, 
     {
         "numbers": {
@@ -503,7 +531,8 @@
             }
         }, 
         "tileName": "DEEP_WOODS", 
-        "enchanted": true
+        "enchanted": true,
+        "type": "WOODS"
     }, 
     {
         "numbers": {
@@ -533,7 +562,8 @@
             }
         }, 
         "tileName": "DEEP_WOODS", 
-        "enchanted": false
+        "enchanted": false,
+        "type": "WOODS"
     }, 
     {
         "numbers": {
@@ -555,7 +585,8 @@
             }
         }, 
         "tileName": "EVIL_VALLEY", 
-        "enchanted": true
+        "enchanted": true,
+        "type": "VALLEY"
     }, 
     {
         "numbers": {
@@ -577,33 +608,40 @@
             }
         }, 
         "tileName": "EVIL_VALLEY", 
-        "enchanted": false
+        "enchanted": false,
+        "type": "VALLEY"
     }, 
     {
         "numbers": {
             "1": {
                 "y": 265, 
-                "x": 330
+                "x": 330,
+                "type": "MOUNTAIN"
             }, 
             "2": {
                 "y": 84, 
-                "x": 245
+                "x": 245,
+                "type": "MOUNTAIN"
             }, 
             "3": {
                 "y": 151, 
-                "x": 358
+                "x": 358,
+                "type": "CAVE"
             }, 
             "4": {
                 "y": 248, 
-                "x": 198
+                "x": 198,
+                "type": "MOUNTAIN"
             }, 
             "5": {
                 "y": 350, 
-                "x": 246
+                "x": 246,
+                "type": "MOUNTAIN"
             }, 
             "6": {
                 "y": 148, 
-                "x": 139
+                "x": 139,
+                "type": "CAVE"
             }
         }, 
         "tileName": "HIGH_PASS", 
@@ -613,27 +651,33 @@
         "numbers": {
             "1": {
                 "y": 256, 
-                "x": 336
+                "x": 336,
+                "type": "MOUNTAIN"
             }, 
             "2": {
                 "y": 87, 
-                "x": 244
+                "x": 244,
+                "type": "MOUNTAIN"
             }, 
             "3": {
                 "y": 153, 
-                "x": 350
+                "x": 350,
+                "type": "CAVE"
             }, 
             "4": {
                 "y": 233, 
-                "x": 217
+                "x": 217,
+                "type": "MOUNTAIN"
             }, 
             "5": {
                 "y": 348, 
-                "x": 250
+                "x": 250,
+                "type": "MOUNTAIN"
             }, 
             "6": {
                 "y": 150, 
-                "x": 133
+                "x": 133,
+                "type": "CAVE"
             }
         }, 
         "tileName": "HIGH_PASS", 
@@ -643,27 +687,33 @@
         "numbers": {
             "1": {
                 "y": 305, 
-                "x": 275
+                "x": 275,
+                "type": "WOODS"
             }, 
             "2": {
                 "y": 133, 
-                "x": 357
+                "x": 357,
+                "type": "MOUNTAIN"
             }, 
             "3": {
                 "y": 261, 
-                "x": 394
+                "x": 394,
+                "type": "WOODS"
             }, 
             "4": {
                 "y": 206, 
-                "x": 246
+                "x": 246,
+                "type": "WOODS"
             }, 
             "5": {
                 "y": 130, 
-                "x": 134
+                "x": 134,
+                "type": "MOUNTAIN"
             }, 
             "6": {
                 "y": 354, 
-                "x": 164
+                "x": 164,
+                "type": "WOODS"
             }
         }, 
         "tileName": "LEDGES", 
@@ -673,27 +723,33 @@
         "numbers": {
             "1": {
                 "y": 314, 
-                "x": 268
+                "x": 268,
+                "type": "WOODS"
             }, 
             "2": {
                 "y": 159, 
-                "x": 363
+                "x": 363,
+                "type": "MOUNTAIN"
             }, 
             "3": {
                 "y": 273, 
-                "x": 376
+                "x": 376,
+                "type": "WOODS"
             }, 
             "4": {
                 "y": 209, 
-                "x": 248
+                "x": 248,
+                "type": "WOODS"
             }, 
             "5": {
                 "y": 127, 
-                "x": 157
+                "x": 157,
+                "type": "MOUNTAIN"
             }, 
             "6": {
                 "y": 353, 
-                "x": 174
+                "x": 174,
+                "type": "WOODS"
             }
         }, 
         "tileName": "LEDGES", 
@@ -715,7 +771,8 @@
             }
         }, 
         "tileName": "LINDEN_WOODS", 
-        "enchanted": true
+        "enchanted": true,
+        "type": "WOODS"
     }, 
     {
         "numbers": {
@@ -733,7 +790,8 @@
             }
         }, 
         "tileName": "LINDEN_WOODS", 
-        "enchanted": false
+        "enchanted": false,
+        "type": "WOODS"
     }, 
     {
         "numbers": {
@@ -751,7 +809,8 @@
             }
         }, 
         "tileName": "MAPLE_WOODS", 
-        "enchanted": true
+        "enchanted": true,
+        "type": "WOODS"
     }, 
     {
         "numbers": {
@@ -769,7 +828,8 @@
             }
         }, 
         "tileName": "MAPLE_WOODS", 
-        "enchanted": false
+        "enchanted": false,
+        "type": "WOODS"
     }, 
     {
         "numbers": {
@@ -799,7 +859,8 @@
             }
         }, 
         "tileName": "MOUNTAIN", 
-        "enchanted": true
+        "enchanted": true,
+        "type": "MOUNTAIN"
     }, 
     {
         "numbers": {
@@ -829,7 +890,8 @@
             }
         }, 
         "tileName": "MOUNTAIN", 
-        "enchanted": false
+        "enchanted": false,
+        "type": "MOUNTAIN"
     }, 
     {
         "numbers": {
@@ -847,7 +909,8 @@
             }
         }, 
         "tileName": "NUT_WOODS", 
-        "enchanted": true
+        "enchanted": true,
+        "type": "WOODS"
     }, 
     {
         "numbers": {
@@ -865,7 +928,8 @@
             }
         }, 
         "tileName": "NUT_WOODS", 
-        "enchanted": false
+        "enchanted": false,
+        "type": "WOODS"
     }, 
     {
         "numbers": {
@@ -883,7 +947,8 @@
             }
         }, 
         "tileName": "OAK_WOODS", 
-        "enchanted": true
+        "enchanted": true,
+        "type": "WOODS"
     }, 
     {
         "numbers": {
@@ -901,7 +966,8 @@
             }
         }, 
         "tileName": "OAK_WOODS", 
-        "enchanted": false
+        "enchanted": false,
+        "type": "WOODS"
     }, 
     {
         "numbers": {
@@ -919,7 +985,8 @@
             }
         }, 
         "tileName": "PINE_WOODS", 
-        "enchanted": true
+        "enchanted": true,
+        "type": "WOODS"
     }, 
     {
         "numbers": {
@@ -937,33 +1004,40 @@
             }
         }, 
         "tileName": "PINE_WOODS", 
-        "enchanted": false
+        "enchanted": false,
+        "type": "WOODS"
     }, 
     {
         "numbers": {
             "1": {
                 "y": 153, 
-                "x": 129
+                "x": 129,
+                "type": "VALLEY"
             }, 
             "2": {
                 "y": 86, 
-                "x": 312
+                "x": 312,
+                "type": "VALLEY"
             }, 
             "3": {
                 "y": 325, 
-                "x": 355
+                "x": 355,
+                "type": "VALLEY"
             }, 
             "4": {
                 "y": 228, 
-                "x": 222
+                "x": 222,
+                "type": "VALLEY"
             }, 
             "5": {
                 "y": 309, 
-                "x": 153
+                "x": 153,
+                "type": "VALLEY"
             }, 
             "6": {
                 "y": 202, 
-                "x": 330
+                "x": 330,
+                "type": "CAVE"
             }
         }, 
         "tileName": "RUINS", 
@@ -973,27 +1047,33 @@
         "numbers": {
             "1": {
                 "y": 151, 
-                "x": 157
+                "x": 157,
+                "type": "VALLEY"
             }, 
             "2": {
                 "y": 90, 
-                "x": 323
+                "x": 323,
+                "type": "VALLEY"
             }, 
             "3": {
                 "y": 288, 
-                "x": 370
+                "x": 370,
+                "type": "VALLEY"
             }, 
             "4": {
                 "y": 262, 
-                "x": 234
+                "x": 234,
+                "type": "VALLEY"
             }, 
             "5": {
                 "y": 331, 
-                "x": 147
+                "x": 147,
+                "type": "VALLEY"
             }, 
             "6": {
                 "y": 184, 
-                "x": 328
+                "x": 328,
+                "type": "CAVE"
             }
         }, 
         "tileName": "RUINS", 

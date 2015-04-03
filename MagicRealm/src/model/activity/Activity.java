@@ -4,12 +4,20 @@ import server.ServerController;
 import model.controller.ModelControlInterface;
 import model.enums.ActivityType;
 import model.enums.CharacterType;
+import model.enums.PhaseType;
 
 public abstract class Activity {
 
 	// perform the action on the model controller
 	public abstract void perform(ServerController serverController);
 
+	public void setPhaseType(PhaseType type){
+		this.phaseType = type;
+	}
+	public PhaseType getPhaseType(){
+		return this.phaseType;
+	}
+	
 	public ActivityType getType() {
 		return type;
 	}
@@ -22,8 +30,9 @@ public abstract class Activity {
 		this.type = type;
 	}
 
-	protected Activity(ActivityType act, CharacterType actor) {
-		type = act;
+	protected Activity(ActivityType act, CharacterType actor, PhaseType phaseType) {
+		this.type = act;
+		this.phaseType = phaseType;
 		setActor(actor);
 	}
 
@@ -33,5 +42,6 @@ public abstract class Activity {
 
 	private ActivityType type;
 	private CharacterType character;
+	private PhaseType phaseType;
 
 }

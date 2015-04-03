@@ -43,6 +43,7 @@ import model.interfaces.HexTileInterface;
 import utils.resources.ResourceHandler;
 import view.controller.BirdsongFinishedListener;
 import view.controller.BoardReadyListener;
+import view.controller.ClearingSelectedListener;
 import view.controller.ViewController;
 import view.controller.characterselection.CharacterSelectionListener;
 import view.controller.game.BoardView;
@@ -308,8 +309,29 @@ public class ControllerMain implements ClientController {
 				new CharacterSelectionListener() {
 
 					@Override
-					public void onCharacterSelected(CharacterType character) {
-						characterSelected(character, ValleyChit.HOUSE);
+					public void onCharacterSelected(final CharacterType character) {
+						mainView.selectClearing(new ClearingSelectedListener(){
+
+							@Override
+							public void onClearingSelection(TileName tile,
+									int clearing) {
+								if(clearing != 0){
+									CounterType loc;
+									if ((loc = board.confirmLocationOfDwelling(tile, clearing)) != null){
+										if(CharacterFactory.getPossibleStartingLocations(character).contains(loc)){
+											characterSelected(character, loc);
+										}
+									}else{
+										mainView.displayMessage("You must select a clearing with a dwelling.");
+										
+									}
+								}else{
+									mainView.selectClearing(this);
+								}
+								
+							}
+							
+						});
 					}
 
 				});
@@ -321,9 +343,9 @@ public class ControllerMain implements ClientController {
 	 * 
 	 * @param character
 	 */
-	public void characterSelected(CharacterType character, ValleyChit location) {
+	public void characterSelected(CharacterType character, CounterType loc) {
 		System.out.println("character selected.");
-		if (!server.send(new CharacterSelected(clientID, character, location))) {
+		if (!server.send(new CharacterSelected(clientID, character, loc))) {
 			System.out.println("failed to send selected character to server.");
 		}
 	}

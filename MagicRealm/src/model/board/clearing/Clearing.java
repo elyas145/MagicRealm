@@ -10,6 +10,7 @@ import communication.handler.server.serialized.SerializedClearing;
 import model.EnchantedHolder;
 import model.board.tile.HexTile;
 import model.counter.chit.Chit;
+import model.enums.LandType;
 import model.enums.PathType;
 import model.interfaces.ClearingInterface;
 import model.interfaces.HexTileInterface;
@@ -25,13 +26,14 @@ public class Clearing implements ClearingInterface, Serializable {
 	private static final long serialVersionUID = -8081415374136797789L;
 
 	// nloc and eloc distance from center of tile
-	public Clearing(HexTile par, int num, Matrix nloc, Matrix eloc) {
+	public Clearing(HexTile par, int num, Matrix nloc, Matrix eloc, LandType land) {
 		parent = par;
 		locations = new EnchantedHolder<Matrix>(Matrix.clone(nloc),
 				Matrix.clone(eloc));
 		internalConnections = new HashMap<ClearingInterface, EnchantedHolder<PathType>>();
 		externalConnections = new HashMap<HexTileInterface, EnchantedHolder<ClearingResolver>>();
 		number = num;
+		terrain = land;
 	}
 
 	/**
@@ -162,6 +164,19 @@ public class Clearing implements ClearingInterface, Serializable {
 		this.number = number;
 	}
 
+	public SerializedClearing getSerializedClearing() {
+		SerializedClearing sClearing = new SerializedClearing();
+		sClearing.setChits(chits);
+		sClearing.setLocations(locations);
+		sClearing.setNumber(number);
+		sClearing.setParent(parent.getName());
+		return sClearing;
+	}
+	
+	public LandType getLandType() {
+		return terrain;
+	}
+
 	@Override
 	public int getClearingNumber() {
 		return number;
@@ -213,15 +228,8 @@ public class Clearing implements ClearingInterface, Serializable {
 
 	private List<Chit> chits;
 	private int number;
+	
+	private LandType terrain;
 
 	private EnchantedHolder<Matrix> locations;
-
-	public SerializedClearing getSerializedClearing() {
-		SerializedClearing sClearing = new SerializedClearing();
-		sClearing.setChits(chits);
-		sClearing.setLocations(locations);
-		sClearing.setNumber(number);
-		sClearing.setParent(parent.getName());
-		return sClearing;
-	}
 }

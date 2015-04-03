@@ -25,6 +25,7 @@ import model.enums.ActivityType;
 import model.enums.CharacterType;
 import model.enums.ChitType;
 import model.enums.CounterType;
+import model.enums.LandType;
 import model.enums.MapChitType;
 import model.enums.PathType;
 import model.enums.PeerType;
@@ -175,7 +176,7 @@ public class ModelController {
 	 * @param site
 	 *            Set to null if not specified.
 	 */
-	public void setPlayersInitialLocations(CounterType c, ValleyChit site) {
+	public void setPlayersInitialLocations(CounterType c, CounterType site) {
 		// TODO get users to set locations
 		if (site != null) {
 			board.setLocationOfCounter(c, site);
@@ -526,5 +527,12 @@ public class ModelController {
 			}
 		}
 		board.setLocationOfMapChit(mc, tile);
+	}
+
+	public boolean checkIfCave(TileName tile, int clearing) {
+		if (board.getClearing(tile, clearing).getLandType() == LandType.CAVE){
+			return true;
+		}
+		return false;
 	}
 }
