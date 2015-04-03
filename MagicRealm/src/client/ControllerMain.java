@@ -461,7 +461,7 @@ public class ControllerMain implements ClientController {
 	@Override
 	public void updateCharacterSelection(CharacterType character) {
 		// TODO mainView.updateCharacterSelection(character);
-		
+		mainView.disableCharacter(character);
 		System.out.println("Client " + clientID
 				+ ": this character is now not selectable: "
 				+ character.toString());
