@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Semaphore;
 
 import jogamp.audio.JogAmpSoundController;
 import communication.ClientNetworkHandler;
@@ -268,6 +269,7 @@ public class ControllerMain implements ClientController {
 				 * temp.get(counter).getParent(),
 				 * temp.get(counter).getNumber()); }
 				 */
+				tilesSet.release();
 			}
 		};
 		t.start();
@@ -406,16 +408,23 @@ public class ControllerMain implements ClientController {
 		System.out.println("update lobby count called: " + count);
 		mainView.waitingForPlayers(count);
 	}
+	
+	private Semaphore tilesSet = new Semaphore(0);
 
 	@Override
 	public void startGame(SerializedBoard board) {
 		System.out.println("starting game.");
 		sleepTime = 0; // finish placing the tiles without waiting.
+		try {
+			tilesSet.acquire();
+		} catch (InterruptedException e) {
+			throw new RuntimeException(e);
+		}
 		ArrayList<MapChit> chits = new ArrayList<MapChit>();
 		for (TileName name : board.getMapChitLocations().keySet()) {
 			chits.add(new MapChit(board.getMapChitLocations().get(name)));
 		}
-		synchronized (this){
+		synchronized (boardView){
 			boardView.loadMapChits(chits);
 			for(Character c : characters.values()){
 				TileName tile = board.getTileOfCounter(c.getType().toCounter());

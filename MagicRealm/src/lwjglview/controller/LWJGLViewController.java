@@ -82,13 +82,6 @@ public class LWJGLViewController implements ViewController {
 		});
 		birdsong.showPhases(phases);
 	}
-
-	@Override
-	public void displayMessage(String string) {
-		sounds.alert();
-		alert.setMessage(string);
-		alert.show();
-	}
 	
 	@Override
 	public boolean confirm(String message, String confirm, String deny) {
@@ -145,11 +138,6 @@ public class LWJGLViewController implements ViewController {
 	}
 
 	@Override
-	public void exit() {
-		System.exit(0);
-	}
-
-	@Override
 	public SearchView enterSearchView(CharacterType character) {
 		// TODO Auto-generated method stub
 		return null;
@@ -169,6 +157,21 @@ public class LWJGLViewController implements ViewController {
 			}
 			
 		});
+	}
+
+	@Override
+	public void displayMessage(String string) {
+		displayMessage(string, null);
+	}
+	
+	@Override
+	public void displayMessage(String string, Runnable onClose) {
+		if(sounds != null) {
+			sounds.alert();
+		}
+		alert.setMessage(string);
+		alert.setHandler(onClose);
+		alert.show();
 	}
 	
 	private void init(ResourceHandler rh, SoundController sc) {

@@ -31,10 +31,16 @@ public class LWJGLAlertDialog {
 
 			@Override
 			public void run() {
+				Runnable onclick = handler;
+				handler = null;
 				hide();
+				if(onclick != null) {
+					onclick.run();
+				}
 			}
 
 		});
+		handler = null;
 		root.setVisible(true);
 		message.setVisible(true);
 		button.setVisible(true);
@@ -52,6 +58,16 @@ public class LWJGLAlertDialog {
 	public void show() {
 		root.moveTo(showPosition, GraphicsConfiguration.PANEL_TIME);
 	}
+	
+	public void setHandler(Runnable run) {
+		handler = run;
+	}
+
+	public void clearHandler() {
+		handler = null;
+	}
+	
+	private Runnable handler;
 	
 	private Matrix showPosition;
 	private LWJGLPanel root;

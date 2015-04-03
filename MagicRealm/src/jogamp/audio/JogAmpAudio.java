@@ -27,14 +27,13 @@ public class JogAmpAudio {
 		buffer = new int[n];
 		for (int id : buffers) {
 			buffer[i++] = id;
-			al.alSourceStop(id);
 		}
 		al.alDeleteBuffers(n, buffer, 0);
 		i = 0;
 		n = sounds.size();
-		buffer = new int[n];
 		for (int id : sounds.values()) {
 			buffer[i++] = id;
+			al.alSourceStop(id);
 		}
 		al.alDeleteSources(n, buffer, 0);
 		ALut.alutExit();
@@ -67,9 +66,6 @@ public class JogAmpAudio {
 		ALut.alutInit();
 		sounds = new HashMap<String, Integer>();
 		buffers = new ArrayList<Integer>();
-		//dataBuffer = new int[MAX_SOUNDS];
-		//sourceBuffer = new int[MAX_SOUNDS];
-		//al.alGenBuffers(dataBuffer.length, dataBuffer, 0);
 	}
 
 	private int loadALData(String fname) {
@@ -150,9 +146,5 @@ public class JogAmpAudio {
 	// filename to source identifier
 	private Map<String, Integer> sounds;
 	private List<Integer> buffers;
-	
-	//private int[] dataBuffer;
-	//private int[] sourceBuffer;
-	//private int numSounds;
 
 }

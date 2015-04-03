@@ -27,6 +27,7 @@ public interface ViewController {
 	void selectClearing(ClearingSelectedListener csl);
 	
 	void displayMessage(String string);
+	void displayMessage(String string, Runnable onClose);
 	
 	boolean confirm(String message, String confirm, String deny);
 	
@@ -37,7 +38,7 @@ public interface ViewController {
 	
 	void enterCharacterSelection(List<CharacterType> characters, CharacterSelectionListener onselect);
 	void enterSplashScreen();
-	void exit();
+
 	SearchView enterSearchView(CharacterType character);
 	void startGame(BoardReadyListener brl);
 }

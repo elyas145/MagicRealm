@@ -120,6 +120,7 @@ public class LWJGLBirdsong implements BirdsongView {
 			} else {
 				pane.setVisible(false);
 			}
+			++i;
 		}
 		readyButton.setVisible(true);
 		setVisible(true);

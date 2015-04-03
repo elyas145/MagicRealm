@@ -92,6 +92,9 @@ public class LWJGLCounterDrawable extends LWJGLDrawableNode implements
 		if (!movements.isFinished()) {
 			return movements.apply();
 		}
+		if(position == null) {
+			position = Matrix.zeroVector(3);
+		}
 		bufferMatrix.translate(position);
 		return bufferMatrix;
 	}
