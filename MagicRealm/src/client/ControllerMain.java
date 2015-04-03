@@ -309,28 +309,42 @@ public class ControllerMain implements ClientController {
 				new CharacterSelectionListener() {
 
 					@Override
-					public void onCharacterSelected(final CharacterType character) {
-						mainView.selectClearing(new ClearingSelectedListener(){
+					public void onCharacterSelected(
+							final CharacterType character) {
+						waitForTiles();
+						mainView.displayMessage("please select starting location.");
+						for (CounterType ct : CharacterFactory
+								.getPossibleStartingLocations(character)) {
+							boardView.setCounter(ct, board
+									.getLocationOfCounter(ct).getParentTile()
+									.getName(), board.getLocationOfCounter(ct)
+									.getClearingNumber());
+						}
+						mainView.selectClearing(new ClearingSelectedListener() {
 
 							@Override
 							public void onClearingSelection(TileName tile,
 									int clearing) {
-								if(clearing != 0){
+								if (clearing != 0) {
 									CounterType loc;
-									if ((loc = board.confirmLocationOfDwelling(tile, clearing)) != null){
-										if(CharacterFactory.getPossibleStartingLocations(character).contains(loc)){
+									if ((loc = board.confirmLocationOfDwelling(
+											tile, clearing)) != null) {
+										if (CharacterFactory
+												.getPossibleStartingLocations(
+														character)
+												.contains(loc)) {
 											characterSelected(character, loc);
 										}
-									}else{
+									} else {
 										mainView.displayMessage("You must select a clearing with a dwelling.");
-										
+
 									}
-								}else{
+								} else {
 									mainView.selectClearing(this);
 								}
-								
+
 							}
-							
+
 						});
 					}
 
@@ -358,14 +372,18 @@ public class ControllerMain implements ClientController {
 	@Override
 	public void enterBirdSong() {
 		System.out.println("Entering bird song.");
-		//phases:
+		// phases:
 		final ArrayList<Phase> phases = new ArrayList<Phase>();
-		
-		phases.add(new Phase(PhaseType.DEFAULT, characters.get(clientID).getType()));
-		phases.add(new Phase(PhaseType.DEFAULT, characters.get(clientID).getType()));
+
+		phases.add(new Phase(PhaseType.DEFAULT, characters.get(clientID)
+				.getType()));
+		phases.add(new Phase(PhaseType.DEFAULT, characters.get(clientID)
+				.getType()));
 		phases.addAll(characters.get(clientID).getSpecialPhases());
-		phases.add(new Phase(PhaseType.SUNLIGHT, characters.get(clientID).getType()));
-		phases.add(new Phase(PhaseType.SUNLIGHT, characters.get(clientID).getType()));
+		phases.add(new Phase(PhaseType.SUNLIGHT, characters.get(clientID)
+				.getType()));
+		phases.add(new Phase(PhaseType.SUNLIGHT, characters.get(clientID)
+				.getType()));
 		mainView.enterBirdSong(1, phases, new BirdsongFinishedListener() {
 
 			@Override
@@ -430,31 +448,36 @@ public class ControllerMain implements ClientController {
 		System.out.println("update lobby count called: " + count);
 		mainView.waitingForPlayers(count);
 	}
-	
+
 	private Semaphore tilesSet = new Semaphore(0);
 
-	@Override
-	public void startGame(SerializedBoard board) {
-		System.out.println("starting game.");
+	private void waitForTiles(){
 		sleepTime = 0; // finish placing the tiles without waiting.
 		try {
 			tilesSet.acquire();
+			tilesSet.release();
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		}
+	}
+	@Override
+	public void startGame(SerializedBoard board) {
+		System.out.println("starting game.");
+		waitForTiles();
 		ArrayList<MapChit> chits = new ArrayList<MapChit>();
 		for (TileName name : board.getMapChitLocations().keySet()) {
 			chits.add(new MapChit(board.getMapChitLocations().get(name)));
 		}
-		synchronized (boardView){
+		synchronized (boardView) {
 			boardView.loadMapChits(chits);
-			for(Character c : characters.values()){
+			for (Character c : characters.values()) {
 				TileName tile = board.getTileOfCounter(c.getType().toCounter());
-				int clearing = board.getClearingOfCounter(c.getType().toCounter());
-				boardView.setCounter(c.getType().toCounter(),tile, clearing);
+				int clearing = board.getClearingOfCounter(c.getType()
+						.toCounter());
+				boardView.setCounter(c.getType().toCounter(), tile, clearing);
 			}
-		}		
-		
+		}
+
 		this.enterBirdSong();
 	}
 
@@ -515,13 +538,13 @@ public class ControllerMain implements ClientController {
 	@Override
 	public void requestSearchInformation() {
 		// TODO ServerNetworkHandler toSend = mainView.getSearchCriteria();
-		ServerNetworkHandler toSend = new SearchCriteria(getCharacter().getType(),
-				TableType.PEER, 2);
+		ServerNetworkHandler toSend = new SearchCriteria(getCharacter()
+				.getType(), TableType.PEER, 2);
 		server.send(toSend);
 	}
 
 	private Character getCharacter() {
-		
+
 		return characters.get(clientID);
 	}
 
