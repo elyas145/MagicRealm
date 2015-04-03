@@ -359,7 +359,7 @@ public class ControllerMain implements ClientController {
 	public void enterBirdSong() {
 		System.out.println("Entering bird song.");
 		//phases:
-		ArrayList<Phase> phases = new ArrayList<Phase>();
+		final ArrayList<Phase> phases = new ArrayList<Phase>();
 		
 		phases.add(new Phase(PhaseType.DEFAULT, characters.get(clientID).getType()));
 		phases.add(new Phase(PhaseType.DEFAULT, characters.get(clientID).getType()));
@@ -370,7 +370,7 @@ public class ControllerMain implements ClientController {
 
 			@Override
 			public void onFinish(List<ActivityType> activities) {
-				// TODO Auto-generated method stub
+				ArrayList<Activity> activitieslist = new ArrayList<Activity>();
 				System.out.println(activities);
 			}
 
@@ -461,6 +461,7 @@ public class ControllerMain implements ClientController {
 	@Override
 	public void updateCharacterSelection(CharacterType character) {
 		// TODO mainView.updateCharacterSelection(character);
+		
 		System.out.println("Client " + clientID
 				+ ": this character is now not selectable: "
 				+ character.toString());
