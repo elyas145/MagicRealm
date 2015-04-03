@@ -72,6 +72,7 @@ public class LWJGLViewController implements ViewController {
 	@Override
 	public void enterBirdSong(int day, List<Phase> phases, final BirdsongFinishedListener onfinish) {
 		lobbyView.setVisible(false);
+		messageOverlay.setVisible(false);
 		birdsong.setActivitiesListener(new ActivitiesListener() {
 
 			@Override
@@ -181,6 +182,12 @@ public class LWJGLViewController implements ViewController {
 		alert.setMessage(string);
 		alert.setHandler(onClose);
 		alert.show();
+	}
+	
+	@Override
+	public void displayBanner(String message) {
+		messageOverlay.setText(message);
+		messageOverlay.setVisible(true);
 	}
 	
 	private void init(ResourceHandler rh, SoundController sc) {

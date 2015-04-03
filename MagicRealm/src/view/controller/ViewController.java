@@ -29,6 +29,8 @@ public interface ViewController {
 	void displayMessage(String string);
 	void displayMessage(String string, Runnable onClose);
 	
+	void displayBanner(String message);
+	
 	boolean confirm(String message, String confirm, String deny);
 	
 	void enterMainMenu(MenuItemListener mil);
