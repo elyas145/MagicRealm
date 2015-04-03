@@ -22,7 +22,7 @@ import view.controller.birdsong.BirdsongView;
 import view.selection.PrimaryClickListener;
 
 public class LWJGLBirdsong implements BirdsongView {
-	
+
 	private static final int MAX_PHASES = 9;
 
 	private static final float COMBO_WIDTH = .6f;
@@ -35,10 +35,15 @@ public class LWJGLBirdsong implements BirdsongView {
 
 	private static final float PANEL_WIDTH = 32f / 9f;
 
+	private static final Font PHASE_FONT = new Font("Times New Roman",
+			Font.PLAIN, 100);
+	
+	private static final Color PHASE_COLOR = Color.PINK;
+
 	public LWJGLBirdsong(ResourceHandler rh, LWJGLMenuLayer par) {
 		borderPane = LWJGLPanel.fromPicture(par, rh,
 				ResourceHandler.joinPath("menus", "birdsong", "bottom.png"),
-				-16f / 9f, -1f, .787f, true);
+				-16f / 9f, -1f, .787f, false);
 		par.add(borderPane);
 		borderPane.setVisible(true);
 		vec3 = Matrix.zeroVector(3);
@@ -52,53 +57,52 @@ public class LWJGLBirdsong implements BirdsongView {
 			public void onClick() {
 				readyButton.setVisible(false);
 				List<ActivityType> acts = new ArrayList<ActivityType>();
-				for(int i = 0; i < numPhases; ++i) {
+				for (int i = 0; i < numPhases; ++i) {
 					ActivityType add = selections[i];
-					if(add == null) {
+					if (add == null) {
 						add = ActivityType.NONE;
 					}
 					acts.add(add);
 				}
 				madeChoice.onActivitiesChosen(acts);
+				setVisible(false);
 			}
-			
+
 		});
 		LWJGLPanel txt = LWJGLPanel.fromString(readyButton, "Ready", new Font(
-				"Times New Roman", Font.BOLD, 100), Color.WHITE, 345, 120, .03f,
-				s * 0.035f, .1f, false);
+				"Times New Roman", Font.BOLD, 100), Color.WHITE, 345, 120,
+				.03f, s * 0.035f, .1f, false);
 		txt.setVisible(true);
 		readyButton.add(txt);
 		readyButton.setVisible(true);
 		borderPane.add(readyButton);
-		phases = new ArrayList<LWJGLDropdown<ActivityType>>();
+		phases = new ArrayList<Phaser>();
 		List<ActivityType> options = new ArrayList<ActivityType>();
-		for(ActivityType at: ActivityType.values()) {
+		for (ActivityType at : ActivityType.values()) {
 			options.add(at);
 		}
-		float width = COMBO_WIDTH;
-		float height = COMBO_HEIGHT;
 		LWJGLTextureLoader stat, dyn;
 		stat = new LWJGLSingleTextureLoader(rh, ResourceHandler.joinPath(
 				"menus", "birdsong", "comboStatic.png"));
 		dyn = new LWJGLSingleTextureLoader(rh, ResourceHandler.joinPath(
 				"menus", "birdsong", "comboCell.png"));
 		for (int i = 0; i < MAX_PHASES; ++i) {
-			LWJGLDropdown<ActivityType> select = new LWJGLDropdown<ActivityType>(
-					borderPane, stat, dyn, options, LWJGLDropdown.Type.UP, 0f,
-					0f, width, height);
+			final Phaser phr = new Phaser(stat, dyn, options);
+			final LWJGLDropdown<ActivityType> select = phr.drop;
 			final int j = i;
 			select.setSelectionListener(new Handler<ActivityType>() {
 
 				@Override
 				public void handle(ActivityType select) {
-					synchronized(selections) {
+					phr.txt.setVisible(false);
+					synchronized (selections) {
 						selections[j] = select;
 					}
 				}
-				
+
 			});
 			borderPane.add(select);
-			phases.add(select);
+			phases.add(phr);
 		}
 		numPhases = 0;
 		selections = new ActivityType[MAX_PHASES];
@@ -110,13 +114,18 @@ public class LWJGLBirdsong implements BirdsongView {
 		int i = 0, n = phss.size();
 		numPhases = n;
 		resize();
-		for (LWJGLDropdown<ActivityType> pane : phases) {
+		for (Phaser ph : phases) {
+			LWJGLDropdown<ActivityType> pane = ph.drop;
 			selections[i] = null;
-			if(i < n) {
+			if (i < n) {
 				pane.setVisible(true);
 				pane.disableAll();
 				Phase phs = phss.get(i);
 				pane.enableAll(phs.getPossibleActivities());
+				ph.txt.updateFromString((i + 1) + ": "
+						+ phss.get(i).getType().toString(), PHASE_FONT,
+						PHASE_COLOR);
+				ph.txt.setVisible(true);
 			} else {
 				pane.setVisible(false);
 			}
@@ -157,25 +166,44 @@ public class LWJGLBirdsong implements BirdsongView {
 			float f = (PANEL_WIDTH - COMBO_SPACE_TOP) * .5f;
 			f += COMBO_SPACE_TOP * j / k - COMBO_WIDTH * .5f;
 			vec3.fill(f, COMBO_VERTICAL_TOP, 0f);
-			phases.get(i++).moveTo(vec3, 0f);
+			phases.get(i++).drop.moveTo(vec3, 0f);
 		}
 		k = n - n / 2 + 1;
 		for (int j = 1; j < k; ++j) {
 			float f = (PANEL_WIDTH - COMBO_SPACE_BOTTOM) * .5f;
 			f += COMBO_SPACE_BOTTOM * j / k - COMBO_WIDTH * .5f;
 			vec3.fill(f, COMBO_VERTICAL_BOTTOM, 0f);
-			phases.get(i++).moveTo(vec3, 0f);
+			phases.get(i++).drop.moveTo(vec3, 0f);
 		}
 	}
-	
+
+	private class Phaser {
+
+		public Phaser(LWJGLTextureLoader stat, LWJGLTextureLoader dyn,
+				List<ActivityType> opts) {
+			drop = new LWJGLDropdown<ActivityType>(borderPane, stat, dyn, opts,
+					LWJGLDropdown.Type.UP, 0f, 0f, COMBO_WIDTH, COMBO_HEIGHT);
+			txt = LWJGLPanel.fromString(drop, "Phase", PHASE_FONT, PHASE_COLOR,
+					800, 120, 0f, COMBO_HEIGHT * .25f, COMBO_HEIGHT * .5f, false);
+			txt.setVisible(true);
+			drop.add(txt);
+			borderPane.add(drop);
+		}
+
+		public LWJGLPanel txt;
+		public LWJGLDropdown<ActivityType> drop;
+
+	}
+
 	private ActivitiesListener madeChoice;
 
 	private LWJGLPanel borderPane;
 	private LWJGLPanel readyButton;
-	private List<LWJGLDropdown<ActivityType>> phases;
+	private List<Phaser> phases;
+	
 	private Matrix vec3;
 	private boolean visible;
-	
+
 	private int numPhases;
 	private ActivityType[] selections;
 

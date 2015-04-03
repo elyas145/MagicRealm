@@ -14,6 +14,8 @@ public interface SoundController {
 	
 	void alert();
 	
+	void error();
+	
 	void revealSoundChit(MapChitType sct);
 	
 	void cleanUp();

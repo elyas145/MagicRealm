@@ -37,6 +37,8 @@ public interface ViewController {
 	void waitingForPlayers(int count);
 	
 	void enterCharacterSelection(List<CharacterType> characters, CharacterSelectionListener onselect);
+	void disableCharacter(CharacterType character);
+	
 	void enterSplashScreen();
 
 	SearchView enterSearchView(CharacterType character);
