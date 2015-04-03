@@ -11,7 +11,7 @@ public class JogAmpSoundController implements SoundController {
 	
 	private String playingTheme;
 	
-	private String alertSound;
+	private String alertSound, errorSound;
 	
 	public JogAmpSoundController() {
 		audio = JogAmpAudio.getInstance();
@@ -19,6 +19,7 @@ public class JogAmpSoundController implements SoundController {
 		lobbyTheme = "spell_fury_final_mix.wav";
 		playingTheme = null;
 		alertSound = "alert1.wav";
+		errorSound = "alert2.wav";
 	}
 	
 	@Override
@@ -68,6 +69,11 @@ public class JogAmpSoundController implements SoundController {
 	@Override
 	public void alert() {
 		audio.playSound(alertSound);
+	}
+
+	@Override
+	public void error() {
+		audio.playSound(errorSound);
 	}
 
 }

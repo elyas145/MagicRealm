@@ -81,10 +81,14 @@ public class LWJGLViewController implements ViewController {
 
 		});
 		birdsong.showPhases(phases);
+		board.setDefaultClearingFocus();
 	}
 	
 	@Override
 	public boolean confirm(String message, String confirm, String deny) {
+		if(sounds != null) {
+			sounds.error();
+		}
 		return confirmation.ask(message, confirm, deny);
 	}
 
@@ -117,6 +121,11 @@ public class LWJGLViewController implements ViewController {
 		lobbyView.setVisible(false);
 		characterSelection.selectCharacter(characters, onselect);
 		displayMessage("Please select your character");
+	}
+	
+	@Override
+	public void disableCharacter(CharacterType character) {
+		characterSelection.disableCharacter(character);
 	}
 
 	@Override
@@ -214,6 +223,8 @@ public class LWJGLViewController implements ViewController {
 			board.setDefaultClearingFocus();
 			splash.setVisible(false);
 			brl.boardReady(board);
+		} catch (RuntimeException e) {
+			throw e;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

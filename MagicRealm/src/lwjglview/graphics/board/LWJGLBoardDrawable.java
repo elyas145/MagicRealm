@@ -138,14 +138,14 @@ public class LWJGLBoardDrawable extends LWJGLCounterLocator implements BoardView
 	}
 	
 	public void setDefaultClearingFocus() {
-		clearingFocus = new ClearingFocusHandler() {
+		setCleaingFocus(new ClearingFocusHandler() {
 
 			@Override
 			public void onFocus(TileName tile, int clearing) {
 				focusOn(tile, clearing);
 			}
 			
-		};
+		});
 	}
 	
 	public void setCleaingFocus(ClearingFocusHandler cfh) {

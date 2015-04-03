@@ -54,6 +54,11 @@ public class LWJGLCharacterSelection extends LWJGLContentPane implements
 	}
 
 	@Override
+	public void disableCharacter(CharacterType character) {
+		hide(character);
+	}
+
+	@Override
 	public void draw(LWJGLGraphics gfx) {
 		if(visible) {
 			for (LWJGLPanel cv : characterViews.values()) {
@@ -84,6 +89,10 @@ public class LWJGLCharacterSelection extends LWJGLContentPane implements
 				.slide(position, GraphicsConfiguration.PANEL_TIME);
 	}
 	
+	private void hide(CharacterType ct) {
+		characterViews.get(ct).resetPosition();
+	}
+	
 	private void hideAll() {
 		for (LWJGLPanel pane : characterViews.values()) {
 			pane.resetPosition();
@@ -99,6 +108,7 @@ public class LWJGLCharacterSelection extends LWJGLContentPane implements
 		@Override
 		public void onClick() {
 			onSelect.onCharacterSelected(character);
+			setVisible(false);
 		}
 
 		private CharacterType character;

@@ -130,11 +130,16 @@ public class LWJGLTileCollection extends LWJGLDrawableNode {
 			}
 			else {
 				selectionTextures.useTextures(gfx);
+				drawAll(gfx);
 			}
 		} else {
 			gfx.getShaders().useShaderProgram(ShaderType.TILE_SHADER);
 			textures.useTextures(gfx);
+			drawAll(gfx);
 		}
+	}
+	
+	private void drawAll(LWJGLGraphics gfx) {
 		// draw all tiles
 		for (LWJGLTileDrawable tile : tiles.values()) {
 			tile.draw(gfx);
