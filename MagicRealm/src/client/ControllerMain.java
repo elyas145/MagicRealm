@@ -415,12 +415,14 @@ public class ControllerMain implements ClientController {
 		for (TileName name : board.getMapChitLocations().keySet()) {
 			chits.add(new MapChit(board.getMapChitLocations().get(name)));
 		}
-		boardView.loadMapChits(chits);
-		for(Character c : characters.values()){
-			TileName tile = board.getTileOfCounter(c.getType().toCounter());
-			int clearing = board.getClearingOfCounter(c.getType().toCounter());
-			boardView.setCounter(c.getType().toCounter(),tile, clearing);
-		}
+		synchronized (this){
+			boardView.loadMapChits(chits);
+			for(Character c : characters.values()){
+				TileName tile = board.getTileOfCounter(c.getType().toCounter());
+				int clearing = board.getClearingOfCounter(c.getType().toCounter());
+				boardView.setCounter(c.getType().toCounter(),tile, clearing);
+			}
+		}		
 		
 		this.enterBirdSong();
 	}
