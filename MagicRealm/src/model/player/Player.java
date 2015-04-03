@@ -22,6 +22,7 @@ public class Player {
 	private PersonalHistory historyPad;
 	private Map<ClearingInterface, EnchantedHolder<Set<ClearingInterface>>> discoveredPaths;
 	private Set<MapChit> discoveredChits;
+	private boolean sunlightFlag = false;
 
 	public Player(int num, String nm) {
 		number = num;
@@ -93,6 +94,13 @@ public class Player {
 							new HashSet<ClearingInterface>()));
 		}
 		discoveredPaths.get(cl1).get(ench).add(cl2);		
+	}
+	
+	public boolean getSunLightFlag(){
+		return sunlightFlag;
+	}
+	public void setSunlightFlag(boolean b){
+		sunlightFlag = b;
 	}
 
 }

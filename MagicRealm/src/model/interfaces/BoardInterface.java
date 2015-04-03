@@ -38,7 +38,7 @@ public interface BoardInterface {
 
 	public void removeCharacter(CharacterType type);
 
-	public void setLocationOfCounter(CounterType counter, ValleyChit initialSite);
+	public void setLocationOfCounter(CounterType counter, CounterType initialSite);
 
 	public void setLocationOfCounter(CounterType characterAmazon,
 			TileName cliff, int i);

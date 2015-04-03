@@ -79,7 +79,7 @@ public class ClientThread extends Thread {
 			oStreamIn.close();
 	}
 
-	public void setCharacter(CharacterType character, ValleyChit location) {
+	public void setCharacter(CharacterType character, CounterType location) {
 		player.setCharacter(CharacterFactory.create(character, location));
 		characterPicked = true;
 	}
@@ -117,4 +117,10 @@ public class ClientThread extends Thread {
 		return player;
 	}
 	
+	public void setSunlightFlag(boolean b){
+		player.setSunlightFlag(b);
+	}
+	public boolean getSunlightFlag(){
+		return player.getSunLightFlag();
+	}
 }

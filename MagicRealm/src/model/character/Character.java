@@ -13,6 +13,7 @@ import model.EnchantedHolder;
 import model.character.belonging.Belonging;
 import model.counter.chit.Chit;
 import model.enums.CharacterType;
+import model.enums.CounterType;
 import model.enums.PathType;
 import model.enums.ValleyChit;
 import model.interfaces.CharacterInterface;
@@ -25,7 +26,7 @@ public class Character implements CharacterInterface, Serializable {
 	private static final long serialVersionUID = 3972396707482617354L;
 	private ArrayList<Belonging> belongings;
 	private boolean hiding;
-	private ValleyChit initialLocation;
+	private CounterType initialLocation;
 	private ArrayList<Phase> specialPhases;
 	private CharacterType type;
 
@@ -34,8 +35,8 @@ public class Character implements CharacterInterface, Serializable {
 		initialLocation = GameConfiguration.INITIAL_SITE;
 		hiding = true;
 	}
-	public void setInitialLocation(ValleyChit chit){
-		initialLocation = chit;
+	public void setInitialLocation(CounterType location){
+		initialLocation = location;
 	}
 	public void AddBelonging(Belonging b) {
 		belongings.add(b);
@@ -45,7 +46,7 @@ public class Character implements CharacterInterface, Serializable {
 		return belongings;
 	}
 
-	public ValleyChit getInitialLocation() {
+	public CounterType getInitialLocation() {
 		return initialLocation;
 	}
 

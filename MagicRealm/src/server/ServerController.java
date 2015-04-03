@@ -15,6 +15,7 @@ import java.util.concurrent.Semaphore;
 import model.activity.Activity;
 import model.controller.ModelController;
 import model.enums.CharacterType;
+import model.enums.CounterType;
 import model.enums.MapChitType;
 import model.enums.TableType;
 import model.enums.TileName;
@@ -134,13 +135,13 @@ public class ServerController {
 	 * @param character
 	 */
 	public void setCharacter(int iD, CharacterType character,
-			ValleyChit startingLocation) {
+			CounterType location) {
 		int pos = findClient(iD);
 		if (pos >= 0) {
 			System.out.println("SERVER: setting client: " + iD + " character.");
-			clients.get(pos).setCharacter(character, startingLocation);
+			clients.get(pos).setCharacter(character, location);
 			model.setPlayersInitialLocations(clients.get(pos).getCharacter()
-					.getType().toCounter(), startingLocation);
+					.getType().toCounter(), location);
 		}
 		boolean everyoneSelected = true;
 		// wait for all clients to choose their character
@@ -269,6 +270,9 @@ public class ServerController {
 
 	public void moveCharacter(CharacterType actor, TileName tile, int clearing) {
 		if (model.moveCharacter(this.getPlayerOf(actor).getPlayer(), tile, clearing)){
+			if(model.checkIfCave(tile, clearing)){
+				getPlayerOf(actor).setSunlightFlag(true);
+			}
 			sendAll(new UpdateLocationOfCharacter(actor, tile, clearing));
 		}else{
 			getPlayerOf(actor).send(new IllegalMove(tile, clearing));

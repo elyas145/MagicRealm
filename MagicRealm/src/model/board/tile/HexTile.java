@@ -6,6 +6,7 @@ import java.util.Map;
 
 import model.EnchantedHolder;
 import model.board.Board;
+import model.board.Board.ClearingData;
 import model.board.clearing.Clearing;
 import model.counter.chit.Chit;
 import model.enums.PathType;
@@ -26,7 +27,7 @@ public class HexTile implements HexTileInterface {
 	private static final long serialVersionUID = 5303629252128539756L;
 
 	public HexTile(Board par, TileName tile, int x, int y, int rot,
-			Map<Integer, EnchantedHolder<Point>> locations,
+			Map<Integer, EnchantedHolder<ClearingData>> locations,
 			TileName[] surrounding) {
 		parent = par;
 		name = tile;
@@ -37,9 +38,9 @@ public class HexTile implements HexTileInterface {
 		bufferA = Matrix.zeroVector(3);
 		bufferB = Matrix.zeroVector(3);
 		bufferC = Matrix.square(3);
-		for (Map.Entry<Integer, EnchantedHolder<Point>> ents : locations
+		for (Map.Entry<Integer, EnchantedHolder<ClearingData>> ents : locations
 				.entrySet()) {
-			EnchantedHolder<Point> pts = ents.getValue();
+			EnchantedHolder<ClearingData> pts = ents.getValue();
 			int num = ents.getKey();
 			if (!pts.has(false)) {
 				throw new RuntimeException(
@@ -51,8 +52,9 @@ public class HexTile implements HexTileInterface {
 						"Missing enchanted position data for tile " + name
 								+ ", clearing " + num);
 			}
-			Clearing cl = new Clearing(this, num, transform(pts.get(false),
-					bufferA), transform(pts.get(true), bufferB));
+			Clearing cl = new Clearing(this, num, transform(
+					pts.get(false).point, bufferA), transform(
+					pts.get(true).point, bufferB), pts.get(false).type);
 			clearings.put(num, cl);
 		}
 		exits = new int[2][6];
@@ -85,14 +87,15 @@ public class HexTile implements HexTileInterface {
 	 * @param serializedTile
 	 */
 	public HexTile(SerializedTile serializedTile, boolean parent) {
-		if(!parent){
-			Map<Integer, SerializedClearing> sClearings = serializedTile.getClearings();
+		if (!parent) {
+			Map<Integer, SerializedClearing> sClearings = serializedTile
+					.getClearings();
 			clearings = new HashMap<Integer, Clearing>();
-			//get the actual clearings
-			for(Integer i : sClearings.keySet()){
+			// get the actual clearings
+			for (Integer i : sClearings.keySet()) {
 				clearings.put(i, new Clearing(sClearings.get(i)));
-			}	
-		}			
+			}
+		}
 		column = serializedTile.getColumn();
 		name = serializedTile.getName();
 		rotation = serializedTile.getRotation();
@@ -430,8 +433,8 @@ public class HexTile implements HexTileInterface {
 		connectClearings(ca, cb, enchanted, pt);
 	}
 
-	private static void connectClearings(Clearing ca,
-			Clearing cb, boolean enchanted, PathType pt) {
+	private static void connectClearings(Clearing ca, Clearing cb,
+			boolean enchanted, PathType pt) {
 		ca.connectTo(cb, enchanted, pt);
 		cb.connectTo(ca, enchanted, pt);
 	}
@@ -496,9 +499,9 @@ public class HexTile implements HexTileInterface {
 		SerializedTile sTile = new SerializedTile();
 		sTile.setPosition(row, column, rotation);
 		sTile.setTileName(name);
-		//create the serialized clearings.
+		// create the serialized clearings.
 		Map<Integer, SerializedClearing> sClearings = new HashMap<Integer, SerializedClearing>();
-		for(Integer i : clearings.keySet()){
+		for (Integer i : clearings.keySet()) {
 			sClearings.put(i, clearings.get(i).getSerializedClearing());
 		}
 		sTile.setClearings(sClearings);
