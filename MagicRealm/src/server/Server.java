@@ -26,7 +26,7 @@ public class Server implements Runnable {
 	public Server(int port, boolean b) {
 		this.port = port;
 		this.doneSettingCheatMode();
-		this.start();
+		this.startServer();
 	}
 	public void startServer(){
 		System.out.println("Binding server to port " + port + "...");

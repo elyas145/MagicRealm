@@ -1,10 +1,18 @@
 package entry;
 
+import client.ControllerMain;
+import server.Server;
+import config.NetworkConfiguration;
+
 public class ComboMain {
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
+		new Server(NetworkConfiguration.DEFAULT_PORT, false);
+		new Thread() {
+			public void run() {
+				new ControllerMain();
+			}
+		}.start();
 	}
 
 }
