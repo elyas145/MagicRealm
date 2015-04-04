@@ -252,7 +252,7 @@ public class ServerController {
 		sendAll(new UpdateHiding(player.getCharacter().getType(), false));
 		for (Activity act : player.getCurrentActivities()) {
 			if (player.getSunlightFlag()
-					&& act.getPhaseType().equals(PhaseType.SUNLIGHT)) {
+					&& act.getPhaseType().equals(PhaseType.SUNLIGHT) && act.getType() != ActivityType.NONE) {
 				player.send(new MessageDisplay(
 						"error using daylight phase. you passed in a cave."));
 			} else {

@@ -546,18 +546,12 @@ public class ControllerMain implements ClientController {
 		}
 		synchronized (boardView) {
 			boardView.loadMapChits(chits);
-			for (Character c : characters.values()) {
-				TileName tile = board.getTileOfCounter(c.getType().toCounter());
-				int clearing = board.getClearingOfCounter(c.getType()
-						.toCounter());
-				boardView.setCounter(c.getType().toCounter(), tile, clearing);
-			}
 			for(CounterType t : board.getCounterPositions().keySet()){
-				boardView.setCounter(c.getType().toCounter(), tile, clearing);
+				boardView.setCounter(t, board.getCounterPositions().get(t).getParent(), board.getCounterPositions().get(t).getNumber());
 			}
-			/*for (MapChit c : chits){
+			for (MapChit c : chits){
 				boardView.setMapChit(c);
-			}*/			
+			}		
 		}
 	}
 
