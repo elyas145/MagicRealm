@@ -649,4 +649,10 @@ public class ControllerMain implements ClientController {
 
 	}
 
+	@Override
+	public void requestSearchChoice() {
+		//TODO mainView.searchChoice();
+		
+	}
+
 }

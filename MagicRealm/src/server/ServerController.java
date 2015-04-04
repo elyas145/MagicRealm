@@ -31,6 +31,8 @@ import communication.handler.server.EnterBirdSong;
 import communication.handler.server.EnterCharacterSelection;
 import communication.handler.server.EnterLobby;
 import communication.handler.server.RequestSearchInformation;
+import communication.handler.server.SearchChoiceRequest;
+import communication.handler.server.SearchResults;
 import communication.handler.server.UpdateHiding;
 import communication.handler.server.IllegalMove;
 import communication.handler.server.MessageDisplay;
@@ -352,7 +354,10 @@ public class ServerController {
 	public void searchChosen(CharacterType car, TableType tbl, int rv) {
 		// do the search activity with the player
 		ClientThread ct = getPlayerOf(car);
-		model.performSearch(ct.getPlayer(), tbl, rv);
+		SearchResults res = model.performSearch(ct.getPlayer(), tbl, rv);
+		if(rv == 1){
+			ct.send(new SearchChoiceRequest());
+		}
 		playSync.release();
 	}
 

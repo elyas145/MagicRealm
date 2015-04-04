@@ -4,7 +4,7 @@ import client.ClientController;
 import communication.ClientNetworkHandler;
 
 public class RequestSearchInformation implements ClientNetworkHandler {
-
+	private static final long serialVersionUID = -3367491063319792949L;
 	@Override
 	public void handle(ClientController controller) {
 		controller.requestSearchInformation();

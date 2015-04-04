@@ -92,4 +92,6 @@ public interface ClientController {
 			Map<ClearingInterface, ClearingInterface> discoveredPaths,
 			ArrayList<MapChit> peek);
 
+	void requestSearchChoice();
+
 }

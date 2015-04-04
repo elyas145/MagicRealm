@@ -405,22 +405,21 @@ public class ModelController {
 		return mapChits;
 	}
 
-	public void performSearch(Player player, TableType selectedTable,
+	public SearchResults performSearch(Player player, TableType selectedTable,
 			int rollValue) {
 		// TODO add other search table options
 		switch (selectedTable) {
 		default:
-			peerTableSearch(player, rollValue);
+			return peerTableSearch(player, rollValue);
 		}
 	}
 
-	private ClientNetworkHandler peerTableSearch(Player player, int roll) {
+	private SearchResults peerTableSearch(Player player, int roll) {
 
 		TileName ct = getTileOf(player.getCharacter().getType()).getName();
 		switch (roll) {
 		case 1:
-			// TODO player chooses what they want to do in the table.
-			roll = 2;
+			return new SearchResults(SearchType.CHOICE);
 		case 2:
 			return peerCP(player);
 		case 3:
@@ -443,7 +442,7 @@ public class ModelController {
 	}
 
 	// PEER SEARCH: clues and paths search
-	private ClientNetworkHandler peerCP(Player player) {
+	private SearchResults peerCP(Player player) {
 		SearchResults cResult = peerC(player);
 		SearchResults pResults = peerP(player);
 
