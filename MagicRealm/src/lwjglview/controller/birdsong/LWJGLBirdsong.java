@@ -115,6 +115,7 @@ public class LWJGLBirdsong implements BirdsongView {
 		numPhases = n;
 		resize();
 		for (Phaser ph : phases) {
+			ph.drop.reset();
 			LWJGLDropdown<ActivityType> pane = ph.drop;
 			selections[i] = null;
 			if (i < n) {

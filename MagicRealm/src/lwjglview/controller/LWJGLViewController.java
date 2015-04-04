@@ -160,10 +160,10 @@ public class LWJGLViewController implements ViewController {
 			@Override
 			public void onFocus(TileName tile, int clearing) {
 				board.focusOn(tile, clearing);
+				board.setDefaultClearingFocus();
 				if(clearing > 0) {
 					csl.onClearingSelection(tile, clearing);
 				}
-				board.setDefaultClearingFocus();
 			}
 			
 		});

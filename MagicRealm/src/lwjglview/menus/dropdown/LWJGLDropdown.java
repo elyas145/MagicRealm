@@ -87,6 +87,13 @@ public class LWJGLDropdown<T> extends LWJGLPanel {
 		}
 		showing = show;
 	}
+	
+	public void reset() {
+		if(text != null) {
+			remove(text, LWJGLPanel.Type.FOREGROUND);
+			text = null;
+		}
+	}
 
 	private void onSelect(T item) {
 		if (selectionListener != null) {
@@ -109,9 +116,7 @@ public class LWJGLDropdown<T> extends LWJGLPanel {
 			if(down) {
 				LWJGLDropdownItem<T> item = selections.get(index);
 				onSelect(item.getItem());
-				if(text != null) {
-					remove(text, LWJGLPanel.Type.FOREGROUND);
-				}
+				reset();
 				LWJGLTextureLoader txt = item.getText();
 				text = LWJGLPanel.fromTextureLoader(LWJGLDropdown.this, txt, 0f, 0f,
 						size, false);
