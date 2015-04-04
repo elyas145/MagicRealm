@@ -552,6 +552,9 @@ public class ControllerMain implements ClientController {
 						.toCounter());
 				boardView.setCounter(c.getType().toCounter(), tile, clearing);
 			}
+			for(CounterType t : board.getCounterPositions().keySet()){
+				boardView.setCounter(c.getType().toCounter(), tile, clearing);
+			}
 			/*for (MapChit c : chits){
 				boardView.setMapChit(c);
 			}*/			
