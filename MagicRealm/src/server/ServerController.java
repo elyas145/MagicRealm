@@ -239,6 +239,7 @@ public class ServerController {
 		if (swordsmanPlayer != null && !swordsmanPlayer.hasPlayed()) {
 			playTurn(swordsmanPlayer);
 		}
+		resetPlayers();
 		// loop back to birdsong. BAD because recursive... TODO fix if time
 		// permits.
 		startBirdSong();
@@ -256,6 +257,7 @@ public class ServerController {
 				if (player.getMountainMoveCount() != 0) {
 					// this has to be a move to the same clearing as before. or
 					// else send illegal move and carry on with this activity.
+					System.out.println("player tried to move to mountain already.");
 					if (act.getType() == ActivityType.MOVE) {
 						// check if same clearing as before.
 						if (!(((Move) act).getTile() == player
@@ -268,6 +270,10 @@ public class ServerController {
 							player.setMountainClearing(null);
 							player.setMountainMoveCount(0);
 						}
+					}else{
+						player.send(new MessageDisplay("move failed. you need two moves to move to a mountain clearing."));
+						player.setMountainClearing(null);
+						player.setMountainMoveCount(0);
 					}
 				}
 				act.perform(this);
@@ -285,7 +291,6 @@ public class ServerController {
 			ClientThread ct = getPlayerOf(CharacterType.SWORDSMAN);
 			playTurn(ct);
 		}
-		resetPlayers();
 		playSync.release();
 	}
 

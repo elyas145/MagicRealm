@@ -18,5 +18,8 @@ public class SubmitActivities implements ServerNetworkHandler {
 		controller.submitActivities(id, activities);
 
 	}
-
+	@Override
+	public String toString(){
+		return "Submit activities handler.";
+	}
 }

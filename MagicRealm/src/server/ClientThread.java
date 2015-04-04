@@ -43,7 +43,7 @@ public class ClientThread extends Thread {
 	
 	public synchronized void send(Object o) {
 		try {
-			System.out.println("sending object to: " + ID);
+			System.out.println("sending object: " + o.toString());
 			//oStreamOut.reset();
 			oStreamOut.writeObject(o);
 			//oStreamOut.flush();

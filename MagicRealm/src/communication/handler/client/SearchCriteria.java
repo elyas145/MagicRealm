@@ -20,5 +20,8 @@ public class SearchCriteria implements ServerNetworkHandler {
 		controller.searchChosen(character, table, rollValue);
 
 	}
-
+	@Override
+	public String toString(){
+		return "search criteria handler.";
+	}
 }

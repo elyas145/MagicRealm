@@ -81,7 +81,7 @@ public class Server implements Runnable {
 
 	public synchronized void handle(int ID, Object input) {
 		if (input instanceof ServerNetworkHandler) {
-			System.out.println("SERVER: recieved object from client.");
+			System.out.println("SERVER: recieved object from client: " + ((ServerNetworkHandler) input).toString());
 			((ServerNetworkHandler) input).handle(controller);
 		}
 	}
