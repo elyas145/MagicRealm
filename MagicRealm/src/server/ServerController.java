@@ -355,9 +355,7 @@ public class ServerController {
 		// do the search activity with the player
 		ClientThread ct = getPlayerOf(car);
 		SearchResults res = model.performSearch(ct.getPlayer(), tbl, rv);
-		if(rv == 1){
-			ct.send(new SearchChoiceRequest(tbl));
-		}
+		getPlayerOf(car).send(res);
 		playSync.release();
 	}
 
