@@ -326,6 +326,14 @@ public class Board implements BoardInterface {
 	private Map<TileName, HexTile> mapOfTiles;
 	private Map<TileName, int[]> tileLocations;
 	private Map<TileName, MapChit> mapChitLocations;
+	public Map<TileName, MapChit> getMapChitLocations() {
+		return mapChitLocations;
+	}
+
+	public void setMapChitLocations(Map<TileName, MapChit> mapChitLocations) {
+		this.mapChitLocations = mapChitLocations;
+	}
+
 	private Map<CounterType, Clearing> counterPositions;
 	private JSONArray arr;
 

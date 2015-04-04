@@ -539,6 +539,7 @@ public class ControllerMain implements ClientController {
 	public void startGame(SerializedBoard board) {
 		System.out.println("starting game.");
 		waitForTiles();
+		this.board = new Board(board);
 		ArrayList<MapChit> chits = new ArrayList<MapChit>();
 		for (TileName name : board.getMapChitLocations().keySet()) {
 			chits.add(new MapChit(board.getMapChitLocations().get(name)));
@@ -551,6 +552,9 @@ public class ControllerMain implements ClientController {
 						.toCounter());
 				boardView.setCounter(c.getType().toCounter(), tile, clearing);
 			}
+			/*for (MapChit c : chits){
+				boardView.setMapChit(c);
+			}*/			
 		}
 	}
 
