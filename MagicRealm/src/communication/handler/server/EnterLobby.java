@@ -14,6 +14,10 @@ public class EnterLobby implements ClientNetworkHandler {
 	public void handle(ClientController control) {
 		control.enterLobby(board);
 	}	
+	@Override
+	public String toString(){
+		return "Enter lobby handler.";		
+	}
 	private static final long serialVersionUID = -53116425386558057L;
 
 }

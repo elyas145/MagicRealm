@@ -130,12 +130,18 @@ public class ModelController {
 	}
 
 	public boolean moveCharacter(Player ct, TileName tt, int clearing) {
+		System.out.println("moving character from: " + board.getLocationOfCounter(ct.getCharacter()
+				.getType().toCounter()).getParentTile().getName() + " clearing " + board.getLocationOfCounter(ct.getCharacter()
+						.getType().toCounter()).getClearingNumber());
+		System.out.println("To: " + tt + " clearing " + clearing);
+		
 		ClearingInterface cl1 = board.getLocationOfCounter(ct.getCharacter()
 				.getType().toCounter());
 		ClearingInterface cl2 = board.getClearing(tt, clearing);
 		if (cl1.isConnectedTo(cl2, PathType.NORMAL)
 				|| ct.hasDiscoveredPath(cl1, cl2)) {
 			board.moveCharacter(ct.getCharacter().getType(), tt, clearing);
+			
 			return true;
 		} else {
 			return false;
@@ -152,6 +158,7 @@ public class ModelController {
 			if (!GameConfiguration.Cheat) {
 				setUpWarning();
 				setUpSoundAndSite();
+				setSiteLocations();
 			}
 		}
 		return board;
@@ -165,7 +172,7 @@ public class ModelController {
 		if (!GameConfiguration.Cheat) {
 			setUpSoundAndSite();
 			setUpWarning();
-			setSiteLocations();
+			
 		}
 	}
 

@@ -1,5 +1,7 @@
 package model.activity;
 
+import java.io.Serializable;
+
 import server.ServerController;
 import model.controller.ModelControlInterface;
 import model.controller.ModelController;
@@ -9,7 +11,11 @@ import model.enums.PhaseType;
 import model.enums.TileName;
 import model.exceptions.IllegalMoveException;
 
-public class Move extends Activity {
+public class Move extends Activity implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 3509514431699725931L;
 	private TileName tile;
 	private int clearing;
 

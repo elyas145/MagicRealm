@@ -22,6 +22,9 @@ import communication.handler.server.serialized.SerializedTile;
 import config.NetworkConfiguration;
 import lwjglview.controller.LWJGLViewController;
 import model.activity.Activity;
+import model.activity.Hide;
+import model.activity.Move;
+import model.activity.Search;
 import model.board.Board;
 import model.board.clearing.Clearing;
 import model.character.Character;
@@ -233,6 +236,7 @@ public class ControllerMain implements ClientController {
 	@Override
 	public void initializeBoard(final SerializedBoard sboard) {
 		// show the board view.
+		board = new Board(sboard);
 		boardView = this.startBoardView();
 		/**
 		 * This function runs as a thread, adding one tile to the board view at
@@ -312,7 +316,7 @@ public class ControllerMain implements ClientController {
 					public void onCharacterSelected(
 							final CharacterType character) {
 						waitForTiles();
-						mainView.displayMessage("please select starting location.");
+						mainView.displayMessage("please select starting location. has to be a valid counter");
 						for (CounterType ct : CharacterFactory
 								.getPossibleStartingLocations(character)) {
 							boardView.setCounter(ct, board
@@ -336,8 +340,8 @@ public class ControllerMain implements ClientController {
 											characterSelected(character, loc);
 										}
 									} else {
-										mainView.displayMessage("You must select a clearing with a dwelling.");
-
+										mainView.displayMessage("please choose a clearing with a counter.");
+										mainView.selectClearing(this);
 									}
 								} else {
 									mainView.selectClearing(this);
@@ -359,6 +363,7 @@ public class ControllerMain implements ClientController {
 	 */
 	public void characterSelected(CharacterType character, CounterType loc) {
 		System.out.println("character selected.");
+		mainView.displayBanner("Please wait for other players.");
 		if (!server.send(new CharacterSelected(clientID, character, loc))) {
 			System.out.println("failed to send selected character to server.");
 		}
@@ -372,6 +377,7 @@ public class ControllerMain implements ClientController {
 	@Override
 	public void enterBirdSong() {
 		System.out.println("Entering bird song.");
+		mainView.displayBanner("");
 		// phases:
 		final ArrayList<Phase> phases = new ArrayList<Phase>();
 
@@ -385,10 +391,77 @@ public class ControllerMain implements ClientController {
 		phases.add(new Phase(PhaseType.SUNLIGHT, characters.get(clientID)
 				.getType()));
 		mainView.enterBirdSong(1, phases, new BirdsongFinishedListener() {
+			Semaphore sem = new Semaphore(1);
 
 			@Override
 			public void onFinish(List<ActivityType> activities) {
-				ArrayList<Activity> activitieslist = new ArrayList<Activity>();
+				final ArrayList<Activity> activitiesList = new ArrayList<Activity>();
+				final int i[] = new int[1];
+				for (ActivityType act : activities) {
+					switch (act) {
+					case MOVE:
+						try {
+							sem.acquire();
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+						mainView.displayMessage("Please select the clearing to move to for phase "
+								+ (i[0] + 1) + ".");
+						mainView.selectClearing(new ClearingSelectedListener() {
+
+							@Override
+							public void onClearingSelection(TileName tile,
+									int clearing) {
+								if (mainView.confirm("So you wanna move to "
+										+ tile.toString() + "clearing "
+										+ clearing + "?", "Yes", "No")) {
+									activitiesList.add(new Move(characters.get(
+											clientID).getType(), tile,
+											clearing, phases.get(i[0] - 1)
+													.getType()));
+									sem.release();
+								} else {
+									mainView.displayMessage("Please select the clearing to move to for phase "
+											+ (i[0] + 1) + ".");
+									mainView.selectClearing(this);
+								}
+							}
+						});
+
+						break;
+					case HIDE:
+						try {
+							sem.acquire();
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}						
+						activitiesList.add(new Hide(characters.get(clientID).getType(), phases.get(i[0]).getType()));
+						sem.release();
+						break;
+					case SEARCH:
+						try {
+							sem.acquire();
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						activitiesList.add(new Search(characters.get(clientID).getType(), phases.get(i[0]).getType()));
+						sem.release();
+						break;
+					default:
+						break;
+					}
+					i[0]++;
+				}
+				try {
+					sem.acquire();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				endBirdSong(activitiesList);
+				sem.release();
 				System.out.println(activities);
 			}
 
@@ -401,6 +474,7 @@ public class ControllerMain implements ClientController {
 	 * "waiting for other players" after this method is called.
 	 */
 	public void endBirdSong(Iterable<Activity> activities) {
+		mainView.displayBanner("Please wait for other players.");
 		server.send(new SubmitActivities(this.clientID, activities));
 	}
 
@@ -426,7 +500,7 @@ public class ControllerMain implements ClientController {
 			setID((Integer) obj);
 		}
 		if (obj instanceof ClientNetworkHandler) {
-			System.out.println("Client: recieved new object.");
+			System.out.println("Client: recieved new object: " + ((ClientNetworkHandler) obj).toString());
 			((ClientNetworkHandler) obj).handle(this);
 		}
 	}
@@ -451,7 +525,7 @@ public class ControllerMain implements ClientController {
 
 	private Semaphore tilesSet = new Semaphore(0);
 
-	private void waitForTiles(){
+	private void waitForTiles() {
 		sleepTime = 0; // finish placing the tiles without waiting.
 		try {
 			tilesSet.acquire();
@@ -460,6 +534,7 @@ public class ControllerMain implements ClientController {
 			throw new RuntimeException(e);
 		}
 	}
+
 	@Override
 	public void startGame(SerializedBoard board) {
 		System.out.println("starting game.");
@@ -477,14 +552,13 @@ public class ControllerMain implements ClientController {
 				boardView.setCounter(c.getType().toCounter(), tile, clearing);
 			}
 		}
-
-		this.enterBirdSong();
 	}
 
 	@Override
 	public void updateCharacterSelection(CharacterType character) {
 		// TODO mainView.updateCharacterSelection(character);
 		mainView.disableCharacter(character);
+
 		System.out.println("Client " + clientID
 				+ ": this character is now not selectable: "
 				+ character.toString());
@@ -504,6 +578,7 @@ public class ControllerMain implements ClientController {
 
 	@Override
 	public void checkSwordsmanTurn() {
+		System.out.println("recieved check swordsman object.");
 		server.send(new SetSwordsmanPlay(mainView.confirm(
 				"Would you like to take your turn now?", "Yes ", "No")));
 	}
@@ -519,6 +594,7 @@ public class ControllerMain implements ClientController {
 					setBoardView(bv);
 				}
 
+				
 			});
 		} catch (Exception e) {
 			e.printStackTrace();

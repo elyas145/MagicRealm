@@ -23,5 +23,9 @@ public class StartGame implements ClientNetworkHandler {
 		controller.setAllCharacters(characters);
 		controller.startGame(board);		
 	}
+	@Override
+	public String toString(){
+		return "start game handler.";		
+	}
 
 }

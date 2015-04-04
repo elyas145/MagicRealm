@@ -18,5 +18,8 @@ public class UpdateHiding implements ClientNetworkHandler {
 		controller.setHiding(character, hiding);
 
 	}
-
+	@Override
+	public String toString(){
+		return "update hiding handler.";		
+	}
 }

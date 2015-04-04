@@ -13,5 +13,9 @@ public class UpdateLobbyCount implements ClientNetworkHandler{
 		controller.updateLobbyCount(count);
 		
 	}
+	@Override
+	public String toString(){
+		return "update lobby count handler.";		
+	}
 
 }

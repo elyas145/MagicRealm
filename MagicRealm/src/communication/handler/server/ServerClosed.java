@@ -1,7 +1,6 @@
 package communication.handler.server;
 
 import communication.ClientNetworkHandler;
-
 import client.ClientController;
 
 public class ServerClosed implements ClientNetworkHandler {
@@ -12,5 +11,8 @@ public class ServerClosed implements ClientNetworkHandler {
 	public void handle(ClientController control) {
 		control.exit();
 	}
-
+	@Override
+	public String toString(){
+		return "server closed handler.";		
+	}
 }

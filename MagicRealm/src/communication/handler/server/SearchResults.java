@@ -53,7 +53,10 @@ public class SearchResults implements ClientNetworkHandler {
 		
 
 	}
-
+	@Override
+	public String toString(){
+		return "search result handler";		
+	}
 	public ArrayList<MapChit> getPeek() {
 		if (type == SearchType.CLUES)
 			return peek;

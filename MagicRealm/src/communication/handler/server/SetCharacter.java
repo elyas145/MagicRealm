@@ -14,5 +14,9 @@ public class SetCharacter implements ClientNetworkHandler{
 		controller.setCharacter(character);
 		
 	}
+	@Override
+	public String toString(){
+		return "set character.";		
+	}
 
 }

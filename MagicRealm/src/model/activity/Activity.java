@@ -1,13 +1,19 @@
 package model.activity;
 
+import java.io.Serializable;
+
 import server.ServerController;
 import model.controller.ModelControlInterface;
 import model.enums.ActivityType;
 import model.enums.CharacterType;
 import model.enums.PhaseType;
 
-public abstract class Activity {
+public abstract class Activity implements Serializable{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 9114075078403710878L;
 	// perform the action on the model controller
 	public abstract void perform(ServerController serverController);
 

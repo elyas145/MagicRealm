@@ -22,5 +22,8 @@ public class UpdateLocationOfCharacter implements ClientNetworkHandler {
 	public void handle(ClientController controller) {
 		controller.moveCounter(character.toCounter(), tile, clearing);
 	}
-
+	@Override
+	public String toString(){
+		return "update location of character handler.";		
+	}
 }

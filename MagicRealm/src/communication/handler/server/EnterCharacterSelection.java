@@ -1,7 +1,6 @@
 package communication.handler.server;
 
 import communication.ClientNetworkHandler;
-
 import client.ClientController;
 
 public class EnterCharacterSelection implements ClientNetworkHandler{
@@ -15,6 +14,10 @@ public class EnterCharacterSelection implements ClientNetworkHandler{
 	public void handle(ClientController controller) {
 		controller.enterCharacterSelection();
 		
+	}
+	@Override
+	public String toString(){
+		return "Enter character selection handler";		
 	}
 	
 }

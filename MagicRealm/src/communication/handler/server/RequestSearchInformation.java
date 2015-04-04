@@ -10,5 +10,8 @@ public class RequestSearchInformation implements ClientNetworkHandler {
 		controller.requestSearchInformation();
 
 	}
-
+	@Override
+	public String toString(){
+		return "request search info handler.";		
+	}
 }
