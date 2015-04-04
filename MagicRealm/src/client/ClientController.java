@@ -18,6 +18,7 @@ import model.counter.chit.MapChit;
 import model.enums.CharacterType;
 import model.enums.CounterType;
 import model.enums.SearchType;
+import model.enums.TableType;
 import model.enums.TileName;
 import model.exceptions.MRException;
 import model.interfaces.ClearingInterface;
@@ -92,6 +93,6 @@ public interface ClientController {
 			Map<ClearingInterface, ClearingInterface> discoveredPaths,
 			ArrayList<MapChit> peek);
 
-	void requestSearchChoice();
+	void requestSearchChoice(TableType table);
 
 }

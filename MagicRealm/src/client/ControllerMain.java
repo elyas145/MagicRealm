@@ -649,9 +649,9 @@ public class ControllerMain implements ClientController {
 	}
 
 	@Override
-	public void requestSearchChoice() {
+	public void requestSearchChoice(TableType table) {
 		//TODO mainView.searchChoice();
-		
+		server.send(new SearchCriteria(characters.get(clientID).getType(), table, 2));
 	}
 
 }
