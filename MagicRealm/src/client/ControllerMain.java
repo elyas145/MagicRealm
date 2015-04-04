@@ -603,7 +603,6 @@ public class ControllerMain implements ClientController {
 		} catch (Exception e) {
 			e.printStackTrace();
 			mainView.displayMessage("The server is not available");
-			mainView.enterMainMenu(mainMenuListener);
 		}
 	}
 
