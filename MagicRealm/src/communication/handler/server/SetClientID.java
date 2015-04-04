@@ -1,7 +1,6 @@
 package communication.handler.server;
 
 import communication.ClientNetworkHandler;
-
 import client.ClientController;
 
 public class SetClientID implements ClientNetworkHandler {
@@ -14,5 +13,8 @@ public class SetClientID implements ClientNetworkHandler {
 	public void handle(ClientController controller) {
 		controller.setID(id);		
 	}
-
+	@Override
+	public String toString(){
+		return "set id handler.";		
+	}
 }

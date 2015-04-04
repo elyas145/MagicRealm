@@ -13,16 +13,21 @@ import java.util.HashMap;
 import java.util.concurrent.Semaphore;
 
 import model.activity.Activity;
+import model.activity.Move;
 import model.controller.ModelController;
+import model.enums.ActivityType;
 import model.enums.CharacterType;
 import model.enums.CounterType;
+import model.enums.LandType;
 import model.enums.MapChitType;
+import model.enums.PhaseType;
 import model.enums.TableType;
 import model.enums.TileName;
 import model.enums.ValleyChit;
 import communication.ClientNetworkHandler;
 import communication.handler.server.CheckSwordsmanPlay;
 import communication.handler.server.DiceRequest;
+import communication.handler.server.EnterBirdSong;
 import communication.handler.server.EnterCharacterSelection;
 import communication.handler.server.EnterLobby;
 import communication.handler.server.RequestSearchInformation;
@@ -53,8 +58,6 @@ public class ServerController {
 		clients = new ArrayList<ClientThread>();
 		model = new ModelController(new ResourceHandler());
 		model.setBoard();
-		// TODO testing purposes.
-		model.setBoardForPlay();
 
 		sboard = model.getBoard().getSerializedBoard();
 	}
@@ -145,7 +148,7 @@ public class ServerController {
 		}
 		boolean everyoneSelected = true;
 		// wait for all clients to choose their character
-		
+
 		for (ClientThread client : clients) {
 			System.out.println("Client request: " + iD);
 			if (!client.didSelectCharacter()) {
@@ -163,12 +166,18 @@ public class ServerController {
 		}
 	}
 
-	public void startGame() {		
+	public void startGame() {
 		HashMap<Integer, Character> characters = new HashMap<Integer, Character>();
-		for(ClientThread c : clients){
+		for (ClientThread c : clients) {
 			characters.put(c.getID(), c.getCharacter());
 		}
 		sendAll(new StartGame(sboard, characters));
+		startBirdSong();
+	}
+
+	private void startBirdSong() {
+		sendAll(new EnterBirdSong());
+
 	}
 
 	public void addTreasure(MapChitType site, TileName tile, Integer value) {
@@ -212,7 +221,7 @@ public class ServerController {
 			}
 		}
 		// check if the swords man wants to play.
-		for (ClientThread player : clients){
+		for (ClientThread player : clients) {
 			if (swordsmanPlayer != null && !swordsmanPlayer.hasPlayed()) {
 				swordsmanPlayer.send(new CheckSwordsmanPlay());
 				try {
@@ -221,22 +230,54 @@ public class ServerController {
 					e.printStackTrace();
 				}
 			}
-			if(player.getCharacter().getType() != CharacterType.SWORDSMAN){
+			if (player.getCharacter().getType() != CharacterType.SWORDSMAN) {
 				playTurn(player);
 			}
 		}
-		
-		//check if swodsman played. if not, they have to play now.
-		if(swordsmanPlayer != null && !swordsmanPlayer.hasPlayed()){
+
+		// check if swodsman played. if not, they have to play now.
+		if (swordsmanPlayer != null && !swordsmanPlayer.hasPlayed()) {
 			playTurn(swordsmanPlayer);
 		}
+		resetPlayers();
+		// loop back to birdsong. BAD because recursive... TODO fix if time
+		// permits.
+		startBirdSong();
 	}
-	
-	private void playTurn(ClientThread player) { 
+
+	private void playTurn(ClientThread player) {
 		player.getCharacter().setHiding(false);
 		sendAll(new UpdateHiding(player.getCharacter().getType(), false));
-		for(Activity act: player.getCurrentActivities()) {
-			act.perform(this);
+		for (Activity act : player.getCurrentActivities()) {
+			if (player.getSunlightFlag()
+					&& act.getPhaseType().equals(PhaseType.SUNLIGHT)) {
+				player.send(new MessageDisplay(
+						"error using daylight phase. you passed in a cave."));
+			} else {
+				if (player.getMountainMoveCount() != 0) {
+					// this has to be a move to the same clearing as before. or
+					// else send illegal move and carry on with this activity.
+					System.out.println("player tried to move to mountain already.");
+					if (act.getType() == ActivityType.MOVE) {
+						// check if same clearing as before.
+						if (!(((Move) act).getTile() == player
+								.getMountainClearing().getParentTile()
+								.getName()
+								&& ((Move) act).getClearing() == player
+										.getMountainClearing()
+										.getClearingNumber())){
+							player.send(new MessageDisplay("move failed. you need two moves to move to a mountain clearing."));
+							player.setMountainClearing(null);
+							player.setMountainMoveCount(0);
+						}
+					}else{
+						player.send(new MessageDisplay("move failed. you need two moves to move to a mountain clearing."));
+						player.setMountainClearing(null);
+						player.setMountainMoveCount(0);
+					}
+				}
+				act.perform(this);
+			}
 		}
 		player.playTurn();
 	}
@@ -245,12 +286,19 @@ public class ServerController {
 	private int currentDieRoll;
 
 	public synchronized void setSwordsManTurn(boolean playing) {
-		//swordsmanTurn = playing;
+		// swordsmanTurn = playing;
 		if (playing) {
 			ClientThread ct = getPlayerOf(CharacterType.SWORDSMAN);
 			playTurn(ct);
 		}
 		playSync.release();
+	}
+
+	private void resetPlayers() {
+		for (ClientThread ct : clients) {
+			ct.newTurn();
+		}
+
 	}
 
 	public void hideCharacter(CharacterType actor) {
@@ -260,21 +308,33 @@ public class ServerController {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		
-		if(model.hideCharacter(currentDieRoll, getPlayerOf(actor).getPlayer())){
+
+		if (model.hideCharacter(currentDieRoll, getPlayerOf(actor).getPlayer())) {
 			sendAll(new UpdateHiding(actor, true));
-		}else{
+		} else {
 			getPlayerOf(actor).send(new MessageDisplay("Hide Failed."));
 		}
 	}
 
 	public void moveCharacter(CharacterType actor, TileName tile, int clearing) {
-		if (model.moveCharacter(this.getPlayerOf(actor).getPlayer(), tile, clearing)){
-			if(model.checkIfCave(tile, clearing)){
+		if (model.getBoard().getClearing(tile, clearing).getLandType() == LandType.MOUNTAIN) {
+			if (getPlayerOf(actor).getMountainClearing() == null) {
+				getPlayerOf(actor).setMountainClearing(
+						(model.getBoard().getClearing(tile, clearing)));
+				getPlayerOf(actor).setMountainMoveCount(1);
+				return;
+			}
+		}
+		if (model.moveCharacter(this.getPlayerOf(actor).getPlayer(), tile,
+				clearing)) {
+			getPlayerOf(actor).setMountainClearing(null);
+			getPlayerOf(actor).setMountainMoveCount(0);
+
+			if (model.checkIfCave(tile, clearing)) {
 				getPlayerOf(actor).setSunlightFlag(true);
 			}
 			sendAll(new UpdateLocationOfCharacter(actor, tile, clearing));
-		}else{
+		} else {
 			getPlayerOf(actor).send(new IllegalMove(tile, clearing));
 		}
 	}
@@ -288,26 +348,27 @@ public class ServerController {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void searchChosen(CharacterType car, TableType tbl, int rv) {
 		// do the search activity with the player
 		ClientThread ct = getPlayerOf(car);
 		model.performSearch(ct.getPlayer(), tbl, rv);
 		playSync.release();
 	}
-	
+
 	private ClientThread getPlayerOf(CharacterType ct) {
-		for(ClientThread cli: clients) {
-			if(cli.getCharacter().getType() == ct) {
+		for (ClientThread cli : clients) {
+			if (cli.getCharacter().getType() == ct) {
 				return cli;
 			}
 		}
-		throw new RuntimeException("The character " + ct + " is not being played!");
+		throw new RuntimeException("The character " + ct
+				+ " is not being played!");
 	}
 
 	public void setDieRoll(int roll) {
 		currentDieRoll = roll;
-		playSync.release();		
+		playSync.release();
 	}
 
 }

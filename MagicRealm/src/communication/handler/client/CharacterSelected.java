@@ -22,4 +22,9 @@ public class CharacterSelected implements ServerNetworkHandler{
 		controller.setCharacter(ID, character, location);
 		
 	}
+	
+	@Override
+	public String toString(){
+		return "Character selected handler.";
+	}
 }

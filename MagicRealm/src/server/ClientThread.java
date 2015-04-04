@@ -4,12 +4,14 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 
 import model.enums.CharacterType;
 import model.enums.CounterType;
 import model.enums.ValleyChit;
 import model.player.Player;
 import model.activity.Activity;
+import model.board.clearing.Clearing;
 import model.character.Character;
 import model.character.CharacterFactory;
 public class ClientThread extends Thread {
@@ -23,6 +25,8 @@ public class ClientThread extends Thread {
 	private boolean characterPicked = false;
 	private Iterable<Activity> currentActivities;
 	private boolean playedTurn;
+	private int mountainMoveCount = 0;
+	private Clearing mountainClearing = null;
 	
 	public ClientThread(Server server, Socket socket) {
 		super();
@@ -39,7 +43,7 @@ public class ClientThread extends Thread {
 	
 	public synchronized void send(Object o) {
 		try {
-			System.out.println("sending object to: " + ID);
+			System.out.println("sending object: " + o.toString());
 			//oStreamOut.reset();
 			oStreamOut.writeObject(o);
 			//oStreamOut.flush();
@@ -107,6 +111,9 @@ public class ClientThread extends Thread {
 	
 	public void newTurn() {
 		playedTurn = false;
+		currentActivities = new ArrayList<Activity>();
+		player.setSunlightFlag(false);
+		mountainMoveCount = 0;
 	}
 	
 	public boolean hasPlayed() {
@@ -122,5 +129,21 @@ public class ClientThread extends Thread {
 	}
 	public boolean getSunlightFlag(){
 		return player.getSunLightFlag();
+	}
+
+	public int getMountainMoveCount() {
+		return mountainMoveCount;
+	}
+
+	public void setMountainMoveCount(int mountainMoveCount) {
+		this.mountainMoveCount = mountainMoveCount;
+	}
+
+	public Clearing getMountainClearing() {
+		return mountainClearing;
+	}
+
+	public void setMountainClearing(Clearing mountainClearing) {
+		this.mountainClearing = mountainClearing;
 	}
 }

@@ -9,5 +9,9 @@ public class CheckSwordsmanPlay implements ClientNetworkHandler {
 	public void handle(ClientController controller) {
 		controller.checkSwordsmanTurn();
 	}
+	@Override
+	public String toString(){
+		return "Check swordsman play handler.";		
+	}
 
 }

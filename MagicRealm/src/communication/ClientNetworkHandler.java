@@ -19,4 +19,5 @@ import utils.handler.Handler;
 public interface ClientNetworkHandler extends Serializable {
 
 	void handle(ClientController controller);
+	String toString();
 }

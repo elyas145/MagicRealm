@@ -16,5 +16,8 @@ public class DieRoll implements ServerNetworkHandler {
 		controller.setDieRoll(roll);
 
 	}
-
+	@Override
+	public String toString(){
+		return "Die roll request handler handler.";
+	}
 }

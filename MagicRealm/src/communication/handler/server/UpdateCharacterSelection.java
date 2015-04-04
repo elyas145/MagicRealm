@@ -17,5 +17,8 @@ public class UpdateCharacterSelection implements ClientNetworkHandler {
 		controller.updateCharacterSelection(character);
 
 	}
-
+	@Override
+	public String toString(){
+		return "update character selection handler.";		
+	}
 }
