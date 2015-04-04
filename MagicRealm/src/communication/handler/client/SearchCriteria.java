@@ -6,6 +6,7 @@ import server.ServerController;
 import communication.ServerNetworkHandler;
 
 public class SearchCriteria implements ServerNetworkHandler {
+	private static final long serialVersionUID = 5193120836501252994L;
 	private TableType table;
 	private int rollValue;
 	private CharacterType character;

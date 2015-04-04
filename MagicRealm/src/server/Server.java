@@ -23,7 +23,11 @@ public class Server implements Runnable {
 		ServerView view = new ServerView(this);
 		view.start();
 	}
-
+	public Server(int port, boolean b) {
+		this.port = port;
+		this.doneSettingCheatMode();
+		this.start();
+	}
 	public void startServer(){
 		System.out.println("Binding server to port " + port + "...");
 		try {
