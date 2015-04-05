@@ -24,7 +24,7 @@ public class LWJGLDieSelection implements DieSelectionView {
 		resources = rh;
 		root = LWJGLPanel.fromPicture(par, resources,
 				ResourceHandler.joinPath("menus", "alert", "bg.gif"), -.35f,
-				.34f, .4f, false);
+				.11f, .4f, false);
 		par.add(root);
 		LWJGLPanel text = LWJGLPanel.fromString(root, "Die Selection",
 				FONT, COLOR, 500, 70, 0f, .15f, .1f, false);
@@ -33,13 +33,13 @@ public class LWJGLDieSelection implements DieSelectionView {
 		LWJGLPanel tmp, head = root;
 		int count = 0;
 		for(int i = 0; i < 2; ++i) { // row
-			tmp = createDie(head, 0f, -.2f, ++count);
+			tmp = createDie(head, 0f, -.25f, ++count);
 			head.add(tmp);
 			head = tmp;
 			head.setVisible(true);
 			LWJGLPanel last = head;
 			for(int j = 1; j < 3; ++j) { // column
-				tmp = createDie(last, .2f, 0f, ++count);
+				tmp = createDie(last, .25f, 0f, ++count);
 				last.add(tmp);
 				last = tmp;
 				last.setVisible(true);
@@ -50,6 +50,7 @@ public class LWJGLDieSelection implements DieSelectionView {
 	@Override
 	public void selectDie(DieSelectionListener dsl) {
 		onSelect = dsl;
+		setVisible(true);
 	}
 
 	@Override
@@ -58,7 +59,7 @@ public class LWJGLDieSelection implements DieSelectionView {
 	}
 	
 	private LWJGLPanel createDie(LWJGLPanel last, float xoff, float yoff, final int count) {
-		LWJGLPanel pane = LWJGLPanel.fromPicture(last, resources, getPath(count), xoff, yoff, .15f, true);
+		LWJGLPanel pane = LWJGLPanel.fromPicture(last, resources, getPath(count), xoff, yoff, .22f, true);
 		pane.setCursorListener(new PrimaryClickListener() {
 
 			@Override
@@ -78,6 +79,7 @@ public class LWJGLDieSelection implements DieSelectionView {
 		if (onSelect != null) {
 			DieSelectionListener dsl = onSelect;
 			onSelect = null;
+			setVisible(false);
 			dsl.dieSelected(die);
 		}
 	}

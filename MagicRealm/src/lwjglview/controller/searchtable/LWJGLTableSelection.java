@@ -61,6 +61,7 @@ public class LWJGLTableSelection implements SearchView {
 	@Override
 	public void selectTable(TableSelectionListener tsl) {
 		onSelect = tsl;
+		setVisible(true);
 	}
 
 	@Override
@@ -72,6 +73,7 @@ public class LWJGLTableSelection implements SearchView {
 		if (onSelect != null) {
 			TableSelectionListener tsl = onSelect;
 			onSelect = null;
+			setVisible(false);
 			tsl.onSelect(tt);
 		}
 	}
