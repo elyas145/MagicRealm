@@ -33,6 +33,7 @@ import communication.handler.server.EnterLobby;
 import communication.handler.server.RequestSearchInformation;
 import communication.handler.server.SearchChoiceRequest;
 import communication.handler.server.SearchResults;
+import communication.handler.server.SetCheatMode;
 import communication.handler.server.UpdateHiding;
 import communication.handler.server.IllegalMove;
 import communication.handler.server.MessageDisplay;
@@ -174,6 +175,9 @@ public class ServerController {
 			characters.put(c.getID(), c.getCharacter());
 		}
 		sendAll(new StartGame(sboard, characters));
+		if(GameConfiguration.Cheat){
+			sendAll(new SetCheatMode());
+		}
 		startBirdSong();
 	}
 

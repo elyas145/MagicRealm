@@ -344,10 +344,21 @@ public class ModelController {
 
 	private void setUpSoundAndSite() {
 		ArrayList<MapChit> chits = new ArrayList<MapChit>();
-
 		// add sound and site chits to array.
 		for (MapChitType chit : MapChitType.SITES) {
-			MapChit mc = new MapChit(chit);
+			switch(chit){
+			case STATUE:
+			case ALTAR:
+			case VAULT:
+			case POOL:
+			case HOARD:
+			case LAIR:
+			case CAIRNS:
+			case SHRINE:
+			default:
+				break;
+			}
+			MapChit mc = new MapChit(chit, Random.choose(makeClearings()));
 			chits.add(mc);
 		}
 		for (MapChitType chit : MapChitType.SOUNDS) {
@@ -415,8 +426,6 @@ public class ModelController {
 	}
 
 	private SearchResults peerTableSearch(Player player, int roll) {
-
-		TileName ct = getTileOf(player.getCharacter().getType()).getName();
 		switch (roll) {
 		case 1:
 			return new SearchResults(SearchType.CHOICE);
