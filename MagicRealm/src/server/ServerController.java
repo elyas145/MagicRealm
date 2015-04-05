@@ -251,10 +251,14 @@ public class ServerController {
 		player.getCharacter().setHiding(false);
 		sendAll(new UpdateHiding(player.getCharacter().getType(), false));
 		for (Activity act : player.getCurrentActivities()) {
+			System.out.println("SERVER: current activity: " + act.getType() + " Phase: " + act.getPhaseType());
+			if(model.getBoard().getLocationOfCounter(player.getCharacter().getType().toCounter()).getLandType() == LandType.CAVE){
+				player.setSunlightFlag(true);
+			}
 			if (player.getSunlightFlag()
-					&& act.getPhaseType().equals(PhaseType.SUNLIGHT)) {
+					&& act.getPhaseType().equals(PhaseType.SUNLIGHT) && act.getType() != ActivityType.NONE) {
 				player.send(new MessageDisplay(
-						"error using daylight phase. you passed in a cave."));
+						"error using sunlight phase. you passed in a cave."));
 			} else {
 				if (player.getMountainMoveCount() != 0) {
 					// this has to be a move to the same clearing as before. or
@@ -355,9 +359,7 @@ public class ServerController {
 		// do the search activity with the player
 		ClientThread ct = getPlayerOf(car);
 		SearchResults res = model.performSearch(ct.getPlayer(), tbl, rv);
-		if(rv == 1){
-			ct.send(new SearchChoiceRequest(tbl));
-		}
+		getPlayerOf(car).send(res);
 		playSync.release();
 	}
 

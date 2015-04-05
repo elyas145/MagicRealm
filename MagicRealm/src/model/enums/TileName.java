@@ -54,4 +54,30 @@ public enum TileName implements Serializable{
 			return LandType.NONE;
 		}
 	}
+	public String toString(){
+		switch(this) {
+		case BORDERLAND: return "Border Land";
+		case CAVERN: return "Cavern";
+		case CAVES: return "Caves";
+		case HIGH_PASS: return "High Pass";
+		case RUINS: return "Ruins";
+		case CLIFF: return "Cliff";
+		case CRAG: return "Crag";
+		case LEDGES: return "Ledges";
+		case MOUNTAIN: return "Mountain";
+		case AWFUL_VALLEY: return "Awful Valley";
+		case BAD_VALLEY: return "Bad Valley";
+		case CURST_VALLEY: return "Crust Valley";
+		case DARK_VALLEY: return "Dark Valley";
+		case EVIL_VALLEY: return "Evil Valley";
+		case DEEP_WOODS: return "Deep Woods";
+		case LINDEN_WOODS: return "Linden Woods";
+		case MAPLE_WOODS: return "Maple Woods";
+		case NUT_WOODS: return "Nut Woods";
+		case OAK_WOODS: return "Oak Woods";
+		case PINE_WOODS: return "Pine Woods";
+		default:
+			 return "None";
+		}
+	}
 }
