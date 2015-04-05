@@ -210,7 +210,11 @@ public class ControllerMain implements ClientController {
 
 	@Override
 	public void setHiding(CharacterType character, boolean hid) {
-
+		if (hid) {
+			boardView.hideCounter(character.toCounter());
+		} else {
+			boardView.unHideCounter(character.toCounter());
+		}
 	}
 
 	@Override
@@ -429,7 +433,7 @@ public class ControllerMain implements ClientController {
 									} else {
 										mainView.displayMessage("Please select the clearing to move to for phase "
 												+ (i[0] + 1) + ".");
-							
+
 										mainView.selectClearing(this);
 									}
 								} else {
@@ -449,18 +453,20 @@ public class ControllerMain implements ClientController {
 
 						break;
 					case HIDE:
-						if(!GameConfiguration.Cheat){
-							activitiesList.add(new Hide(characters.get(clientID)
-									.getType(), phases.get(i[0]).getType(), Random.dieRoll()));
-						}else{
-							mainView.selectDie(new DieSelectionListener(){
+						if (!GameConfiguration.Cheat) {
+							activitiesList.add(new Hide(characters
+									.get(clientID).getType(), phases.get(i[0])
+									.getType(), Random.dieRoll()));
+						} else {
+							mainView.selectDie(new DieSelectionListener() {
 								@Override
 								public void dieSelected(int val) {
-									activitiesList.add(new Hide(characters.get(clientID)
-											.getType(), phases.get(i[0]).getType(), val));	
+									activitiesList.add(new Hide(characters.get(
+											clientID).getType(), phases.get(
+											i[0]).getType(), val));
 									sem.release();
 								}
-								
+
 							});
 							try {
 								sem.acquire();
@@ -469,7 +475,7 @@ public class ControllerMain implements ClientController {
 								e.printStackTrace();
 							}
 						}
-						
+
 						break;
 					case SEARCH:
 						try {
@@ -581,6 +587,9 @@ public class ControllerMain implements ClientController {
 			}
 			for (MapChit c : chits) {
 				boardView.setMapChit(c);
+			}
+			for (Character c : characters.values()) {
+				boardView.hideCounter(c.getType().toCounter());
 			}
 		}
 	}
