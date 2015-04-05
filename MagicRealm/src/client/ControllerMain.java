@@ -425,6 +425,7 @@ public class ControllerMain implements ClientController {
 									} else {
 										mainView.displayMessage("Please select the clearing to move to for phase "
 												+ (i[0] + 1) + ".");
+							
 										mainView.selectClearing(this);
 									}
 								} else {

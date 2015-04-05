@@ -35,5 +35,7 @@ public class SerializedMapChit implements Serializable{
 	public TileName getTile() {
 		return tile;
 	}
-
+public String toString(){
+	return "SMapChit: " + type + " identifier: " + identifier + " tile" + tile; 
+}
 }

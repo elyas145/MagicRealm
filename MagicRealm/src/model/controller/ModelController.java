@@ -51,7 +51,7 @@ public class ModelController {
 
 	private ResourceHandler rh;
 	private int numPlayers = 0;
-	private ArrayList<ValleyChit> sites;
+	private ArrayList<ValleyChit> dwellings;
 	private int currentDay = 0;
 	private LostSite lostCity;
 	private LostSite lostCastle;
@@ -70,10 +70,10 @@ public class ModelController {
 	public ModelController(ResourceHandler rh) {
 		this.rh = rh;
 		currentDay = 1;
-		sites = new ArrayList<ValleyChit>();
+		dwellings = new ArrayList<ValleyChit>();
 
 		for (ValleyChit t : ValleyChit.values()) {
-			sites.add(t);
+			dwellings.add(t);
 		}
 
 		mapChits = new HashSet<MapChit>();
@@ -156,9 +156,7 @@ public class ModelController {
 		if (board == null) {
 			board = new Board(rh);
 			if (!GameConfiguration.Cheat) {
-				setUpWarning();
-				setUpSoundAndSite();
-				setSiteLocations();
+				setDwellingLocations();
 			}
 		}
 		return board;
@@ -191,8 +189,8 @@ public class ModelController {
 			board.setLocationOfCounter(c, GameConfiguration.INITIAL_SITE);
 	}
 
-	public void setSiteLocations() {
-		for (ValleyChit t : sites) {
+	public void setDwellingLocations() {
+		for (ValleyChit t : dwellings) {
 			switch (t) {
 			case CHAPEL:
 				board.setLocationOfCounter(t.toCounterType(),
@@ -344,21 +342,22 @@ public class ModelController {
 
 	private void setUpSoundAndSite() {
 		ArrayList<MapChit> chits = new ArrayList<MapChit>();
+		int loc = 0;
 		// add sound and site chits to array.
 		for (MapChitType chit : MapChitType.SITES) {
 			switch(chit){
-			case STATUE:
-			case ALTAR:
-			case VAULT:
-			case POOL:
-			case HOARD:
-			case LAIR:
-			case CAIRNS:
-			case SHRINE:
+			case STATUE: loc = 2; break;
+			case ALTAR: loc = 1; break;
+			case VAULT: loc = 3; break;
+			case POOL: loc = 6; break;
+			case HOARD: loc = 6; break;
+			case LAIR: loc = 3; break;
+			case CAIRNS: loc = 5; break;
+			case SHRINE: loc = 4; break;
 			default:
 				break;
 			}
-			MapChit mc = new MapChit(chit, Random.choose(makeClearings()));
+			MapChit mc = new MapChit(chit, loc);
 			chits.add(mc);
 		}
 		for (MapChitType chit : MapChitType.SOUNDS) {
@@ -391,13 +390,17 @@ public class ModelController {
 		for (TileName tn : new TileName[] { TileName.BORDERLAND,
 				TileName.CAVERN, TileName.CAVES, TileName.HIGH_PASS,
 				TileName.RUINS }) {
-			board.setLocationOfMapChit(Random.remove(cityList), tn);
+			MapChit c = Random.remove(cityList);
+			c.setTile(tn);
+			board.setLocationOfMapChit(c, tn);
 		}
 
 		// each chit in castle list goes on mountain tile
 		for (TileName tn : new TileName[] { TileName.CLIFF, TileName.CRAG,
 				TileName.DEEP_WOODS, TileName.LEDGES, TileName.MOUNTAIN }) {
-			board.setLocationOfMapChit(Random.remove(castleList), tn);
+			MapChit c = Random.remove(castleList);
+			c.setTile(tn);
+			board.setLocationOfMapChit(c, tn);
 		}
 
 		ArrayList<MapChit> lostCityChits = new ArrayList<MapChit>();
