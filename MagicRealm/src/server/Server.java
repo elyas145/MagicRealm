@@ -27,6 +27,7 @@ public class Server implements Runnable {
 		this.port = port;
 		this.doneSettingCheatMode();
 		this.startServer();
+		GameConfiguration.Cheat = b;
 	}
 	public void startServer(){
 		System.out.println("Binding server to port " + port + "...");
