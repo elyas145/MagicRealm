@@ -391,42 +391,56 @@ public class ControllerMain implements ClientController {
 		phases.add(new Phase(PhaseType.SUNLIGHT, characters.get(clientID)
 				.getType()));
 		mainView.enterBirdSong(1, phases, new BirdsongFinishedListener() {
-			Semaphore sem = new Semaphore(1);
+			Semaphore sem = new Semaphore(0);
 
 			@Override
 			public void onFinish(List<ActivityType> activities) {
 				final ArrayList<Activity> activitiesList = new ArrayList<Activity>();
 				final int i[] = new int[1];
+				i[0] = 0;
+				System.out.println("Phases: " + phases);
+				System.out.println("Activities: " + activities);
 				for (ActivityType act : activities) {
 					switch (act) {
 					case MOVE:
-						try {
-							sem.acquire();
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-						mainView.displayMessage("Please select the clearing to move to for phase "
-								+ (i[0] + 1) + ".");
 						mainView.selectClearing(new ClearingSelectedListener() {
 
 							@Override
 							public void onClearingSelection(TileName tile,
 									int clearing) {
-								if (mainView.confirm("So you wanna move to "
-										+ tile.toString() + "clearing "
-										+ clearing + "?", "Yes", "No")) {
-									activitiesList.add(new Move(characters.get(
-											clientID).getType(), tile,
-											clearing, phases.get(i[0] - 1)
-													.getType()));
-									sem.release();
+								if (clearing != 0) {
+									if (mainView.confirm(
+											"So you wanna move to "
+													+ tile.toString()
+													+ "clearing " + clearing
+													+ "?", "Yes", "No")) {
+										activitiesList.add(new Move(characters
+												.get(clientID).getType(), tile,
+												clearing, phases.get(i[0])
+														.getType()));
+										System.out.println("MOVE: "
+												+ (i[0] + 1) + " "
+												+ phases.get(i[0]));
+										sem.release();
+									} else {
+										mainView.displayMessage("Please select the clearing to move to for phase "
+												+ (i[0] + 1) + ".");
+										mainView.selectClearing(this);
+									}
 								} else {
-									mainView.displayMessage("Please select the clearing to move to for phase "
-											+ (i[0] + 1) + ".");
 									mainView.selectClearing(this);
 								}
 							}
 						});
+						mainView.displayMessage("Please select the clearing to move to for phase "
+								+ (i[0] + 1) + ".");
+						try {
+							sem.acquire();
+							System.out.println("aquired Semaphore: "
+									+ sem.availablePermits());
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
 
 						break;
 					case HIDE:
@@ -435,8 +449,9 @@ public class ControllerMain implements ClientController {
 						} catch (InterruptedException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
-						}						
-						activitiesList.add(new Hide(characters.get(clientID).getType(), phases.get(i[0]).getType()));
+						}
+						activitiesList.add(new Hide(characters.get(clientID)
+								.getType(), phases.get(i[0]).getType()));
 						sem.release();
 						break;
 					case SEARCH:
@@ -446,22 +461,17 @@ public class ControllerMain implements ClientController {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-						activitiesList.add(new Search(characters.get(clientID).getType(), phases.get(i[0]).getType()));
+						activitiesList.add(new Search(characters.get(clientID)
+								.getType(), phases.get(i[0]).getType()));
 						sem.release();
 						break;
 					default:
 						break;
 					}
+					System.out.println("i: " + i[0]);
 					i[0]++;
 				}
-				try {
-					sem.acquire();
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
 				endBirdSong(activitiesList);
-				sem.release();
 				System.out.println(activities);
 			}
 
@@ -500,7 +510,8 @@ public class ControllerMain implements ClientController {
 			setID((Integer) obj);
 		}
 		if (obj instanceof ClientNetworkHandler) {
-			System.out.println("Client: recieved new object: " + ((ClientNetworkHandler) obj).toString());
+			System.out.println("Client: recieved new object: "
+					+ ((ClientNetworkHandler) obj).toString());
 			((ClientNetworkHandler) obj).handle(this);
 		}
 	}
@@ -546,12 +557,14 @@ public class ControllerMain implements ClientController {
 		}
 		synchronized (boardView) {
 			boardView.loadMapChits(chits);
-			for(CounterType t : board.getCounterPositions().keySet()){
-				boardView.setCounter(t, board.getCounterPositions().get(t).getParent(), board.getCounterPositions().get(t).getNumber());
+			for (CounterType t : board.getCounterPositions().keySet()) {
+				boardView.setCounter(t, board.getCounterPositions().get(t)
+						.getParent(), board.getCounterPositions().get(t)
+						.getNumber());
 			}
-			for (MapChit c : chits){
+			for (MapChit c : chits) {
 				boardView.setMapChit(c);
-			}		
+			}
 		}
 	}
 
@@ -595,7 +608,6 @@ public class ControllerMain implements ClientController {
 					setBoardView(bv);
 				}
 
-				
 			});
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -647,8 +659,9 @@ public class ControllerMain implements ClientController {
 
 	@Override
 	public void requestSearchChoice(TableType table) {
-		//TODO mainView.searchChoice();
-		server.send(new SearchCriteria(characters.get(clientID).getType(), table, 2));
+		// TODO mainView.searchChoice();
+		server.send(new SearchCriteria(characters.get(clientID).getType(),
+				table, 2));
 	}
 
 }

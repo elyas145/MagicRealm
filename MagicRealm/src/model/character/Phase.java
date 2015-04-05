@@ -62,7 +62,11 @@ public class Phase implements Serializable{
 		possibleActivities = new ArrayList<ActivityType>();
 		switch(type){
 		case DEFAULT:
-			
+			possibleActivities.add(ActivityType.NONE);
+			possibleActivities.add(ActivityType.HIDE);
+			possibleActivities.add(ActivityType.MOVE);
+			possibleActivities.add(ActivityType.SEARCH);
+			break;
 		case SUNLIGHT:
 			possibleActivities.add(ActivityType.NONE);
 			possibleActivities.add(ActivityType.HIDE);
@@ -72,5 +76,8 @@ public class Phase implements Serializable{
 		case SPECIAL:
 			break;
 		}
+	}
+	public String toString(){
+		return "Phase type: " + type;
 	}
 }
