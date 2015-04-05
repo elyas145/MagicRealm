@@ -1,10 +1,9 @@
 package view.controller.search;
 
-import model.enums.TableType;
+import view.controller.ItemGroup;
 
-public interface SearchView {
+public interface SearchView extends ItemGroup {
 
-	boolean doneSearching();
-	TableType getSelectedTable();
+	void selectTable(TableSelectionListener tsl);
 
 }

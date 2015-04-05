@@ -8,16 +8,25 @@ public abstract class LWJGLContentPane extends LWJGLDrawableNode {
 	
 	protected LWJGLContentPane(LWJGLDrawableNode par, MatrixCalculator mat) {
 		super(par, mat);
+		parent = null;
 	}
 	
-	protected LWJGLContentPane(LWJGLDrawableNode par) {
+	protected LWJGLContentPane(LWJGLContentPane par) {
 		super(par);
 	}
-
-	public abstract void add(LWJGLContentPane pane);
-
-	public abstract void remove(LWJGLContentPane pane);
 	
-	public abstract SelectionFrame getSelectionFrame();
+	public SelectionFrame getSelectionFrame() {
+		return getParent().getSelectionFrame();
+	}
+	
+	public LWJGLContentPane getParent() {
+		return parent;
+	}
+
+	public void add(LWJGLContentPane pane) {}
+
+	public void remove(LWJGLContentPane pane) {}
+	
+	private LWJGLContentPane parent;
 
 }

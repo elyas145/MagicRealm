@@ -8,7 +8,9 @@ import jogamp.audio.JogAmpSoundController;
 import lwjglview.controller.birdsong.LWJGLBirdsong;
 import lwjglview.controller.lobby.LWJGLLobbyView;
 import lwjglview.controller.mainmenu.LWJGLMainMenu;
+import lwjglview.controller.searchtable.LWJGLTableSelection;
 import lwjglview.controller.characterselection.LWJGLCharacterSelection;
+import lwjglview.controller.cheatmode.LWJGLDieSelection;
 import lwjglview.graphics.LWJGLGraphics;
 import lwjglview.graphics.board.ClearingFocusHandler;
 import lwjglview.graphics.board.LWJGLBoardDrawable;
@@ -202,23 +204,25 @@ public class LWJGLViewController implements ViewController {
 		}, LWJGLGraphics.LAYER0);
 		selections = new SelectionFrame(graphics);
 		menus = new LWJGLMenuLayer(graphics, selections);
-		mainMenu = new LWJGLMainMenu(menus, resources);
+		birdsong = new LWJGLBirdsong(resources, menus);
 		characterSelection = new LWJGLCharacterSelection(rh, graphics, menus);
 		menus.add(characterSelection);
+		mainMenu = new LWJGLMainMenu(menus, resources);
+		tableSelect = new LWJGLTableSelection(resources, menus);
+		dieSelection = new LWJGLDieSelection(resources, menus);
+		confirmation = new LWJGLConfirmationDialog(menus, resources,
+				"Will you join the dark side?", "Yes master", "Never!", -.73f,
+				1f, -.73f, -.4f, .8f);
+		alert = new LWJGLAlertDialog(menus, resources,
+				"this is a very very long message to fill the alert!", -.73f,
+				1f, -.73f, -.4f, .8f);
 		splash = LWJGLPanel.fromPicture(menus, resources,
 				ResourceHandler.joinPath("splash", "splash.jpg"), -1.78f, -1f,
 				2.3f, true);
 		menus.add(splash);
-		alert = new LWJGLAlertDialog(menus, resources,
-				"this is a very very long message to fill the alert!", -.73f,
-				1f, -.73f, -.4f, .8f);
-		confirmation = new LWJGLConfirmationDialog(menus, resources,
-				"Will you join the dark side?", "Yes master", "Never!", -.73f,
-				1f, -.73f, -.4f, .8f);
-		birdsong = new LWJGLBirdsong(resources, menus);
-		board = null;
 		messageOverlay = new LWJGLWaitingView(menus, "Waiting");
 		lobbyView = new LWJGLLobbyView(messageOverlay);
+		board = null;
 		graphics.start();
 	}
 
@@ -249,5 +253,7 @@ public class LWJGLViewController implements ViewController {
 	private LWJGLConfirmationDialog confirmation;
 	private LWJGLWaitingView messageOverlay;
 	private LWJGLLobbyView lobbyView;
+	private LWJGLTableSelection tableSelect;
+	private LWJGLDieSelection dieSelection;
 
 }

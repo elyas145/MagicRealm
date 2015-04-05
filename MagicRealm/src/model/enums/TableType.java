@@ -2,5 +2,9 @@
 package model.enums;
 
 public enum TableType {
-	PEER
+	PEER,
+	LOCATE,
+	PASSAGES,
+	PASSAGES_CLUES,
+	LOOT
 }

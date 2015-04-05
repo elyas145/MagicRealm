@@ -38,7 +38,7 @@ public class LWJGLBirdsong implements BirdsongView {
 	private static final Font PHASE_FONT = new Font("Times New Roman",
 			Font.PLAIN, 100);
 	
-	private static final Color PHASE_COLOR = Color.PINK;
+	private static final Color PHASE_COLOR = new Color(128, 0, 128);
 
 	public LWJGLBirdsong(ResourceHandler rh, LWJGLMenuLayer par) {
 		borderPane = LWJGLPanel.fromPicture(par, rh,
