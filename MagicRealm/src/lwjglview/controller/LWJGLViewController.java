@@ -34,8 +34,10 @@ import view.controller.ClearingSelectedListener;
 import view.controller.ViewController;
 import view.controller.birdsong.ActivitiesListener;
 import view.controller.characterselection.CharacterSelectionListener;
+import view.controller.cheatmode.DieSelectionListener;
 import view.controller.mainmenu.MenuItemListener;
 import view.controller.search.SearchView;
+import view.controller.search.TableSelectionListener;
 
 public class LWJGLViewController implements ViewController {
 
@@ -167,6 +169,16 @@ public class LWJGLViewController implements ViewController {
 			}
 			
 		});
+	}
+	
+	@Override
+	public void selectSearchTable(TableSelectionListener tsl) {
+		tableSelect.selectTable(tsl);
+	}
+
+	@Override
+	public void selectDie(DieSelectionListener dsl) {
+		dieSelection.selectDie(dsl);
 	}
 
 	@Override

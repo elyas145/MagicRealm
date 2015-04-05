@@ -10,8 +10,10 @@ import model.enums.CharacterType;
 import model.enums.TileName;
 import model.player.PersonalHistory;
 import view.controller.characterselection.CharacterSelectionListener;
+import view.controller.cheatmode.DieSelectionListener;
 import view.controller.mainmenu.MenuItemListener;
 import view.controller.search.SearchView;
+import view.controller.search.TableSelectionListener;
 
 public interface ViewController {
 	
@@ -37,6 +39,10 @@ public interface ViewController {
 	
 	void enterLobby();
 	void waitingForPlayers(int count);
+	
+	void selectSearchTable(TableSelectionListener tsl);
+	
+	void selectDie(DieSelectionListener dsl);
 	
 	void enterCharacterSelection(List<CharacterType> characters, CharacterSelectionListener onselect);
 	void disableCharacter(CharacterType character);
