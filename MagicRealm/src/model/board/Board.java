@@ -47,7 +47,7 @@ public class Board implements BoardInterface {
 	}
 
 	public Board(ResourceHandler rh) {
-		mapChitLocations = new HashMap<TileName, MapChit>();
+		mapChitLocations = new HashMap<MapChit, TileName>();
 		surround = new TileName[6];
 		tileLocations = new HashMap<TileName, int[]>();
 		mapOfTileLocations = new HashMap<Integer, Map<Integer, TileName>>();
@@ -117,10 +117,10 @@ public class Board implements BoardInterface {
 			counterPositions.put(type, new Clearing(sboard
 					.getCounterPositions().get(type)));
 		}
-		mapChitLocations = new HashMap<TileName, MapChit>();
-		for (TileName name : sboard.getMapChitLocations().keySet()) {
-			mapChitLocations.put(name, new MapChit(sboard.getMapChitLocations()
-					.get(name)));
+		mapChitLocations = new HashMap<MapChit, TileName>();
+		for (SerializedMapChit name : sboard.getMapChitLocations().keySet()) {
+			mapChitLocations.put(new MapChit(name),sboard.getMapChitLocations()
+					.get(name));
 		}
 		mapOfTileLocations = sboard.getMapOfTileLocations();
 		tileLocations = sboard.getTileLocations();
@@ -197,7 +197,7 @@ public class Board implements BoardInterface {
 	}
 
 	public void setLocationOfMapChit(MapChit mc, TileName tile) {
-		mapChitLocations.put(tile, mc);
+		mapChitLocations.put(mc, tile);
 		mc.setTile(tile);
 	}
 
@@ -325,12 +325,12 @@ public class Board implements BoardInterface {
 	private Map<Integer, Map<Integer, TileName>> mapOfTileLocations;
 	private Map<TileName, HexTile> mapOfTiles;
 	private Map<TileName, int[]> tileLocations;
-	private Map<TileName, MapChit> mapChitLocations;
-	public Map<TileName, MapChit> getMapChitLocations() {
+	private Map<MapChit, TileName> mapChitLocations;
+	public Map<MapChit, TileName> getMapChitLocations() {
 		return mapChitLocations;
 	}
 
-	public void setMapChitLocations(Map<TileName, MapChit> mapChitLocations) {
+	public void setMapChitLocations(Map<MapChit, TileName> mapChitLocations) {
 		this.mapChitLocations = mapChitLocations;
 	}
 
@@ -346,9 +346,9 @@ public class Board implements BoardInterface {
 		}
 		sboard.setMapOfTiles(sMapOfTiles);
 		sboard.setTileLocations(tileLocations);
-		Map<TileName, SerializedMapChit> sMapChits = new HashMap<TileName, SerializedMapChit>();
-		for (TileName name : mapChitLocations.keySet()) {
-			sMapChits.put(name, mapChitLocations.get(name).getSerializedChit());
+		Map<SerializedMapChit, TileName> sMapChits = new HashMap<SerializedMapChit, TileName>();
+		for (MapChit name : mapChitLocations.keySet()) {
+			sMapChits.put(name.getSerializedChit(), mapChitLocations.get(name));
 		}
 		sboard.setMapChitLocations(sMapChits);
 		Map<CounterType, SerializedClearing> sCounterPositions = new HashMap<CounterType, SerializedClearing>();

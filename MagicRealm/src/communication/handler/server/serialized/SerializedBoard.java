@@ -15,7 +15,7 @@ public class SerializedBoard implements Serializable {
 	private Map<Integer, Map<Integer, TileName>> mapOfTileLocations;
 	private Map<TileName, SerializedTile> sMapOfTiles = new HashMap<TileName, SerializedTile>();
 	private Map<TileName, int[]> tileLocations;
-	private Map<TileName, SerializedMapChit> mapChitLocations;
+	private Map<SerializedMapChit, TileName> mapChitLocations;
 	private Map<CounterType, SerializedClearing> counterPositions;
 
 	public Map<Integer, Map<Integer, TileName>> getMapOfTileLocations() {
@@ -30,7 +30,7 @@ public class SerializedBoard implements Serializable {
 		return tileLocations;
 	}
 
-	public Map<TileName, SerializedMapChit> getMapChitLocations() {
+	public Map<SerializedMapChit, TileName> getMapChitLocations() {
 		return mapChitLocations;
 	}
 
@@ -52,7 +52,7 @@ public class SerializedBoard implements Serializable {
 
 	}
 
-	public void setMapChitLocations(Map<TileName, SerializedMapChit> sMapChits) {
+	public void setMapChitLocations(Map<SerializedMapChit, TileName> sMapChits) {
 		this.mapChitLocations = sMapChits;
 
 	}

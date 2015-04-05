@@ -18,7 +18,9 @@ import communication.handler.client.SetSwordsmanPlay;
 import communication.handler.client.SubmitActivities;
 import communication.handler.server.serialized.SerializedBoard;
 import communication.handler.server.serialized.SerializedClearing;
+import communication.handler.server.serialized.SerializedMapChit;
 import communication.handler.server.serialized.SerializedTile;
+import config.GameConfiguration;
 import config.NetworkConfiguration;
 import lwjglview.controller.LWJGLViewController;
 import model.activity.Activity;
@@ -43,12 +45,14 @@ import model.enums.ValleyChit;
 import model.exceptions.MRException;
 import model.interfaces.ClearingInterface;
 import model.interfaces.HexTileInterface;
+import utils.random.Random;
 import utils.resources.ResourceHandler;
 import view.controller.BirdsongFinishedListener;
 import view.controller.BoardReadyListener;
 import view.controller.ClearingSelectedListener;
 import view.controller.ViewController;
 import view.controller.characterselection.CharacterSelectionListener;
+import view.controller.cheatmode.DieSelectionListener;
 import view.controller.game.BoardView;
 import view.controller.mainmenu.MenuItem;
 import view.controller.mainmenu.MenuItemListener;
@@ -445,15 +449,27 @@ public class ControllerMain implements ClientController {
 
 						break;
 					case HIDE:
-						try {
-							sem.acquire();
-						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+						if(!GameConfiguration.Cheat){
+							activitiesList.add(new Hide(characters.get(clientID)
+									.getType(), phases.get(i[0]).getType(), Random.dieRoll()));
+						}else{
+							mainView.selectDie(new DieSelectionListener(){
+								@Override
+								public void dieSelected(int val) {
+									activitiesList.add(new Hide(characters.get(clientID)
+											.getType(), phases.get(i[0]).getType(), val));	
+									sem.release();
+								}
+								
+							});
+							try {
+								sem.acquire();
+							} catch (InterruptedException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
 						}
-						activitiesList.add(new Hide(characters.get(clientID)
-								.getType(), phases.get(i[0]).getType()));
-						sem.release();
+						
 						break;
 					case SEARCH:
 						try {
@@ -553,8 +569,8 @@ public class ControllerMain implements ClientController {
 		waitForTiles();
 		this.board = new Board(board);
 		ArrayList<MapChit> chits = new ArrayList<MapChit>();
-		for (TileName name : board.getMapChitLocations().keySet()) {
-			chits.add(new MapChit(board.getMapChitLocations().get(name)));
+		for (SerializedMapChit name : board.getMapChitLocations().keySet()) {
+			chits.add(new MapChit(name));
 		}
 		synchronized (boardView) {
 			boardView.loadMapChits(chits);

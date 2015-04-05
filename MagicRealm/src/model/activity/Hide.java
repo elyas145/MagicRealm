@@ -10,19 +10,16 @@ import model.enums.CharacterType;
 import model.enums.PhaseType;
 
 public class Hide extends Activity implements Serializable{
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 8360233239299744462L;
-
-	public Hide(CharacterType actor, PhaseType type) {
+	private int rv = 0;
+	public Hide(CharacterType actor, PhaseType type, int rv) {
 		super(ActivityType.HIDE, actor, type);
+		this.rv = rv;
 	}
 
 	@Override
 	public void perform(ServerController controller) {
-		controller.hideCharacter(getActor());
+		controller.hideCharacter(getActor(), rv);
 	}
 
 }

@@ -311,15 +311,8 @@ public class ServerController {
 
 	}
 
-	public void hideCharacter(CharacterType actor) {
-		getPlayerOf(actor).send(new DiceRequest());
-		try {
-			playSync.acquire();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-
-		if (model.hideCharacter(currentDieRoll, getPlayerOf(actor).getPlayer())) {
+	public void hideCharacter(CharacterType actor, int rv) {		
+		if (model.hideCharacter(rv, getPlayerOf(actor).getPlayer())) {
 			sendAll(new UpdateHiding(actor, true));
 		} else {
 			getPlayerOf(actor).send(new MessageDisplay("Hide Failed."));
