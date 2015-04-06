@@ -170,4 +170,31 @@ public enum MapChitType {
 			return CounterType.NONE;
 		}
 	}
+	
+	public String toString(){
+		switch (this){
+		case HOWL: return "Howl";
+		case FLUTTER: return "Flutter";
+		case ROAR: return "Roar";
+		case PATTER: return "Patter";
+		case SLITHER: return "Slither";
+		case STINK: return "Stink";
+		case SMOKE: return "Smoke";
+		case RUINS: return "Ruins";
+		case DANK: return "Dank";
+		case BONES: return "Bones";
+		case STATUE: return "Statue";
+		case ALTAR: return "Altar";
+		case VAULT: return "Vault";
+		case POOL: return "Pool";
+		case HOARD: return "Hoard";
+		case LAIR: return "Lair";
+		case CAIRNS: return "Cairns";
+		case SHRINE: return "Shrine";
+		case LOST_CITY: return "Lost City";
+		case LOST_CASTLE: return "Lost Castle";
+		default:
+			return "None";
+		}
+	}
 }

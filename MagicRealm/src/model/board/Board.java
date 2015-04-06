@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -30,10 +31,12 @@ import model.EnchantedHolder;
 import model.board.clearing.Clearing;
 import model.board.tile.HexTile;
 import model.character.belonging.Treasure;
+import model.counter.chit.LostSite;
 import model.counter.chit.MapChit;
 import model.enums.CharacterType;
 import model.enums.CounterType;
 import model.enums.LandType;
+import model.enums.MapChitType;
 import model.enums.TileName;
 import model.enums.ValleyChit;
 import model.interfaces.BoardInterface;
@@ -47,7 +50,7 @@ public class Board implements BoardInterface {
 	}
 
 	public Board(ResourceHandler rh) {
-		mapChitLocations = new HashMap<MapChit, TileName>();
+		mapChitLocations = new ConcurrentHashMap<MapChit, TileName>();
 		surround = new TileName[6];
 		tileLocations = new HashMap<TileName, int[]>();
 		mapOfTileLocations = new HashMap<Integer, Map<Integer, TileName>>();
@@ -117,7 +120,7 @@ public class Board implements BoardInterface {
 			counterPositions.put(type, new Clearing(sboard
 					.getCounterPositions().get(type)));
 		}
-		mapChitLocations = new HashMap<MapChit, TileName>();
+		mapChitLocations = new ConcurrentHashMap<MapChit, TileName>();
 		for (SerializedMapChit name : sboard.getMapChitLocations().keySet()) {
 			mapChitLocations.put(new MapChit(name),sboard.getMapChitLocations()
 					.get(name));
@@ -340,7 +343,7 @@ public class Board implements BoardInterface {
 	public SerializedBoard getSerializedBoard() {
 		SerializedBoard sboard = new SerializedBoard();
 		sboard.setMapOfTileLocations(mapOfTileLocations);
-		Map<TileName, SerializedTile> sMapOfTiles = new HashMap<TileName, SerializedTile>();
+		Map<TileName, SerializedTile> sMapOfTiles = new ConcurrentHashMap<TileName, SerializedTile>();
 		for (TileName name : mapOfTiles.keySet()) {
 			sMapOfTiles.put(name, mapOfTiles.get(name).getSerializedTile());
 		}
@@ -366,6 +369,39 @@ public class Board implements BoardInterface {
 			Clearing c = counterPositions.get(ct);
 			if(c.getClearingNumber() == clearing && c.getParentTile().getName() == tile){
 				return ct;
+			}
+		}
+		return null;
+	}
+
+	public void removeMapChit(MapChit site) {
+		mapChitLocations.remove(site);
+		
+	}
+
+	public void removeMapChit(MapChitType type) {
+		for(MapChit c : mapChitLocations.keySet()){
+			if(c.getType() == type){
+				mapChitLocations.remove(c);
+			}
+		}
+		
+	}
+
+	public TileName getMapChitTile(MapChitType type) {
+		for(MapChit c : mapChitLocations.keySet()){
+			if(c.getType() == type){
+				return mapChitLocations.get(c);
+			}
+		}
+		return null;
+		
+	}
+
+	public MapChit getMapChit(MapChitType type) {
+		for(MapChit c : mapChitLocations.keySet()){
+			if(c.getType() == type){
+				return c;
 			}
 		}
 		return null;

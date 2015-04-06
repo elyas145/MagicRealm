@@ -282,7 +282,7 @@ public class HexTile implements HexTileInterface {
 			connect(1, 3, true, n);
 			connect(1, 4, false, h);
 			connect(1, 4, true, n);
-			connect(1, 6, true, n);
+			connect(1, 6, false, n);
 			connect(2, 3, false, n);
 			connect(2, 5, true, n);
 			connect(2, 6, true, n);

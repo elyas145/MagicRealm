@@ -80,10 +80,10 @@ public class MapChit extends Chit implements Serializable, Comparable<MapChit> {
 	public String toString() {
 		String str = "";
 		if (this.type != null) {
-			str += type.type().toString() + ": ";
-			str += this.type.toString() + ". ";
-			str += this.identifier + ", ";
-			str += super.toString();
+			str += type.type() + ": ";
+			str += this.type.type().toString() + ": ";
+			//str += this.identifier + ": ";
+			//str += super.toString();
 		}
 		return str;
 	}
@@ -110,5 +110,8 @@ public class MapChit extends Chit implements Serializable, Comparable<MapChit> {
 			return identifier - other.identifier;
 		}
 		return mine - theirs;
+	}
+	public boolean equals(MapChit other){
+		return (this.identifier == other.identifier && this.type == other.type);
 	}
 }

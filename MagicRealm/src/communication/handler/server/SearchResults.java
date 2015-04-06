@@ -10,43 +10,52 @@ import client.ClientController;
 import communication.ClientNetworkHandler;
 
 public class SearchResults implements ClientNetworkHandler {
-	ArrayList<MapChit> peek;
-	Map<ClearingInterface, ClearingInterface> discoveredPaths;
-	SearchType type;
-
-	public SearchResults(SearchType type, ArrayList<MapChit> peek) {
+	private static final long serialVersionUID = -3006294261338995592L;
+	private ArrayList<MapChit> peek;
+	private ArrayList<String> discoveredPaths;
+	private SearchType type;
+	private boolean city = false;
+	private boolean castle = false;
+	public SearchResults(SearchType type, ArrayList<MapChit> peek, ArrayList<String> discoveredPaths) {
 		this.peek = peek;
 		this.type = type;
+		this.discoveredPaths = discoveredPaths;
 	}
 
 	public SearchResults(SearchType type) {
 		this.type = type;
 	}
 
-	public SearchResults(SearchType type,
-			Map<ClearingInterface, ClearingInterface> discoveredPaths) {
-		this.type = type;
-		this.discoveredPaths = discoveredPaths;
-	}
 
 	public SearchResults(SearchType type, ArrayList<MapChit> peek,
-			Map<ClearingInterface, ClearingInterface> paths) {
+			Object object, boolean castle, boolean city) {
 		this.type = type;
+		this.setCastle(castle);
+		this.setCity(city);
 		this.peek = peek;
-		this.discoveredPaths = paths;
 	}
 
 	@Override
 	public void handle(ClientController controller) {
 		switch(type){
 		case CLUES:
-			controller.displayFinishedSearch(type, peek);
+			controller.peekMapChits(peek);
 			break;
 		case PATHS:
-			controller.displayFinishedSearch(type, discoveredPaths);
+			controller.DiscoverPaths(discoveredPaths);
 			break;
 		case CLUES_PATHS:
-			controller.displayFinishedSearch(type, discoveredPaths, peek);
+			controller.DiscoverPaths(discoveredPaths);
+			controller.peekMapChits(peek);
+			break;
+		case PASSAGES_CLUES:
+			controller.peekMapChits(peek);
+			controller.DiscoverPaths(discoveredPaths);
+			break;
+		case PASSAGES:
+			controller.DiscoverPaths(discoveredPaths);
+		case DISCOVER_CHITS:
+			controller.discoverChits(peek);
 		default:
 			return;
 		}
@@ -64,11 +73,27 @@ public class SearchResults implements ClientNetworkHandler {
 			return null;
 	}
 
-	public Map<ClearingInterface, ClearingInterface> getPaths() {
+	public ArrayList<String> getPaths() {
 		if (type == SearchType.PATHS)
 			return discoveredPaths;
 		else
 			return null;
+	}
+
+	public boolean isCity() {
+		return city;
+	}
+
+	public void setCity(boolean city) {
+		this.city = city;
+	}
+
+	public boolean isCastle() {
+		return castle;
+	}
+
+	public void setCastle(boolean castle) {
+		this.castle = castle;
 	}
 
 }

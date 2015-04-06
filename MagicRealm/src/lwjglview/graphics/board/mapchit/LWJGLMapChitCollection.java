@@ -74,9 +74,17 @@ public class LWJGLMapChitCollection extends LWJGLDrawableNode {
 	}
 
 	public void replace(MapChit chit, Iterable<MapChit> replacements) {
-		get(chit).setVisible(false);
+		for(MapChit m : mapChits.keySet()){
+			if(chit.equals(m)){
+				get(m).setVisible(false);
+			}
+		}		
 		for (MapChit mc : replacements) {
-			get(mc).setVisible(true);
+			for(MapChit uc : mapChits.keySet()){
+				if(mc.equals(uc)){
+					get(uc).setVisible(true);
+				}
+			}
 		}
 	}
 
