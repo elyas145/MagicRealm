@@ -382,7 +382,7 @@ public class LWJGLBoardDrawable extends LWJGLCounterLocator implements BoardView
 		// reset the view matrix
 		lwgfx.resetViewMatrix();
 		float time = Timing.getSeconds() * .1f;
-		bufferA.rotateX(Mathf.PI / 4f);
+		bufferA.rotateX(Mathf.PI / 6f);
 		float k = (Mathf.sin(time * .6f) + 6f) / 10f;
 		bufferB.translate(0f, -1f * k, 1f * k);
 		bufferB.multiply(bufferA, bufferA);

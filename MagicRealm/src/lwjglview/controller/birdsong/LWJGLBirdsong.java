@@ -64,8 +64,8 @@ public class LWJGLBirdsong implements BirdsongView {
 					}
 					acts.add(add);
 				}
-				madeChoice.onActivitiesChosen(acts);
 				setVisible(false);
+				madeChoice.onActivitiesChosen(acts);
 			}
 
 		});
