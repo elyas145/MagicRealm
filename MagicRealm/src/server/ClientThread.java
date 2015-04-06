@@ -5,6 +5,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import model.enums.CharacterType;
 import model.enums.CounterType;
@@ -27,7 +30,6 @@ public class ClientThread extends Thread {
 	private boolean playedTurn;
 	private int mountainMoveCount = 0;
 	private Clearing mountainClearing = null;
-	
 	public ClientThread(Server server, Socket socket) {
 		super();
 		this.server = server;

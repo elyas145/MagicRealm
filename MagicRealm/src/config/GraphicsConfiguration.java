@@ -24,7 +24,7 @@ public class GraphicsConfiguration {
 	public static final int IMAGE_SCALE_WIDTH = 512;
 	public static final int IMAGE_SCALE_HEIGHT = 512;
 	
-	public static final float CHIT_SCALE = .1f;
+	public static final float CHIT_SCALE = .14f;
 	public static final float CHIT_HOVER = CHIT_SCALE * .2f;
 	
 	public static final float CHIT_SPACING = CHIT_SCALE * .2f;

@@ -8,6 +8,7 @@ import java.util.Map;
 
 import communication.ClientNetworkHandler;
 import communication.handler.server.serialized.SerializedBoard;
+import communication.handler.server.serialized.SerializedMapChit;
 import view.controller.game.BoardView;
 import lwjglview.graphics.board.LWJGLBoardDrawable;
 import model.activity.Activity;
@@ -17,6 +18,7 @@ import model.controller.requests.DieRequest;
 import model.counter.chit.MapChit;
 import model.enums.CharacterType;
 import model.enums.CounterType;
+import model.enums.MapChitType;
 import model.enums.SearchType;
 import model.enums.TableType;
 import model.enums.TileName;
@@ -84,15 +86,14 @@ public interface ClientController {
 
 	void requestSearchInformation();
 
-	void displayFinishedSearch(SearchType type, ArrayList<MapChit> peek);
-
-	void displayFinishedSearch(SearchType type,
-			Map<ClearingInterface, ClearingInterface> discoveredPaths);
-
-	void displayFinishedSearch(SearchType type,
-			Map<ClearingInterface, ClearingInterface> discoveredPaths,
-			ArrayList<MapChit> peek);
+	void peekMapChits(ArrayList<MapChit> peek);
+	void DiscoverPaths(ArrayList<String> paths);
+	
 
 	void requestSearchChoice(TableType table);
+
+	void discoverChits(ArrayList<MapChit> peek);
+
+	void updateMapChits(MapChitType type, ArrayList<SerializedMapChit> mapChits);
 
 }

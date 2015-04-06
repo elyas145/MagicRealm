@@ -10,12 +10,7 @@ import model.enums.CharacterType;
 import model.enums.PhaseType;
 
 public class Search extends Activity implements Serializable{
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -2839219458392754433L;
-
 	public Search(CharacterType actor, PhaseType type) {
 		super(ActivityType.SEARCH, actor, type);
 	}

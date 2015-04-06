@@ -36,7 +36,9 @@ import model.controller.requests.DieRequest;
 import model.counter.chit.MapChit;
 import model.enums.ActivityType;
 import model.enums.CharacterType;
+import model.enums.ChitType;
 import model.enums.CounterType;
+import model.enums.MapChitType;
 import model.enums.PhaseType;
 import model.enums.SearchType;
 import model.enums.TableType;
@@ -56,6 +58,7 @@ import view.controller.cheatmode.DieSelectionListener;
 import view.controller.game.BoardView;
 import view.controller.mainmenu.MenuItem;
 import view.controller.mainmenu.MenuItemListener;
+import view.controller.search.TableSelectionListener;
 
 public class ControllerMain implements ClientController {
 
@@ -67,7 +70,7 @@ public class ControllerMain implements ClientController {
 	private int clientID = -1;
 	private ClientServer server;
 	private int sleepTime = 2000;
-
+	private ArrayList<MapChit> discoveredChits;
 	private MenuItemListener mainMenuListener;
 
 	public ControllerMain() {
@@ -478,15 +481,8 @@ public class ControllerMain implements ClientController {
 
 						break;
 					case SEARCH:
-						try {
-							sem.acquire();
-						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
 						activitiesList.add(new Search(characters.get(clientID)
 								.getType(), phases.get(i[0]).getType()));
-						sem.release();
 						break;
 					default:
 						break;
@@ -649,38 +645,48 @@ public class ControllerMain implements ClientController {
 
 	}
 
+	private TableType selectedTable;
+
 	@Override
 	public void requestSearchInformation() {
-		// TODO ServerNetworkHandler toSend = mainView.getSearchCriteria();
-		ServerNetworkHandler toSend = new SearchCriteria(getCharacter()
-				.getType(), TableType.PEER, 2);
-		server.send(toSend);
-	}
-
-	private Character getCharacter() {
-
-		return characters.get(clientID);
-	}
-
-	@Override
-	public void displayFinishedSearch(SearchType type, ArrayList<MapChit> peek) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void displayFinishedSearch(SearchType type,
-			Map<ClearingInterface, ClearingInterface> discoveredPaths) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void displayFinishedSearch(SearchType type,
-			Map<ClearingInterface, ClearingInterface> discoveredPaths,
-			ArrayList<MapChit> peek) {
-		// TODO Auto-generated method stub
-
+		final int rollValue[] = new int[1];
+		final Semaphore sem = new Semaphore(0);
+		mainView.selectSearchTable(new TableSelectionListener() {
+			@Override
+			public void onSelect(final TableType table) {
+				selectedTable = table;
+				if (true) {// GameConfiguration.Cheat){
+					final Semaphore sem2 = new Semaphore(0);
+					mainView.selectDie(new DieSelectionListener() {
+						@Override
+						public void dieSelected(int val) {
+							rollValue[0] = val;
+							sem2.release();
+						}
+					});
+					try {
+						sem2.acquire();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				} else {
+					rollValue[0] = Random.dieRoll();
+				}
+				if (rollValue[0] == 1) {
+					Semaphore sem3 = new Semaphore(0);
+					// ask for row.
+					rollValue[0] = 2;
+				}
+				sem.release();
+			}
+		});
+		try {
+			sem.acquire();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		server.send(new SearchCriteria(characters.get(clientID).getType(),
+				selectedTable, rollValue[0]));
 	}
 
 	@Override
@@ -688,6 +694,47 @@ public class ControllerMain implements ClientController {
 		// TODO mainView.searchChoice();
 		server.send(new SearchCriteria(characters.get(clientID).getType(),
 				table, 2));
+	}
+
+	@Override
+	public void peekMapChits(ArrayList<MapChit> peek) {
+		mainView.displayMessage("peeking at map chits.");
+	}
+
+	@Override
+	public void DiscoverPaths(ArrayList<String> paths) {
+		mainView.displayMessage("found paths!");
+	}
+
+	@Override
+	public void discoverChits(ArrayList<MapChit> chits) {
+		mainView.displayMessage("recieved object.");
+		for (MapChit c : chits) {
+			if (c.getType().type() == ChitType.SITE) {
+				// show in discoveries.
+			}
+			if (c.getType().type() == ChitType.LOST_CASTLE) {
+
+			} else if (c.getType().type() == ChitType.LOST_CITY) {
+
+			}
+		}
+
+	}
+
+	@Override
+	public void updateMapChits(MapChitType type,
+			ArrayList<SerializedMapChit> smapChits) {
+		ArrayList<MapChit> mapChits = new ArrayList<MapChit>();
+		for (SerializedMapChit c : smapChits) {
+			MapChit cm = new MapChit(c); 
+			mapChits.add(cm);
+			board.setLocationOfMapChit(cm, cm.getTile());
+		}
+		boardView.replaceMapChit(board.getMapChit(type), mapChits);
+		synchronized (board) {
+			board.removeMapChit(type);
+		}
 	}
 
 }

@@ -15,6 +15,7 @@ import java.util.concurrent.Semaphore;
 import model.activity.Activity;
 import model.activity.Move;
 import model.controller.ModelController;
+import model.counter.chit.MapChit;
 import model.enums.ActivityType;
 import model.enums.CharacterType;
 import model.enums.CounterType;
@@ -42,7 +43,9 @@ import communication.handler.server.StartGame;
 import communication.handler.server.UpdateCharacterSelection;
 import communication.handler.server.UpdateLobbyCount;
 import communication.handler.server.UpdateLocationOfCharacter;
+import communication.handler.server.UpdateMapChits;
 import communication.handler.server.serialized.SerializedBoard;
+import communication.handler.server.serialized.SerializedMapChit;
 import model.character.Character;
 import server.ClientThread;
 import utils.resources.ResourceHandler;
@@ -356,6 +359,28 @@ public class ServerController {
 		// do the search activity with the player
 		ClientThread ct = getPlayerOf(car);
 		SearchResults res = model.performSearch(ct.getPlayer(), tbl, rv);
+		if(res.isCastle()){
+			model.getBoard().removeMapChit(model.getCastle());
+			for(MapChit c : model.getCastle().getWarningAndSite()){
+				model.getBoard().setLocationOfMapChit(c, model.getCastle().getTile());
+			}
+			ArrayList<SerializedMapChit> smapchits = new ArrayList<SerializedMapChit>();
+			for(MapChit c : model.getCastle().getWarningAndSite()){
+				smapchits.add(c.getSerializedChit());
+			}
+			sendAll(new UpdateMapChits(MapChitType.LOST_CASTLE, smapchits));
+		}
+		if(res.isCity()){
+			model.getBoard().removeMapChit(model.getCity());
+			for(MapChit c : model.getCity().getWarningAndSite()){
+				model.getBoard().setLocationOfMapChit(c, model.getCity().getTile());
+			}
+			ArrayList<SerializedMapChit> smapchits = new ArrayList<SerializedMapChit>();
+			for(MapChit c : model.getCity().getWarningAndSite()){
+				smapchits.add(c.getSerializedChit());
+			}
+			sendAll(new UpdateMapChits(MapChitType.LOST_CITY, smapchits));
+		}
 		getPlayerOf(car).send(res);
 		playSync.release();
 	}
