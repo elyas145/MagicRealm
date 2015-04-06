@@ -722,19 +722,21 @@ public class ModelController {
 		switch (site) {
 		case LOST_CASTLE:
 			lostCastle = new LostSite(MapChitType.LOST_CASTLE);
-			lostCastle.setWarningAndSite(mcArray);
-			lostCastle.setClearing(MapChitType.LOST_CASTLE.getClearing());
 			lostCastle.setTile(tile);
+			lostCastle.setWarningAndSite(mcArray);			
+			lostCastle.setClearing(MapChitType.LOST_CASTLE.getClearing());			
 			board.setLocationOfMapChit(lostCastle, tile);
+			board.addChitsToLoad(lostCastle.getWarningAndSite());
 			mapChits.add(lostCastle);
 			break;
 		case LOST_CITY:
 			lostCity = new LostSite(MapChitType.LOST_CITY);
-			lostCity.setWarningAndSite(mcArray);
-			lostCity.setClearing(MapChitType.LOST_CITY.getClearing());
 			lostCity.setTile(tile);
+			lostCity.setWarningAndSite(mcArray);			
+			lostCity.setClearing(MapChitType.LOST_CITY.getClearing());			
 			board.setLocationOfMapChit(lostCity, tile);
 			mapChits.add(lostCity);
+			board.addChitsToLoad(lostCity.getWarningAndSite());
 			break;
 		default:
 			break;
