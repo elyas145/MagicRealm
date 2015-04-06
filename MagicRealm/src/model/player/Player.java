@@ -21,9 +21,10 @@ public class Player {
 	private Character character;
 	private PersonalHistory historyPad;
 	private Map<ClearingInterface, EnchantedHolder<Set<ClearingInterface>>> discoveredPaths;
-	private Set<MapChit> discoveredChits;
+	private ArrayList<MapChit> discoveredChits;
 	private boolean sunlightFlag = false;
-
+	private int gold = 0;
+	
 	public Player(int num, String nm) {
 		number = num;
 		name = nm;
@@ -31,7 +32,7 @@ public class Player {
 		historyPad = new PersonalHistory();
 
 		discoveredPaths = new HashMap<ClearingInterface, EnchantedHolder<Set<ClearingInterface>>>();
-		discoveredChits = new HashSet<MapChit>();
+		discoveredChits = new ArrayList<MapChit>();
 	}
 
 	public void setCharacter(Character c) {
@@ -101,6 +102,28 @@ public class Player {
 	}
 	public void setSunlightFlag(boolean b){
 		sunlightFlag = b;
+	}
+
+	public int getGold() {
+		return gold;
+	}
+
+	public void addGold(int gold) {
+		this.gold += gold;
+	}
+
+	public void addDiscoveredMapChit(MapChit chit) {
+		discoveredChits.add(chit);
+		
+	}
+
+	public boolean hasDiscoveredSite(MapChit c) {
+		for(MapChit mc : discoveredChits){
+			if(mc.equals(c)){
+				return true;
+			}
+		}
+		return false;
 	}
 
 }

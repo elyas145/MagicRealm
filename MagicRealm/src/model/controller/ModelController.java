@@ -56,7 +56,6 @@ public class ModelController {
 	private Map<MapChitType, ArrayList<Treasure>> treasures;
 	private boolean discoveredCastle = false;
 	private boolean discoveredCity = false;
-
 	private static final RuntimeException noPlayersException = new RuntimeException(
 			"There are no players in the queue");
 
@@ -444,10 +443,23 @@ public class ModelController {
 			return peerTableSearch(player, rollValue);
 		case LOCATE:
 			return locateTableSearch(player, rollValue);
+		case LOOT:
+			return lootSearch(player, rollValue);
 		default:
 			break;
 		}
 		return null;
+	}
+
+	private SearchResults lootSearch(Player player, int rollValue) {
+		TileName myTile = board.getLocationOfCounter(player.getCharacter().getType().toCounter()).getParentTile().getName();
+		int myClearing = board.getLocationOfCounter(player.getCharacter().getType().toCounter()).getClearingNumber();
+		for(MapChit c : board.getMapChitLocations().keySet()){
+			if((c.getTile() == myTile) && (c.getClearing() == myClearing) && (c.getType().type() == ChitType.SITE) && (player.hasDiscoveredSite(c))){
+				return new SearchResults(SearchType.LOOT, GameConfiguration.MAX_TREASURE_VALUE / rollValue, c.getType());
+			}
+		}
+		return new SearchResults(SearchType.NONE);
 	}
 
 	private SearchResults locateTableSearch(Player player, int rollValue) {
@@ -706,6 +718,9 @@ public class ModelController {
 			for (MapChit c : lostCastle.getWarningAndSite()) {
 				smapchits.add(c.getSerializedChit());
 			}
+			break;
+			default:
+				break;
 		}
 		return smapchits;
 	}
@@ -741,6 +756,5 @@ public class ModelController {
 		default:
 			break;
 		}
-
 	}
 }

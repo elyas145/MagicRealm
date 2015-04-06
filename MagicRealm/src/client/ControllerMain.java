@@ -73,7 +73,6 @@ public class ControllerMain implements ClientController {
 	private int sleepTime = 2000;
 	private ArrayList<MapChit> discoveredChits;
 	private MenuItemListener mainMenuListener;
-
 	public ControllerMain() {
 		rh = new ResourceHandler();
 		mainView = new LWJGLViewController(rh, new JogAmpSoundController());
@@ -647,6 +646,7 @@ public class ControllerMain implements ClientController {
 	}
 
 	private TableType selectedTable;
+	private int goldValue;
 
 	@Override
 	public void requestSearchInformation() {
@@ -744,6 +744,12 @@ public class ControllerMain implements ClientController {
 			server.send(new UpdateMapChitsRequest(type));
 		}
 
+	}
+
+	@Override
+	public void addGold(int goldValue, MapChitType site) {
+		this.goldValue += goldValue;
+		mainView.displayMessage("You looted " + site + "! gold: " + this.goldValue);
 	}
 
 }

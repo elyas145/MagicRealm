@@ -17,6 +17,8 @@ public class SearchResults implements ClientNetworkHandler {
 	private SearchType type;
 	private boolean city = false;
 	private boolean castle = false;
+	private int goldValue = 0;
+	private MapChitType site;
 	public SearchResults(SearchType type, ArrayList<MapChit> peek, ArrayList<String> discoveredPaths) {
 		this.peek = peek;
 		this.type = type;
@@ -34,6 +36,12 @@ public class SearchResults implements ClientNetworkHandler {
 		this.setCastle(castle);
 		this.setCity(city);
 		this.peek = peek;
+	}
+
+	public SearchResults(SearchType loot, int goldValue, MapChitType site) {
+		this.type = loot;
+		this.goldValue = goldValue;
+		this.site = site;		
 	}
 
 	@Override
@@ -56,8 +64,13 @@ public class SearchResults implements ClientNetworkHandler {
 			break;
 		case PASSAGES:
 			controller.DiscoverPaths(discoveredPaths);
+			break;
 		case DISCOVER_CHITS:
 			controller.discoverChits(peek);
+			break;
+		case LOOT:
+			controller.addGold(goldValue, site);
+			break;
 		default:
 			return;
 		}
