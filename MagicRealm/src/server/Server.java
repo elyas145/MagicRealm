@@ -3,6 +3,7 @@ package server;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -124,24 +125,24 @@ public class Server implements Runnable {
 		controller.remove(ID);
 	}
 
-	public void addTreasure(MapChitType site, TileName tile, Integer value) {
+	public void addSite(MapChitType site, TileName tile) {
 		if (controller == null) {
 			System.out.println("Server controller not initialized.");
 			return;
 		}
-		controller.addTreasure(site, tile, value);
+		controller.addSite(site, tile);
 	}
 
 	public void doneSettingCheatMode() {
 		ready = true;
 	}
 
-	public void addSound(MapChitType sound, TileName tile, Integer clearing) {
+	public void addSound(MapChitType sound, TileName tile) {
 		if (controller == null) {
 			System.out.println("Server controller not initialized.");
 			return;
 		}
-		controller.addSound(sound, tile, clearing);
+		controller.addSound(sound, tile);
 	}
 
 	public void addWarning(MapChitType type, TileName tile) {
@@ -150,5 +151,10 @@ public class Server implements Runnable {
 			return;
 		}
 		controller.addWarning(type, tile);
+	}
+
+	public void setLost(MapChitType lostCity,
+			ArrayList<MapChitType> soundAndSiteArray, TileName tile) {
+		controller.setLost(lostCity, soundAndSiteArray, tile);
 	}
 }

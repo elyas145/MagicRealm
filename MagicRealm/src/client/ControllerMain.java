@@ -16,6 +16,7 @@ import communication.handler.client.DieRoll;
 import communication.handler.client.SearchCriteria;
 import communication.handler.client.SetSwordsmanPlay;
 import communication.handler.client.SubmitActivities;
+import communication.handler.client.UpdateMapChitsRequest;
 import communication.handler.server.serialized.SerializedBoard;
 import communication.handler.server.serialized.SerializedClearing;
 import communication.handler.server.serialized.SerializedMapChit;
@@ -575,7 +576,7 @@ public class ControllerMain implements ClientController {
 			chits.add(new MapChit(name));
 		}
 		synchronized (boardView) {
-			boardView.loadMapChits(chits);
+			boardView.loadMapChits(this.board.getMapChitsToLoad());
 			for (CounterType t : board.getCounterPositions().keySet()) {
 				boardView.setCounter(t, board.getCounterPositions().get(t)
 						.getParent(), board.getCounterPositions().get(t)
@@ -727,14 +728,22 @@ public class ControllerMain implements ClientController {
 			ArrayList<SerializedMapChit> smapChits) {
 		ArrayList<MapChit> mapChits = new ArrayList<MapChit>();
 		for (SerializedMapChit c : smapChits) {
-			MapChit cm = new MapChit(c); 
+			MapChit cm = new MapChit(c);
+			cm.setTile(board.getMapChitTile(type));
 			mapChits.add(cm);
 			board.setLocationOfMapChit(cm, cm.getTile());
 		}
 		boardView.replaceMapChit(board.getMapChit(type), mapChits);
-		synchronized (board) {
-			board.removeMapChit(type);
+		board.removeMapChit(type);
+	}
+
+	@Override
+	public void clueLost(MapChitType type) {
+		if (mainView.confirm("You have discovered " + type
+				+ ". wanna switch for its chits?", "yes", "no")) {
+			server.send(new UpdateMapChitsRequest(type));
 		}
+
 	}
 
 }

@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import communication.handler.server.SearchResults;
+import communication.handler.server.serialized.SerializedMapChit;
 import config.BoardConfiguration;
 import config.GameConfiguration;
 import utils.random.Random;
@@ -69,11 +70,7 @@ public class ModelController {
 		}
 
 		mapChits = new HashSet<MapChit>();
-		for (MapChitType type : MapChitType.WARNINGS) {
-			mapChits.add(new MapChit(type, 'C'));
-			mapChits.add(new MapChit(type, 'W'));
-			mapChits.add(new MapChit(type, 'M'));
-		}
+		
 
 		treasures = new HashMap<MapChitType, ArrayList<Treasure>>();
 
@@ -152,9 +149,7 @@ public class ModelController {
 	public Board setBoard() {
 		if (board == null) {
 			board = new Board(rh);
-			if (!GameConfiguration.Cheat) {
-				setDwellingLocations();
-			}
+			setDwellingLocations();
 		}
 		return board;
 	}
@@ -167,7 +162,6 @@ public class ModelController {
 		if (!GameConfiguration.Cheat) {
 			setUpSoundAndSite();
 			setUpWarning();
-
 		}
 	}
 
@@ -290,6 +284,11 @@ public class ModelController {
 	}
 
 	private void setUpWarning() {
+		for (MapChitType type : MapChitType.WARNINGS) {
+			mapChits.add(new MapChit(type, 'C'));
+			mapChits.add(new MapChit(type, 'W'));
+			mapChits.add(new MapChit(type, 'M'));
+		}
 		ArrayList<MapChit> cave = new ArrayList<MapChit>();
 		ArrayList<MapChit> woods = new ArrayList<MapChit>();
 		ArrayList<MapChit> mountain = new ArrayList<MapChit>();
@@ -417,12 +416,20 @@ public class ModelController {
 		ArrayList<MapChit> lostCastleChits = new ArrayList<MapChit>();
 		for (int i = 0; i < 5; i++) {
 			// add 5 chits to lost city.
-			lostCityChits.add(Random.remove(chits));
+			MapChit c = Random.remove(chits);
+			c.setTile(lostCity.getTile());
+			lostCityChits.add(c);
 			// add 5 chits to lost castle.
-			lostCastleChits.add(Random.remove(chits));
+			MapChit d = Random.remove(chits);
+			d.setTile(lostCastle.getTile());
+			lostCastleChits.add(d);
 		}
 		lostCastle.setWarningAndSite(lostCastleChits);
 		lostCity.setWarningAndSite(lostCityChits);
+		mapChits.add(lostCastle);
+		mapChits.add(lostCity);
+		board.addChitsToLoad(lostCastle.getWarningAndSite());
+		board.addChitsToLoad(lostCity.getWarningAndSite());
 	}
 
 	public Iterable<MapChit> getMapChits() {
@@ -464,15 +471,18 @@ public class ModelController {
 		boolean city = false;
 		for (MapChit chit : mapChits) {
 			System.out.println("Current map chit: " + chit);
-			if (chit.getTile() == board
+			if ((chit.getTile() == board
 					.getLocationOfCounter(
 							player.getCharacter().getType().toCounter())
-					.getParentTile().getName()) {
-				System.out.println("this chit is on my tile.");
-				if(chit.getType() == MapChitType.LOST_CITY){
+					.getParentTile().getName())
+					&& (chit.getClearing() == board.getLocationOfCounter(
+							player.getCharacter().getType().toCounter())
+							.getClearingNumber())) {
+				System.out.println("this chit is on my clearing.");
+				if (chit.getType() == MapChitType.LOST_CITY) {
 					System.out.println("this chit is lost city");
 					city = true;
-				}else if(chit.getType() == MapChitType.LOST_CASTLE){
+				} else if (chit.getType() == MapChitType.LOST_CASTLE) {
 					System.out.println("this chit is lost castle");
 					castle = true;
 				}
@@ -483,25 +493,27 @@ public class ModelController {
 						System.out.println("lost city discovered");
 						peek.add(chit);
 					}
-				}else if(lostCastle.getWarningAndSite().contains(chit)){
+				} else if (lostCastle.getWarningAndSite().contains(chit)) {
 					System.out.println("this chit is inside lost castle.");
 					castle = true;
-					if(discoveredCastle){
+					if (discoveredCastle) {
 						System.out.println("lost castle discovered");
 						peek.add(chit);
 					}
-				}else{
-					System.out.println("this chit has nothing to do with lost city nd lost castle.");
+				} else {
+					System.out
+							.println("this chit has nothing to do with lost city nd lost castle.");
 					peek.add(chit);
 				}
 			}
 		}
 		player.discoverAllMapChits(peek);
-		if(castle)
+		if (castle)
 			discoveredCastle = true;
-		if(city)
+		if (city)
 			discoveredCity = true;
-		return new SearchResults(SearchType.DISCOVER_CHITS, peek, null, castle, city);
+		return new SearchResults(SearchType.DISCOVER_CHITS, peek, null, castle,
+				city);
 	}
 
 	private SearchResults searchPassages(Player player) {
@@ -560,11 +572,18 @@ public class ModelController {
 		// there.
 		// TODO clearing type affects peer (mountain can see adjacent tiles)
 		ArrayList<MapChit> peek = new ArrayList<MapChit>();
+		boolean city = false;
+		boolean castle = false;
 		for (MapChit chit : mapChits) {
 			if (chit.getTile() == board
 					.getLocationOfCounter(
 							player.getCharacter().getType().toCounter())
 					.getParentTile().getName()) {
+				if (chit.getType() == MapChitType.LOST_CASTLE) {
+					castle = true;
+				} else if (chit.getType() == MapChitType.LOST_CITY) {
+					city = true;
+				}
 				if (lostCity.getWarningAndSite().contains(chit)) {
 					if (discoveredCity) {
 						peek.add(chit);
@@ -572,18 +591,18 @@ public class ModelController {
 				} else {
 					peek.add(chit);
 				}
-				
-				if(lostCastle.getWarningAndSite().contains(chit)){
-					if(discoveredCastle){
+
+				if (lostCastle.getWarningAndSite().contains(chit)) {
+					if (discoveredCastle) {
 						peek.add(chit);
 					}
-				}else{
+				} else {
 					peek.add(chit);
 				}
 			}
 		}
 
-		return new SearchResults(SearchType.CLUES, peek, null);
+		return new SearchResults(SearchType.CLUES, peek, null, castle, city);
 	}
 
 	private SearchResults peerP(Player player) { // peer paths
@@ -611,22 +630,17 @@ public class ModelController {
 	 * }
 	 */
 
-	public void addTreasure(MapChitType site, TileName tile, int value) {
+	public void addSite(MapChitType site, TileName tile) {
 		board.setLocationOfMapChit(new MapChit(site), tile);
-		if (treasures.get(site) == null) {
-			treasures.put(site, new ArrayList<Treasure>());
-		}
-		treasures.get(site).add(new Treasure(value));
-		System.out.println("added treasure with value: " + value + " at "
-				+ site + " " + tile);
+		mapChits.add(new MapChit(site, site.getClearing(), tile));
+		System.out.println("added site at " + tile);
 	}
 
-	public void addSound(MapChitType sound, TileName tile, Integer clearing) {
-		MapChit mc = new MapChit(sound, clearing);
+	public void addSound(MapChitType sound, TileName tile) {
+		MapChit mc = new MapChit(sound, sound.getClearing());
 		mapChits.add(mc);
 		board.setLocationOfMapChit(mc, tile);
-		System.out.println("added sound chit: " + sound + " " + tile
-				+ " with clearing: " + clearing);
+		System.out.println("added sound chit: " + sound + " " + tile);
 	}
 
 	public void addWarning(MapChitType type, TileName tile) {
@@ -670,5 +684,61 @@ public class ModelController {
 
 	public LostSite getCity() {
 		return lostCity;
+	}
+
+	public void setLostCastleFound(boolean b) {
+		discoveredCastle = b;
+	}
+
+	public void setLostCityFound(boolean b) {
+		discoveredCastle = b;
+	}
+
+	public ArrayList<SerializedMapChit> getLostChits(MapChitType type) {
+		ArrayList<SerializedMapChit> smapchits = new ArrayList<SerializedMapChit>();
+		switch (type) {
+		case LOST_CITY:
+			for (MapChit c : lostCity.getWarningAndSite()) {
+				smapchits.add(c.getSerializedChit());
+			}
+			break;
+		case LOST_CASTLE:
+			for (MapChit c : lostCastle.getWarningAndSite()) {
+				smapchits.add(c.getSerializedChit());
+			}
+		}
+		return smapchits;
+	}
+
+	public void setLost(MapChitType site, ArrayList<MapChitType> array,
+			TileName tile) {
+		System.out.println("set " + site);
+		ArrayList<MapChit> mcArray = new ArrayList<MapChit>();
+		for (MapChitType mc : array) {
+			MapChit c = new MapChit(tile, mc);
+			mcArray.add(c);
+			mapChits.add(c);
+		}
+		switch (site) {
+		case LOST_CASTLE:
+			lostCastle = new LostSite(MapChitType.LOST_CASTLE);
+			lostCastle.setWarningAndSite(mcArray);
+			lostCastle.setClearing(MapChitType.LOST_CASTLE.getClearing());
+			lostCastle.setTile(tile);
+			board.setLocationOfMapChit(lostCastle, tile);
+			mapChits.add(lostCastle);
+			break;
+		case LOST_CITY:
+			lostCity = new LostSite(MapChitType.LOST_CITY);
+			lostCity.setWarningAndSite(mcArray);
+			lostCity.setClearing(MapChitType.LOST_CITY.getClearing());
+			lostCity.setTile(tile);
+			board.setLocationOfMapChit(lostCity, tile);
+			mapChits.add(lostCity);
+			break;
+		default:
+			break;
+		}
+
 	}
 }

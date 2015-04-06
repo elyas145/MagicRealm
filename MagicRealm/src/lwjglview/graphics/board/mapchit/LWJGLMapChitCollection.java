@@ -40,7 +40,12 @@ public class LWJGLMapChitCollection extends LWJGLDrawableNode {
 	}
 
 	public LWJGLCounterDrawable get(MapChit mc) {
-		return mapChits.get(mc);
+		for(MapChit c : mapChits.keySet()){
+			if(c.equals(mc)){
+				return mapChits.get(c);
+			}
+		}
+		return null;
 	}
 
 	public LWJGLCounterDrawable create(MapChit chit) {

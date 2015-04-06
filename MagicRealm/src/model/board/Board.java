@@ -9,7 +9,9 @@ package model.board;
 
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -57,6 +59,8 @@ public class Board implements BoardInterface {
 		mapOfTiles = new HashMap<TileName, HexTile>();
 		clearingLocations = new HashMap<TileName, Map<Integer, EnchantedHolder<ClearingData>>>();
 		counterPositions = new HashMap<CounterType, Clearing>();
+		mapChitsToLoad = new HashSet<MapChit>();
+		
 		try {
 			String path = rh.getResource(ResourceHandler.joinPath("data",
 					"data.json"));
@@ -120,13 +124,30 @@ public class Board implements BoardInterface {
 			counterPositions.put(type, new Clearing(sboard
 					.getCounterPositions().get(type)));
 		}
+		mapChitsToLoad = new HashSet<MapChit>();
 		mapChitLocations = new ConcurrentHashMap<MapChit, TileName>();
 		for (SerializedMapChit name : sboard.getMapChitLocations().keySet()) {
-			mapChitLocations.put(new MapChit(name),sboard.getMapChitLocations()
+			MapChit c = new MapChit(name);
+			mapChitLocations.put(c,sboard.getMapChitLocations()
 					.get(name));
+			mapChitsToLoad.add(c);
 		}
 		mapOfTileLocations = sboard.getMapOfTileLocations();
 		tileLocations = sboard.getTileLocations();
+		
+		boolean flag = false;
+		for(SerializedMapChit c : sboard.getMapChitsToLoad()){
+			for(MapChit mc : mapChitsToLoad){
+				if(c.getType() == mc.getType() && c.getIdentifier() == mc.getIdentifier() && c.getTile() == mc.getTile()){
+					flag = true;
+					break;
+				}
+			}
+			if(!flag){
+				mapChitsToLoad.add(new MapChit(c));
+			}
+			flag = false;
+		}
 	}
 
 	public HexTile getTile(TileName tile) {
@@ -329,12 +350,18 @@ public class Board implements BoardInterface {
 	private Map<TileName, HexTile> mapOfTiles;
 	private Map<TileName, int[]> tileLocations;
 	private Map<MapChit, TileName> mapChitLocations;
+	private HashSet<MapChit> mapChitsToLoad;
+	
 	public Map<MapChit, TileName> getMapChitLocations() {
 		return mapChitLocations;
 	}
 
 	public void setMapChitLocations(Map<MapChit, TileName> mapChitLocations) {
 		this.mapChitLocations = mapChitLocations;
+		mapChitsToLoad = new HashSet<MapChit>();
+		for(MapChit c : mapChitLocations.keySet()){
+			mapChitsToLoad.add(c);
+		}
 	}
 
 	private Map<CounterType, Clearing> counterPositions;
@@ -353,6 +380,11 @@ public class Board implements BoardInterface {
 		for (MapChit name : mapChitLocations.keySet()) {
 			sMapChits.put(name.getSerializedChit(), mapChitLocations.get(name));
 		}
+		ArrayList<SerializedMapChit> toLoad = new ArrayList<SerializedMapChit>();
+		for(MapChit c : mapChitsToLoad){
+			toLoad.add(c.getSerializedChit());
+		}
+		sboard.setMapChitsToLoad(toLoad);
 		sboard.setMapChitLocations(sMapChits);
 		Map<CounterType, SerializedClearing> sCounterPositions = new HashMap<CounterType, SerializedClearing>();
 		for (CounterType type : counterPositions.keySet()) {
@@ -405,6 +437,19 @@ public class Board implements BoardInterface {
 			}
 		}
 		return null;
+	}
+
+	public HashSet<MapChit> getMapChitsToLoad() {
+		return mapChitsToLoad;
+	}
+
+	public void setMapChitsToLoad(Collection<MapChit> mapChitsToLoad) {
+		this.mapChitsToLoad = new HashSet<MapChit> (mapChitsToLoad);
+	}
+
+	public void addChitsToLoad(ArrayList<MapChit> array) {
+		mapChitsToLoad.addAll(array);
+		
 	}
 
 }

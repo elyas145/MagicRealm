@@ -189,13 +189,13 @@ public class ServerController {
 
 	}
 
-	public void addTreasure(MapChitType site, TileName tile, Integer value) {
-		model.addTreasure(site, tile, value);
+	public void addSite(MapChitType site, TileName tile) {
+		model.addSite(site, tile);
 
 	}
 
-	public void addSound(MapChitType sound, TileName tile, Integer clearing) {
-		model.addSound(sound, tile, clearing);
+	public void addSound(MapChitType sound, TileName tile) {
+		model.addSound(sound, tile);
 	}
 
 	public void addWarning(MapChitType type, TileName tile) {
@@ -398,6 +398,25 @@ public class ServerController {
 	public void setDieRoll(int roll) {
 		currentDieRoll = roll;
 		playSync.release();
+	}
+
+	public void updateMapChits(MapChitType type) {
+		switch (type){
+		case LOST_CASTLE:
+			model.setLostCastleFound(true);			
+		case LOST_CITY:
+			model.setLostCastleFound(true);
+		default:
+			break;
+		}
+		sendAll(new UpdateMapChits(type, model.getLostChits(type)));
+		
+	}
+
+	public void setLost(MapChitType lost,
+			ArrayList<MapChitType> array, TileName tile) {
+		model.setLost(lost, array, tile);
+		
 	}
 
 }

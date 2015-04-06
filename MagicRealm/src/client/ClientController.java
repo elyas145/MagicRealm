@@ -96,4 +96,6 @@ public interface ClientController {
 
 	void updateMapChits(MapChitType type, ArrayList<SerializedMapChit> mapChits);
 
+	void clueLost(MapChitType type);
+
 }

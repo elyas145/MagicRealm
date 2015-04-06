@@ -58,6 +58,12 @@ public class MapChit extends Chit implements Serializable, Comparable<MapChit> {
 		setTile(sChit.getTile());
 	}
 
+	public MapChit(MapChitType site, int clearing, TileName tile) {
+		this.type = site;
+		this.setClearing(clearing);
+		this.setTile(tile);
+	}
+
 	public ArrayList<MapChit> getWarningAndSite() {
 		return new ArrayList<MapChit>();
 	}

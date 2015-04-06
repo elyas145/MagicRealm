@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import model.counter.chit.MapChit;
+import model.enums.MapChitType;
 import model.enums.SearchType;
 import model.interfaces.ClearingInterface;
 import client.ClientController;
@@ -45,6 +46,7 @@ public class SearchResults implements ClientNetworkHandler {
 			controller.DiscoverPaths(discoveredPaths);
 			break;
 		case CLUES_PATHS:
+			if(castle || city) controller.clueLost(city ? MapChitType.LOST_CITY : MapChitType.LOST_CASTLE);
 			controller.DiscoverPaths(discoveredPaths);
 			controller.peekMapChits(peek);
 			break;

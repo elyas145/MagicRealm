@@ -30,12 +30,17 @@ public class CheatView extends JFrame implements ActionListener {
 	private JButton setWarning;
 	private JButton start;
 	private JButton ok;
+	private JButton setLost;
 	private JTextField treasureValue;
 	private Container treasurePane;
 	private Container soundPane;
 	private Container warningPane;
 	private Container comboContainer;
 	private Container defaultPane;
+	private Container lostPane;
+	private Container lostAndTilePane;
+	private Container soundAndSitePane;
+
 	private Toolkit tk = Toolkit.getDefaultToolkit();
 	private int xSize = ((int) tk.getScreenSize().getWidth());
 	private int ySize = ((int) tk.getScreenSize().getHeight());
@@ -45,6 +50,8 @@ public class CheatView extends JFrame implements ActionListener {
 	private JComboBox<MapChitType> comboSounds;
 	private JComboBox<MapChitType> comboWarnings;
 	private JComboBox<Integer> comboClearings;
+	private JComboBox<MapChitType> comboLost;
+	private JComboBox<MapChitType> comboSiteAndSound[] = new JComboBox[5];
 
 	public CheatView(Server ser) {
 		super("Cheat View");
@@ -63,6 +70,8 @@ public class CheatView extends JFrame implements ActionListener {
 		setWarning = new JButton("Set Warning");
 		start = new JButton("Start");
 		ok = new JButton("OK");
+		setLost = new JButton("lost site");
+
 		treasureValue = new JTextField();
 		comboSites = new JComboBox<MapChitType>(MapChitType.SITES);
 		comboTiles = new JComboBox<TileName>(TileName.values());
@@ -77,10 +86,12 @@ public class CheatView extends JFrame implements ActionListener {
 		setWarning.addActionListener(this);
 		start.addActionListener(this);
 		ok.addActionListener(this);
+		setLost.addActionListener(this);
 
 		defaultPane.add(setTreasure);
 		defaultPane.add(setSound);
 		defaultPane.add(setWarning);
+		defaultPane.add(setLost);
 		defaultPane.add(start);
 		comboContainer = new Container();
 		comboContainer
@@ -91,15 +102,49 @@ public class CheatView extends JFrame implements ActionListener {
 		comboSounds = new JComboBox<MapChitType>(MapChitType.SOUNDS);
 		comboWarnings = new JComboBox<MapChitType>(MapChitType.WARNINGS);
 		comboClearings = new JComboBox<Integer>();
+		comboLost = new JComboBox<MapChitType>(MapChitType.LOST);
+
 		soundPane = new Container();
 		soundPane.setLayout(new BoxLayout(soundPane, BoxLayout.Y_AXIS));
-		
+
 		warningPane = new Container();
 		warningPane.add(comboContainer);
 		warningPane.add(ok);
 		setClearings();
 		setContentPane(defaultPane);
 
+		lostPane = new Container();
+		lostPane.setLayout(new BoxLayout(lostPane, BoxLayout.X_AXIS));
+		lostAndTilePane = new Container();
+		lostAndTilePane.setLayout(new BoxLayout(lostAndTilePane,
+				BoxLayout.Y_AXIS));
+		soundAndSitePane = new Container();
+		soundAndSitePane.setLayout(new BoxLayout(soundAndSitePane,
+				BoxLayout.Y_AXIS));
+
+		for (int i = 0; i < 5; i++) {
+			comboSiteAndSound[i] = new JComboBox<MapChitType>(
+					MapChitType.SITE_AND_SOUND);
+			soundAndSitePane.add(comboSiteAndSound[i]);
+		}
+		comboLost.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (((MapChitType) comboLost.getSelectedItem()) == MapChitType.LOST_CASTLE) {
+					comboTiles.setModel(new JComboBox<TileName>(
+							TileName.MOUNTAIN_TILES).getModel());
+				} else {
+					comboTiles.setModel(new JComboBox<TileName>(
+							TileName.CAVE_TILES).getModel());
+				}
+			}
+		});
+		lostAndTilePane.add(comboLost);
+		lostAndTilePane.add(comboTiles);
+		lostPane.add(lostAndTilePane);
+
+		lostPane.add(soundAndSitePane);
+		lostPane.add(ok);
 		pack();
 		setVisible(true);
 	}
@@ -153,7 +198,6 @@ public class CheatView extends JFrame implements ActionListener {
 			comboContainer.removeAll();
 			comboContainer.add(comboSounds);
 			comboContainer.add(comboTiles);
-			comboContainer.add(comboClearings);
 			soundPane.add(comboContainer);
 			soundPane.add(ok);
 			setContentPane(soundPane);
@@ -172,20 +216,36 @@ public class CheatView extends JFrame implements ActionListener {
 			// check which pane is set.
 			if (getContentPane().equals(treasurePane)) {
 				// add the treasure to the model.
-				server.addTreasure((MapChitType) comboSites.getSelectedItem(),
-						(TileName) comboTiles.getSelectedItem(),
-						Integer.parseInt(treasureValue.getText()));
+				server.addSite((MapChitType) comboSites.getSelectedItem(),
+						(TileName) comboTiles.getSelectedItem());
 
 			} else if (getContentPane().equals(soundPane)) {
 				server.addSound((MapChitType) comboSounds.getSelectedItem(),
-						(TileName) comboTiles.getSelectedItem(),
-						(Integer) comboClearings.getSelectedItem());
+						(TileName) comboTiles.getSelectedItem());
 			} else if (getContentPane().equals(warningPane)) {
 				server.addWarning(
 						(MapChitType) comboWarnings.getSelectedItem(),
 						(TileName) comboTiles.getSelectedItem());
-					resetComboTiles();
+				resetComboTiles();
 
+			} else if (getContentPane().equals(lostPane)) {
+				ArrayList<MapChitType> soundAndSiteArray = new ArrayList<MapChitType>();
+				for (int i = 0; i < comboSiteAndSound.length; i++) {
+					soundAndSiteArray.add((MapChitType) comboSiteAndSound[i]
+							.getSelectedItem());
+				}
+				switch ((MapChitType) comboLost.getSelectedItem()) {
+				case LOST_CITY:
+					server.setLost(MapChitType.LOST_CITY, soundAndSiteArray,
+							(TileName) comboTiles.getSelectedItem());
+					break;
+				case LOST_CASTLE:
+					server.setLost(MapChitType.LOST_CASTLE, soundAndSiteArray,
+							(TileName) comboTiles.getSelectedItem());
+					break;
+				default:
+					break;
+				}
 			}
 			setContentPane(defaultPane);
 			pack();
@@ -196,26 +256,34 @@ public class CheatView extends JFrame implements ActionListener {
 							this,
 							"This window will now close. the only things setup are those you have set manually. nothing else is set.");
 			this.setVisible(false);
+
+		} else if (e.getSource().equals(setLost)) {
+			setContentPane(lostPane);
+			comboTiles
+					.setModel(new JComboBox<TileName>(TileName.MOUNTAIN_TILES)
+							.getModel());
+			pack();
 		}
 	}
 
 	private void resetComboTiles() {
-		comboTiles.setModel(new JComboBox<TileName>(TileName.values()).getModel());
-		
+		comboTiles.setModel(new JComboBox<TileName>(TileName.values())
+				.getModel());
+
 	}
 
 	private void setWarningTiles() {
 		ArrayList<TileName> list = new ArrayList<TileName>();
-		for(TileName n : TileName.values()){
-			if(n.getType() != LandType.VALLEY){
+		for (TileName n : TileName.values()) {
+			if (n.getType() != LandType.VALLEY) {
 				list.add(n);
 			}
 		}
 		TileName arr[] = new TileName[list.size()];
-		for(int i = 0; i < arr.length; ++i){
+		for (int i = 0; i < arr.length; ++i) {
 			arr[i] = list.get(i);
 		}
 		comboTiles.setModel(new JComboBox<TileName>(arr).getModel());
-		
+
 	}
 }

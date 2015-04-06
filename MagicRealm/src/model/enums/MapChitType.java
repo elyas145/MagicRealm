@@ -37,6 +37,27 @@ public enum MapChitType {
 		SLITHER
 	};
 	
+	public static final MapChitType[] SITE_AND_SOUND = {
+		HOWL,
+		FLUTTER,
+		ROAR,
+		PATTER,
+		SLITHER,
+		STATUE,
+		ALTAR,
+		VAULT,
+		POOL,
+		HOARD,
+		LAIR,
+		CAIRNS,
+		SHRINE
+	};
+	
+	public static final MapChitType[] LOST = {
+		LOST_CASTLE,
+		LOST_CITY
+	};
+	
 	public static final MapChitType[] WARNINGS = {
 		STINK,
 		SMOKE,

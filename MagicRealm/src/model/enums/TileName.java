@@ -24,6 +24,22 @@ public enum TileName implements Serializable{
 	PINE_WOODS, // woods
 	RUINS, // cave
 	EMPTY;
+	
+	public static final TileName[] CAVE_TILES = {
+		BORDERLAND,
+		CAVERN,
+		CAVES,
+		HIGH_PASS,
+		RUINS
+	};
+	
+	public static final TileName[] MOUNTAIN_TILES = {
+		CLIFF,
+		CRAG,
+		LEDGES,
+		MOUNTAIN
+	};
+	
 	public LandType getType() {
 		switch(this) {
 		case BORDERLAND:
