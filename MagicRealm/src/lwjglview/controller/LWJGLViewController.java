@@ -150,12 +150,6 @@ public class LWJGLViewController implements ViewController {
 		}.start();
 		// controller.startGame();
 	}
-
-	@Override
-	public SearchView enterSearchView(CharacterType character) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 	
 	@Override
 	public void selectClearing(final ClearingSelectedListener csl) {

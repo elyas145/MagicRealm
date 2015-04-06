@@ -49,6 +49,5 @@ public interface ViewController {
 	
 	void enterSplashScreen();
 
-	SearchView enterSearchView(CharacterType character);
 	void startGame(BoardReadyListener brl);
 }
