@@ -73,6 +73,7 @@ public class ControllerMain implements ClientController {
 	private int sleepTime = 2000;
 	private ArrayList<MapChit> discoveredChits;
 	private MenuItemListener mainMenuListener;
+
 	public ControllerMain() {
 		rh = new ResourceHandler();
 		mainView = new LWJGLViewController(rh, new JogAmpSoundController());
@@ -587,6 +588,7 @@ public class ControllerMain implements ClientController {
 			for (Character c : characters.values()) {
 				boardView.hideCounter(c.getType().toCounter());
 			}
+			//boardView.hideAllMapChits();
 		}
 	}
 
@@ -709,15 +711,12 @@ public class ControllerMain implements ClientController {
 
 	@Override
 	public void discoverChits(ArrayList<MapChit> chits) {
-		mainView.displayMessage("recieved object.");
+		if (!chits.isEmpty())
+			mainView.displayMessage("You have discovered map chits!");
 		for (MapChit c : chits) {
+			boardView.revealMapChit(c);
 			if (c.getType().type() == ChitType.SITE) {
 				// show in discoveries.
-			}
-			if (c.getType().type() == ChitType.LOST_CASTLE) {
-
-			} else if (c.getType().type() == ChitType.LOST_CITY) {
-
 			}
 		}
 
@@ -749,7 +748,8 @@ public class ControllerMain implements ClientController {
 	@Override
 	public void addGold(int goldValue, MapChitType site) {
 		this.goldValue += goldValue;
-		mainView.displayMessage("You looted " + site + "! gold: " + this.goldValue);
+		mainView.displayMessage("You looted " + site + "! gold: "
+				+ this.goldValue);
 	}
 
 }

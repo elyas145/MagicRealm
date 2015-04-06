@@ -86,7 +86,7 @@ public class MapChit extends Chit implements Serializable, Comparable<MapChit> {
 	public String toString() {
 		String str = "";
 		if (this.type != null) {
-			str += type.type() + ": ";
+			str += type + ": ";
 			str += this.type.type().toString() + ": ";
 			// str += this.identifier + ": ";
 			// str += super.toString();

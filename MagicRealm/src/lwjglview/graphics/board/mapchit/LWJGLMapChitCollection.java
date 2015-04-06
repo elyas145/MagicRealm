@@ -23,7 +23,10 @@ import model.counter.chit.MapChit;
 public class LWJGLMapChitCollection extends LWJGLDrawableNode {
 
 	private static final Color BLANK = GraphicsConfiguration.MAP_CHIT_HIDE_COLOUR;
-	private static final Color SHOW = GraphicsConfiguration.MAP_CHIT_SHOW_COLOUR;
+	private static final Color WHITE = GraphicsConfiguration.MAP_CHIT_WHITE_COLOUR;
+	private static final Color RED = GraphicsConfiguration.MAP_CHIT_RED_COLOUR;
+	private static final Color ORANGE = GraphicsConfiguration.MAP_CHIT_ORANGE_COLOUR;
+	private static final Color YELLOW = GraphicsConfiguration.MAP_CHIT_YELLOW_COLOUR;
 
 	public LWJGLMapChitCollection(LWJGLCounterLocator par, ResourceHandler rh,
 			Iterable<MapChit> avail) {
@@ -75,7 +78,25 @@ public class LWJGLMapChitCollection extends LWJGLDrawableNode {
 
 	public void reveal(MapChit chit) {
 		System.out.println("Changing color of " + chit + " to show");
-		get(chit).changeColour(SHOW);
+		Color c;
+		switch(chit.getType().type()){
+		case SOUND:
+			c = RED;
+			break;
+		case SITE:
+			c=ORANGE;
+			break;
+		case LOST_CITY:
+		case LOST_CASTLE:
+			c=RED;
+			break;
+		case WARNING:
+			c=YELLOW;
+			break;
+		default:
+			c=WHITE;
+		}
+		get(chit).changeColour(c);
 	}
 
 	public void replace(MapChit chit, Iterable<MapChit> replacements) {
