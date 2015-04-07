@@ -58,6 +58,10 @@ public class HexTile implements HexTileInterface {
 			clearings.put(num, cl);
 		}
 		exits = new int[2][6];
+		surroundings = new TileName[6];
+		for(int i = 0; i < 6; ++i) {
+			surroundings[i] = surrounding[i];
+		}
 		clearExits();
 		connectClearings();
 		for (int i = 0; i < surrounding.length; ++i) {
@@ -106,6 +110,23 @@ public class HexTile implements HexTileInterface {
 		this.name = parent;
 	}
 
+	public void setRotation(int rot) {
+		rotation = rot;
+	}
+
+	public SerializedTile getSerializedTile() {
+		SerializedTile sTile = new SerializedTile();
+		sTile.setPosition(row, column, rotation);
+		sTile.setTileName(name);
+		// create the serialized clearings.
+		Map<Integer, SerializedClearing> sClearings = new HashMap<Integer, SerializedClearing>();
+		for (Integer i : clearings.keySet()) {
+			sClearings.put(i, clearings.get(i).getSerializedClearing());
+		}
+		sTile.setClearings(sClearings);
+		return sTile;
+	}
+
 	@Override
 	public Clearing getEntryClearing(int rot) {
 		return getEntryClearing(rot, isEnchanted());
@@ -127,16 +148,14 @@ public class HexTile implements HexTileInterface {
 		return clearings.get(num);
 	}
 
+	@Override
 	public int getBoardRow() {
 		return row;
 	}
 
+	@Override
 	public int getBoardColumn() {
 		return column;
-	}
-
-	public void setRotation(int rot) {
-		rotation = rot;
 	}
 
 	@Override
@@ -152,6 +171,17 @@ public class HexTile implements HexTileInterface {
 	@Override
 	public boolean isEnchanted() {
 		return enchanted;
+	}
+
+	@Override
+	public void connectTo(TileName otherTile, int exit) {
+		surroundings[exit % 6] = otherTile;
+
+	}
+
+	@Override
+	public Iterable<TileName> getSurrounding() {
+		return IterationTools.notNull(surroundings);
 	}
 
 	protected Board getParent() {
@@ -207,7 +237,7 @@ public class HexTile implements HexTileInterface {
 			break;
 		case CAVERN:
 			connect(1, 2, true, s);
-			connect(1, 3, true, s);
+			connect(1, 3, false, n);
 			connect(1, 4, false, s);
 			connect(1, 4, true, n);
 			connect(2, 3, false, n);
@@ -484,30 +514,6 @@ public class HexTile implements HexTileInterface {
 	private Map<Integer, Clearing> clearings;
 	private int rotation;
 	private TileName[] surroundings;
-
-	@Override
-	public void connectTo(TileName otherTile, int exit) {
-		surroundings[exit % 6] = otherTile;
-
-	}
-
-	@Override
-	public Iterable<TileName> getSurrounding() {
-		return IterationTools.notNull(surroundings);
-	}
-
-	public SerializedTile getSerializedTile() {
-		SerializedTile sTile = new SerializedTile();
-		sTile.setPosition(row, column, rotation);
-		sTile.setTileName(name);
-		// create the serialized clearings.
-		Map<Integer, SerializedClearing> sClearings = new HashMap<Integer, SerializedClearing>();
-		for (Integer i : clearings.keySet()) {
-			sClearings.put(i, clearings.get(i).getSerializedClearing());
-		}
-		sTile.setClearings(sClearings);
-		return sTile;
-	}
 
 	public boolean setEnchanted(boolean b) {
 		this.enchanted = b;		

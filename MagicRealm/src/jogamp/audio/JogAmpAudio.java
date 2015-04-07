@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import utils.resources.ResourceHandler;
 
@@ -31,40 +33,48 @@ public class JogAmpAudio {
 		al.alDeleteBuffers(n, buffer, 0);
 		i = 0;
 		n = sounds.size();
-		for (int id : sounds.values()) {
-			buffer[i++] = id;
-			al.alSourceStop(id);
+		for (SoundInfo si : sounds.values()) {
+			buffer[i++] = si.sid;
+			al.alSourceStop(si.sid);
 		}
 		al.alDeleteSources(n, buffer, 0);
 		ALut.alutExit();
 	}
 
 	public void playSound(String file) {
+		playSound(file, null);
+	}
+
+	public void playSound(String file, Runnable run) {
 		if (!sounds.containsKey(file)) {
 			if (loadALData(file) != AL.AL_TRUE) {
 				throw new RuntimeException("Could not load the sound " + file);
 			}
 		}
-		int sourceID = sounds.get(file);
+		SoundInfo si = sounds.get(file);
+		si.cancelTimer();
+		si.startTimer(run);
 		setListenerValues();
-		al.alSourcePlay(sourceID);
+		al.alSourcePlay(si.sid);
 	}
 
 	public void pauseSound(String file) {
 		if(sounds.containsKey(file)) {
-			al.alSourcePause(sounds.get(file));
+			al.alSourcePause(sounds.get(file).sid);
 		}
 	}
 
 	public void stopSound(String file) {
 		if(sounds.containsKey(file)) {
-			al.alSourceStop(sounds.get(file));
+			SoundInfo si = sounds.get(file);
+			si.cancelTimer();
+			al.alSourceStop(si.sid);
 		}
 	}
 
 	private JogAmpAudio() {
 		ALut.alutInit();
-		sounds = new HashMap<String, Integer>();
+		sounds = new HashMap<String, SoundInfo>();
 		buffers = new ArrayList<Integer>();
 	}
 
@@ -89,8 +99,7 @@ public class JogAmpAudio {
 		ALut.alutLoadWAVFile(
 				ResourceHandler.joinPath("src", "resources", "sounds", fname), format,
 				data, size, freq, loop);
-		float length = size[0] / (float) (8 * freq[0]);
-		System.out.println("Audio is " + length + " seconds long");
+		float length = size[0] / (float) (4 * freq[0]);
 		al.alBufferData(bid, format[0], data[0], size[0], freq[0]);
 
 		// Bind buffer with a source.
@@ -100,7 +109,7 @@ public class JogAmpAudio {
 			return AL.AL_FALSE;
 
 		int sid = buffer[0];
-		sounds.put(fname, sid);
+		sounds.put(fname, new SoundInfo(sid, length));
 
 		al.alSourcei(sid, AL.AL_BUFFER, bid);
 		al.alSourcef(sid, AL.AL_PITCH, 1.0f);
@@ -120,6 +129,34 @@ public class JogAmpAudio {
 		al.alListenerfv(AL.AL_POSITION, listenerPos, 0);
 		al.alListenerfv(AL.AL_VELOCITY, listenerVel, 0);
 		al.alListenerfv(AL.AL_ORIENTATION, listenerOri, 0);
+	}
+	
+	private class SoundInfo {
+		public SoundInfo(int s, float l) {
+			sid = s;
+			length = (long) (l * 1000);
+		}
+		public void startTimer(final Runnable run) {
+			if(run != null) {
+				timer = new Timer();
+				timer.schedule(new TimerTask() {
+	
+					@Override
+					public void run() {
+						run.run();
+					}
+					
+				}, length);
+			}
+		}
+		public void cancelTimer() {
+			if(timer != null) {
+				timer.cancel();
+			}
+		}
+		public int sid;
+		private long length;
+		private Timer timer;
 	}
 
 	private static JogAmpAudio instance = null;
@@ -146,7 +183,7 @@ public class JogAmpAudio {
 	private float[] listenerOri = { 0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f };
 
 	// filename to source identifier
-	private Map<String, Integer> sounds;
+	private Map<String, SoundInfo> sounds;
 	private List<Integer> buffers;
 
 }
