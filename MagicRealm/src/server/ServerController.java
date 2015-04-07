@@ -196,7 +196,8 @@ public class ServerController {
 					winner = winner.getPlayer().getGold() < t.getPlayer()
 							.getGold() ? t : winner;
 			}
-			sendAll(new GameFinished(winner.getCharacter().getType(), winner.getPlayer().getGold()));
+			sendAll(new GameFinished(winner.getCharacter().getType(), winner
+					.getPlayer().getGold()));
 		} else {
 			currentDay++;
 			sendAll(new EnterBirdSong());
@@ -380,7 +381,7 @@ public class ServerController {
 		// do the search activity with the player
 		ClientThread ct = getPlayerOf(car);
 		SearchResults res = model.performSearch(ct.getPlayer(), tbl, rv);
-		if (res.isCastle()) {
+		if (res.isCastle() && tbl == TableType.LOCATE) {
 			model.getBoard().removeMapChit(model.getCastle());
 			for (MapChit c : model.getCastle().getWarningAndSite()) {
 				model.getBoard().setLocationOfMapChit(c,
@@ -391,8 +392,7 @@ public class ServerController {
 				smapchits.add(c.getSerializedChit());
 			}
 			sendAll(new UpdateMapChits(MapChitType.LOST_CASTLE, smapchits));
-		}
-		if (res.isCity()) {
+		} else if (res.isCity() && tbl == TableType.LOCATE) {
 			model.getBoard().removeMapChit(model.getCity());
 			for (MapChit c : model.getCity().getWarningAndSite()) {
 				model.getBoard().setLocationOfMapChit(c,
