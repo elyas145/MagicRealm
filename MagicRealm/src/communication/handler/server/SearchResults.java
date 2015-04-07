@@ -52,19 +52,19 @@ public class SearchResults implements ClientNetworkHandler {
 			if(castle || city) controller.clueLost(city ? MapChitType.LOST_CITY : MapChitType.LOST_CASTLE);
 			break;
 		case PATHS:
-			controller.DiscoverPaths(discoveredPaths);
+			controller.discoverPaths(discoveredPaths);
 			break;
 		case CLUES_PATHS:
 			if(castle || city) controller.clueLost(city ? MapChitType.LOST_CITY : MapChitType.LOST_CASTLE);
-			controller.DiscoverPaths(discoveredPaths);
+			controller.discoverPaths(discoveredPaths);
 			controller.peekMapChits(peek);
 			break;
 		case PASSAGES_CLUES:
 			controller.peekMapChits(peek);
-			controller.DiscoverPaths(discoveredPaths);
+			controller.discoverPaths(discoveredPaths);
 			break;
 		case PASSAGES:
-			controller.DiscoverPaths(discoveredPaths);
+			controller.discoverPaths(discoveredPaths);
 			break;
 		case DISCOVER_CHITS:
 			controller.discoverChits(peek);
