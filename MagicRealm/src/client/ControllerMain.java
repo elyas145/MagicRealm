@@ -711,15 +711,16 @@ public class ControllerMain implements ClientController {
 
 	@Override
 	public void discoverChits(ArrayList<MapChit> chits) {
+		ArrayList<String> updates = new ArrayList<String>();
 		if (!chits.isEmpty())
-			mainView.displayMessage("You have discovered map chits!");
+			updates.add("You have discovered map chits!");
 		for (MapChit c : chits) {
 			boardView.revealMapChit(c);
 			if (c.getType().type() == ChitType.SITE) {
-				// show in discoveries.
+				updates.add("Discovered " + c.getType());
 			}
 		}
-
+		mainView.updateLog(updates);
 	}
 
 	@Override

@@ -203,6 +203,13 @@ public class LWJGLViewController implements ViewController {
 	public void hideBanner() {
 		messageOverlay.setVisible(false);
 	}
+	
+	@Override
+	public void updateLog(ArrayList<String> updates) {
+		for(String s: updates) {
+			discovered.addText(s);
+		}
+	}
 
 	private void init(ResourceHandler rh, SoundController sc) {
 		resources = rh;

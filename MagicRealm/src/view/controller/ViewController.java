@@ -51,4 +51,6 @@ public interface ViewController {
 	void enterSplashScreen();
 
 	void startGame(BoardReadyListener brl);
+	
+	void updateLog(ArrayList<String> updates);
 }

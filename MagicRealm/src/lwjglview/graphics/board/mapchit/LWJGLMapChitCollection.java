@@ -52,7 +52,7 @@ public class LWJGLMapChitCollection extends LWJGLDrawableNode {
 	}
 
 	public LWJGLCounterDrawable create(MapChit chit) {
-		LWJGLCounterDrawable drbl = resources.generate(chit, locations);
+		LWJGLCounterDrawable drbl = resources.generate(chit, locations, BLANK);
 		synchronized (mapChits) {
 			mapChits.put(chit, drbl);
 		}
@@ -143,8 +143,8 @@ public class LWJGLMapChitCollection extends LWJGLDrawableNode {
 		get(mc).setVisible(true);
 	}
 	
-	public void hide(MapChit mc) {
-		get(mc).setVisible(false);
+	public void setVisible(MapChit mc, boolean vis) {
+		get(mc).setVisible(vis);
 	}
 
 	@Override

@@ -301,6 +301,9 @@ public class LWJGLBoardDrawable extends LWJGLCounterLocator implements BoardView
 
 	@Override
 	public void replaceMapChit(MapChit chit, Iterable<MapChit> replacements) {
+		for(MapChit mc: replacements) {
+			setMapChit(mc);
+		}
 		mapChits.replace(chit, replacements);
 	}
 
