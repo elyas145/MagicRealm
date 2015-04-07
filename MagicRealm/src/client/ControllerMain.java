@@ -703,7 +703,7 @@ public class ControllerMain implements ClientController {
 	public void peekMapChits(ArrayList<MapChit> peek) {
 		mainView.displayMessage("peeking at map chits.");
 		boardView.revealAllMapChits(peek);
-
+		
 	}
 
 	@Override

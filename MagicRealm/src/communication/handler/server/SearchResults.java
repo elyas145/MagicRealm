@@ -49,6 +49,7 @@ public class SearchResults implements ClientNetworkHandler {
 		switch(type){
 		case CLUES:
 			controller.peekMapChits(peek);
+			if(castle || city) controller.clueLost(city ? MapChitType.LOST_CITY : MapChitType.LOST_CASTLE);
 			break;
 		case PATHS:
 			controller.DiscoverPaths(discoveredPaths);
