@@ -181,8 +181,12 @@ public class LWJGLPanel extends LWJGLContentPane {
 		}
 	}
 
+	public void resetPosition(float time) {
+		moveTo(rootPosition, time);
+	}
+
 	public void resetPosition() {
-		moveTo(rootPosition, GraphicsConfiguration.PANEL_TIME);
+		resetPosition(GraphicsConfiguration.PANEL_TIME);
 	}
 
 	public LWJGLTextureLoader getTexture() {

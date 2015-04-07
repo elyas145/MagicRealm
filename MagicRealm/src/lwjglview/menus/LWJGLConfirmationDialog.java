@@ -1,30 +1,16 @@
 package lwjglview.menus;
 
-import java.awt.Color;
-import java.awt.Font;
-
-import config.GraphicsConfiguration;
 import lwjglview.graphics.textures.LWJGLSingleTextureLoader;
 import lwjglview.graphics.textures.LWJGLTextureLoader;
-import utils.math.linear.Matrix;
 import utils.resources.ResourceHandler;
 
-public class LWJGLConfirmationDialog {
-
-	private static final Font FONT = new Font("Times New Roman", Font.PLAIN, 80);
-	private static final Color COLOR = Color.GRAY;
+public class LWJGLConfirmationDialog extends LWJGLDialog {
 
 	public LWJGLConfirmationDialog(LWJGLContentPane cp, ResourceHandler rh,
 			String msg, String yesMsg, String noMsg, float xi, float yi,
 			float xf, float yf, float size) {
+		super(cp, rh, msg, xi, yi, xf, yf, size);
 		confirm = false;
-		showPosition = Matrix.columnVector(xf, yf, 0f);
-		root = LWJGLPanel.fromPicture(cp, rh,
-				ResourceHandler.joinPath("menus", "alert", "bg.gif"), xi, yi,
-				size, true);
-		message = LWJGLPanel.fromString(root, msg, FONT, COLOR, 1800, 100, 0f,
-				size * .6f, size * .1f, false);
-		root.add(message);
 		LWJGLTextureLoader buttonBG = new LWJGLSingleTextureLoader(rh,
 				ResourceHandler.joinPath("menus", "main", "button.png"));
 		yButton = new LWJGLButton(root, yesMsg, buttonBG, size * .5f,
@@ -53,8 +39,6 @@ public class LWJGLConfirmationDialog {
 			}
 
 		});
-		root.setVisible(true);
-		message.setVisible(true);
 		yButton.setVisible(true);
 		nButton.setVisible(true);
 		cp.add(root);
@@ -62,7 +46,7 @@ public class LWJGLConfirmationDialog {
 	}
 
 	public synchronized boolean ask(String question, String yes, String no) {
-		message.updateFromString(question, FONT, COLOR);
+		setMessage(question);
 		yButton.setText(yes);
 		nButton.setText(no);
 		if (!visible) {
@@ -83,14 +67,7 @@ public class LWJGLConfirmationDialog {
 		root.resetPosition();
 	}
 
-	private void show() {
-		root.moveTo(showPosition, GraphicsConfiguration.PANEL_TIME);
-	}
-
 	private boolean visible;
-	private Matrix showPosition;
-	private LWJGLPanel root;
-	private LWJGLPanel message;
 	private LWJGLButton yButton;
 	private LWJGLButton nButton;
 	private boolean confirm;

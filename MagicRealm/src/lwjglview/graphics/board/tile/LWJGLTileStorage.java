@@ -104,15 +104,6 @@ public class LWJGLTileStorage extends LWJGLCounterStorage {
 				}
 			}
 		}
-		int obstructed = 0;
-		for (Obstruction ob : obstructions.get(ench)) {
-			if (ob.obstructs(rand)) {
-				++obstructed;
-			}
-		}
-		if (obstructed > 0) {
-			System.out.println("Counter is obstructed: " + obstructed);
-		}
 		synchronized (chits) {
 			chits.put(id, new Obstruction(rand, counterRadius, false));
 		}
@@ -175,7 +166,6 @@ public class LWJGLTileStorage extends LWJGLCounterStorage {
 			pos.subtract(location, buffer);
 			float len = radius / buffer.length();
 			len *= isOut ? .95f : 1.05f;
-			System.out.println(pos + ", " + len);
 			buffer.multiply(len, buffer);
 			location.add(buffer, pos);
 		}

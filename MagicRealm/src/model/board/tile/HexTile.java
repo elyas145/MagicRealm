@@ -195,6 +195,7 @@ public class HexTile implements HexTileInterface {
 		case BORDERLAND:
 			connectAlways(1, 6);
 			connectAlways(2, 3);
+			connectAlways(3, 5);
 			connectAlways(3, 6);
 			connectAlways(4, 5, s);
 			connectAlways(4, 6);

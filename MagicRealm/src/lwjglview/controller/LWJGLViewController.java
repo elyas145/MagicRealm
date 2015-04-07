@@ -1,10 +1,12 @@
 package lwjglview.controller;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import jogamp.audio.JogAmpSoundController;
+import config.GraphicsConfiguration;
 import lwjglview.controller.birdsong.LWJGLBirdsong;
 import lwjglview.controller.lobby.LWJGLLobbyView;
 import lwjglview.controller.mainmenu.LWJGLMainMenu;
@@ -18,13 +20,13 @@ import lwjglview.menus.LWJGLAlertDialog;
 import lwjglview.menus.LWJGLConfirmationDialog;
 import lwjglview.menus.LWJGLMenuLayer;
 import lwjglview.menus.LWJGLPanel;
+import lwjglview.menus.LWJGLTextLog;
 import lwjglview.selection.SelectionFrame;
 import model.activity.Activity;
 import model.character.Phase;
 import model.enums.ActivityType;
 import model.enums.CharacterType;
 import model.enums.TileName;
-import model.player.PersonalHistory;
 import utils.handler.Handler;
 import utils.resources.ResourceHandler;
 import view.audio.SoundController;
@@ -36,7 +38,6 @@ import view.controller.birdsong.ActivitiesListener;
 import view.controller.characterselection.CharacterSelectionListener;
 import view.controller.cheatmode.DieSelectionListener;
 import view.controller.mainmenu.MenuItemListener;
-import view.controller.search.SearchView;
 import view.controller.search.TableSelectionListener;
 
 public class LWJGLViewController implements ViewController {
@@ -74,7 +75,8 @@ public class LWJGLViewController implements ViewController {
 	}
 
 	@Override
-	public void enterBirdSong(int day, List<Phase> phases, final BirdsongFinishedListener onfinish) {
+	public void enterBirdSong(int day, List<Phase> phases,
+			final BirdsongFinishedListener onfinish) {
 		lobbyView.setVisible(false);
 		messageOverlay.setVisible(false);
 		birdsong.setActivitiesListener(new ActivitiesListener() {
@@ -88,10 +90,10 @@ public class LWJGLViewController implements ViewController {
 		birdsong.showPhases(phases);
 		board.setDefaultClearingFocus();
 	}
-	
+
 	@Override
 	public boolean confirm(String message, String confirm, String deny) {
-		if(sounds != null) {
+		if (sounds != null) {
 			sounds.error();
 		}
 		return confirmation.ask(message, confirm, deny);
@@ -101,7 +103,7 @@ public class LWJGLViewController implements ViewController {
 	public void enterMainMenu(MenuItemListener mil) {
 		mainMenu.setVisible(true);
 		mainMenu.setMenuItemListener(mil);
-		if(sounds != null) {
+		if (sounds != null) {
 			sounds.playMainTheme();
 		}
 	}
@@ -110,7 +112,7 @@ public class LWJGLViewController implements ViewController {
 	public void enterLobby() {
 		mainMenu.setVisible(false);
 		lobbyView.setVisible(true);
-		if(sounds != null) {
+		if (sounds != null) {
 			sounds.playLobbyTheme();
 		}
 	}
@@ -127,7 +129,7 @@ public class LWJGLViewController implements ViewController {
 		characterSelection.selectCharacter(characters, onselect);
 		displayMessage("Please select your character");
 	}
-	
+
 	@Override
 	public void disableCharacter(CharacterType character) {
 		characterSelection.disableCharacter(character);
@@ -150,7 +152,7 @@ public class LWJGLViewController implements ViewController {
 		}.start();
 		// controller.startGame();
 	}
-	
+
 	@Override
 	public void selectClearing(final ClearingSelectedListener csl) {
 		board.setCleaingFocus(new ClearingFocusHandler() {
@@ -161,10 +163,10 @@ public class LWJGLViewController implements ViewController {
 				board.setDefaultClearingFocus();
 				csl.onClearingSelection(tile, clearing);
 			}
-			
+
 		});
 	}
-	
+
 	@Override
 	public void selectSearchTable(TableSelectionListener tsl) {
 		tableSelect.selectTable(tsl);
@@ -179,23 +181,23 @@ public class LWJGLViewController implements ViewController {
 	public void displayMessage(String string) {
 		displayMessage(string, null);
 	}
-	
+
 	@Override
 	public void displayMessage(String string, Runnable onClose) {
-		if(sounds != null) {
+		if (sounds != null) {
 			sounds.alert();
 		}
 		alert.setMessage(string);
 		alert.setHandler(onClose);
 		alert.show();
 	}
-	
+
 	@Override
 	public void displayBanner(String message) {
 		messageOverlay.setText(message);
 		messageOverlay.setVisible(true);
 	}
-	
+
 	private void init(ResourceHandler rh, SoundController sc) {
 		resources = rh;
 		sounds = sc;
@@ -210,6 +212,33 @@ public class LWJGLViewController implements ViewController {
 		}, LWJGLGraphics.LAYER0);
 		selections = new SelectionFrame(graphics);
 		menus = new LWJGLMenuLayer(graphics, selections);
+		discovered = new LWJGLTextLog(menus, .7f, -.3f, 1f, .05f, 0, .05f, 30,
+				GraphicsConfiguration.PANEL_TIME);
+		menus.add(discovered);
+		discovered.addText("Hello");
+		discovered.addText("Goodbye");
+
+		System.setOut(new PrintStream(new OutputStream() { // PRINT OUT TO GAME
+															// LOG
+
+					StringBuilder buff = new StringBuilder();
+
+					@Override
+					public void write(int arg0) throws IOException {
+						if (arg0 < 0) {
+							throw new IOException();
+						}
+						char c = (char) arg0;
+						if (c == '\n') {
+							discovered.addText(buff.toString());
+							buff = new StringBuilder();
+						} else {
+							buff.append(c);
+						}
+					}
+
+				}));
+
 		birdsong = new LWJGLBirdsong(resources, menus);
 		characterSelection = new LWJGLCharacterSelection(rh, graphics, menus);
 		menus.add(characterSelection);
@@ -261,5 +290,6 @@ public class LWJGLViewController implements ViewController {
 	private LWJGLLobbyView lobbyView;
 	private LWJGLTableSelection tableSelect;
 	private LWJGLDieSelection dieSelection;
+	private LWJGLTextLog discovered;
 
 }

@@ -13,6 +13,7 @@ public abstract class LWJGLContentPane extends LWJGLDrawableNode {
 	
 	protected LWJGLContentPane(LWJGLContentPane par) {
 		super(par);
+		parent = par;
 	}
 	
 	public SelectionFrame getSelectionFrame() {
