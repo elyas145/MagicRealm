@@ -467,14 +467,14 @@ public class ModelController {
 		case 2: // passages and clues
 			SearchResults p = searchPassages(player);
 			SearchResults c = peerC(player);
-			return new SearchResults(SearchType.PASSAGES_CLUES, p.getPeek(),
-					c.getPaths());
+			return new SearchResults(SearchType.PASSAGES_CLUES, c.getPeek(),
+					p.getPaths());
 		case 3: // passages
 			return searchPassages(player);
 		case 4:
 			return discoverChits(player);
 		}
-		return null;
+		return new SearchResults(SearchType.NONE);
 	}
 
 	private SearchResults discoverChits(Player player) {

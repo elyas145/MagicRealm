@@ -20,7 +20,6 @@ public class JogAmpSoundController implements SoundController {
 		playingTheme = null;
 		alertSound = "alert1.wav";
 		errorSound = "alert2.wav";
-		revealSoundChit(MapChitType.HOWL);
 	}
 	
 	@Override

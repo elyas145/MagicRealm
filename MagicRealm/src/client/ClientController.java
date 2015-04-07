@@ -86,7 +86,7 @@ public interface ClientController {
 	void requestSearchInformation();
 
 	void peekMapChits(ArrayList<MapChit> peek);
-	void DiscoverPaths(ArrayList<String> paths);
+	void discoverPaths(ArrayList<String> paths);
 	
 
 	void requestSearchChoice(TableType table);

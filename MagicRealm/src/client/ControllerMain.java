@@ -711,7 +711,7 @@ public class ControllerMain implements ClientController {
 	}
 
 	@Override
-	public void DiscoverPaths(ArrayList<String> paths) {
+	public void discoverPaths(ArrayList<String> paths) {
 		mainView.displayMessage("found paths!");
 		ArrayList<String> temp = new ArrayList<String>();
 		temp.add("Discovered Paths:");

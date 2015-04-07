@@ -89,6 +89,8 @@ public class JogAmpAudio {
 		ALut.alutLoadWAVFile(
 				ResourceHandler.joinPath("src", "resources", "sounds", fname), format,
 				data, size, freq, loop);
+		float length = size[0] / (float) (8 * freq[0]);
+		System.out.println("Audio is " + length + " seconds long");
 		al.alBufferData(bid, format[0], data[0], size[0], freq[0]);
 
 		// Bind buffer with a source.
