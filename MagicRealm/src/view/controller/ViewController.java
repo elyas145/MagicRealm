@@ -32,6 +32,7 @@ public interface ViewController {
 	void displayMessage(String string, Runnable onClose);
 	
 	void displayBanner(String message);
+	void hideBanner();
 	
 	boolean confirm(String message, String confirm, String deny);
 	

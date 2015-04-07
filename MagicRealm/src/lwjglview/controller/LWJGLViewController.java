@@ -169,6 +169,7 @@ public class LWJGLViewController implements ViewController {
 
 	@Override
 	public void selectSearchTable(TableSelectionListener tsl) {
+		hideBanner();
 		tableSelect.selectTable(tsl);
 	}
 
@@ -196,6 +197,11 @@ public class LWJGLViewController implements ViewController {
 	public void displayBanner(String message) {
 		messageOverlay.setText(message);
 		messageOverlay.setVisible(true);
+	}
+	
+	@Override
+	public void hideBanner() {
+		messageOverlay.setVisible(false);
 	}
 
 	private void init(ResourceHandler rh, SoundController sc) {
