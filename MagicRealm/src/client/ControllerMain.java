@@ -702,11 +702,17 @@ public class ControllerMain implements ClientController {
 	@Override
 	public void peekMapChits(ArrayList<MapChit> peek) {
 		mainView.displayMessage("peeking at map chits.");
+		boardView.revealAllMapChits(peek);
+
 	}
 
 	@Override
 	public void DiscoverPaths(ArrayList<String> paths) {
 		mainView.displayMessage("found paths!");
+		ArrayList<String> temp = new ArrayList<String>();
+		temp.add("Discovered Paths:");
+		temp.addAll(paths);
+		mainView.updateLog(paths);
 	}
 
 	@Override
