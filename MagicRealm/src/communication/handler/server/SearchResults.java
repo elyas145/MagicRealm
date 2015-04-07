@@ -112,4 +112,13 @@ public class SearchResults implements ClientNetworkHandler {
 		this.castle = castle;
 	}
 
+	public void setPeek(ArrayList<MapChit> peek) {
+		this.peek = peek;
+		
+	}
+
+	public void setPaths(ArrayList<String> paths) {
+		this.discoveredPaths = paths;
+	}
+
 }

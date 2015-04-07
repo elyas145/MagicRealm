@@ -499,18 +499,20 @@ public class ModelController {
 					castle = true;
 				}
 				if (lostCity.getWarningAndSite().contains(chit)) {
-					System.out.println("this chit is inside lost city.");
-					city = true;
+					System.out.println("this chit is inside lost city.");					
 					if (discoveredCity) {
 						System.out.println("lost city discovered");
 						peek.add(chit);
+					}else{
+						city = true;
 					}
 				} else if (lostCastle.getWarningAndSite().contains(chit)) {
-					System.out.println("this chit is inside lost castle.");
-					castle = true;
+					System.out.println("this chit is inside lost castle.");					
 					if (discoveredCastle) {
 						System.out.println("lost castle discovered");
 						peek.add(chit);
+					}else{
+						castle = true;
 					}
 				} else {
 					System.out
@@ -573,9 +575,16 @@ public class ModelController {
 	private SearchResults peerCP(Player player) {
 		SearchResults cResult = peerC(player);
 		SearchResults pResults = peerP(player);
-
-		return new SearchResults(SearchType.CLUES_PATHS, cResult.getPeek(),
-				pResults.getPaths());
+		SearchResults res = new SearchResults(SearchType.CLUES_PATHS);
+		if(cResult.isCastle()){
+			res.setCastle(true);
+		}
+		if(cResult.isCity()){
+			res.setCity(true);
+		}
+		res.setPeek(cResult.getPeek());
+		res.setPaths(pResults.getPaths());
+		return res;
 	}
 
 	private SearchResults peerC(Player player) {
@@ -600,15 +609,11 @@ public class ModelController {
 					if (discoveredCity) {
 						peek.add(chit);
 					}
-				} else {
-					peek.add(chit);
-				}
-
-				if (lostCastle.getWarningAndSite().contains(chit)) {
+				} else if (lostCastle.getWarningAndSite().contains(chit)){
 					if (discoveredCastle) {
 						peek.add(chit);
 					}
-				} else {
+				}else {
 					peek.add(chit);
 				}
 			}
