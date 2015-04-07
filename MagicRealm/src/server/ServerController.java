@@ -438,7 +438,7 @@ public class ServerController {
 		case LOST_CASTLE:
 			model.setLostCastleFound(true);
 		case LOST_CITY:
-			model.setLostCastleFound(true);
+			model.setLostCityFound(true);
 		default:
 			break;
 		}

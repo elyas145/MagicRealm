@@ -601,9 +601,11 @@ public class ModelController {
 							player.getCharacter().getType().toCounter())
 					.getParentTile().getName()) {
 				if (chit.getType() == MapChitType.LOST_CASTLE) {
-					castle = true;
+					if(!discoveredCastle)
+						castle = true;
 				} else if (chit.getType() == MapChitType.LOST_CITY) {
-					city = true;
+					if(!discoveredCity)
+						city = true;
 				}
 				if (lostCity.getWarningAndSite().contains(chit)) {
 					if (discoveredCity) {
