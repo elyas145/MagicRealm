@@ -24,16 +24,14 @@ import model.enums.MapChitType;
 import model.enums.PhaseType;
 import model.enums.TableType;
 import model.enums.TileName;
-import model.enums.ValleyChit;
 import communication.ClientNetworkHandler;
 import communication.handler.server.CheckSwordsmanPlay;
-import communication.handler.server.DiceRequest;
 import communication.handler.server.EnterBirdSong;
 import communication.handler.server.EnterCharacterSelection;
 import communication.handler.server.EnterLobby;
 import communication.handler.server.GameFinished;
+import communication.handler.server.IllegalCharacterSelection;
 import communication.handler.server.RequestSearchInformation;
-import communication.handler.server.SearchChoiceRequest;
 import communication.handler.server.SearchResults;
 import communication.handler.server.SetCheatMode;
 import communication.handler.server.UpdateHiding;
@@ -58,7 +56,6 @@ public class ServerController {
 	private int clientCount = 0;
 	private ModelController model;
 	private SerializedBoard sboard;
-	private boolean swordsmanTurn = false;
 	private int currentDay = 0;
 
 	public ServerController(Server s) {
@@ -147,12 +144,32 @@ public class ServerController {
 	 */
 	public void setCharacter(int iD, CharacterType character,
 			CounterType location) {
+		if(character == null || location == null || iD == 0)
+			return;
+		
+		boolean flag = false;
+		for (ClientThread c : clients) {
+			if (c.getCharacterType() == character) {
+				flag = true;
+			}
+		}
+
 		int pos = findClient(iD);
+		if (flag) {
+			if (pos >= 0){
+				clients.get(pos).send(new IllegalCharacterSelection(character));
+				return;
+			}else{
+				return;
+			}
+		}
 		if (pos >= 0) {
 			System.out.println("SERVER: setting client: " + iD + " character.");
 			clients.get(pos).setCharacter(character, location);
 			model.setPlayersInitialLocations(clients.get(pos).getCharacter()
 					.getType().toCounter(), location);
+		}else{
+			return;
 		}
 		boolean everyoneSelected = true;
 		// wait for all clients to choose their character
@@ -318,7 +335,6 @@ public class ServerController {
 	}
 
 	private Semaphore playSync = new Semaphore(0);
-	private int currentDieRoll;
 
 	public synchronized void setSwordsManTurn(boolean playing) {
 		// swordsmanTurn = playing;
@@ -418,10 +434,6 @@ public class ServerController {
 				+ " is not being played!");
 	}
 
-	public void setDieRoll(int roll) {
-		currentDieRoll = roll;
-		playSync.release();
-	}
 
 	public void updateMapChits(MapChitType type) {
 		switch (type) {

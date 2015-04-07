@@ -10,9 +10,7 @@ import java.util.concurrent.Semaphore;
 
 import jogamp.audio.JogAmpSoundController;
 import communication.ClientNetworkHandler;
-import communication.ServerNetworkHandler;
 import communication.handler.client.CharacterSelected;
-import communication.handler.client.DieRoll;
 import communication.handler.client.SearchCriteria;
 import communication.handler.client.SetSwordsmanPlay;
 import communication.handler.client.SubmitActivities;
@@ -33,7 +31,6 @@ import model.board.clearing.Clearing;
 import model.character.Character;
 import model.character.CharacterFactory;
 import model.character.Phase;
-import model.controller.requests.DieRequest;
 import model.counter.chit.MapChit;
 import model.enums.ActivityType;
 import model.enums.CharacterType;
@@ -41,13 +38,9 @@ import model.enums.ChitType;
 import model.enums.CounterType;
 import model.enums.MapChitType;
 import model.enums.PhaseType;
-import model.enums.SearchType;
 import model.enums.TableType;
 import model.enums.TileName;
-import model.enums.ValleyChit;
 import model.exceptions.MRException;
-import model.interfaces.ClearingInterface;
-import model.interfaces.HexTileInterface;
 import utils.random.Random;
 import utils.resources.ResourceHandler;
 import view.controller.BirdsongFinishedListener;
@@ -71,15 +64,15 @@ public class ControllerMain implements ClientController {
 	private int clientID = -1;
 	private ClientServer server;
 	private int sleepTime = 2000;
-	private ArrayList<MapChit> discoveredChits;
 	private MenuItemListener mainMenuListener;
+	private ArrayList<CharacterType> disabledCharacters;
 
 	public ControllerMain() {
 		rh = new ResourceHandler();
 		mainView = new LWJGLViewController(rh, new JogAmpSoundController());
 
 		server = new ClientServer(this);
-
+		disabledCharacters = new ArrayList<CharacterType>();
 		characters = new HashMap<Integer, Character>();
 		mainMenuListener = new MenuItemListener() {
 
@@ -232,13 +225,6 @@ public class ControllerMain implements ClientController {
 
 	}
 
-	@Override
-	public void rollDie() {
-		int i = 5;
-		// TODO i = mainView.rollDice();
-		server.send(new DieRoll(i));
-	}
-
 	/**
 	 * This function is called when the EnterLobby object is passed to the
 	 * client.
@@ -314,12 +300,17 @@ public class ControllerMain implements ClientController {
 	}
 
 	@Override
-	public void enterCharacterSelection() {
+	public void enterCharacterSelection(ArrayList<CharacterType> disabled) {
 		System.out.println("Entered player selection.");
 
 		ArrayList<CharacterType> characters = new ArrayList<CharacterType>();
 		for (CharacterType ct : CharacterType.values()) {
-			characters.add(ct);
+			if ((disabled != null) && !(disabled.contains(ct))) {
+				characters.add(ct);
+			} else {
+				if (disabled == null)
+					characters.add(ct);
+			}
 		}
 		mainView.enterCharacterSelection(characters,
 				new CharacterSelectionListener() {
@@ -594,9 +585,8 @@ public class ControllerMain implements ClientController {
 
 	@Override
 	public void updateCharacterSelection(CharacterType character) {
-		// TODO mainView.updateCharacterSelection(character);
 		mainView.disableCharacter(character);
-
+		disabledCharacters.add(character);
 		System.out.println("Client " + clientID
 				+ ": this character is now not selectable: "
 				+ character.toString());
@@ -703,7 +693,7 @@ public class ControllerMain implements ClientController {
 	public void peekMapChits(ArrayList<MapChit> peek) {
 		mainView.displayMessage("peeking at map chits.");
 		boardView.revealAllMapChits(peek);
-		
+
 	}
 
 	@Override
@@ -763,6 +753,12 @@ public class ControllerMain implements ClientController {
 	public void gameFinished(CharacterType winner, int score) {
 		mainView.displayBanner("Game Over! The winner is " + winner
 				+ " with score: " + score + "!");
+	}
+
+	@Override
+	public void illegalCharacterSelection(CharacterType type) {
+		mainView.displayMessage("Sorry. character already selected.");
+		this.enterCharacterSelection(disabledCharacters);
 	}
 
 }

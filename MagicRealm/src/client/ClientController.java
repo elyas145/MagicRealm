@@ -32,7 +32,7 @@ public interface ClientController {
 
 	void enterBirdSong();
 
-	void enterCharacterSelection();
+	void enterCharacterSelection(ArrayList<CharacterType> disabled);
 
 	void enterLobby(SerializedBoard sboard);
 
@@ -54,7 +54,6 @@ public interface ClientController {
 
 	void revealMapChits(Iterable<MapChit> chits);
 
-	void rollDie();
 
 	void setHiding(CharacterType character, boolean hid);
 
@@ -101,5 +100,7 @@ public interface ClientController {
 	void addGold(int goldValue, MapChitType site);
 
 	void gameFinished(CharacterType winner, int score);
+
+	void illegalCharacterSelection(CharacterType type);
 
 }

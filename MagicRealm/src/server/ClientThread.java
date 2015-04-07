@@ -148,4 +148,11 @@ public class ClientThread extends Thread {
 	public void setMountainClearing(Clearing mountainClearing) {
 		this.mountainClearing = mountainClearing;
 	}
+
+	public CharacterType getCharacterType() {
+		if(player.getCharacter() != null){
+			return player.getCharacter().getType();
+		}
+		return null;
+	}
 }

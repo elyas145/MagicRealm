@@ -18,7 +18,7 @@ public class Player {
 
 	private int number;
 	private String name;
-	private Character character;
+	private Character character = null;
 	private PersonalHistory historyPad;
 	private Map<ClearingInterface, EnchantedHolder<Set<ClearingInterface>>> discoveredPaths;
 	private ArrayList<MapChit> discoveredChits;

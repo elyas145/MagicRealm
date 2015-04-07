@@ -12,7 +12,7 @@ public class EnterCharacterSelection implements ClientNetworkHandler{
 
 	@Override
 	public void handle(ClientController controller) {
-		controller.enterCharacterSelection();
+		controller.enterCharacterSelection(null);
 		
 	}
 	@Override
