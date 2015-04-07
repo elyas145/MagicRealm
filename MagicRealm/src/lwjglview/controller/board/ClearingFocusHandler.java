@@ -1,4 +1,4 @@
-package lwjglview.graphics.board;
+package lwjglview.controller.board;
 
 import model.enums.TileName;
 

@@ -8,6 +8,8 @@ import java.util.List;
 
 import config.GraphicsConfiguration;
 import lwjglview.controller.birdsong.LWJGLBirdsong;
+import lwjglview.controller.board.ClearingFocusHandler;
+import lwjglview.controller.board.LWJGLBoardDrawable;
 import lwjglview.controller.lobby.LWJGLLobbyView;
 import lwjglview.controller.mainmenu.LWJGLMainMenu;
 import lwjglview.controller.searchtable.LWJGLSearchChoiceView;
@@ -15,8 +17,6 @@ import lwjglview.controller.searchtable.LWJGLTableSelection;
 import lwjglview.controller.characterselection.LWJGLCharacterSelection;
 import lwjglview.controller.cheatmode.LWJGLDieSelection;
 import lwjglview.graphics.LWJGLGraphics;
-import lwjglview.graphics.board.ClearingFocusHandler;
-import lwjglview.graphics.board.LWJGLBoardDrawable;
 import lwjglview.menus.LWJGLAlertDialog;
 import lwjglview.menus.LWJGLConfirmationDialog;
 import lwjglview.menus.LWJGLMenuLayer;

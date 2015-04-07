@@ -10,7 +10,7 @@ import communication.ClientNetworkHandler;
 import communication.handler.server.serialized.SerializedBoard;
 import communication.handler.server.serialized.SerializedMapChit;
 import view.controller.game.BoardView;
-import lwjglview.graphics.board.LWJGLBoardDrawable;
+import lwjglview.controller.board.LWJGLBoardDrawable;
 import model.activity.Activity;
 import model.board.Board;
 import model.character.Character;

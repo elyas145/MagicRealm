@@ -1,4 +1,4 @@
-package lwjglview.graphics.board;
+package lwjglview.controller.board;
 
 import java.awt.Color;
 import java.io.IOException;
@@ -465,8 +465,8 @@ public class LWJGLBoardDrawable extends LWJGLCounterLocator implements BoardView
 
 		private void addPosition(LWJGLCounterStorage store, boolean ench) {
 			synchronized (buffer3) {
-				store.getLocation(buffer3, false);
-				position.set(false, Matrix.clone(buffer3));
+				store.getLocation(buffer3, ench);
+				position.set(ench, Matrix.clone(buffer3));
 			}
 		}
 

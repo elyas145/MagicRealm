@@ -1,8 +1,8 @@
 package lwjglview.graphics;
 
+import lwjglview.controller.board.LWJGLBoardDrawable;
 import lwjglview.graphics.animator.matrixcalculator.MatrixCalculator;
 import lwjglview.graphics.animator.matrixcalculator.StaticMatrixCalculator;
-import lwjglview.graphics.board.LWJGLBoardDrawable;
 import utils.math.linear.Matrix;
 
 public class TransformationDrawable extends LWJGLDrawableNode {
