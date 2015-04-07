@@ -13,4 +13,5 @@ public class GameConfiguration {
 	
 	public static boolean Cheat = false;
 	public static final boolean DEBUG_MODE = true;
+	public static final int MAX_TREASURE_VALUE = 50;
 }

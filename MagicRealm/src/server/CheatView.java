@@ -188,8 +188,6 @@ public class CheatView extends JFrame implements ActionListener {
 			comboContainer.add(comboSites);
 			comboContainer.add(comboTiles);
 			treasurePane.add(comboContainer);
-			treasurePane.add(new JLabel("Value: "));
-			treasurePane.add(treasureValue);
 			treasurePane.add(ok);
 			setContentPane(treasurePane);
 			pack();

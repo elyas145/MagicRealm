@@ -24,7 +24,7 @@ public class GraphicsConfiguration {
 	public static final int IMAGE_SCALE_WIDTH = 512;
 	public static final int IMAGE_SCALE_HEIGHT = 512;
 	
-	public static final float CHIT_SCALE = .14f;
+	public static final float CHIT_SCALE = .1f;
 	public static final float CHIT_HOVER = CHIT_SCALE * .2f;
 	
 	public static final float CHIT_SPACING = CHIT_SCALE * .2f;
@@ -41,7 +41,10 @@ public class GraphicsConfiguration {
 	public static final float DAY_CHANGE_TIME = 3f;
 	
 	public static final Color MAP_CHIT_HIDE_COLOUR = new Color(1f, 1f, 1f, 0f);
-	public static final Color MAP_CHIT_SHOW_COLOUR = new Color(1f, 1f, 1f, 1f);
+	public static final Color MAP_CHIT_WHITE_COLOUR = new Color(1f, 1f, 1f, 1f);
+	public static final Color MAP_CHIT_YELLOW_COLOUR = new Color(1f, 1f, 0f, 1f);
+	public static final Color MAP_CHIT_RED_COLOUR = new Color(1f, 0f, 0f, 1f);
+	public static final Color MAP_CHIT_ORANGE_COLOUR = new Color(1f, .63529f, 0f, 1f);
 	
 	public static final int INITIAL_ACTION_WIDTH = 200;
 	public static final int INITIAL_ACTION_HEIGHT = 150;

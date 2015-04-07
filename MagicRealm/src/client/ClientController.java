@@ -98,4 +98,6 @@ public interface ClientController {
 
 	void clueLost(MapChitType type);
 
+	void addGold(int goldValue, MapChitType site);
+
 }

@@ -59,7 +59,7 @@ public class Board implements BoardInterface {
 		mapOfTiles = new HashMap<TileName, HexTile>();
 		clearingLocations = new HashMap<TileName, Map<Integer, EnchantedHolder<ClearingData>>>();
 		counterPositions = new HashMap<CounterType, Clearing>();
-		mapChitsToLoad = new HashSet<MapChit>();
+		mapChitsToLoad = new ArrayList<MapChit>();
 		
 		try {
 			String path = rh.getResource(ResourceHandler.joinPath("data",
@@ -124,7 +124,7 @@ public class Board implements BoardInterface {
 			counterPositions.put(type, new Clearing(sboard
 					.getCounterPositions().get(type)));
 		}
-		mapChitsToLoad = new HashSet<MapChit>();
+		mapChitsToLoad = new ArrayList<MapChit>();
 		mapChitLocations = new ConcurrentHashMap<MapChit, TileName>();
 		for (SerializedMapChit name : sboard.getMapChitLocations().keySet()) {
 			MapChit c = new MapChit(name);
@@ -350,7 +350,7 @@ public class Board implements BoardInterface {
 	private Map<TileName, HexTile> mapOfTiles;
 	private Map<TileName, int[]> tileLocations;
 	private Map<MapChit, TileName> mapChitLocations;
-	private HashSet<MapChit> mapChitsToLoad;
+	private ArrayList<MapChit> mapChitsToLoad;
 	
 	public Map<MapChit, TileName> getMapChitLocations() {
 		return mapChitLocations;
@@ -358,7 +358,7 @@ public class Board implements BoardInterface {
 
 	public void setMapChitLocations(Map<MapChit, TileName> mapChitLocations) {
 		this.mapChitLocations = mapChitLocations;
-		mapChitsToLoad = new HashSet<MapChit>();
+		mapChitsToLoad = new ArrayList<MapChit>();
 		for(MapChit c : mapChitLocations.keySet()){
 			mapChitsToLoad.add(c);
 		}
@@ -439,12 +439,12 @@ public class Board implements BoardInterface {
 		return null;
 	}
 
-	public HashSet<MapChit> getMapChitsToLoad() {
+	public ArrayList<MapChit> getMapChitsToLoad() {
 		return mapChitsToLoad;
 	}
 
 	public void setMapChitsToLoad(Collection<MapChit> mapChitsToLoad) {
-		this.mapChitsToLoad = new HashSet<MapChit> (mapChitsToLoad);
+		this.mapChitsToLoad = new ArrayList<MapChit> (mapChitsToLoad);
 	}
 
 	public void addChitsToLoad(ArrayList<MapChit> array) {

@@ -86,17 +86,12 @@ public class MapChit extends Chit implements Serializable, Comparable<MapChit> {
 	public String toString() {
 		String str = "";
 		if (this.type != null) {
-			str += type.type() + ": ";
+			str += type + ": ";
 			str += this.type.type().toString() + ": ";
-			//str += this.identifier + ": ";
-			//str += super.toString();
+			// str += this.identifier + ": ";
+			// str += super.toString();
 		}
 		return str;
-	}
-
-	@Override
-	public int hashCode() {
-		return type.hashCode() + identifier * MapChitType.values().length;
 	}
 
 	public SerializedMapChit getSerializedChit() {
@@ -112,12 +107,13 @@ public class MapChit extends Chit implements Serializable, Comparable<MapChit> {
 		int mine, theirs;
 		mine = type.ordinal();
 		theirs = other.type.ordinal();
-		if(mine == theirs) {
+		if (mine == theirs) {
 			return identifier - other.identifier;
 		}
 		return mine - theirs;
 	}
-	public boolean equals(MapChit other){
+
+	public boolean equals(MapChit other) {
 		return (this.identifier == other.identifier && this.type == other.type);
 	}
 }
