@@ -142,16 +142,14 @@ public class LWJGLBirdsong implements BirdsongView {
 			if (visible) {
 				vec3.fill(0f, -.8f, 0f);
 				borderPane.slide(vec3, GraphicsConfiguration.PANEL_TIME);
+				for(Phaser phr: phases) {
+					phr.drop.reset();
+				}
 			} else {
 				borderPane.resetPosition();
 			}
 		}
 		visible = vis;
-	}
-
-	@Override
-	public void updateHistory(PersonalHistory hist) {
-		// TODO Auto-generated method stub
 	}
 
 	@Override

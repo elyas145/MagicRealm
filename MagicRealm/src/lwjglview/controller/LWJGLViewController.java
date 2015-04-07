@@ -10,6 +10,7 @@ import config.GraphicsConfiguration;
 import lwjglview.controller.birdsong.LWJGLBirdsong;
 import lwjglview.controller.lobby.LWJGLLobbyView;
 import lwjglview.controller.mainmenu.LWJGLMainMenu;
+import lwjglview.controller.searchtable.LWJGLSearchChoiceView;
 import lwjglview.controller.searchtable.LWJGLTableSelection;
 import lwjglview.controller.characterselection.LWJGLCharacterSelection;
 import lwjglview.controller.cheatmode.LWJGLDieSelection;
@@ -27,6 +28,7 @@ import model.character.Phase;
 import model.counter.chit.MapChit;
 import model.enums.ActivityType;
 import model.enums.CharacterType;
+import model.enums.SearchType;
 import model.enums.TileName;
 import utils.handler.Handler;
 import utils.resources.ResourceHandler;
@@ -39,6 +41,7 @@ import view.controller.birdsong.ActivitiesListener;
 import view.controller.characterselection.CharacterSelectionListener;
 import view.controller.cheatmode.DieSelectionListener;
 import view.controller.mainmenu.MenuItemListener;
+import view.controller.search.SearchTypeListener;
 import view.controller.search.TableSelectionListener;
 
 public class LWJGLViewController implements ViewController {
@@ -173,6 +176,12 @@ public class LWJGLViewController implements ViewController {
 		hideBanner();
 		tableSelect.selectTable(tsl);
 	}
+	
+	@Override
+	public void selectSearchType(List<SearchType> avail, SearchTypeListener stl) {
+		hideBanner();
+		searchSelect.selectSearchType(avail, stl);
+	}
 
 	@Override
 	public void selectDie(DieSelectionListener dsl) {
@@ -268,6 +277,7 @@ public class LWJGLViewController implements ViewController {
 		menus.add(characterSelection);
 		mainMenu = new LWJGLMainMenu(menus, resources);
 		tableSelect = new LWJGLTableSelection(resources, menus);
+		searchSelect = new LWJGLSearchChoiceView(resources, menus);
 		dieSelection = new LWJGLDieSelection(resources, menus);
 		confirmation = new LWJGLConfirmationDialog(menus, resources,
 				"Will you join the dark side?", "Yes master", "Never!", -.73f,
@@ -313,6 +323,7 @@ public class LWJGLViewController implements ViewController {
 	private LWJGLWaitingView messageOverlay;
 	private LWJGLLobbyView lobbyView;
 	private LWJGLTableSelection tableSelect;
+	private LWJGLSearchChoiceView searchSelect;
 	private LWJGLDieSelection dieSelection;
 	private LWJGLTextLog discovered;
 

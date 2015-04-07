@@ -8,11 +8,13 @@ import model.activity.Activity;
 import model.character.Phase;
 import model.counter.chit.MapChit;
 import model.enums.CharacterType;
+import model.enums.SearchType;
 import model.enums.TileName;
 import model.player.PersonalHistory;
 import view.controller.characterselection.CharacterSelectionListener;
 import view.controller.cheatmode.DieSelectionListener;
 import view.controller.mainmenu.MenuItemListener;
+import view.controller.search.SearchTypeListener;
 import view.controller.search.SearchView;
 import view.controller.search.TableSelectionListener;
 
@@ -43,6 +45,8 @@ public interface ViewController {
 	void waitingForPlayers(int count);
 	
 	void selectSearchTable(TableSelectionListener tsl);
+	
+	void selectSearchType(List<SearchType> avail, SearchTypeListener stl);
 	
 	void selectDie(DieSelectionListener dsl);
 	

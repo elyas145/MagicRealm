@@ -93,6 +93,7 @@ public class LWJGLDropdown<T> extends LWJGLPanel {
 			remove(text, LWJGLPanel.Type.FOREGROUND);
 			text = null;
 		}
+		setShowing(false);
 	}
 	
 	protected void setText(LWJGLTextureLoader texture) {

@@ -38,6 +38,7 @@ import model.enums.ChitType;
 import model.enums.CounterType;
 import model.enums.MapChitType;
 import model.enums.PhaseType;
+import model.enums.SearchType;
 import model.enums.TableType;
 import model.enums.TileName;
 import model.exceptions.MRException;
@@ -52,6 +53,7 @@ import view.controller.cheatmode.DieSelectionListener;
 import view.controller.game.BoardView;
 import view.controller.mainmenu.MenuItem;
 import view.controller.mainmenu.MenuItemListener;
+import view.controller.search.SearchTypeListener;
 import view.controller.search.TableSelectionListener;
 
 public class ControllerMain implements ClientController {
@@ -665,9 +667,25 @@ public class ControllerMain implements ClientController {
 					rollValue[0] = Random.dieRoll();
 				}
 				if (rollValue[0] == 1 && table != TableType.LOOT) {
-					Semaphore sem3 = new Semaphore(0);
 					// ask for row.
-					rollValue[0] = 2;
+					ArrayList<SearchType> types = new ArrayList<SearchType>();
+					table.getSearchTypes(types);
+					types.remove(SearchType.CHOICE);
+					final Semaphore sem = new Semaphore(0);
+					mainView.selectSearchType(types, new SearchTypeListener() {
+
+						@Override
+						public void onSearchTypeSelected(SearchType st) {
+							rollValue[0] = table.getRollValue(st);
+							sem.release();
+						}
+						
+					});
+					try {
+						sem.acquire();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
 				}
 				sem.release();
 			}
@@ -683,10 +701,7 @@ public class ControllerMain implements ClientController {
 	}
 
 	@Override
-	public void requestSearchChoice(TableType table) {
-		// TODO mainView.searchChoice();
-		server.send(new SearchCriteria(characters.get(clientID).getType(),
-				table, 2));
+	public void requestSearchChoice(final TableType table) {
 	}
 
 	@Override

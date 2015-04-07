@@ -15,6 +15,7 @@ import java.util.concurrent.Semaphore;
 import model.activity.Activity;
 import model.activity.Move;
 import model.controller.ModelController;
+import model.counter.chit.LostSite;
 import model.counter.chit.MapChit;
 import model.enums.ActivityType;
 import model.enums.CharacterType;
@@ -397,28 +398,25 @@ public class ServerController {
 		// do the search activity with the player
 		ClientThread ct = getPlayerOf(car);
 		SearchResults res = model.performSearch(ct.getPlayer(), tbl, rv);
-		if (res.isCastle() && tbl == TableType.LOCATE) {
-			model.getBoard().removeMapChit(model.getCastle());
-			for (MapChit c : model.getCastle().getWarningAndSite()) {
-				model.getBoard().setLocationOfMapChit(c,
-						model.getCastle().getTile());
+		if(tbl == TableType.LOCATE) {
+			if (res.isCastle() || res.isCity()) {
+				LostSite ls;
+				if(res.isCastle()) {
+					ls = model.getCastle();
+				} else {
+					ls = model.getCity();
+				}
+				model.getBoard().removeMapChit(ls);
+				for (MapChit c : model.getCastle().getWarningAndSite()) {
+					model.getBoard().setLocationOfMapChit(c,
+							ls.getTile());
+				}
+				ArrayList<SerializedMapChit> smapchits = new ArrayList<SerializedMapChit>();
+				for (MapChit c : ls.getWarningAndSite()) {
+					smapchits.add(c.getSerializedChit());
+				}
+				sendAll(new UpdateMapChits(ls.getType(), smapchits));
 			}
-			ArrayList<SerializedMapChit> smapchits = new ArrayList<SerializedMapChit>();
-			for (MapChit c : model.getCastle().getWarningAndSite()) {
-				smapchits.add(c.getSerializedChit());
-			}
-			sendAll(new UpdateMapChits(MapChitType.LOST_CASTLE, smapchits));
-		} else if (res.isCity() && tbl == TableType.LOCATE) {
-			model.getBoard().removeMapChit(model.getCity());
-			for (MapChit c : model.getCity().getWarningAndSite()) {
-				model.getBoard().setLocationOfMapChit(c,
-						model.getCity().getTile());
-			}
-			ArrayList<SerializedMapChit> smapchits = new ArrayList<SerializedMapChit>();
-			for (MapChit c : model.getCity().getWarningAndSite()) {
-				smapchits.add(c.getSerializedChit());
-			}
-			sendAll(new UpdateMapChits(MapChitType.LOST_CITY, smapchits));
 		}
 		getPlayerOf(car).send(res);
 		playSync.release();
