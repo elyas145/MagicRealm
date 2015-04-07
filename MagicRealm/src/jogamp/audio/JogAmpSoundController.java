@@ -1,6 +1,10 @@
 package jogamp.audio;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import model.enums.MapChitType;
+import utils.random.Random;
 import view.audio.SoundController;
 
 public class JogAmpSoundController implements SoundController {
@@ -8,6 +12,8 @@ public class JogAmpSoundController implements SoundController {
 	private JogAmpAudio audio;
 	
 	private String mainTheme, lobbyTheme;
+	
+	private List<String> themes;
 	
 	private String playingTheme;
 	
@@ -17,6 +23,14 @@ public class JogAmpSoundController implements SoundController {
 		audio = JogAmpAudio.getInstance();
 		mainTheme = "VictoryMarch.wav";
 		lobbyTheme = "spell_fury_final_mix.wav";
+		themes = new ArrayList<String>();
+		themes.add("BeforeTheBattle.wav");
+		themes.add("CosmicFestival.wav");
+		themes.add("FightScene.wav");
+		themes.add("Highlander.wav");
+		themes.add("Mists.wav");
+		themes.add("Nascimento.wav");
+		Random.shuffle(themes);
 		playingTheme = null;
 		alertSound = "alert1.wav";
 		errorSound = "alert2.wav";
@@ -24,12 +38,26 @@ public class JogAmpSoundController implements SoundController {
 	
 	@Override
 	public void playMainTheme() {
-		playTheme(mainTheme);
+		playTheme(mainTheme, new Runnable() {
+
+			@Override
+			public void run() {
+				playMainTheme();
+			}
+			
+		});
 	}
 
 	@Override
 	public void playLobbyTheme() {
-		playTheme(lobbyTheme);
+		playTheme(lobbyTheme, new Runnable() {
+
+			@Override
+			public void run() {
+				playNext();
+			}
+			
+		});
 	}
 
 	@Override
@@ -59,12 +87,25 @@ public class JogAmpSoundController implements SoundController {
 		audio.stopSound(alertSound);
 		audio.killALData();
 	}
+
+	private void playNext() {
+		String fl = themes.remove(0);
+		themes.add(fl);
+		playTheme(fl, new Runnable() {
+
+			@Override
+			public void run() {
+				playNext();
+			}
+			
+		});
+	}
 	
-	private void playTheme(String fl) {
+	private void playTheme(String fl, Runnable onfinish) {
 		if(playingTheme != null) {
 			audio.stopSound(playingTheme);
 		}
-		audio.playSound(fl);
+		audio.playSound(fl, onfinish);
 		playingTheme = fl;
 	}
 
