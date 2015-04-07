@@ -25,7 +25,7 @@ import utils.tools.IterationTools;
 public class HexTile implements HexTileInterface {
 
 	private static final long serialVersionUID = 5303629252128539756L;
-
+	private boolean enchanted = false;
 	public HexTile(Board par, TileName tile, int x, int y, int rot,
 			Map<Integer, EnchantedHolder<ClearingData>> locations,
 			TileName[] surrounding) {
@@ -151,8 +151,7 @@ public class HexTile implements HexTileInterface {
 
 	@Override
 	public boolean isEnchanted() {
-		// TODO implement enchanted tile
-		return false;
+		return enchanted;
 	}
 
 	protected Board getParent() {
@@ -508,5 +507,10 @@ public class HexTile implements HexTileInterface {
 		}
 		sTile.setClearings(sClearings);
 		return sTile;
+	}
+
+	public boolean setEnchanted(boolean b) {
+		this.enchanted = b;		
+		return this.enchanted;
 	}
 }

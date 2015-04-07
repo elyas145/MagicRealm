@@ -23,6 +23,7 @@ import config.GameConfiguration;
 import config.NetworkConfiguration;
 import lwjglview.controller.LWJGLViewController;
 import model.activity.Activity;
+import model.activity.Enchant;
 import model.activity.Hide;
 import model.activity.Move;
 import model.activity.Search;
@@ -68,11 +69,11 @@ public class ControllerMain implements ClientController {
 	private int sleepTime = 2000;
 	private MenuItemListener mainMenuListener;
 	private ArrayList<CharacterType> disabledCharacters;
-
+	private ArrayList<String> updateStrings;
 	public ControllerMain() {
 		rh = new ResourceHandler();
 		mainView = new LWJGLViewController(rh, new JogAmpSoundController());
-
+		updateStrings = new ArrayList<String>();
 		server = new ClientServer(this);
 		disabledCharacters = new ArrayList<CharacterType>();
 		characters = new HashMap<Integer, Character>();
@@ -477,6 +478,9 @@ public class ControllerMain implements ClientController {
 						activitiesList.add(new Search(characters.get(clientID)
 								.getType(), phases.get(i[0]).getType()));
 						break;
+					case ENCHANT:
+						activitiesList.add(new Enchant(characters.get(clientID)
+								.getType(), phases.get(i[0]).getType()));
 					default:
 						break;
 					}
@@ -759,20 +763,35 @@ public class ControllerMain implements ClientController {
 	@Override
 	public void addGold(int goldValue, MapChitType site) {
 		this.goldValue += goldValue;
-		mainView.displayMessage("You looted " + site + "! gold: "
+		updateStrings.clear();
+		updateStrings.add("You looted " + site + "! gold: "
 				+ this.goldValue);
+		mainView.updateLog(updateStrings);
 	}
 
 	@Override
 	public void gameFinished(CharacterType winner, int score) {
-		mainView.displayBanner("Game Over! The winner is " + winner
-				+ " with score: " + score + "!");
+		mainView.displayBanner(("Game Over! The winner is " + winner
+				+ " with score: " + score + "!"));
 	}
 
 	@Override
 	public void illegalCharacterSelection(CharacterType type) {
 		mainView.displayMessage("Sorry. character already selected.");
 		this.enterCharacterSelection(disabledCharacters);
+	}
+
+	@Override
+	public void setEnchantedTile(TileName tile, CharacterType actor,
+			boolean bool) {
+		boardView.enchantTile(tile);
+		this.updateStrings.clear();
+		if(bool){			
+			updateStrings.add(actor + " has enchanted " + tile);			
+		}else{
+			updateStrings.add(actor + " has un-enchanted " + tile);
+		}
+		mainView.updateLog(updateStrings);
 	}
 
 }

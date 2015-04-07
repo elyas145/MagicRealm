@@ -4,7 +4,8 @@ public enum ActivityType {
 	NONE,
 	MOVE,
 	HIDE,
-	SEARCH;
+	SEARCH,
+	ENCHANT;
 	
 	@Override
 	public String toString() {
@@ -17,6 +18,8 @@ public enum ActivityType {
 			return "Hide";
 		case SEARCH:
 			return "Search";
+		case ENCHANT:
+			return "Enchant";
 		}
 		return "null";
 	}

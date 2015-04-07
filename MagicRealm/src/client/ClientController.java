@@ -103,4 +103,6 @@ public interface ClientController {
 
 	void illegalCharacterSelection(CharacterType type);
 
+	void setEnchantedTile(TileName tile, CharacterType actor, boolean bool);
+
 }

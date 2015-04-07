@@ -455,4 +455,11 @@ public class Board implements BoardInterface {
 		
 	}
 
+	public boolean setEnchantedTile(TileName tile) {
+		if(mapOfTiles.get(tile).isEnchanted())
+			return mapOfTiles.get(tile).setEnchanted(false);
+		else
+			return mapOfTiles.get(tile).setEnchanted(true);
+		
+	}
 }

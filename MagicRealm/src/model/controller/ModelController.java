@@ -12,6 +12,7 @@ import communication.handler.server.SearchResults;
 import communication.handler.server.serialized.SerializedMapChit;
 import config.BoardConfiguration;
 import config.GameConfiguration;
+import server.ClientThread;
 import utils.random.Random;
 import utils.resources.ResourceHandler;
 import utils.structures.Queue;
@@ -69,7 +70,6 @@ public class ModelController {
 		}
 
 		mapChits = new HashSet<MapChit>();
-		
 
 		treasures = new HashMap<MapChitType, ArrayList<Treasure>>();
 
@@ -446,17 +446,25 @@ public class ModelController {
 		case LOOT:
 			return lootSearch(player, rollValue);
 		default:
-			break;
+			return null;
 		}
-		return null;
 	}
 
 	private SearchResults lootSearch(Player player, int rollValue) {
-		TileName myTile = board.getLocationOfCounter(player.getCharacter().getType().toCounter()).getParentTile().getName();
-		int myClearing = board.getLocationOfCounter(player.getCharacter().getType().toCounter()).getClearingNumber();
-		for(MapChit c : board.getMapChitLocations().keySet()){
-			if((c.getTile() == myTile) && (c.getClearing() == myClearing) && (c.getType().type() == ChitType.SITE) && (player.hasDiscoveredSite(c))){
-				return new SearchResults(SearchType.LOOT, GameConfiguration.MAX_TREASURE_VALUE / rollValue, c.getType());
+		TileName myTile = board
+				.getLocationOfCounter(
+						player.getCharacter().getType().toCounter())
+				.getParentTile().getName();
+		int myClearing = board.getLocationOfCounter(
+				player.getCharacter().getType().toCounter())
+				.getClearingNumber();
+		for (MapChit c : board.getMapChitLocations().keySet()) {
+			if ((c.getTile() == myTile) && (c.getClearing() == myClearing)
+					&& (c.getType().type() == ChitType.SITE)
+					&& (player.hasDiscoveredSite(c))) {
+				return new SearchResults(SearchType.LOOT,
+						GameConfiguration.MAX_TREASURE_VALUE / rollValue,
+						c.getType());
 			}
 		}
 		return new SearchResults(SearchType.NONE);
@@ -499,19 +507,19 @@ public class ModelController {
 					castle = true;
 				}
 				if (lostCity.getWarningAndSite().contains(chit)) {
-					System.out.println("this chit is inside lost city.");					
+					System.out.println("this chit is inside lost city.");
 					if (discoveredCity) {
 						System.out.println("lost city discovered");
 						peek.add(chit);
-					}else{
+					} else {
 						city = true;
 					}
 				} else if (lostCastle.getWarningAndSite().contains(chit)) {
-					System.out.println("this chit is inside lost castle.");					
+					System.out.println("this chit is inside lost castle.");
 					if (discoveredCastle) {
 						System.out.println("lost castle discovered");
 						peek.add(chit);
-					}else{
+					} else {
 						castle = true;
 					}
 				} else {
@@ -576,10 +584,10 @@ public class ModelController {
 		SearchResults cResult = peerC(player);
 		SearchResults pResults = peerP(player);
 		SearchResults res = new SearchResults(SearchType.CLUES_PATHS);
-		if(cResult.isCastle()){
+		if (cResult.isCastle()) {
 			res.setCastle(true);
 		}
-		if(cResult.isCity()){
+		if (cResult.isCity()) {
 			res.setCity(true);
 		}
 		res.setPeek(cResult.getPeek());
@@ -601,21 +609,21 @@ public class ModelController {
 							player.getCharacter().getType().toCounter())
 					.getParentTile().getName()) {
 				if (chit.getType() == MapChitType.LOST_CASTLE) {
-					if(!discoveredCastle)
+					if (!discoveredCastle)
 						castle = true;
 				} else if (chit.getType() == MapChitType.LOST_CITY) {
-					if(!discoveredCity)
+					if (!discoveredCity)
 						city = true;
 				}
 				if (lostCity.getWarningAndSite().contains(chit)) {
 					if (discoveredCity) {
 						peek.add(chit);
 					}
-				} else if (lostCastle.getWarningAndSite().contains(chit)){
+				} else if (lostCastle.getWarningAndSite().contains(chit)) {
 					if (discoveredCastle) {
 						peek.add(chit);
 					}
-				}else {
+				} else {
 					peek.add(chit);
 				}
 			}
@@ -726,8 +734,8 @@ public class ModelController {
 				smapchits.add(c.getSerializedChit());
 			}
 			break;
-			default:
-				break;
+		default:
+			break;
 		}
 		return smapchits;
 	}
@@ -745,8 +753,8 @@ public class ModelController {
 		case LOST_CASTLE:
 			lostCastle = new LostSite(MapChitType.LOST_CASTLE);
 			lostCastle.setTile(tile);
-			lostCastle.setWarningAndSite(mcArray);			
-			lostCastle.setClearing(MapChitType.LOST_CASTLE.getClearing());			
+			lostCastle.setWarningAndSite(mcArray);
+			lostCastle.setClearing(MapChitType.LOST_CASTLE.getClearing());
 			board.setLocationOfMapChit(lostCastle, tile);
 			board.addChitsToLoad(lostCastle.getWarningAndSite());
 			mapChits.add(lostCastle);
@@ -754,8 +762,8 @@ public class ModelController {
 		case LOST_CITY:
 			lostCity = new LostSite(MapChitType.LOST_CITY);
 			lostCity.setTile(tile);
-			lostCity.setWarningAndSite(mcArray);			
-			lostCity.setClearing(MapChitType.LOST_CITY.getClearing());			
+			lostCity.setWarningAndSite(mcArray);
+			lostCity.setClearing(MapChitType.LOST_CITY.getClearing());
 			board.setLocationOfMapChit(lostCity, tile);
 			mapChits.add(lostCity);
 			board.addChitsToLoad(lostCity.getWarningAndSite());
@@ -763,5 +771,16 @@ public class ModelController {
 		default:
 			break;
 		}
+	}
+
+	public boolean enchantTile(Player player) {
+		return board.setEnchantedTile(board
+				.getLocationOfCounter(
+						player.getCharacter().getType().toCounter())
+				.getParentTile().getName());
+	}
+
+	public TileName getLocation(Character character) {
+		return board.getLocationOfCounter(character.getType().toCounter()).getParentTile().getName();
 	}
 }

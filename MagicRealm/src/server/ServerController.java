@@ -35,6 +35,7 @@ import communication.handler.server.IllegalCharacterSelection;
 import communication.handler.server.RequestSearchInformation;
 import communication.handler.server.SearchResults;
 import communication.handler.server.SetCheatMode;
+import communication.handler.server.UpdateEnchantedTile;
 import communication.handler.server.UpdateHiding;
 import communication.handler.server.IllegalMove;
 import communication.handler.server.MessageDisplay;
@@ -450,6 +451,10 @@ public class ServerController {
 			TileName tile) {
 		model.setLost(lost, array, tile);
 
+	}
+
+	public void requestEnchant(CharacterType actor) {
+		sendAll(new UpdateEnchantedTile(model.getLocation(getPlayerOf(actor).getCharacter()), actor, model.enchantTile(getPlayerOf(actor).getPlayer())));		
 	}
 
 }

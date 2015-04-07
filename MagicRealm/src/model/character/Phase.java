@@ -66,12 +66,14 @@ public class Phase implements Serializable{
 			possibleActivities.add(ActivityType.HIDE);
 			possibleActivities.add(ActivityType.MOVE);
 			possibleActivities.add(ActivityType.SEARCH);
+			possibleActivities.add(ActivityType.ENCHANT);
 			break;
 		case SUNLIGHT:
 			possibleActivities.add(ActivityType.NONE);
 			possibleActivities.add(ActivityType.HIDE);
 			possibleActivities.add(ActivityType.MOVE);
 			possibleActivities.add(ActivityType.SEARCH);
+			possibleActivities.add(ActivityType.ENCHANT);
 			break;
 		case SPECIAL:
 			break;
