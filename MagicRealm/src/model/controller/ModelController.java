@@ -708,7 +708,7 @@ public class ModelController {
 	}
 
 	public void setLostCityFound(boolean b) {
-		discoveredCastle = b;
+		discoveredCity = b;
 	}
 
 	public ArrayList<SerializedMapChit> getLostChits(MapChitType type) {
