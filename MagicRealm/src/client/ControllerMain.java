@@ -678,6 +678,7 @@ public class ControllerMain implements ClientController {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+		
 		server.send(new SearchCriteria(characters.get(clientID).getType(),
 				selectedTable, rollValue[0]));
 	}

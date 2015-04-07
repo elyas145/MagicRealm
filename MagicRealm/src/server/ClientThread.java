@@ -113,7 +113,7 @@ public class ClientThread extends Thread {
 	
 	public void newTurn() {
 		playedTurn = false;
-		currentActivities = new ArrayList<Activity>();
+		currentActivities = null;
 		player.setSunlightFlag(false);
 		mountainMoveCount = 0;
 	}
