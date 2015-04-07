@@ -100,4 +100,6 @@ public interface ClientController {
 
 	void addGold(int goldValue, MapChitType site);
 
+	void gameFinished(CharacterType winner, int score);
+
 }

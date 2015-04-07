@@ -31,6 +31,7 @@ import communication.handler.server.DiceRequest;
 import communication.handler.server.EnterBirdSong;
 import communication.handler.server.EnterCharacterSelection;
 import communication.handler.server.EnterLobby;
+import communication.handler.server.GameFinished;
 import communication.handler.server.RequestSearchInformation;
 import communication.handler.server.SearchChoiceRequest;
 import communication.handler.server.SearchResults;
@@ -58,6 +59,7 @@ public class ServerController {
 	private ModelController model;
 	private SerializedBoard sboard;
 	private boolean swordsmanTurn = false;
+	private int currentDay = 0;
 
 	public ServerController(Server s) {
 		this.server = s;
@@ -178,15 +180,27 @@ public class ServerController {
 			characters.put(c.getID(), c.getCharacter());
 		}
 		sendAll(new StartGame(sboard, characters));
-		if(GameConfiguration.Cheat){
+		if (GameConfiguration.Cheat) {
 			sendAll(new SetCheatMode());
 		}
 		startBirdSong();
 	}
 
 	private void startBirdSong() {
-		sendAll(new EnterBirdSong());
-
+		if (currentDay == GameConfiguration.LUNAR_MONTH) {
+			ClientThread winner = null;
+			for (ClientThread t : clients) {
+				if (winner == null)
+					winner = t;
+				else
+					winner = winner.getPlayer().getGold() < t.getPlayer()
+							.getGold() ? t : winner;
+			}
+			sendAll(new GameFinished(winner.getCharacter().getType(), winner.getPlayer().getGold()));
+		} else {
+			currentDay++;
+			sendAll(new EnterBirdSong());
+		}
 	}
 
 	public void addSite(MapChitType site, TileName tile) {
@@ -258,33 +272,40 @@ public class ServerController {
 		player.getCharacter().setHiding(false);
 		sendAll(new UpdateHiding(player.getCharacter().getType(), false));
 		for (Activity act : player.getCurrentActivities()) {
-			System.out.println("SERVER: current activity: " + act.getType() + " Phase: " + act.getPhaseType());
-			if(model.getBoard().getLocationOfCounter(player.getCharacter().getType().toCounter()).getLandType() == LandType.CAVE){
+			System.out.println("SERVER: current activity: " + act.getType()
+					+ " Phase: " + act.getPhaseType());
+			if (model
+					.getBoard()
+					.getLocationOfCounter(
+							player.getCharacter().getType().toCounter())
+					.getLandType() == LandType.CAVE) {
 				player.setSunlightFlag(true);
 			}
 			if (player.getSunlightFlag()
-					&& act.getPhaseType().equals(PhaseType.SUNLIGHT) && act.getType() != ActivityType.NONE) {
+					&& act.getPhaseType().equals(PhaseType.SUNLIGHT)
+					&& act.getType() != ActivityType.NONE) {
 				player.send(new MessageDisplay(
 						"error using sunlight phase. you passed in a cave."));
 			} else {
 				if (player.getMountainMoveCount() != 0) {
 					// this has to be a move to the same clearing as before. or
 					// else send illegal move and carry on with this activity.
-					System.out.println("player tried to move to mountain already.");
+					System.out
+							.println("player tried to move to mountain already.");
 					if (act.getType() == ActivityType.MOVE) {
 						// check if same clearing as before.
 						if (!(((Move) act).getTile() == player
 								.getMountainClearing().getParentTile()
-								.getName()
-								&& ((Move) act).getClearing() == player
-										.getMountainClearing()
-										.getClearingNumber())){
-							player.send(new MessageDisplay("move failed. you need two moves to move to a mountain clearing."));
+								.getName() && ((Move) act).getClearing() == player
+								.getMountainClearing().getClearingNumber())) {
+							player.send(new MessageDisplay(
+									"move failed. you need two moves to move to a mountain clearing."));
 							player.setMountainClearing(null);
 							player.setMountainMoveCount(0);
 						}
-					}else{
-						player.send(new MessageDisplay("move failed. you need two moves to move to a mountain clearing."));
+					} else {
+						player.send(new MessageDisplay(
+								"move failed. you need two moves to move to a mountain clearing."));
 						player.setMountainClearing(null);
 						player.setMountainMoveCount(0);
 					}
@@ -314,7 +335,7 @@ public class ServerController {
 
 	}
 
-	public void hideCharacter(CharacterType actor, int rv) {		
+	public void hideCharacter(CharacterType actor, int rv) {
 		if (model.hideCharacter(rv, getPlayerOf(actor).getPlayer())) {
 			sendAll(new UpdateHiding(actor, true));
 		} else {
@@ -359,24 +380,26 @@ public class ServerController {
 		// do the search activity with the player
 		ClientThread ct = getPlayerOf(car);
 		SearchResults res = model.performSearch(ct.getPlayer(), tbl, rv);
-		if(res.isCastle()){
+		if (res.isCastle()) {
 			model.getBoard().removeMapChit(model.getCastle());
-			for(MapChit c : model.getCastle().getWarningAndSite()){
-				model.getBoard().setLocationOfMapChit(c, model.getCastle().getTile());
+			for (MapChit c : model.getCastle().getWarningAndSite()) {
+				model.getBoard().setLocationOfMapChit(c,
+						model.getCastle().getTile());
 			}
 			ArrayList<SerializedMapChit> smapchits = new ArrayList<SerializedMapChit>();
-			for(MapChit c : model.getCastle().getWarningAndSite()){
+			for (MapChit c : model.getCastle().getWarningAndSite()) {
 				smapchits.add(c.getSerializedChit());
 			}
 			sendAll(new UpdateMapChits(MapChitType.LOST_CASTLE, smapchits));
 		}
-		if(res.isCity()){
+		if (res.isCity()) {
 			model.getBoard().removeMapChit(model.getCity());
-			for(MapChit c : model.getCity().getWarningAndSite()){
-				model.getBoard().setLocationOfMapChit(c, model.getCity().getTile());
+			for (MapChit c : model.getCity().getWarningAndSite()) {
+				model.getBoard().setLocationOfMapChit(c,
+						model.getCity().getTile());
 			}
 			ArrayList<SerializedMapChit> smapchits = new ArrayList<SerializedMapChit>();
-			for(MapChit c : model.getCity().getWarningAndSite()){
+			for (MapChit c : model.getCity().getWarningAndSite()) {
 				smapchits.add(c.getSerializedChit());
 			}
 			sendAll(new UpdateMapChits(MapChitType.LOST_CITY, smapchits));
@@ -401,22 +424,22 @@ public class ServerController {
 	}
 
 	public void updateMapChits(MapChitType type) {
-		switch (type){
+		switch (type) {
 		case LOST_CASTLE:
-			model.setLostCastleFound(true);			
+			model.setLostCastleFound(true);
 		case LOST_CITY:
 			model.setLostCastleFound(true);
 		default:
 			break;
 		}
 		sendAll(new UpdateMapChits(type, model.getLostChits(type)));
-		
+
 	}
 
-	public void setLost(MapChitType lost,
-			ArrayList<MapChitType> array, TileName tile) {
+	public void setLost(MapChitType lost, ArrayList<MapChitType> array,
+			TileName tile) {
 		model.setLost(lost, array, tile);
-		
+
 	}
 
 }

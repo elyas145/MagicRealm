@@ -588,7 +588,7 @@ public class ControllerMain implements ClientController {
 			for (Character c : characters.values()) {
 				boardView.hideCounter(c.getType().toCounter());
 			}
-			//boardView.hideAllMapChits();
+			// boardView.hideAllMapChits();
 		}
 	}
 
@@ -658,7 +658,7 @@ public class ControllerMain implements ClientController {
 			@Override
 			public void onSelect(final TableType table) {
 				selectedTable = table;
-				if (true) {// GameConfiguration.Cheat){
+				if (GameConfiguration.Cheat) {
 					final Semaphore sem2 = new Semaphore(0);
 					mainView.selectDie(new DieSelectionListener() {
 						@Override
@@ -675,7 +675,7 @@ public class ControllerMain implements ClientController {
 				} else {
 					rollValue[0] = Random.dieRoll();
 				}
-				if (rollValue[0] == 1) {
+				if (rollValue[0] == 1 && table != TableType.LOOT) {
 					Semaphore sem3 = new Semaphore(0);
 					// ask for row.
 					rollValue[0] = 2;
@@ -750,6 +750,12 @@ public class ControllerMain implements ClientController {
 		this.goldValue += goldValue;
 		mainView.displayMessage("You looted " + site + "! gold: "
 				+ this.goldValue);
+	}
+
+	@Override
+	public void gameFinished(CharacterType winner, int score) {
+		mainView.displayBanner("Game Over! The winner is " + winner
+				+ " with score: " + score + "!");
 	}
 
 }
