@@ -163,8 +163,7 @@ public class ControllerMain implements ClientController {
 	 */
 	@Override
 	public void revealMapChits(Iterable<MapChit> chits) {
-
-		boardView.revealAllMapChits(chits);
+		mainView.revealAllMapChits(chits);
 	}
 
 	/**
@@ -693,8 +692,7 @@ public class ControllerMain implements ClientController {
 	@Override
 	public void peekMapChits(ArrayList<MapChit> peek) {
 		mainView.displayMessage("peeking at map chits.");
-		boardView.revealAllMapChits(peek);
-
+		mainView.revealAllMapChits(peek);
 	}
 
 	@Override

@@ -24,6 +24,7 @@ import lwjglview.menus.LWJGLTextLog;
 import lwjglview.selection.SelectionFrame;
 import model.activity.Activity;
 import model.character.Phase;
+import model.counter.chit.MapChit;
 import model.enums.ActivityType;
 import model.enums.CharacterType;
 import model.enums.TileName;
@@ -209,6 +210,16 @@ public class LWJGLViewController implements ViewController {
 		for(String s: updates) {
 			discovered.addText(s);
 		}
+	}
+	
+	@Override
+	public void revealAllMapChits(Iterable<MapChit> chits) {
+		if(sounds != null) {
+			for(MapChit mc: chits) {
+				sounds.revealSoundChit(mc.getType());
+			}
+		}
+		board.revealAllMapChits(chits);
 	}
 
 	private void init(ResourceHandler rh, SoundController sc) {

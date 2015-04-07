@@ -6,6 +6,7 @@ import java.util.Map;
 
 import model.activity.Activity;
 import model.character.Phase;
+import model.counter.chit.MapChit;
 import model.enums.CharacterType;
 import model.enums.TileName;
 import model.player.PersonalHistory;
@@ -53,4 +54,6 @@ public interface ViewController {
 	void startGame(BoardReadyListener brl);
 	
 	void updateLog(ArrayList<String> updates);
+	
+	void revealAllMapChits(Iterable<MapChit> chits);
 }

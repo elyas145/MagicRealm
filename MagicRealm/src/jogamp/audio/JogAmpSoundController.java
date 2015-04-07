@@ -47,8 +47,10 @@ public class JogAmpSoundController implements SoundController {
 
 	@Override
 	public void revealSoundChit(MapChitType sct) {
-		// TODO Auto-generated method stub
-		
+		String fl = getFile(sct);
+		if(fl != null) {
+			audio.playSound(fl);
+		}
 	}
 	
 	@Override
@@ -74,6 +76,22 @@ public class JogAmpSoundController implements SoundController {
 	@Override
 	public void error() {
 		audio.playSound(errorSound);
+	}
+	
+	private static String getFile(MapChitType mct) {
+		switch(mct) {
+		case HOWL:
+			return "coyote.wav";
+		case FLUTTER:
+			return "flutter.wav";
+		case ROAR:
+			return "roar.wav";
+		case PATTER:
+			return "patter.wav";
+		case SLITHER:
+			return "snake.wav";
+		}
+		return null;
 	}
 
 }
