@@ -37,7 +37,8 @@ import utils.resources.ResourceHandler;
 import utils.time.Timing;
 import view.controller.game.BoardView;
 
-public class LWJGLBoardDrawable extends LWJGLCounterLocator implements BoardView {
+public class LWJGLBoardDrawable extends LWJGLCounterLocator implements
+		BoardView {
 
 	public static final Matrix[] AMBIENT_COLOURS = new Matrix[] {
 			Matrix.columnVector(new float[] { .3f, .3f, .3f, 1f // 00:00
@@ -50,8 +51,8 @@ public class LWJGLBoardDrawable extends LWJGLCounterLocator implements BoardView
 					}), Matrix.columnVector(new float[] { .4f, .4f, .5f, 1f // 21:00
 					}) };
 
-	public LWJGLBoardDrawable(ResourceHandler rh, LWJGLGraphics gfx, SelectionFrame frame)
-			throws IOException {
+	public LWJGLBoardDrawable(ResourceHandler rh, LWJGLGraphics gfx,
+			SelectionFrame frame) throws IOException {
 		super(null);
 		resources = rh;
 		counterLocations = new HashMap<Integer, CounterStorage>();
@@ -90,7 +91,7 @@ public class LWJGLBoardDrawable extends LWJGLCounterLocator implements BoardView
 			public void onFocus(TileName tile, int clearing) {
 				focusOn(tile, clearing);
 			}
-			
+
 		};
 		selectionFrame = frame;
 		addTo(gfx);
@@ -137,7 +138,7 @@ public class LWJGLBoardDrawable extends LWJGLCounterLocator implements BoardView
 	public void requestFocus(TileName tile, int clearing) {
 		clearingFocus.onFocus(tile, clearing);
 	}
-	
+
 	public void setDefaultClearingFocus() {
 		setCleaingFocus(new ClearingFocusHandler() {
 
@@ -145,10 +146,10 @@ public class LWJGLBoardDrawable extends LWJGLCounterLocator implements BoardView
 			public void onFocus(TileName tile, int clearing) {
 				focusOn(tile, clearing);
 			}
-			
+
 		});
 	}
-	
+
 	public void setCleaingFocus(ClearingFocusHandler cfh) {
 		clearingFocus = cfh;
 	}
@@ -158,7 +159,7 @@ public class LWJGLBoardDrawable extends LWJGLCounterLocator implements BoardView
 	 * OVERRIDE METHODS
 	 * ***********************************************************************
 	 */
-	
+
 	@Override
 	public void loadMapChits(Iterable<MapChit> chits) {
 		mapChits = new LWJGLMapChitCollection(this, resources, chits);
@@ -175,15 +176,13 @@ public class LWJGLBoardDrawable extends LWJGLCounterLocator implements BoardView
 
 	@Override
 	public synchronized void setTileEnchanted(TileName tile, boolean ench) {
-		synchronized (tiles) {
-			tiles.setEnchanted(tile, ench);
-			refreshCounters(tile);
-		}
+		tiles.setEnchanted(tile, ench);
+		refreshCounters(tile);
 	}
 
 	@Override
 	public synchronized void updateNodeUniforms(LWJGLGraphics gfx) {
-		if(!selectionFrame.isSelectionPass()) {
+		if (!selectionFrame.isSelectionPass()) {
 			GLShaderHandler shaders = gfx.getShaders();
 			synchronized (fBuffer4) {
 				fBuffer4.clear();
@@ -204,12 +203,12 @@ public class LWJGLBoardDrawable extends LWJGLCounterLocator implements BoardView
 		}
 
 		// draw the other objects if selection is not activated
-		if(!selectionFrame.isSelectionPass()) {
+		if (!selectionFrame.isSelectionPass()) {
 			synchronized (counters) {
 				counters.draw(lwgfx);
 			}
-	
-			if(mapChits != null) {
+
+			if (mapChits != null) {
 				synchronized (mapChits) {
 					mapChits.draw(lwgfx);
 				}
@@ -221,7 +220,7 @@ public class LWJGLBoardDrawable extends LWJGLCounterLocator implements BoardView
 	public synchronized void focusOn(TileName tile) {
 		Matrix vector;
 		MatrixCalculator calc;
-		synchronized(tiles) {
+		synchronized (tiles) {
 			vector = tiles.getVector(tile);
 			calc = new StaticMatrixCalculator(vector);
 		}
@@ -264,7 +263,7 @@ public class LWJGLBoardDrawable extends LWJGLCounterLocator implements BoardView
 	@Override
 	public void setTile(TileName tile, int rw, int cl, int rot,
 			Iterable<? extends ClearingInterface> clears) {
-		synchronized(tiles) {
+		synchronized (tiles) {
 			tiles.setTile(tile, rw, cl, rot, clears);
 		}
 	}
@@ -303,7 +302,7 @@ public class LWJGLBoardDrawable extends LWJGLCounterLocator implements BoardView
 
 	@Override
 	public void replaceMapChit(MapChit chit, Iterable<MapChit> replacements) {
-		for(MapChit mc: replacements) {
+		for (MapChit mc : replacements) {
 			setMapChit(mc);
 		}
 		mapChits.replace(chit, replacements);
@@ -381,7 +380,7 @@ public class LWJGLBoardDrawable extends LWJGLCounterLocator implements BoardView
 		loc.clearing = clear;
 		getClearing(tile, clear).put(id);
 	}
-	
+
 	private void refreshCounters(TileName tn) {
 		tiles.get(tn).refreshCounters();
 	}
@@ -502,9 +501,9 @@ public class LWJGLBoardDrawable extends LWJGLCounterLocator implements BoardView
 
 	private Matrix bufferA;
 	private Matrix bufferB;
-	
+
 	private ClearingFocusHandler clearingFocus;
-	
+
 	private SelectionFrame selectionFrame;
 
 }

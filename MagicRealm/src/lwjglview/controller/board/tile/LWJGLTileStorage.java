@@ -3,7 +3,6 @@ package lwjglview.controller.board.tile;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import config.GraphicsConfiguration;
@@ -38,16 +37,14 @@ public class LWJGLTileStorage extends LWJGLCounterStorage {
 	}
 
 	@Override
-	public void getLocation(int id, Matrix buff) {
+	public synchronized void getLocation(int id, Matrix buff) {
 		Obstruction ob;
-		synchronized (chits) {
-			ob = chits.get(id);
-		}
+		ob = chits.get(id);
 		ob.getLocation(buff);
 	}
-	
+
 	@Override
-	public void put(int id) {
+	public synchronized void put(int id) {
 		Matrix rand = vec3;
 		randomLocation(rand);
 		boolean ench = isEnchanted();
@@ -81,25 +78,19 @@ public class LWJGLTileStorage extends LWJGLCounterStorage {
 				}
 			}
 		}
-		synchronized (chits) {
-			chits.put(id, new Obstruction(rand, counterRadius, false));
-		}
+		chits.put(id, new Obstruction(rand, counterRadius, false));
 		moveChit(id);
 	}
 
 	@Override
-	public void remove(int id) {
-		synchronized (chits) {
-			chits.remove(id);
-		}
+	public synchronized void remove(int id) {
+		chits.remove(id);
 	}
-	
+
 	@Override
-	protected void getIDs(List<Integer> dest) {
-		synchronized(chits) {
-			for(int i: chits.keySet()) {
-				dest.add(i);
-			}
+	public synchronized void resetAll() {
+		for (int i : chits.keySet()) {
+			moveChit(i);
 		}
 	}
 

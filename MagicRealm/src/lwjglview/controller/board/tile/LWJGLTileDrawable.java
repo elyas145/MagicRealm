@@ -100,7 +100,7 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode implements
 
 	public void refreshCounters() {
 		for(int clr: getClearings()) {
-			getClearing(clr).resetCounters();
+			getClearing(clr).resetAll();
 		}
 	}
 
@@ -153,9 +153,7 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode implements
 		float halfThick = GraphicsConfiguration.TILE_THICKNESS * .5f;
 		Matrix mat = Matrix.translation(0f, 0f, halfThick);
 		faces.add(new LWJGLDrawableLeaf(this, new HexTileFace(this, mat, false)));
-		mat = Matrix.rotationX(4, Mathf.PI).multiply(mat);
-		mat.multiply(rotation, mat);
-		mat.multiply(rotation, mat);
+		mat = Matrix.rotationY(4, Mathf.PI).multiply(mat);
 		faces.add(new LWJGLDrawableLeaf(this, new HexTileFace(this, mat, true)));
 		// scale square
 		mat = Matrix.dilation(.5f, halfThick, 1f, 1f);

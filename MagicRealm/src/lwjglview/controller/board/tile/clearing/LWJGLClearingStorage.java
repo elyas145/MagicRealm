@@ -19,7 +19,7 @@ public class LWJGLClearingStorage extends LWJGLCounterStorage {
 
 	// get the location of a counter in the clearing
 	@Override
-	public void getLocation(int id, Matrix loc) {
+	public synchronized void getLocation(int id, Matrix loc) {
 		int idx = chits.indexOf(id);
 		int row = dim - idx / dim - 1;
 		int col = idx % dim;
@@ -27,51 +27,43 @@ public class LWJGLClearingStorage extends LWJGLCounterStorage {
 		float spacing = 2f * GraphicsConfiguration.CHIT_SCALE
 				+ GraphicsConfiguration.CHIT_SPACING;
 		float offs = spacing * gaps * .5f;
-		synchronized (vec3) {
-			getLocation(vec3);
-			buffer3.fill(col * spacing - offs, row * spacing - offs, 0f);
-			vec3.add(buffer3, loc);
-		}
+		getLocation(vec3);
+		buffer3.fill(col * spacing - offs, row * spacing - offs, 0f);
+		vec3.add(buffer3, loc);
 	}
 
 	@Override
-	public void put(int id) {
-		synchronized (chits) {
+	public synchronized void put(int id) {
 			if (!chits.contains(id)) {
 				chits.add(id);
 				if (changeDim()) {
-					relocateAllChits();
+					resetAll();
 				} else {
 					moveChit(id);
 				}
 			}
-		}
 	}
 
 	@Override
-	public void remove(int id) {
-		synchronized (chits) {
+	public synchronized void remove(int id) {
 			if (chits.contains(id)) {
 				int idx = chits.indexOf(id);
 				chits.remove((Integer) id);
 				if (changeDim()) {
-					relocateAllChits();
+					resetAll();
 				} else {
 					for (; idx < chits.size(); ++idx) {
 						moveChit(chits.get(idx));
 					}
 				}
 			}
-		}
 	}
 	
 	@Override
-	public void getIDs(List<Integer> dest) {
-		synchronized(chits) {
+	public synchronized void resetAll() {
 			for(int i: chits) {
-				dest.add(i);
+				moveChit(i);
 			}
-		}
 	}
 
 	private boolean changeDim() {
@@ -85,14 +77,6 @@ public class LWJGLClearingStorage extends LWJGLCounterStorage {
 			return true;
 		}
 		return false;
-	}
-
-	private void relocateAllChits() {
-		synchronized (chits) {
-			for (Integer id : chits) {
-				moveChit(id);
-			}
-		}
 	}
 	
 	private int dim;

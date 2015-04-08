@@ -24,12 +24,12 @@ public class JogAmpSoundController implements SoundController {
 		mainTheme = "VictoryMarch.wav";
 		lobbyTheme = "spell_fury_final_mix.wav";
 		themes = new ArrayList<String>();
-		themes.add("BeforeTheBattle.wav");
+		/*themes.add("BeforeTheBattle.wav");
 		themes.add("CosmicFestival.wav");
 		themes.add("FightScene.wav");
-		themes.add("Highlander.wav");
+		themes.add("Highlander.wav");*/
 		themes.add("Mists.wav");
-		themes.add("Nascimento.wav");
+		//themes.add("Nascimento.wav");
 		Random.shuffle(themes);
 		playingTheme = null;
 		alertSound = "alert1.wav";

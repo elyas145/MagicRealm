@@ -17,7 +17,7 @@ public class LWJGLDropdownItem<T> extends LWJGLPanel {
 		buffer = Matrix.zeroVector(3);
 		parent = par;
 		item = it;
-		int height = 60;
+		int height = 50;
 		Font fnt = new Font("Times New Roman", Font.PLAIN, height);
 		LWJGLPanel pane = LWJGLPanel.fromString(this, it.toString(), fnt,
 				Color.RED, (int) (height * w / h), height * 7 / 5, 0f, 0f, h, false);
