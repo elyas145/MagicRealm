@@ -34,6 +34,7 @@ import communication.handler.server.GameFinished;
 import communication.handler.server.IllegalCharacterSelection;
 import communication.handler.server.RequestSearchInformation;
 import communication.handler.server.SearchResults;
+import communication.handler.server.SetBoard;
 import communication.handler.server.SetCheatMode;
 import communication.handler.server.UpdateEnchantedTile;
 import communication.handler.server.UpdateHiding;
@@ -51,6 +52,7 @@ import model.character.Character;
 import server.ClientThread;
 import utils.resources.ResourceHandler;
 import config.GameConfiguration;
+import config.NetworkConfiguration;
 
 public class ServerController {
 	private Server server;
@@ -59,14 +61,21 @@ public class ServerController {
 	private ModelController model;
 	private SerializedBoard sboard;
 	private int currentDay = 0;
-
+	private ArrayList<CharacterType> disabledCharacters;
+	private HashMap<Integer, Character> characters;
 	public ServerController(Server s) {
 		this.server = s;
 		clients = new ArrayList<ClientThread>();
 		model = new ModelController(new ResourceHandler());
 		model.setBoard();
-
-		sboard = model.getBoard().getSerializedBoard();
+		disabledCharacters = new ArrayList<CharacterType>();
+		characters = new HashMap<Integer, Character>();
+		if (NetworkConfiguration.START_NORMAL)
+			sboard = model.getBoard().getSerializedBoard();
+		else {
+			model.setBoardForPlay();
+			sboard = model.getBoard().getSerializedBoard();
+		}
 	}
 
 	/**
@@ -88,17 +97,22 @@ public class ServerController {
 			clients.add(temp);
 			clientCount++;
 			temp.send(new Integer(socket.getPort()));
-			if (GameConfiguration.MAX_PLAYERS - clientCount == 0) {
-				// added last player.
-				temp.send(new EnterLobby(sboard));
-				// enter character selection.
-				sendAll(new EnterCharacterSelection());
-			} else {
-				temp.send(new EnterLobby(sboard));
-				sendAll(new UpdateLobbyCount(GameConfiguration.MAX_PLAYERS
-						- clientCount));
-			}
+			if (NetworkConfiguration.START_NORMAL) {
+				if (GameConfiguration.MAX_PLAYERS - clientCount == 0) {
+					// added last player.
+					temp.send(new EnterLobby(sboard));
+					// enter character selection.
+					sendAll(new EnterCharacterSelection(null));
+				} else {
+					temp.send(new EnterLobby(sboard));
+					sendAll(new UpdateLobbyCount(GameConfiguration.MAX_PLAYERS
+							- clientCount));
+				}
 
+			} else {
+				temp.send(new SetBoard(sboard));
+				temp.send(new EnterCharacterSelection(disabledCharacters));
+			}
 		} else {
 			temp.send(new Reject());
 			System.out.println("client rejected.");
@@ -146,9 +160,9 @@ public class ServerController {
 	 */
 	public void setCharacter(int iD, CharacterType character,
 			CounterType location) {
-		if(character == null || location == null || iD == 0)
+		if (character == null || location == null || iD == 0)
 			return;
-		
+
 		boolean flag = false;
 		for (ClientThread c : clients) {
 			if (c.getCharacterType() == character) {
@@ -158,10 +172,10 @@ public class ServerController {
 
 		int pos = findClient(iD);
 		if (flag) {
-			if (pos >= 0){
+			if (pos >= 0) {
 				clients.get(pos).send(new IllegalCharacterSelection(character));
 				return;
-			}else{
+			} else {
 				return;
 			}
 		}
@@ -170,37 +184,45 @@ public class ServerController {
 			clients.get(pos).setCharacter(character, location);
 			model.setPlayersInitialLocations(clients.get(pos).getCharacter()
 					.getType().toCounter(), location);
-		}else{
+			disabledCharacters.add(character);
+			characters.put(iD, clients.get(pos).getCharacter());
+		} else {
 			return;
 		}
-		boolean everyoneSelected = true;
-		// wait for all clients to choose their character
+		if (NetworkConfiguration.START_NORMAL) {
+			boolean everyoneSelected = true;
+			// wait for all clients to choose their character
 
-		for (ClientThread client : clients) {
-			System.out.println("Client request: " + iD);
-			if (!client.didSelectCharacter()) {
-				everyoneSelected = false;
-				break;
+			for (ClientThread client : clients) {
+				System.out.println("Client request: " + iD);
+				if (!client.didSelectCharacter()) {
+					everyoneSelected = false;
+					break;
+				}
+
 			}
-
-		}
-		if (!everyoneSelected) {
-			sendAll(new UpdateCharacterSelection(character));
+			if (!everyoneSelected) {
+				sendAll(new UpdateCharacterSelection(character));
+			} else {
+				if (GameConfiguration.Cheat) {
+					sendAll(new SetCheatMode());
+				}
+				model.setBoardForPlay();
+				sboard = model.getBoard().getSerializedBoard();
+				startGame();
+			}
 		} else {
-			if (GameConfiguration.Cheat) {
-				sendAll(new SetCheatMode());
+			if (clientCount == 1) {
+				startGame();
+			} else {
+				clients.get(pos).send(new StartGame(sboard, characters));
+				clients.get(pos).send(
+						new MessageDisplay("Please wait for next bird song."));
 			}
-			model.setBoardForPlay();
-			sboard = model.getBoard().getSerializedBoard();
-			startGame();
 		}
 	}
 
 	public void startGame() {
-		HashMap<Integer, Character> characters = new HashMap<Integer, Character>();
-		for (ClientThread c : clients) {
-			characters.put(c.getID(), c.getCharacter());
-		}
 		sendAll(new StartGame(sboard, characters));
 		startBirdSong();
 	}
@@ -399,18 +421,17 @@ public class ServerController {
 		// do the search activity with the player
 		ClientThread ct = getPlayerOf(car);
 		SearchResults res = model.performSearch(ct.getPlayer(), tbl, rv);
-		if(tbl == TableType.LOCATE) {
+		if (tbl == TableType.LOCATE) {
 			if (res.isCastle() || res.isCity()) {
 				LostSite ls;
-				if(res.isCastle()) {
+				if (res.isCastle()) {
 					ls = model.getCastle();
 				} else {
 					ls = model.getCity();
 				}
 				model.getBoard().removeMapChit(ls);
 				for (MapChit c : model.getCastle().getWarningAndSite()) {
-					model.getBoard().setLocationOfMapChit(c,
-							ls.getTile());
+					model.getBoard().setLocationOfMapChit(c, ls.getTile());
 				}
 				ArrayList<SerializedMapChit> smapchits = new ArrayList<SerializedMapChit>();
 				for (MapChit c : ls.getWarningAndSite()) {
@@ -433,7 +454,6 @@ public class ServerController {
 				+ " is not being played!");
 	}
 
-
 	public void updateMapChits(MapChitType type) {
 		switch (type) {
 		case LOST_CASTLE:
@@ -454,7 +474,9 @@ public class ServerController {
 	}
 
 	public void requestEnchant(CharacterType actor) {
-		sendAll(new UpdateEnchantedTile(model.getLocation(getPlayerOf(actor).getCharacter()), actor, model.enchantTile(getPlayerOf(actor).getPlayer())));		
+		sendAll(new UpdateEnchantedTile(model.getLocation(getPlayerOf(actor)
+				.getCharacter()), actor, model.enchantTile(getPlayerOf(actor)
+				.getPlayer())));
 	}
 
 }
