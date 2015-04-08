@@ -4,14 +4,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import model.enums.CharacterType;
 import model.enums.CounterType;
-import model.enums.ValleyChit;
 import model.player.Player;
 import model.activity.Activity;
 import model.board.clearing.Clearing;
@@ -36,7 +31,7 @@ public class ClientThread extends Thread {
 		this.socket = socket;
 		this.ID = socket.getPort();
 		playedTurn = false;
-		player = new Player(ID, "player");
+		player = new Player();
 	}
 	
 	public Integer getID() {

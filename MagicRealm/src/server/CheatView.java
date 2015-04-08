@@ -6,16 +6,13 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.BoxLayout;
-import javax.swing.ComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JTextField;
 
 import model.enums.LandType;
 import model.enums.MapChitType;
@@ -32,7 +29,6 @@ public class CheatView extends JFrame implements ActionListener {
 	private JButton start;
 	private JButton ok;
 	private JButton setLost;
-	private JTextField treasureValue;
 	private Container treasurePane;
 	private Container soundPane;
 	private Container warningPane;
@@ -52,6 +48,7 @@ public class CheatView extends JFrame implements ActionListener {
 	private JComboBox<MapChitType> comboWarnings;
 	private JComboBox<Integer> comboClearings;
 	private JComboBox<MapChitType> comboLost;
+	@SuppressWarnings("unchecked")
 	private JComboBox<MapChitType> comboSiteAndSound[] = new JComboBox[5];
 
 	public CheatView(Server ser) {
@@ -73,7 +70,6 @@ public class CheatView extends JFrame implements ActionListener {
 		ok = new JButton("OK");
 		setLost = new JButton("lost site");
 		startRandom = new JButton("random chits");
-		treasureValue = new JTextField();
 		comboSites = new JComboBox<MapChitType>(MapChitType.SITES);
 		comboTiles = new JComboBox<TileName>(TileName.values());
 		comboTiles.addActionListener(new ActionListener() {

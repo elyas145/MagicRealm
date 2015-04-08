@@ -2,27 +2,19 @@ package lwjglview.controller.searchtable;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import lwjglview.graphics.LWJGLGraphics;
 import lwjglview.graphics.textures.LWJGLSingleTextureLoader;
 import lwjglview.graphics.textures.LWJGLTextureLoader;
 import lwjglview.menus.LWJGLContentPane;
 import lwjglview.menus.LWJGLPanel;
-import lwjglview.menus.dropdown.LWJGLDropdown;
-import lwjglview.selection.SelectionFrame;
 import model.enums.SearchType;
-import model.enums.TableType;
-import utils.handler.Handler;
 import utils.math.linear.Matrix;
 import utils.resources.ResourceHandler;
 import view.controller.search.SearchTypeListener;
 import view.controller.search.SearchChoiceView;
-import view.controller.search.SearchView;
-import view.controller.search.TableSelectionListener;
 import view.selection.PrimaryClickListener;
 
 public class LWJGLSearchChoiceView implements SearchChoiceView {

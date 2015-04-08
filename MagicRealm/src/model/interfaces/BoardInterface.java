@@ -10,7 +10,6 @@ package model.interfaces;
 import model.enums.CharacterType;
 import model.enums.CounterType;
 import model.enums.TileName;
-import model.enums.ValleyChit;
 
 public interface BoardInterface {
   

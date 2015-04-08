@@ -5,8 +5,6 @@ import java.awt.Font;
 import java.util.ArrayList;
 
 import config.GraphicsConfiguration;
-import lwjglview.graphics.textures.LWJGLSingleTextureLoader;
-import lwjglview.graphics.textures.LWJGLTextureLoader;
 import utils.math.linear.Matrix;
 import utils.resources.ResourceHandler;
 import utils.string.TextTools;

@@ -10,8 +10,6 @@ import model.enums.BelongingType;
 import model.enums.CharacterType;
 import model.enums.CounterType;
 import model.enums.PhaseType;
-import model.enums.ValleyChit;
-import model.interfaces.CharacterFactoryInterface;
 
 public class CharacterFactory {
 

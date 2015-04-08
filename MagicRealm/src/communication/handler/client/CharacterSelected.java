@@ -4,7 +4,6 @@ import server.ServerController;
 import communication.ServerNetworkHandler;
 import model.enums.CharacterType;
 import model.enums.CounterType;
-import model.enums.ValleyChit;
 
 public class CharacterSelected implements ServerNetworkHandler{
 	private static final long serialVersionUID = -1347594998974805965L;

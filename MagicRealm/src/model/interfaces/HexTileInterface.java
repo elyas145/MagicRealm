@@ -5,9 +5,7 @@ import java.util.Collection;
 
 import communication.handler.server.serialized.SerializedTile;
 import model.board.clearing.Clearing;
-import model.counter.chit.Chit;
 import model.enums.TileName;
-import model.enums.LandType;
 
 public interface HexTileInterface extends Serializable{
 

@@ -4,27 +4,25 @@ import java.io.Serializable;
 
 import model.counter.chit.Chit;
 import model.enums.BelongingType;
-import model.enums.CharacterType;
 
-public abstract class Belonging implements Serializable{
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -9216766079985487056L;
+public abstract class Belonging implements Serializable {
+
 	private Chit chit;
 	private boolean active;
 	private BelongingType type;
-	
-	public Belonging(Chit chit, boolean active, BelongingType type){
-		
+
+	public Belonging(Chit chit, boolean active, BelongingType type) {
+
 		this.chit = chit;
 		this.active = active;
 		this.type = type;
 	}
-	public void setType(BelongingType type){
+
+	public void setType(BelongingType type) {
 		this.type = type;
 	}
-	public BelongingType getType(){
+
+	public BelongingType getType() {
 		return this.type;
 	}
 
@@ -39,7 +37,11 @@ public abstract class Belonging implements Serializable{
 	public void setChit(Chit c) {
 		chit = c;
 	}
-	public String toString(){
+
+	public String toString() {
 		return type.toString();
 	}
+
+	private static final long serialVersionUID = -9216766079985487056L;
+
 }

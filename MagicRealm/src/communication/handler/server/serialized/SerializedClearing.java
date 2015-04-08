@@ -5,12 +5,8 @@ import java.util.List;
 
 import utils.math.linear.Matrix;
 import model.EnchantedHolder;
-import model.board.tile.HexTile;
 import model.counter.chit.Chit;
-import model.enums.PathType;
 import model.enums.TileName;
-import model.interfaces.ClearingInterface;
-import model.interfaces.HexTileInterface;
 
 public class SerializedClearing implements Serializable {
 	private static final long serialVersionUID = -1947263645476199141L;

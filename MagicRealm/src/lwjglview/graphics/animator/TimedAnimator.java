@@ -26,6 +26,5 @@ public abstract class TimedAnimator extends TimeAnimator {
 	}
 
 	private float length;
-	private float endTime;
 
 }

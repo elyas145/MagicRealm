@@ -3,7 +3,6 @@ package communication;
 import java.io.Serializable;
 
 import client.ClientController;
-import utils.handler.Handler;
 
 /**
  * 

@@ -11,7 +11,6 @@ import java.util.concurrent.TimeUnit;
 import communication.ServerNetworkHandler;
 import model.enums.MapChitType;
 import model.enums.TileName;
-import client.ClientThread;
 import config.GameConfiguration;
 
 public class Server implements Runnable {

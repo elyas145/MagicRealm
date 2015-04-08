@@ -5,7 +5,6 @@ import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
 
-import config.GraphicsConfiguration;
 import utils.math.linear.Matrix;
 import lwjglview.graphics.LWJGLGraphics;
 import lwjglview.graphics.animator.matrixcalculator.StaticMatrixCalculator;

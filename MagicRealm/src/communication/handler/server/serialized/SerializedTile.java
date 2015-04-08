@@ -3,10 +3,7 @@ package communication.handler.server.serialized;
 import java.io.Serializable;
 import java.util.Map;
 
-import model.board.clearing.Clearing;
-import model.counter.chit.Chit;
 import model.enums.TileName;
-import model.interfaces.HexTileInterface;
 
 public class SerializedTile implements Serializable{
 

@@ -6,6 +6,7 @@ import client.ClientController;
 import communication.ClientNetworkHandler;
 
 public class UpdateEnchantedTile implements ClientNetworkHandler {
+	
 	private TileName tile;
 	private CharacterType actor;
 	private boolean bool;
@@ -15,10 +16,12 @@ public class UpdateEnchantedTile implements ClientNetworkHandler {
 		this.actor = actor;
 		this.bool = enchanted;
 	}
+	
 	@Override
 	public void handle(ClientController controller) {
 		controller.setEnchantedTile(tile, actor, bool);
-
 	}
+	
+	private static final long serialVersionUID = 8627259960070990063L;
 
 }

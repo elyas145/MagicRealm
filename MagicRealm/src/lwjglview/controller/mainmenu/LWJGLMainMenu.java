@@ -1,14 +1,9 @@
 package lwjglview.controller.mainmenu;
 
-import java.awt.Color;
-import java.awt.Font;
-
 import utils.resources.ResourceHandler;
 import view.controller.mainmenu.MenuItem;
 import view.controller.mainmenu.MenuItemListener;
 import view.controller.mainmenu.MenuView;
-import view.selection.CursorListener;
-import view.selection.CursorSelection;
 import lwjglview.graphics.textures.LWJGLSingleTextureLoader;
 import lwjglview.graphics.textures.LWJGLTextureLoader;
 import lwjglview.menus.LWJGLButton;
@@ -17,12 +12,6 @@ import lwjglview.menus.LWJGLPanel;
 import lwjglview.menus.dropdown.LWJGLDropdown;
 
 public class LWJGLMainMenu implements MenuView {
-
-	private static final int FONT_HEIGHT = 100;
-
-	private static final Font FONT = new Font("Times New Roman", Font.PLAIN, FONT_HEIGHT);
-
-	private static final Color COLOR = Color.WHITE;
 
 	public LWJGLMainMenu(LWJGLMenuLayer par, ResourceHandler rh) {
 		parent = par;

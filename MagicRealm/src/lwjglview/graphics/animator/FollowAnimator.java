@@ -47,10 +47,6 @@ public class FollowAnimator extends Animator {
 		}
 		Matrix pos = calculator.calculateMatrix();
 		Matrix diff = bufferNx1;
-		if((pos == null) || (currentPosition == null) || (diff == null)) {
-			int i = 5*4;
-			i *= 2;
-		}
 		pos.subtract(currentPosition, diff);
 		float ct = Timing.getSeconds();
 		float dist = (ct - lastTime) * speed;

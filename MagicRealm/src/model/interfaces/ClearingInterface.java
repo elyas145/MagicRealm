@@ -6,7 +6,6 @@ import communication.handler.server.serialized.SerializedClearing;
 
 import utils.math.linear.Matrix;
 import model.enums.PathType;
-import model.enums.TileName;
 
 public interface ClearingInterface extends Serializable{
 	

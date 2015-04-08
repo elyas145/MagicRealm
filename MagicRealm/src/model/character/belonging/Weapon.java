@@ -3,6 +3,7 @@ package model.character.belonging;
 import model.enums.BelongingType;
 
 public class Weapon extends Belonging {
+	
 	private boolean alerted;
 	private int attackTime;
 
@@ -51,4 +52,7 @@ public class Weapon extends Belonging {
 	public void setSharpness(int sharpness) {
 		this.sharpness = sharpness;
 	}
+	
+	private static final long serialVersionUID = -1253148762099824573L;
+	
 }

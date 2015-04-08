@@ -3,7 +3,6 @@ package utils.resources;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
-import model.enums.CounterType;
 import model.enums.TileName;
 
 public class TileImages {

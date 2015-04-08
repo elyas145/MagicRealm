@@ -3,15 +3,11 @@ package lwjglview.controller.cheatmode;
 import java.awt.Color;
 import java.awt.Font;
 
-import lwjglview.graphics.textures.LWJGLSingleTextureLoader;
-import lwjglview.graphics.textures.LWJGLTextureLoader;
 import lwjglview.menus.LWJGLContentPane;
 import lwjglview.menus.LWJGLPanel;
-import model.enums.TableType;
 import utils.resources.ResourceHandler;
 import view.controller.cheatmode.DieSelectionListener;
 import view.controller.cheatmode.DieSelectionView;
-import view.controller.search.TableSelectionListener;
 import view.selection.PrimaryClickListener;
 
 public class LWJGLDieSelection implements DieSelectionView {

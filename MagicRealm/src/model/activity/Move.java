@@ -3,19 +3,13 @@ package model.activity;
 import java.io.Serializable;
 
 import server.ServerController;
-import model.controller.ModelControlInterface;
-import model.controller.ModelController;
 import model.enums.ActivityType;
 import model.enums.CharacterType;
 import model.enums.PhaseType;
 import model.enums.TileName;
-import model.exceptions.IllegalMoveException;
 
 public class Move extends Activity implements Serializable {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 3509514431699725931L;
+	
 	private TileName tile;
 	private int clearing;
 
@@ -46,5 +40,7 @@ public class Move extends Activity implements Serializable {
 		// set location on the board.
 		controller.moveCharacter(getActor(), getTile(), getClearing());
 	}
+	
+	private static final long serialVersionUID = 3509514431699725931L;
 
 }

@@ -2,10 +2,10 @@ package model.enums;
 
 public enum SearchType {
 	CLUES, NONE, PATHS, CLUES_PATHS, CHOICE, PASSAGES, PASSAGES_CLUES, DISCOVER_CHITS, LOOT, FAIL_LOOT;
-	
+
 	@Override
 	public String toString() {
-		switch(this) {
+		switch (this) {
 		case CLUES:
 			return "Clues";
 		case NONE:
@@ -24,7 +24,8 @@ public enum SearchType {
 			return "Discover Chits";
 		case LOOT:
 			return "Loot";
+		default:
+			return "None";
 		}
-		return "None";
 	}
 }

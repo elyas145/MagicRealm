@@ -20,7 +20,6 @@ import lwjglview.menus.LWJGLMenuLayer;
 import lwjglview.menus.LWJGLPanel;
 import lwjglview.menus.LWJGLTextLog;
 import lwjglview.selection.SelectionFrame;
-import model.activity.Activity;
 import model.character.Phase;
 import model.counter.chit.MapChit;
 import model.enums.ActivityType;
@@ -60,20 +59,6 @@ public class LWJGLViewController implements ViewController {
 	@Override
 	public void focusOnBoard(TileName selectedTile, Integer selectedClearing) {
 		board.focusOn(selectedTile, selectedClearing);
-	}
-
-	@Override
-	public void setPlayerActivities(CharacterType character,
-			ArrayList<Activity> activities) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void setPlayerActivities(CharacterType character,
-			List<Activity> activities) {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override

@@ -16,8 +16,6 @@ import model.interfaces.ClearingInterface;
 
 public class Player {
 
-	private int number;
-	private String name;
 	private Character character = null;
 	private PersonalHistory historyPad;
 	private Map<ClearingInterface, EnchantedHolder<Set<ClearingInterface>>> discoveredPaths;
@@ -25,9 +23,7 @@ public class Player {
 	private boolean sunlightFlag = false;
 	private int gold = 0;
 	
-	public Player(int num, String nm) {
-		number = num;
-		name = nm;
+	public Player() {
 		character = null;
 		historyPad = new PersonalHistory();
 

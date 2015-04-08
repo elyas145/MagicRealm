@@ -1,12 +1,10 @@
 package lwjglview.selection;
 
 import java.awt.Color;
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -16,18 +14,13 @@ import org.lwjgl.BufferUtils;
 
 import config.GraphicsConfiguration;
 import utils.handler.Handler;
-import utils.resources.ResourceHandler;
 import utils.structures.LinkedQueue;
 import utils.structures.Queue;
 import view.selection.CursorListener;
 import view.selection.CursorSelection;
-import lwjglview.controller.board.LWJGLBoardDrawable;
 import lwjglview.graphics.LWJGLGraphics;
 import lwjglview.graphics.shader.GLShaderHandler;
 import lwjglview.graphics.shader.ShaderType;
-import model.board.Board;
-import model.enums.TileName;
-import model.interfaces.HexTileInterface;
 
 public class SelectionFrame {
 

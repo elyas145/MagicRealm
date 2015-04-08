@@ -3,7 +3,6 @@ package model.activity;
 import java.io.Serializable;
 
 import server.ServerController;
-import model.controller.ModelControlInterface;
 import model.enums.ActivityType;
 import model.enums.CharacterType;
 import model.enums.PhaseType;

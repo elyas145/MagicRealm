@@ -6,25 +6,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import communication.ClientNetworkHandler;
 import communication.handler.server.serialized.SerializedBoard;
 import communication.handler.server.serialized.SerializedMapChit;
 import view.controller.game.BoardView;
-import lwjglview.controller.board.LWJGLBoardDrawable;
 import model.activity.Activity;
-import model.board.Board;
 import model.character.Character;
-import model.controller.requests.DieRequest;
 import model.counter.chit.MapChit;
 import model.enums.CharacterType;
 import model.enums.CounterType;
 import model.enums.MapChitType;
-import model.enums.SearchType;
 import model.enums.TableType;
 import model.enums.TileName;
 import model.exceptions.MRException;
-import model.interfaces.ClearingInterface;
-import model.interfaces.HexTileInterface;
 
 public interface ClientController {
 

@@ -32,4 +32,7 @@ public class SubMatrix extends Matrix {
 	private int row;
 	private int column;
 	private Matrix parent;
+	
+	private static final long serialVersionUID = 3038551738368620099L;
+	
 }

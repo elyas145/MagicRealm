@@ -1,7 +1,6 @@
 package model.controller;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -12,22 +11,18 @@ import communication.handler.server.SearchResults;
 import communication.handler.server.serialized.SerializedMapChit;
 import config.BoardConfiguration;
 import config.GameConfiguration;
-import server.ClientThread;
 import utils.random.Random;
 import utils.resources.ResourceHandler;
 import utils.structures.Queue;
 import utils.structures.QueueEmptyException;
 import model.activity.Activity;
 import model.board.Board;
-import model.board.tile.HexTile;
-import model.enums.ActivityType;
 import model.enums.CharacterType;
 import model.enums.ChitType;
 import model.enums.CounterType;
 import model.enums.LandType;
 import model.enums.MapChitType;
 import model.enums.PathType;
-import model.enums.PhaseType;
 import model.enums.SearchType;
 import model.enums.TableType;
 import model.enums.TileName;
@@ -35,7 +30,6 @@ import model.enums.ValleyChit;
 import model.interfaces.ClearingInterface;
 import model.player.Player;
 import model.character.Character;
-import model.character.Phase;
 import model.counter.chit.LostSite;
 import model.counter.chit.MapChit;
 
@@ -74,35 +68,9 @@ public class ModelController {
 		lostCastle = new LostSite(MapChitType.LOST_CASTLE);
 	}
 
-	// TODO belongs in ClientThread.
-
 	public void setCharacterHidden(Player player, boolean hid) {
 		player.getCharacter().setHiding(hid);
 	}
-
-	// TODO belongs in ClientThread.
-	/*
-	 * @Override public void peerChoice(PeerType choice, CharacterType actor) {
-	 * // choice of // peer if (choice == null) {
-	 * System.out.println("PEER CHOICE WAS NULL"); return; } switch (choice) {
-	 * case CLUES_AND_PATHS: case CLUES: peerCP(actor); break; default: break; }
-	 * 
-	 * }
-	 */
-
-	// TODO belongs in ClientThread.
-	/*
-	 * @Override public void hideCharacter(CharacterType actor) {
-	 * getClient(actor).rollDie(actor, DieRequest.PEER_TABLE); }
-	 */
-
-	// TODO belongs in ClientThread.
-	/*
-	 * @Override public void setPlayerActivities(List<Activity> activities,
-	 * CharacterType chr) { getPlayerOf(chr).setActivities(activities); }
-	 */
-
-	// TODO belongs in ClientThread.
 
 	public boolean hideCharacter(int chance, Player player) {
 		if (chance <= 5) {
@@ -239,16 +207,6 @@ public class ModelController {
 		for (Player player : players.values()) {
 			player.getPersonalHistory().newDay();
 		}
-
-	}
-
-	// TODO belongs in clientThread
-	public ArrayList<Phase> getAllowedPhases() {
-		ArrayList<Phase> phases = new ArrayList<Phase>();
-		phases.addAll(getInitialPhases());
-		// phases.addAll(getCurrentCharacter().getSpecialPhases());
-		phases.addAll(getSunlightPhases());
-		return phases;
 	}
 
 	public boolean isCharacterHidden(CharacterType ct) {
@@ -257,30 +215,6 @@ public class ModelController {
 
 	public Character getCharacter(CharacterType ct) {
 		return characters.get(ct);
-	}
-
-	/*
-	 * private void playActivities(CharacterType chr) { Player plr =
-	 * getPlayerOf(chr); for (Activity act :
-	 * plr.getPersonalHistory().getCurrentActivities()) { act.perform(this); } }
-	 */
-
-	private Collection<? extends Phase> getSunlightPhases() {
-		ArrayList<Phase> init = new ArrayList<Phase>();
-		for (int i = 0; i < GameConfiguration.SUNLIGHT_PHASES; i++) {
-			init.add(new Phase(PhaseType.SUNLIGHT));
-			init.get(i).setPossibleActivities(ActivityType.values());
-		}
-		return init;
-	}
-
-	private Collection<? extends Phase> getInitialPhases() {
-		ArrayList<Phase> init = new ArrayList<Phase>();
-		for (int i = 0; i < GameConfiguration.INITIAL_PHASES; i++) {
-			init.add(new Phase(PhaseType.DEFAULT));
-			init.get(i).setPossibleActivities(ActivityType.values());
-		}
-		return init;
 	}
 
 	private void setUpWarning() {

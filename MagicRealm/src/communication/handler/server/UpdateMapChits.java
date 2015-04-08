@@ -1,11 +1,8 @@
 package communication.handler.server;
 
 import java.util.ArrayList;
-import java.util.Map;
 
-import model.counter.chit.MapChit;
 import model.enums.MapChitType;
-import model.enums.TileName;
 import client.ClientController;
 import communication.ClientNetworkHandler;
 import communication.handler.server.serialized.SerializedMapChit;

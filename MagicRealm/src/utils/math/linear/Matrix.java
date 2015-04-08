@@ -11,13 +11,6 @@ import utils.math.Mathf;
 
 public abstract class Matrix implements Serializable {
 
-	public static void main(String[] args) {
-		Matrix test = Matrix.initialize(4, 4, new float[] { -0.9623067f,
-				0.19230938f, -0.19230938f, 0.2943588f, -0.27196655f,
-				-0.68045354f, 0.68045354f, -4.278378f, 0.0f, 0.70710677f,
-				0.70710677f, 0.65234303f, 0.0f, 0.0f, 0.0f, 1.0f });
-	}
-
 	public static Matrix clone(Matrix inp) {
 		Matrix ret = Matrix.empty(inp.rowCount(), inp.columnCount());
 		ret.copyFrom(inp);
@@ -531,8 +524,6 @@ public abstract class Matrix implements Serializable {
 		}
 		return msg + "]";
 	}
-	
-	// TODO implement equals
 
 	/*
 	 * protected abstract methods
@@ -712,4 +703,7 @@ public abstract class Matrix implements Serializable {
 	private Matrix augment;
 	private int detChanged;
 	private float det;
+	
+	private static final long serialVersionUID = -3151712528937189871L;
+	
 }

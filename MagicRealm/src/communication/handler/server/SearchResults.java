@@ -1,12 +1,10 @@
 package communication.handler.server;
 
 import java.util.ArrayList;
-import java.util.Map;
 
 import model.counter.chit.MapChit;
 import model.enums.MapChitType;
 import model.enums.SearchType;
-import model.interfaces.ClearingInterface;
 import client.ClientController;
 import communication.ClientNetworkHandler;
 

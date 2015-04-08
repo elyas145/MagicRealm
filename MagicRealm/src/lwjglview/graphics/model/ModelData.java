@@ -2,20 +2,16 @@ package lwjglview.graphics.model;
 
 import java.io.IOException;
 import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import lwjglview.graphics.LWJGLDrawable;
-import lwjglview.graphics.LWJGLDrawableNode;
 import lwjglview.graphics.LWJGLGraphics;
 
 import org.lwjgl.BufferUtils;
 
 import utils.resources.ResourceHandler;
-import view.graphics.Drawable;
-import view.graphics.Graphics;
 
 public class ModelData implements LWJGLDrawable {
 

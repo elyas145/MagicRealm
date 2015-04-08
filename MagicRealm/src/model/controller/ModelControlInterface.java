@@ -8,7 +8,6 @@ import model.enums.CharacterType;
 import model.enums.PeerType;
 import model.enums.TableType;
 import model.enums.TileName;
-import model.exceptions.GameFullException;
 
 /*
  * Meant to be a container for the entire model

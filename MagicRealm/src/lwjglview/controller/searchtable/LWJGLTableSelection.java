@@ -2,17 +2,12 @@ package lwjglview.controller.searchtable;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.util.ArrayList;
 
-import lwjglview.graphics.LWJGLGraphics;
 import lwjglview.graphics.textures.LWJGLSingleTextureLoader;
 import lwjglview.graphics.textures.LWJGLTextureLoader;
 import lwjglview.menus.LWJGLContentPane;
 import lwjglview.menus.LWJGLPanel;
-import lwjglview.menus.dropdown.LWJGLDropdown;
-import lwjglview.selection.SelectionFrame;
 import model.enums.TableType;
-import utils.handler.Handler;
 import utils.resources.ResourceHandler;
 import view.controller.search.SearchView;
 import view.controller.search.TableSelectionListener;

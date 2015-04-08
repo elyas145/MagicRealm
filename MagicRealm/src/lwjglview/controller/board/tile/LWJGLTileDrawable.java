@@ -36,7 +36,6 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode implements
 		position = Matrix.clone(pos);
 		translation = Matrix.translation(position);
 		rotation = Matrix.rotationZ(4, -rot);
-		reverseRotation = rotation.inverse();
 		transformation = Matrix.clone(translation);
 		textureLocation = textureLocs;
 		selectionLocation = selectLocs;
@@ -266,7 +265,6 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode implements
 	private Collection<LWJGLDrawableLeaf> faces;
 	private Matrix transformation;
 	private Matrix rotation;
-	private Matrix reverseRotation;
 	private Matrix position;
 	// private Matrix vector;
 	private Matrix translation;

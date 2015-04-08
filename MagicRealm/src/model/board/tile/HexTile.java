@@ -9,12 +9,9 @@ import model.EnchantedHolder;
 import model.board.Board;
 import model.board.Board.ClearingData;
 import model.board.clearing.Clearing;
-import model.counter.chit.Chit;
 import model.enums.PathType;
 import model.enums.TileName;
 import model.interfaces.HexTileInterface;
-
-import org.json.simple.JSONArray;
 
 import communication.handler.server.serialized.SerializedClearing;
 import communication.handler.server.serialized.SerializedTile;

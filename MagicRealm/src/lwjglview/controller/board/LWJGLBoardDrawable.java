@@ -14,7 +14,6 @@ import lwjglview.controller.board.mapchit.LWJGLMapChitCollection;
 import lwjglview.controller.board.tile.LWJGLCounterStorage;
 import lwjglview.controller.board.tile.LWJGLTileCollection;
 import lwjglview.controller.board.tile.LWJGLTileDrawable;
-import lwjglview.controller.board.tile.LWJGLTileStorage;
 import lwjglview.graphics.LWJGLGraphics;
 import lwjglview.graphics.animator.AnimationQueue;
 import lwjglview.graphics.animator.FadeAnimator;

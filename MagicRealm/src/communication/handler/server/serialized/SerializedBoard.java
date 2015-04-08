@@ -5,11 +5,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import model.counter.chit.MapChit;
 import model.enums.CounterType;
-import model.enums.MapChitType;
 import model.enums.TileName;
-import model.interfaces.ClearingInterface;
 
 public class SerializedBoard implements Serializable {
 	private static final long serialVersionUID = 4842931638624923336L;

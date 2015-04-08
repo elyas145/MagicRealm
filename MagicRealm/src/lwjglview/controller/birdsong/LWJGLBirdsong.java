@@ -13,7 +13,6 @@ import lwjglview.menus.LWJGLPanel;
 import lwjglview.menus.dropdown.LWJGLDropdown;
 import model.character.Phase;
 import model.enums.ActivityType;
-import model.player.PersonalHistory;
 import utils.handler.Handler;
 import utils.math.linear.Matrix;
 import utils.resources.ResourceHandler;

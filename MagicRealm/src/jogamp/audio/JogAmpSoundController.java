@@ -131,6 +131,8 @@ public class JogAmpSoundController implements SoundController {
 			return "patter.wav";
 		case SLITHER:
 			return "snake.wav";
+		default:
+			break;
 		}
 		return null;
 	}
