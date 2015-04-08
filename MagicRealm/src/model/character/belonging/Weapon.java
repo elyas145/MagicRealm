@@ -1,32 +1,22 @@
 package model.character.belonging;
 
-import model.enums.WeaponType;
-import model.interfaces.BelongingType;
+import model.enums.BelongingType;
 
 public class Weapon extends Belonging {
 	private boolean alerted;
 	private int attackTime;
-	private WeaponType weaponType;
-	public WeaponType getWeaponType() {
-		return weaponType;
-	}
-
-	public void setWeaponType(WeaponType weaponType) {
-		this.weaponType = weaponType;
-		setType(weaponType.toBelonging());
-	}
 
 	private char harm;
 
 	private int sharpness;
 
-	public Weapon(WeaponType type, int sharpness, boolean alerted,
+	public Weapon(BelongingType type, int sharpness, boolean alerted,
 			int attackTime, char harm) {
+		super(null, alerted, type);
 		this.harm = harm;
 		this.sharpness = sharpness;
 		this.alerted = alerted;
 		this.attackTime = attackTime;
-		this.weaponType = type;
 
 	}
 
@@ -60,17 +50,5 @@ public class Weapon extends Belonging {
 
 	public void setSharpness(int sharpness) {
 		this.sharpness = sharpness;
-	}
-
-	@Override
-	public BelongingType getType() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setType(BelongingType type) {
-		// TODO Auto-generated method stub
-		
 	}
 }

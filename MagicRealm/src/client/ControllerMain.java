@@ -32,6 +32,7 @@ import model.board.clearing.Clearing;
 import model.character.Character;
 import model.character.CharacterFactory;
 import model.character.Phase;
+import model.character.belonging.Belonging;
 import model.counter.chit.MapChit;
 import model.enums.ActivityType;
 import model.enums.CharacterType;
@@ -587,6 +588,12 @@ public class ControllerMain implements ClientController {
 			}
 			// boardView.hideAllMapChits();
 		}
+		updateStrings.clear();
+		updateStrings.add("Belongings: ");
+		for(Belonging b : characters.get(clientID).getBelongings()){
+			updateStrings.add(b.toString());
+		}
+		mainView.updateBelongings(updateStrings);
 	}
 
 	@Override
@@ -720,7 +727,6 @@ public class ControllerMain implements ClientController {
 
 	@Override
 	public void discoverPaths(ArrayList<String> paths) {
-		mainView.displayMessage("found paths!");
 		ArrayList<String> temp = new ArrayList<String>();
 		temp.add("Discovered Paths:");
 		temp.addAll(paths);

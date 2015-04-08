@@ -1,16 +1,13 @@
 package model.character.belonging;
 
 import java.io.Serializable;
-
-import model.enums.ArmorType;
-import model.interfaces.BelongingType;
+import model.enums.BelongingType;
 
 public class Armor extends Belonging{
 	private char toughness;
-	private ArmorType type;
 
-	public Armor(ArmorType t, char toughness){
-		this.type = t;
+	public Armor(BelongingType t, char toughness){
+		super(null, true, t);
 		this.toughness = toughness;		
 	}
 
@@ -18,16 +15,8 @@ public class Armor extends Belonging{
 		return toughness;
 	}
 
-	public ArmorType getArmorType() {
-		return type;
-	}
-
 	public void setToughness(char toughness) {
 		this.toughness = toughness;
-	}
-	
-	public void setArmorType(ArmorType type) {
-		this.type = type;
 	}
 
 	@Override

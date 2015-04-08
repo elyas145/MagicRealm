@@ -6,13 +6,11 @@ import model.character.belonging.Armor;
 import model.character.belonging.Belonging;
 import model.character.belonging.Weapon;
 import model.enums.ActivityType;
-import model.enums.ArmorType;
+import model.enums.BelongingType;
 import model.enums.CharacterType;
 import model.enums.CounterType;
 import model.enums.PhaseType;
 import model.enums.ValleyChit;
-import model.enums.WeaponType;
-import model.interfaces.BelongingType;
 import model.interfaces.CharacterFactoryInterface;
 
 public class CharacterFactory {
@@ -43,10 +41,10 @@ public class CharacterFactory {
 			//has to start at the inn
 			c.setInitialLocation(CounterType.VALLEY_INN);
 			//initial belongings
-			belongings.add(new Weapon(WeaponType.SHORT_SWORD, 1, false, 0, 'L'));
-			belongings.add(new Armor(ArmorType.HELMET, 'M'));
-			belongings.add(new Armor(ArmorType.BREAST_PLATE, 'M'));
-			belongings.add(new Armor(ArmorType.SHIELD, 'M'));
+			belongings.add(new Weapon(BelongingType.SHORT_SWORD, 1, false, 0, 'L'));
+			belongings.add(new Armor(BelongingType.HELMET, 'M'));
+			belongings.add(new Armor(BelongingType.BREAST_PLATE, 'M'));
+			belongings.add(new Armor(BelongingType.SHIELD, 'M'));
 			break;
 		case CAPTAIN:
 			specialPhases.add(new Phase(PhaseType.SPECIAL, CharacterType.CAPTAIN));
@@ -57,13 +55,13 @@ public class CharacterFactory {
 			//has to start at the inn, house, or guard house
 			c.setInitialLocation(location);
 			//initial belongings
-			belongings.add(new Weapon(WeaponType.SHORT_SWORD, 1, false, 0, 'L'));
-			belongings.add(new Armor(ArmorType.HELMET, 'M'));
-			belongings.add(new Armor(ArmorType.BREAST_PLATE, 'M'));
-			belongings.add(new Armor(ArmorType.SHIELD, 'M'));
+			belongings.add(new Weapon(BelongingType.SHORT_SWORD, 1, false, 0, 'L'));
+			belongings.add(new Armor(BelongingType.HELMET, 'M'));
+			belongings.add(new Armor(BelongingType.BREAST_PLATE, 'M'));
+			belongings.add(new Armor(BelongingType.SHIELD, 'M'));
 			break;
 		case SWORDSMAN:
-			belongings.add(new Weapon(WeaponType.THRUSTING_SWORD, 1, false, 0, 'L'));
+			belongings.add(new Weapon(BelongingType.THRUSTING_SWORD, 1, false, 0, 'L'));
 			break;
 		default:
 			break;

@@ -36,7 +36,6 @@ import model.interfaces.ClearingInterface;
 import model.player.Player;
 import model.character.Character;
 import model.character.Phase;
-import model.character.belonging.Treasure;
 import model.counter.chit.LostSite;
 import model.counter.chit.MapChit;
 
@@ -55,7 +54,6 @@ public class ModelController {
 	private Queue<CharacterType> orderOfPlay;
 	private boolean currentPlayerDone = false;
 	private Set<MapChit> mapChits;
-	private Map<MapChitType, ArrayList<Treasure>> treasures;
 	private boolean discoveredCastle = false;
 	private boolean discoveredCity = false;
 	private static final RuntimeException noPlayersException = new RuntimeException(
@@ -71,8 +69,6 @@ public class ModelController {
 		}
 
 		mapChits = new HashSet<MapChit>();
-
-		treasures = new HashMap<MapChitType, ArrayList<Treasure>>();
 
 		lostCity = new LostSite(MapChitType.LOST_CITY);
 		lostCastle = new LostSite(MapChitType.LOST_CASTLE);
