@@ -415,9 +415,9 @@ public class ControllerMain implements ClientController {
 									int clearing) {
 								if (clearing != 0) {
 									if (mainView.confirm(
-											"So you wanna move to "
+											"move to "
 													+ tile.toString()
-													+ "clearing " + clearing
+													+ " " + clearing
 													+ "?", "Yes", "No")) {
 										activitiesList.add(new Move(characters
 												.get(clientID).getType(), tile,
@@ -438,7 +438,7 @@ public class ControllerMain implements ClientController {
 								}
 							}
 						});
-						mainView.displayMessage("Please select the clearing to move to for phase "
+						mainView.displayMessage("Select clearing for phase "
 								+ (i[0] + 1) + ".");
 						try {
 							sem.acquire();
@@ -468,7 +468,6 @@ public class ControllerMain implements ClientController {
 							try {
 								sem.acquire();
 							} catch (InterruptedException e) {
-								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}
 						}
@@ -710,7 +709,10 @@ public class ControllerMain implements ClientController {
 
 	@Override
 	public void peekMapChits(ArrayList<MapChit> peek) {
-		mainView.displayMessage("peeking at map chits.");
+		if(!peek.isEmpty()){
+			updateStrings.clear();
+			updateStrings.add("peeking at map chits.");
+		}
 		mainView.revealAllMapChits(peek);
 	}
 
