@@ -187,6 +187,9 @@ public class ServerController {
 		if (!everyoneSelected) {
 			sendAll(new UpdateCharacterSelection(character));
 		} else {
+			if (GameConfiguration.Cheat) {
+				sendAll(new SetCheatMode());
+			}
 			model.setBoardForPlay();
 			sboard = model.getBoard().getSerializedBoard();
 			startGame();
@@ -199,9 +202,6 @@ public class ServerController {
 			characters.put(c.getID(), c.getCharacter());
 		}
 		sendAll(new StartGame(sboard, characters));
-		if (GameConfiguration.Cheat) {
-			sendAll(new SetCheatMode());
-		}
 		startBirdSong();
 	}
 

@@ -70,6 +70,7 @@ public class ControllerMain implements ClientController {
 	private MenuItemListener mainMenuListener;
 	private ArrayList<CharacterType> disabledCharacters;
 	private ArrayList<String> updateStrings;
+
 	public ControllerMain() {
 		rh = new ResourceHandler();
 		mainView = new LWJGLViewController(rh, new JogAmpSoundController());
@@ -415,10 +416,9 @@ public class ControllerMain implements ClientController {
 									int clearing) {
 								if (clearing != 0) {
 									if (mainView.confirm(
-											"move to "
-													+ tile.toString()
-													+ " " + clearing
-													+ "?", "Yes", "No")) {
+											"move to " + tile.toString() + " "
+													+ clearing + "?", "Yes",
+											"No")) {
 										activitiesList.add(new Move(characters
 												.get(clientID).getType(), tile,
 												clearing, phases.get(i[0])
@@ -579,6 +579,8 @@ public class ControllerMain implements ClientController {
 			}
 			for (MapChit c : chits) {
 				boardView.setMapChit(c);
+				if (GameConfiguration.Cheat)
+					boardView.revealMapChit(c);
 			}
 			for (Character c : characters.values()) {
 				boardView.hideCounter(c.getType().toCounter());
@@ -682,7 +684,7 @@ public class ControllerMain implements ClientController {
 							rollValue[0] = table.getRollValue(st);
 							sem.release();
 						}
-						
+
 					});
 					try {
 						sem.acquire();
@@ -698,7 +700,7 @@ public class ControllerMain implements ClientController {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		
+
 		server.send(new SearchCriteria(characters.get(clientID).getType(),
 				selectedTable, rollValue[0]));
 	}
@@ -709,7 +711,7 @@ public class ControllerMain implements ClientController {
 
 	@Override
 	public void peekMapChits(ArrayList<MapChit> peek) {
-		if(!peek.isEmpty()){
+		if (!peek.isEmpty()) {
 			updateStrings.clear();
 			updateStrings.add("peeking at map chits.");
 		}
@@ -766,8 +768,7 @@ public class ControllerMain implements ClientController {
 	public void addGold(int goldValue, MapChitType site) {
 		this.goldValue += goldValue;
 		updateStrings.clear();
-		updateStrings.add("You looted " + site + "! gold: "
-				+ this.goldValue);
+		updateStrings.add("You looted " + site + "! gold: " + this.goldValue);
 		mainView.updateLog(updateStrings);
 	}
 
@@ -786,11 +787,11 @@ public class ControllerMain implements ClientController {
 	@Override
 	public void setEnchantedTile(TileName tile, CharacterType actor,
 			boolean bool) {
-		boardView.enchantTile(tile);
+		boardView.setTileEnchanted(tile, bool);
 		this.updateStrings.clear();
-		if(bool){			
-			updateStrings.add(actor + " has enchanted " + tile);			
-		}else{
+		if (bool) {
+			updateStrings.add(actor + " has enchanted " + tile);
+		} else {
 			updateStrings.add(actor + " has un-enchanted " + tile);
 		}
 		mainView.updateLog(updateStrings);
