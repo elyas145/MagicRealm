@@ -174,9 +174,9 @@ public class LWJGLBoardDrawable extends LWJGLCounterLocator implements BoardView
 	}
 
 	@Override
-	public synchronized void enchantTile(TileName tile) {
+	public synchronized void setTileEnchanted(TileName tile, boolean ench) {
 		synchronized (tiles) {
-			tiles.setEnchanted(tile, true);
+			tiles.setEnchanted(tile, ench);
 			refreshCounters(tile);
 		}
 	}

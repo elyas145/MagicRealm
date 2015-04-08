@@ -97,8 +97,6 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode implements
 	public Iterable<Integer> getClearings() {
 		return clearings.keySet();
 	}
-	
-	private ArrayList<Integer> ids = new ArrayList<Integer>();
 
 	public void refreshCounters() {
 		for(int clr: getClearings()) {
@@ -156,6 +154,8 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode implements
 		Matrix mat = Matrix.translation(0f, 0f, halfThick);
 		faces.add(new LWJGLDrawableLeaf(this, new HexTileFace(this, mat, false)));
 		mat = Matrix.rotationX(4, Mathf.PI).multiply(mat);
+		mat.multiply(rotation, mat);
+		mat.multiply(rotation, mat);
 		faces.add(new LWJGLDrawableLeaf(this, new HexTileFace(this, mat, true)));
 		// scale square
 		mat = Matrix.dilation(.5f, halfThick, 1f, 1f);

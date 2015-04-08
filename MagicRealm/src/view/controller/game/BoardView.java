@@ -11,7 +11,7 @@ public interface BoardView {
 	void setTile(TileName tile, int row, int col, int rot,
 			Iterable<? extends ClearingInterface> clearings);
 
-	void enchantTile(TileName tile);
+	void setTileEnchanted(TileName tile, boolean ench);
 
 	void setCounter(CounterType counter, TileName tile, int clearing);
 	

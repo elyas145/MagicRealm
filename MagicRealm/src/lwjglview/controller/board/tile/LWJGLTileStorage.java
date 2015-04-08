@@ -45,30 +45,6 @@ public class LWJGLTileStorage extends LWJGLCounterStorage {
 		}
 		ob.getLocation(buff);
 	}
-
-	/*
-	@Override
-	public void put(int id) {
-		Matrix rand = vec3;
-		randomLocation(rand);
-		boolean ench = isEnchanted();
-		for (int i = 0; i < 20; ++i) {
-			for (Obstruction ob : obstructions.get(ench)) {
-				if (ob.obstructs(rand)) {
-					ob.recommend(rand);
-				}
-			}
-			for (Obstruction ob : chits.values()) {
-				if (ob.obstructs(rand)) {
-					ob.recommend(rand);
-				}
-			}
-		}
-		synchronized (chits) {
-			chits.put(id, new Obstruction(rand, counterRadius, false));
-		}
-		moveChit(id);
-	}*/
 	
 	@Override
 	public void put(int id) {
