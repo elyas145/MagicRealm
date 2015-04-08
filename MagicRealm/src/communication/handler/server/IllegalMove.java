@@ -15,7 +15,7 @@ public class IllegalMove implements ClientNetworkHandler{
 	}
 	@Override
 	public void handle(ClientController controller) {
-		controller.updateLog("Illegal Move. You cannot move to " + tile.toString() + "clearing " + clearing);		
+		controller.updateLog(String.format("Illegal Move. You cannot move to %s %d", tile.toString(), clearing));		
 	}
 	@Override
 	public String toString(){

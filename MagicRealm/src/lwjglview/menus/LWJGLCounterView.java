@@ -87,7 +87,7 @@ public class LWJGLCounterView extends LWJGLCounterLocator {
 			textureLoc = gfx.generateBufferTexture(bufferLoc);
 		}
 		gfx.useFrameBuffer(bufferLoc);
-		gfx.setClearColor(0f, 1f, 1f, .8f);
+		gfx.setClearColor(.5f, .5f, .5f, .5f);
 		gfx.clearActiveBuffers();
 		gfx.resetViewMatrix();
 		gfx.translateCamera(0f, 0f, -0.2f);

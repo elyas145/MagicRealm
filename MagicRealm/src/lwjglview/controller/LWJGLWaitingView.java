@@ -13,7 +13,7 @@ public class LWJGLWaitingView {
 	private static final Font FONT = new Font("Times New Roman", Font.PLAIN,
 			100);
 	private static final Color COLOR = Color.WHITE;
-	private static final int MAX_CHARS = 35;
+	private static final int MAX_CHARS = 31;
 	private static final int MAX_LINES = 3;
 
 	public LWJGLWaitingView(LWJGLContentPane par, String msg) {

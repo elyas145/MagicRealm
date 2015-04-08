@@ -61,7 +61,11 @@ public class HexTile implements HexTileInterface {
 		exits = new int[2][6];
 		surroundings = new TileName[6];
 		for(int i = 0; i < 6; ++i) {
-			surroundings[i] = surrounding[i];
+			TileName tn = surrounding[i];
+			surroundings[i] = tn;
+			if(tn != null) {
+				parent.getTile(surroundings[i]).connectTo(name, i + 3);
+			}
 		}
 		clearExits();
 		connectClearings();
@@ -177,7 +181,6 @@ public class HexTile implements HexTileInterface {
 	@Override
 	public void connectTo(TileName otherTile, int exit) {
 		surroundings[exit % 6] = otherTile;
-
 	}
 
 	@Override

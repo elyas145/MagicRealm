@@ -8,7 +8,7 @@ public class Reject implements ClientNetworkHandler{
 
 	@Override
 	public void handle(ClientController controller) {
-		controller.displayMessage("You were rejected from the game. please try again at a later time.");		
+		controller.displayMessage("You were rejected from the game. Please try again at a later time.");		
 	}
 	@Override
 	public String toString(){

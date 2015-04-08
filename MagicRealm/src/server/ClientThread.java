@@ -116,6 +116,7 @@ public class ClientThread extends Thread {
 		currentActivities = null;
 		player.setSunlightFlag(false);
 		mountainMoveCount = 0;
+		mountainClearing = null;
 	}
 	
 	public boolean hasPlayed() {

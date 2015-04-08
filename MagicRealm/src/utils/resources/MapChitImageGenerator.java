@@ -5,9 +5,7 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
 
-import config.GraphicsConfiguration;
 import utils.images.ImageTools;
 import model.counter.chit.MapChit;
 
@@ -27,7 +25,7 @@ public class MapChitImageGenerator implements ImageTools.GraphicsHandler {
 		double width = w;
 		double height = h;
 		g.fillRect(0, 0, (int) width, (int) height);
-		g.setFont(new Font("TimesRoman", Font.BOLD, (int) (height * .19)));
+		g.setFont(new Font("TimesRoman", Font.BOLD, (int) (height * .17)));
 		g.setColor(Color.BLACK);
 		FontMetrics fm = g.getFontMetrics();
 		Rectangle2D rekt = fm.getStringBounds(name, g);

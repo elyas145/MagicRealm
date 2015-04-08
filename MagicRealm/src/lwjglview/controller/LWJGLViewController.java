@@ -1,8 +1,5 @@
 package lwjglview.controller;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,6 +29,7 @@ import model.enums.SearchType;
 import model.enums.TileName;
 import utils.handler.Handler;
 import utils.resources.ResourceHandler;
+import utils.string.TextTools;
 import view.audio.SoundController;
 import view.controller.BirdsongFinishedListener;
 import view.controller.BoardReadyListener;
@@ -216,8 +214,13 @@ public class LWJGLViewController implements ViewController {
 	
 	@Override
 	public void updateLog(ArrayList<String> updates) {
+		ArrayList<String> dest = new ArrayList<String>();
 		for(String s: updates) {
-			discovered.addText(s);
+			dest.clear();
+			TextTools.wrap(s, dest, 35);
+			for(String l: dest) {
+				discovered.addText(l);
+			}
 		}
 	}
 	

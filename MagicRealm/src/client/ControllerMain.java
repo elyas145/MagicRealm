@@ -322,7 +322,7 @@ public class ControllerMain implements ClientController {
 					public void onCharacterSelected(
 							final CharacterType character) {
 						waitForTiles();
-						mainView.displayMessage("please select starting location. has to be a valid counter");
+						mainView.displayMessage("Please select a dwelling to start");
 						for (CounterType ct : CharacterFactory
 								.getPossibleStartingLocations(character)) {
 							boardView.setCounter(ct, board
@@ -330,6 +330,8 @@ public class ControllerMain implements ClientController {
 									.getName(), board.getLocationOfCounter(ct)
 									.getClearingNumber());
 						}
+						final ArrayList<String> error = new ArrayList<String>();
+						error.add("Please choose a dwelling");
 						mainView.selectClearing(new ClearingSelectedListener() {
 
 							@Override
@@ -346,7 +348,7 @@ public class ControllerMain implements ClientController {
 											characterSelected(character, loc);
 										}
 									} else {
-										mainView.displayMessage("please choose a clearing with a counter.");
+										mainView.updateLog(error);
 										mainView.selectClearing(this);
 									}
 								} else {
@@ -383,7 +385,7 @@ public class ControllerMain implements ClientController {
 	@Override
 	public void enterBirdSong() {
 		System.out.println("Entering bird song.");
-		mainView.displayBanner("");
+		mainView.hideBanner();
 		// phases:
 		final ArrayList<Phase> phases = new ArrayList<Phase>();
 
@@ -416,7 +418,7 @@ public class ControllerMain implements ClientController {
 									int clearing) {
 								if (clearing != 0) {
 									if (mainView.confirm(
-											"move to " + tile.toString() + " "
+											"Move to " + tile.toString() + " "
 													+ clearing + "?", "Yes",
 											"No")) {
 										activitiesList.add(new Move(characters
@@ -428,9 +430,8 @@ public class ControllerMain implements ClientController {
 												+ phases.get(i[0]));
 										sem.release();
 									} else {
-										mainView.displayMessage("Please select the clearing to move to for phase "
-												+ (i[0] + 1) + ".");
-
+										mainView.displayMessage("Please make a move for phase "
+												+ (i[0] + 1));
 										mainView.selectClearing(this);
 									}
 								} else {
@@ -439,7 +440,7 @@ public class ControllerMain implements ClientController {
 							}
 						});
 						mainView.displayMessage("Select clearing for phase "
-								+ (i[0] + 1) + ".");
+								+ (i[0] + 1));
 						try {
 							sem.acquire();
 							System.out.println("aquired Semaphore: "
@@ -499,7 +500,7 @@ public class ControllerMain implements ClientController {
 	 * "waiting for other players" after this method is called.
 	 */
 	public void endBirdSong(Iterable<Activity> activities) {
-		mainView.displayBanner("Please wait for other players.");
+		mainView.displayBanner("Please wait for other players");
 		server.send(new SubmitActivities(characters.get(this.clientID)
 				.getType(), activities));
 	}
@@ -722,7 +723,7 @@ public class ControllerMain implements ClientController {
 	public void peekMapChits(ArrayList<MapChit> peek) {
 		if (!peek.isEmpty()) {
 			updateStrings.clear();
-			updateStrings.add("peeking at map chits.");
+			updateStrings.add("Peeking at map chits");
 			mainView.updateLog(updateStrings);
 			mainView.revealAllMapChits(peek);
 		}
@@ -769,7 +770,7 @@ public class ControllerMain implements ClientController {
 	@Override
 	public void clueLost(MapChitType type) {
 		if (mainView.confirm("You have discovered " + type
-				+ ". wanna switch for its chits?", "yes", "no")) {
+				+ "! Would you like to place its chits?", "Yes", "No")) {
 			server.send(new UpdateMapChitsRequest(type));
 		}
 
@@ -779,7 +780,8 @@ public class ControllerMain implements ClientController {
 	public void addGold(int goldValue, MapChitType site) {
 		this.goldValue += goldValue;
 		updateStrings.clear();
-		updateStrings.add("You looted " + site + "! gold: " + this.goldValue);
+		updateStrings.add("You looted " + site + " with " + goldValue + " gold!");
+		updateStrings.add("You now have " + this.goldValue + " gold");
 		mainView.updateLog(updateStrings);
 	}
 
@@ -791,7 +793,7 @@ public class ControllerMain implements ClientController {
 
 	@Override
 	public void illegalCharacterSelection(CharacterType type) {
-		mainView.displayMessage("Sorry. character already selected.");
+		mainView.displayMessage("Character already selected!");
 		this.enterCharacterSelection(disabledCharacters);
 	}
 
@@ -803,7 +805,7 @@ public class ControllerMain implements ClientController {
 		if (bool) {
 			updateStrings.add(actor + " has enchanted " + tile);
 		} else {
-			updateStrings.add(actor + " has un-enchanted " + tile);
+			updateStrings.add(actor + " has cleansed " + tile);
 		}
 		mainView.updateLog(updateStrings);
 	}
