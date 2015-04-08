@@ -222,6 +222,13 @@ public class LWJGLViewController implements ViewController {
 	}
 	
 	@Override
+	public void updateBelongings(ArrayList<String> updates) {
+		for(String s: updates) {
+			belongings.addText(s);
+		}
+	}
+	
+	@Override
 	public void revealAllMapChits(Iterable<MapChit> chits) {
 		if(sounds != null) {
 			for(MapChit mc: chits) {
@@ -248,8 +255,9 @@ public class LWJGLViewController implements ViewController {
 		discovered = new LWJGLTextLog(menus, .7f, -.3f, 1f, .05f, 0, .05f, 30,
 				GraphicsConfiguration.PANEL_TIME);
 		menus.add(discovered);
-		discovered.addText("Hello");
-		discovered.addText("Goodbye");
+		belongings = new LWJGLTextLog(menus, -1.7f, -.3f, 1f, .05f, 0, .05f, 30,
+				GraphicsConfiguration.PANEL_TIME);
+		menus.add(belongings);
 
 		/*System.setOut(new PrintStream(new OutputStream() { // PRINT OUT TO GAME
 															// LOG
@@ -326,5 +334,6 @@ public class LWJGLViewController implements ViewController {
 	private LWJGLSearchChoiceView searchSelect;
 	private LWJGLDieSelection dieSelection;
 	private LWJGLTextLog discovered;
+	private LWJGLTextLog belongings;
 
 }
