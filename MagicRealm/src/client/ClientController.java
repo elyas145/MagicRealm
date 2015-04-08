@@ -107,4 +107,6 @@ public interface ClientController {
 
 	void addCharacter(int id, Character character);
 
+	void updateLog(String string);
+
 }

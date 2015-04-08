@@ -820,4 +820,12 @@ public class ControllerMain implements ClientController {
 		boardView.hideCounter(character.getType().toCounter());
 	}
 
+	@Override
+	public void updateLog(String string) {
+		updateStrings.clear();
+		updateStrings.add(string);
+		mainView.updateLog(updateStrings);
+		
+	}
+
 }

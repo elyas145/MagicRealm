@@ -44,6 +44,11 @@ public class SearchResults implements ClientNetworkHandler {
 		this.site = site;		
 	}
 
+	public SearchResults(SearchType failLoot, MapChitType type2) {
+		this.type = failLoot;
+		this.site = type2;
+	}
+
 	@Override
 	public void handle(ClientController controller) {
 		switch(type){
@@ -72,6 +77,8 @@ public class SearchResults implements ClientNetworkHandler {
 		case LOOT:
 			controller.addGold(goldValue, site);
 			break;
+		case FAIL_LOOT:
+			controller.updateLog(site + " was already looted.");
 		
 		default:
 			return;

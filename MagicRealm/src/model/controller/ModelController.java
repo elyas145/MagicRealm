@@ -47,7 +47,7 @@ public class ModelController {
 	private int currentDay = 0;
 	private LostSite lostCity;
 	private LostSite lostCastle;
-
+	private Map<MapChit, Boolean> lootedMap;
 	private Board board = null;
 	private Map<CharacterType, Character> characters;
 	private Map<CharacterType, Player> players;
@@ -67,7 +67,7 @@ public class ModelController {
 		for (ValleyChit t : ValleyChit.values()) {
 			dwellings.add(t);
 		}
-
+		lootedMap = new HashMap<MapChit, Boolean>();
 		mapChits = new HashSet<MapChit>();
 
 		lostCity = new LostSite(MapChitType.LOST_CITY);
@@ -158,6 +158,11 @@ public class ModelController {
 		if (GameConfiguration.RANDOM || !GameConfiguration.Cheat) {
 			setUpSoundAndSite();
 			setUpWarning();
+			for(MapChit c : mapChits){
+				if(c.getType().type() == ChitType.SITE){
+					lootedMap.put(c, false);
+				}
+			}
 		}
 	}
 
@@ -460,8 +465,11 @@ public class ModelController {
 					&& (c.getTile() == myTile)
 					&& (c.getClearing() == myClearing)
 					&& (player.hasDiscoveredSite(c))) {
-				return new SearchResults(GameConfiguration.MAX_TREASURE_VALUE
-						/ rollValue, c.getType());
+				if(!lootedMap.get(c))
+					return new SearchResults(GameConfiguration.MAX_TREASURE_VALUE
+							/ rollValue, c.getType());
+				else
+					return new SearchResults(SearchType.FAIL_LOOT, c.getType());
 			}
 		}
 		return new SearchResults(SearchType.NONE);
@@ -687,7 +695,9 @@ public class ModelController {
 
 	public void addSite(MapChitType site, TileName tile) {
 		board.setLocationOfMapChit(new MapChit(site), tile);
-		mapChits.add(new MapChit(site, site.getClearing(), tile));
+		MapChit c = new MapChit(site, site.getClearing(), tile);
+		mapChits.add(c);
+		lootedMap.put(c, false);
 		System.out.println("Added site at " + tile);
 	}
 
@@ -786,6 +796,11 @@ public class ModelController {
 			board.setLocationOfMapChit(lostCastle, tile);
 			board.addChitsToLoad(lostCastle.getWarningAndSite());
 			mapChits.add(lostCastle);
+			for(MapChit c : lostCastle.getWarningAndSite()){
+				if(c.getType().type() == ChitType.SITE){
+					lootedMap.put(c, false);
+				}
+			}
 			break;
 		case LOST_CITY:
 			lostCity = new LostSite(MapChitType.LOST_CITY);
@@ -795,6 +810,11 @@ public class ModelController {
 			board.setLocationOfMapChit(lostCity, tile);
 			mapChits.add(lostCity);
 			board.addChitsToLoad(lostCity.getWarningAndSite());
+			for(MapChit c : lostCity.getWarningAndSite()){
+				if(c.getType().type() == ChitType.SITE){
+					lootedMap.put(c, false);
+				}
+			}
 			break;
 		default:
 			break;
