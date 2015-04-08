@@ -58,6 +58,7 @@ public interface ViewController {
 	void startGame(BoardReadyListener brl);
 	
 	void updateLog(ArrayList<String> updates);
+	void updateBelongings(ArrayList<String> updates);
 	
 	void revealAllMapChits(Iterable<MapChit> chits);
 }
