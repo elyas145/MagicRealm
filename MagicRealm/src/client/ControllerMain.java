@@ -306,7 +306,7 @@ public class ControllerMain implements ClientController {
 	@Override
 	public void enterCharacterSelection(ArrayList<CharacterType> disabled) {
 		System.out.println("Entered player selection.");
-
+		mainView.hideMainMenu();
 		ArrayList<CharacterType> characters = new ArrayList<CharacterType>();
 		for (CharacterType ct : CharacterType.values()) {
 			if ((disabled != null) && !(disabled.contains(ct))) {
@@ -584,6 +584,9 @@ public class ControllerMain implements ClientController {
 					boardView.revealMapChit(c);
 			}
 			for (Character c : characters.values()) {
+				boardView.setCounter(c.getType().toCounter(), board.getCounterPositions().get(c)
+						.getParent(), board.getCounterPositions().get(c)
+						.getNumber());
 				boardView.hideCounter(c.getType().toCounter());
 			}
 			// boardView.hideAllMapChits();
@@ -722,6 +725,7 @@ public class ControllerMain implements ClientController {
 			updateStrings.clear();
 			updateStrings.add("peeking at map chits.");
 		}
+		mainView.updateLog(updateStrings);
 		mainView.revealAllMapChits(peek);
 	}
 

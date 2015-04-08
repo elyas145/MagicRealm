@@ -169,7 +169,6 @@ public class ModelController {
 	 *            Set to null if not specified.
 	 */
 	public void setPlayersInitialLocations(CounterType c, CounterType site) {
-		// TODO get users to set locations
 		if (site != null) {
 			board.setLocationOfCounter(c, site);
 		} else
