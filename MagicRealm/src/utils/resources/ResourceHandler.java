@@ -67,6 +67,7 @@ public class ResourceHandler {
 	public BufferedImage readImage(String fname) throws IOException {
 		String ur = getResource(fname);
 		String rep = ur.toString();
+		System.out.println("HELOOOO: " + rep);
 		if (!images.containsKey(rep)) {
 			images.put(rep, ImageIO.read(new File(ur)));
 		}
@@ -99,7 +100,7 @@ public class ResourceHandler {
 		URL url1 = getClass().getResource("");
 		String ur = url1.toString();
 		ur = ur.substring(9);
-		String truePath = ur.split("game.jar")[0];
+		String truePath = ur.split("client.jar")[0];
 		truePath = URLDecoder.decode(truePath, "UTF-8");
 		return truePath;
 	}

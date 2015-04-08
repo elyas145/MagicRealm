@@ -43,6 +43,7 @@ public class LWJGLTextLog extends LWJGLContentPane {
 		font = fnt;
 		color = col;
 		updateTime = update;
+		visible = true;
 	}
 
 	public synchronized void addText(String txt) {
@@ -62,10 +63,16 @@ public class LWJGLTextLog extends LWJGLContentPane {
 		pane.setVisible(true);
 	}
 
+	public void setVisible(boolean vis) {
+		visible = vis;
+	}
+
 	@Override
 	public synchronized void draw(LWJGLGraphics gfx) {
-		updateTransformation();
-		drawPanels(gfx);
+		if(visible) {
+			updateTransformation();
+			drawPanels(gfx);
+		}
 	}
 
 	@Override
@@ -86,6 +93,7 @@ public class LWJGLTextLog extends LWJGLContentPane {
 	private Font font;
 	private Color color;
 	private float updateTime;
+	private boolean visible;
 
 	private List<LWJGLPanel> text;
 

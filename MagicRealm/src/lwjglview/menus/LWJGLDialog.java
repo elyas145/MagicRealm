@@ -9,6 +9,7 @@ import lwjglview.graphics.textures.LWJGLSingleTextureLoader;
 import lwjglview.graphics.textures.LWJGLTextureLoader;
 import utils.math.linear.Matrix;
 import utils.resources.ResourceHandler;
+import utils.string.TextTools;
 
 public class LWJGLDialog {
 
@@ -34,31 +35,9 @@ public class LWJGLDialog {
 
 	public void setMessage(String msg) {
 		ArrayList<String> lines = new ArrayList<String>();
-		int i = MAX_CHARS;
-		while (i < msg.length()) { // split msg
-			if (i >= MAX_CHARS) { // find whitespace
-				int j;
-				for (j = i; j > 0; --j) {
-					if (msg.charAt(j) == ' ') {
-						i = j - 1;
-						j = 0;
-					}
-				}
-				for (j = i; j > 0; --j) {
-					if (msg.charAt(j) != ' ') {
-						i = j + 1;
-						j = 0;
-					}
-				}
-				lines.add(msg.substring(0, i));
-				msg = msg.substring(i, msg.length());
-				if (lines.size() >= MAX_LINES) {
-					i = msg.length();
-				}
-			}
-		}
-		if (lines.size() < MAX_LINES) {
-			lines.add(msg);
+		TextTools.wrap(msg, lines, MAX_CHARS);
+		while(lines.size() > MAX_LINES) {
+			lines.remove(lines.size() - 1);
 		}
 		while (lines.size() < MAX_LINES) {
 			lines.add("");
