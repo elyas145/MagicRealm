@@ -29,7 +29,6 @@ public class JogAmpSoundController implements SoundController {
 		themes.add("FightScene.wav");
 		themes.add("Highlander.wav");
 		themes.add("Mists.wav");
-		themes.add("Nascimento.wav");
 		Random.shuffle(themes);
 		playingTheme = null;
 		alertSound = "alert1.wav";
