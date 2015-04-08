@@ -32,6 +32,7 @@ import communication.handler.server.EnterCharacterSelection;
 import communication.handler.server.EnterLobby;
 import communication.handler.server.GameFinished;
 import communication.handler.server.IllegalCharacterSelection;
+import communication.handler.server.PlayerAdded;
 import communication.handler.server.RequestSearchInformation;
 import communication.handler.server.SearchResults;
 import communication.handler.server.SetBoard;
@@ -63,12 +64,15 @@ public class ServerController {
 	private int currentDay = 0;
 	private ArrayList<CharacterType> disabledCharacters;
 	private HashMap<Integer, Character> characters;
+	private ServerState state;
+
 	public ServerController(Server s) {
 		this.server = s;
 		clients = new ArrayList<ClientThread>();
 		model = new ModelController(new ResourceHandler());
 		model.setBoard();
 		disabledCharacters = new ArrayList<CharacterType>();
+		state = ServerState.IDLE;
 		characters = new HashMap<Integer, Character>();
 		if (NetworkConfiguration.START_NORMAL)
 			sboard = model.getBoard().getSerializedBoard();
@@ -215,9 +219,16 @@ public class ServerController {
 			if (clientCount == 1) {
 				startGame();
 			} else {
+				sboard = model.getBoard().getSerializedBoard();
 				clients.get(pos).send(new StartGame(sboard, characters));
-				clients.get(pos).send(
-						new MessageDisplay("Please wait for next bird song."));
+				sendAll(new PlayerAdded(iD, clients.get(pos).getCharacter()));
+				if (state == ServerState.BIRD_SONG) {
+					clients.get(pos).send(new EnterBirdSong());
+				} else {
+					clients.get(pos).send(
+							new MessageDisplay(
+									"Please wait for next bird song."));
+				}
 			}
 		}
 	}
@@ -229,6 +240,7 @@ public class ServerController {
 	}
 
 	private void startBirdSong() {
+		state = ServerState.BIRD_SONG;
 		if (currentDay == GameConfiguration.LUNAR_MONTH) {
 			ClientThread winner = null;
 			for (ClientThread t : clients) {
@@ -277,6 +289,7 @@ public class ServerController {
 	}
 
 	private void startDayLight() {
+		state = ServerState.DAYLIGHT;
 		ClientThread swordsmanPlayer = null;
 		Collections.shuffle(clients);
 		// check if a client has a swordsman.

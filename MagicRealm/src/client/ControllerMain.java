@@ -584,8 +584,8 @@ public class ControllerMain implements ClientController {
 					boardView.revealMapChit(c);
 			}
 			for (Character c : characters.values()) {
-				boardView.setCounter(c.getType().toCounter(), board.getCounterPositions().get(c)
-						.getParent(), board.getCounterPositions().get(c)
+				boardView.setCounter(c.getType().toCounter(), board.getCounterPositions().get(c.getType().toCounter())
+						.getParent(), board.getCounterPositions().get(c.getType().toCounter())
 						.getNumber());
 				boardView.hideCounter(c.getType().toCounter());
 			}
@@ -806,6 +806,13 @@ public class ControllerMain implements ClientController {
 			updateStrings.add(actor + " has un-enchanted " + tile);
 		}
 		mainView.updateLog(updateStrings);
+	}
+
+	@Override
+	public void addCharacter(int id, Character character) {
+		characters.put(id, character);
+		board.setLocationOfCounter(character.getType().toCounter(), character.getInitialLocation());
+		
 	}
 
 }

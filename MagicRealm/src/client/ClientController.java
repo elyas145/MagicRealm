@@ -105,4 +105,6 @@ public interface ClientController {
 
 	void setEnchantedTile(TileName tile, CharacterType actor, boolean bool);
 
+	void addCharacter(int id, Character character);
+
 }
