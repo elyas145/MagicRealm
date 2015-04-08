@@ -7,7 +7,7 @@ import config.NetworkConfiguration;
 public class ComboMain {
 
 	public static void main(String[] args) {
-		new Server(NetworkConfiguration.DEFAULT_PORT, false);
+		new Server(NetworkConfiguration.DEFAULT_PORT, true);
 		new Thread() {
 			public void run() {
 				new ControllerMain();

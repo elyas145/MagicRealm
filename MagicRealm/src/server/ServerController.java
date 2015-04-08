@@ -10,6 +10,9 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Semaphore;
 
 import model.activity.Activity;
@@ -57,21 +60,28 @@ import config.NetworkConfiguration;
 
 public class ServerController {
 	private Server server;
-	private ArrayList<ClientThread> clients;
-	private int clientCount = 0;
+	private Map<Integer, ClientThread> current;
+	private Set<Integer> joined;
+	private Set<Integer> waiting;
+	private Set<Integer> playing;
+	private Set<Integer> observing;
 	private ModelController model;
 	private SerializedBoard sboard;
 	private int currentDay = 0;
-	private ArrayList<CharacterType> disabledCharacters;
+	private Set<CharacterType> disabledCharacters;
 	private HashMap<Integer, Character> characters;
 	private ServerState state;
 
 	public ServerController(Server s) {
 		this.server = s;
-		clients = new ArrayList<ClientThread>();
+		current = new HashMap<Integer, ClientThread>();
+		joined = new HashSet<Integer>();
+		waiting = new HashSet<Integer>();
+		playing = new HashSet<Integer>();
+		observing = new HashSet<Integer>();
 		model = new ModelController(new ResourceHandler());
 		model.setBoard();
-		disabledCharacters = new ArrayList<CharacterType>();
+		disabledCharacters = new HashSet<CharacterType>();
 		state = ServerState.IDLE;
 		characters = new HashMap<Integer, Character>();
 		if (NetworkConfiguration.START_NORMAL)
@@ -88,9 +98,9 @@ public class ServerController {
 	 * 
 	 * @param socket
 	 */
-	public void addClient(Socket socket) {
+	public synchronized void addClient(Socket socket) {
 		ClientThread temp = new ClientThread(server, socket);
-		if (clientCount < GameConfiguration.MAX_PLAYERS) {
+		if (countClients() < GameConfiguration.MAX_PLAYERS) {
 			try {
 				temp.open();
 			} catch (IOException e) {
@@ -98,24 +108,24 @@ public class ServerController {
 			}
 			temp.start();
 			System.out.println("the player id is: " + temp.getID());
-			clients.add(temp);
-			clientCount++;
+			justJoined(temp);
 			temp.send(new Integer(socket.getPort()));
+			temp.send(new SetBoard(sboard));
 			if (NetworkConfiguration.START_NORMAL) {
-				if (GameConfiguration.MAX_PLAYERS - clientCount == 0) {
+				temp.send(new EnterLobby());
+				if (GameConfiguration.MAX_PLAYERS == countClients()) {
 					// added last player.
-					temp.send(new EnterLobby(sboard));
 					// enter character selection.
-					sendAll(new EnterCharacterSelection(null));
+					sendAll(new EnterCharacterSelection(), joined);
 				} else {
-					temp.send(new EnterLobby(sboard));
 					sendAll(new UpdateLobbyCount(GameConfiguration.MAX_PLAYERS
-							- clientCount));
+							- countClients()), joined);
 				}
 
 			} else {
-				temp.send(new SetBoard(sboard));
-				temp.send(new EnterCharacterSelection(disabledCharacters));
+				// temp.send(new SetBoard(sboard));
+				temp.send(new EnterCharacterSelection(
+						new ArrayList<CharacterType>(disabledCharacters)));
 			}
 		} else {
 			temp.send(new Reject());
@@ -123,37 +133,59 @@ public class ServerController {
 		}
 	}
 
-	private void sendAll(ClientNetworkHandler handler) {
-		for (ClientThread client : clients) {
-			client.send(handler);
-		}
-
+	private void justJoined(ClientThread cli) {
+		int id = cli.getID();
+		current.put(id, cli);
+		joined.add(id);
 	}
 
-	public void remove(int ID) {
-		int pos = findClient(ID);
-		if (pos >= 0) {
-			ClientThread toTerminate = clients.get(pos);
-			System.out.println("removing client thread " + ID + " at " + pos);
-			clients.remove(pos);
-			clientCount--;
-			try {
-				toTerminate.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			toTerminate = null;
+	private void startWaiting(int id) {
+		synchronized (waiting) {
+			waiting.add(id);
 		}
-
+		observing.add(id);
+		joined.remove(id);
 	}
 
-	private int findClient(int ID) {
-		for (int i = 0; i < clients.size(); i++) {
-			if (clients.get(i).getID() == ID) {
-				return i;
-			}
+	private void startPlaying(int id) {
+		playing.add(id);
+		observing.add(id);
+		synchronized (waiting) {
+			waiting.remove(id);
 		}
-		return -1;
+	}
+
+	private ClientThread getClient(int id) {
+		return current.get(id);
+	}
+
+	private void sendAll(ClientNetworkHandler handler, Iterable<Integer> ids) {
+		for (int client : ids) {
+			send(client, handler);
+		}
+	}
+
+	private synchronized void send(int cl, ClientNetworkHandler handle) {
+		getClient(cl).send(handle);
+	}
+
+	public synchronized void remove(int ID) {
+		joined.remove(ID);
+		synchronized (waiting) {
+			waiting.remove(ID);
+		}
+		observing.remove(ID);
+		playing.remove(ID);
+		ClientThread term = getClient(ID);
+		try {
+			term.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private int countClients() {
+		return current.size();
 	}
 
 	/**
@@ -162,42 +194,34 @@ public class ServerController {
 	 * @param iD
 	 * @param character
 	 */
-	public void setCharacter(int iD, CharacterType character,
+	public synchronized void setCharacter(int iD, CharacterType character,
 			CounterType location) {
-		if (character == null || location == null || iD == 0)
-			return;
 
-		boolean flag = false;
-		for (ClientThread c : clients) {
-			if (c.getCharacterType() == character) {
-				flag = true;
-			}
-		}
-
-		int pos = findClient(iD);
-		if (flag) {
-			if (pos >= 0) {
-				clients.get(pos).send(new IllegalCharacterSelection(character));
-				return;
-			} else {
-				return;
-			}
-		}
-		if (pos >= 0) {
-			System.out.println("SERVER: setting client: " + iD + " character.");
-			clients.get(pos).setCharacter(character, location);
-			model.setPlayersInitialLocations(clients.get(pos).getCharacter()
-					.getType().toCounter(), location);
-			disabledCharacters.add(character);
-			characters.put(iD, clients.get(pos).getCharacter());
-		} else {
+		ClientThread clt = getClient(iD);
+		if (disabledCharacters.contains(character)) {
+			clt.send(new IllegalCharacterSelection(character));
 			return;
+		}
+		System.out.println("SERVER: setting client: " + iD + " character.");
+		clt.setCharacter(character, location);
+		model.setPlayersInitialLocations(clt.getCharacter().getType()
+				.toCounter(), location);
+		disabledCharacters.add(character);
+		characters.put(iD, clt.getCharacter());
+		startWaiting(iD);
+		sendAll(new UpdateCharacterSelection(clt.getCharacterType()), joined);
+		sendAll(new PlayerAdded(iD, clt.getCharacter()), observing);
+		for (Character chr : characters.values()) {
+			send(iD,
+					new UpdateLocationOfCharacter(chr.getType(), model
+							.getTile(chr), model.getClearing(chr)));
+			send(iD, new UpdateHiding(chr.getType(), chr.isHiding()));
 		}
 		if (NetworkConfiguration.START_NORMAL) {
 			boolean everyoneSelected = true;
 			// wait for all clients to choose their character
 
-			for (ClientThread client : clients) {
+			for (ClientThread client : current.values()) {
 				System.out.println("Client request: " + iD);
 				if (!client.didSelectCharacter()) {
 					everyoneSelected = false;
@@ -206,80 +230,142 @@ public class ServerController {
 
 			}
 			if (!everyoneSelected) {
-				sendAll(new UpdateCharacterSelection(character));
+				synchronized (waiting) {
+					sendAll(new UpdateCharacterSelection(character), waiting);
+				}
 			} else {
 				if (GameConfiguration.Cheat) {
-					sendAll(new SetCheatMode());
+					sendAll(new SetCheatMode(), waiting);
 				}
-				model.setBoardForPlay();
-				sboard = model.getBoard().getSerializedBoard();
 				startGame();
 			}
 		} else {
-			if (clientCount == 1) {
+			if (playing.size() == 0) {
+				startPlaying(iD);
 				startGame();
 			} else {
 				sboard = model.getBoard().getSerializedBoard();
-				clients.get(pos).send(new StartGame(sboard, characters));
-				sendAll(new PlayerAdded(iD, clients.get(pos).getCharacter()));
+				clt.send(new StartGame(sboard, characters));
 				if (state == ServerState.BIRD_SONG) {
-					clients.get(pos).send(new EnterBirdSong());
+					clt.send(new EnterBirdSong());
+					startPlaying(iD);
 				} else {
-					clients.get(pos).send(
-							new MessageDisplay(
-									"Please wait for next bird song."));
+					clt.send(new MessageDisplay(
+							"Please wait for next bird song."));
 				}
 			}
 		}
 	}
 
-	public void startGame() {
+	/**
+	 * called when the client selects their character
+	 * 
+	 * @param iD
+	 * @param character
+	 */
+	/*
+	 * public void setCharacter(int iD, CharacterType character, CounterType
+	 * location) { if (character == null || location == null || iD == 0) return;
+	 * 
+	 * boolean flag = false; for (ClientThread c : clients) { if
+	 * (c.getCharacterType() == character) { flag = true; } }
+	 * 
+	 * int pos = findClient(iD); if (flag) { if (pos >= 0) { if
+	 * (NetworkConfiguration.START_NORMAL) clients.get(pos).send( new
+	 * IllegalCharacterSelection(character)); else waiting.get(pos).send( new
+	 * IllegalCharacterSelection(character)); return; } else { return; } } if
+	 * (pos >= 0) { System.out.println("SERVER: setting client: " + iD +
+	 * " character."); if (NetworkConfiguration.START_NORMAL) {
+	 * clients.get(pos).setCharacter(character, location);
+	 * model.setPlayersInitialLocations(clients.get(pos).getCharacter()
+	 * .getType().toCounter(), location); disabledCharacters.add(character);
+	 * characters.put(iD, clients.get(pos).getCharacter()); } else {
+	 * waiting.get(pos).setCharacter(character, location);
+	 * model.setPlayersInitialLocations(waiting.get(pos).getCharacter()
+	 * .getType().toCounter(), location); disabledCharacters.add(character);
+	 * characters.put(iD, waiting.get(pos).getCharacter()); } } else { return; }
+	 * if (NetworkConfiguration.START_NORMAL) { boolean everyoneSelected = true;
+	 * // wait for all clients to choose their character
+	 * 
+	 * for (ClientThread client : clients) {
+	 * System.out.println("Client request: " + iD); if
+	 * (!client.didSelectCharacter()) { everyoneSelected = false; break; }
+	 * 
+	 * } if (!everyoneSelected) { sendAll(new
+	 * UpdateCharacterSelection(character)); } else { if
+	 * (GameConfiguration.Cheat) { sendAll(new SetCheatMode()); }
+	 * model.setBoardForPlay(); sboard = model.getBoard().getSerializedBoard();
+	 * startGame(); } } else { if (clients.size() == 0) {
+	 * clients.addAll(waiting); waiting.clear(); startGame(); } else { sboard =
+	 * model.getBoard().getSerializedBoard(); ClientThread cl =
+	 * waiting.get(pos); cl.send(new StartGame(sboard, characters)); sendAll(new
+	 * PlayerAdded(iD, cl.getCharacter())); if (state == ServerState.BIRD_SONG)
+	 * { cl.send(new EnterBirdSong()); clients.addAll(waiting); waiting.clear();
+	 * } else { cl.send(new MessageDisplay( "Please wait for next bird song."));
+	 * } } } }
+	 */
+
+	public synchronized void startGame() {
+		model.setBoardForPlay();
 		sboard = model.getBoard().getSerializedBoard();
-		sendAll(new StartGame(sboard, characters));
+		sendAll(new StartGame(sboard, characters), playing);
 		startBirdSong();
 	}
 
 	private void startBirdSong() {
 		state = ServerState.BIRD_SONG;
+		synchronized (waiting) {
+			for (int id : waiting) {
+				playing.add(id);
+				observing.add(id);
+			}
+		}
+		waiting.clear();
 		if (currentDay == GameConfiguration.LUNAR_MONTH) {
 			ClientThread winner = null;
-			for (ClientThread t : clients) {
-				if (winner == null)
-					winner = t;
-				else
-					winner = winner.getPlayer().getGold() < t.getPlayer()
-							.getGold() ? t : winner;
+			synchronized (playing) {
+				for (int id : playing) {
+					ClientThread t = getClient(id);
+					if (winner == null)
+						winner = t;
+					else
+						winner = winner.getPlayer().getGold() < t.getPlayer()
+								.getGold() ? t : winner;
+				}
 			}
 			sendAll(new GameFinished(winner.getCharacter().getType(), winner
-					.getPlayer().getGold()));
+					.getPlayer().getGold()), current.keySet());
 		} else {
 			currentDay++;
-			sendAll(new EnterBirdSong());
+			sendAll(new EnterBirdSong(), playing);
 		}
 	}
 
-	public void addSite(MapChitType site, TileName tile) {
+	public synchronized void addSite(MapChitType site, TileName tile) {
 		model.addSite(site, tile);
 
 	}
 
-	public void addSound(MapChitType sound, TileName tile) {
+	public synchronized void addSound(MapChitType sound, TileName tile) {
 		model.addSound(sound, tile);
 	}
 
-	public void addWarning(MapChitType type, TileName tile) {
+	public synchronized void addWarning(MapChitType type, TileName tile) {
 		model.addWarning(type, tile);
 
 	}
 
-	public void submitActivities(int id, Iterable<Activity> activities) {
-		clients.get(findClient(id)).setCurrentActivities(activities);
+	public synchronized void submitActivities(CharacterType type,
+			Iterable<Activity> activities) {
+		getPlayerOf(type).setCurrentActivities(activities);
 		boolean done = true;
 		// check if birdsong is done.
-		for (ClientThread client : clients) {
-			if (client.getCurrentActivities() == null) {
-				done = false;
-				return;
+		synchronized (playing) {
+			for (int client : playing) {
+				if (getClient(client).getCurrentActivities() == null) {
+					done = false;
+					return;
+				}
 			}
 		}
 		if (done) {
@@ -291,16 +377,21 @@ public class ServerController {
 	private void startDayLight() {
 		state = ServerState.DAYLIGHT;
 		ClientThread swordsmanPlayer = null;
-		Collections.shuffle(clients);
+		ArrayList<ClientThread> cls = new ArrayList<ClientThread>();
 		// check if a client has a swordsman.
-		for (ClientThread client : clients) {
-			if (client.getCharacter().getType() == CharacterType.SWORDSMAN) {
-				swordsmanPlayer = client;
-				break;
+		synchronized (playing) {
+			for (int cl : playing) {
+				ClientThread client = getClient(cl);
+				if (client.getCharacter().getType() == CharacterType.SWORDSMAN) {
+					swordsmanPlayer = client;
+				} else {
+					cls.add(client);
+				}
 			}
 		}
+		Collections.shuffle(cls);
 		// check if the swords man wants to play.
-		for (ClientThread player : clients) {
+		for (ClientThread player : cls) {
 			if (swordsmanPlayer != null && !swordsmanPlayer.hasPlayed()) {
 				swordsmanPlayer.send(new CheckSwordsmanPlay());
 				try {
@@ -309,9 +400,7 @@ public class ServerController {
 					e.printStackTrace();
 				}
 			}
-			if (player.getCharacter().getType() != CharacterType.SWORDSMAN) {
-				playTurn(player);
-			}
+			playTurn(player);
 		}
 
 		// check if swodsman played. if not, they have to play now.
@@ -326,7 +415,8 @@ public class ServerController {
 
 	private void playTurn(ClientThread player) {
 		player.getCharacter().setHiding(false);
-		sendAll(new UpdateHiding(player.getCharacter().getType(), false));
+		sendAll(new UpdateHiding(player.getCharacter().getType(), false),
+				playing);
 		for (Activity act : player.getCurrentActivities()) {
 			System.out.println("SERVER: current activity: " + act.getType()
 					+ " Phase: " + act.getPhaseType());
@@ -384,21 +474,23 @@ public class ServerController {
 	}
 
 	private void resetPlayers() {
-		for (ClientThread ct : clients) {
-			ct.newTurn();
+		synchronized (playing) {
+			for (int ct : playing) {
+				getClient(ct).newTurn();
+			}
 		}
-
 	}
 
-	public void hideCharacter(CharacterType actor, int rv) {
+	public synchronized void hideCharacter(CharacterType actor, int rv) {
 		if (model.hideCharacter(rv, getPlayerOf(actor).getPlayer())) {
-			sendAll(new UpdateHiding(actor, true));
+			sendAll(new UpdateHiding(actor, true), playing);
 		} else {
 			getPlayerOf(actor).send(new MessageDisplay("Hide Failed."));
 		}
 	}
 
-	public void moveCharacter(CharacterType actor, TileName tile, int clearing) {
+	public synchronized void moveCharacter(CharacterType actor, TileName tile,
+			int clearing) {
 		if (model.getBoard().getClearing(tile, clearing).getLandType() == LandType.MOUNTAIN) {
 			if (getPlayerOf(actor).getMountainClearing() == null) {
 				getPlayerOf(actor).setMountainClearing(
@@ -415,13 +507,14 @@ public class ServerController {
 			if (model.checkIfCave(tile, clearing)) {
 				getPlayerOf(actor).setSunlightFlag(true);
 			}
-			sendAll(new UpdateLocationOfCharacter(actor, tile, clearing));
+			sendAll(new UpdateLocationOfCharacter(actor, tile, clearing),
+					playing);
 		} else {
 			getPlayerOf(actor).send(new IllegalMove(tile, clearing));
 		}
 	}
 
-	public void startSearching(CharacterType actor) {
+	public synchronized void startSearching(CharacterType actor) {
 		ClientThread ct = getPlayerOf(actor);
 		ct.send(new RequestSearchInformation());
 		try {
@@ -431,7 +524,8 @@ public class ServerController {
 		}
 	}
 
-	public void searchChosen(CharacterType car, TableType tbl, int rv) {
+	public synchronized void searchChosen(CharacterType car, TableType tbl,
+			int rv) {
 		// do the search activity with the player
 		ClientThread ct = getPlayerOf(car);
 		SearchResults res = model.performSearch(ct.getPlayer(), tbl, rv);
@@ -451,7 +545,7 @@ public class ServerController {
 				for (MapChit c : ls.getWarningAndSite()) {
 					smapchits.add(c.getSerializedChit());
 				}
-				sendAll(new UpdateMapChits(ls.getType(), smapchits));
+				sendAll(new UpdateMapChits(ls.getType(), smapchits), observing);
 			}
 		}
 		getPlayerOf(car).send(res);
@@ -459,16 +553,19 @@ public class ServerController {
 	}
 
 	private ClientThread getPlayerOf(CharacterType ct) {
-		for (ClientThread cli : clients) {
-			if (cli.getCharacter().getType() == ct) {
-				return cli;
+		synchronized (playing) {
+			for (int cl : playing) {
+				ClientThread cli = getClient(cl);
+				if (cli.getCharacter().getType() == ct) {
+					return cli;
+				}
 			}
 		}
 		throw new RuntimeException("The character " + ct
 				+ " is not being played!");
 	}
 
-	public void updateMapChits(MapChitType type) {
+	public synchronized void updateMapChits(MapChitType type) {
 		switch (type) {
 		case LOST_CASTLE:
 			model.setLostCastleFound(true);
@@ -477,20 +574,19 @@ public class ServerController {
 		default:
 			break;
 		}
-		sendAll(new UpdateMapChits(type, model.getLostChits(type)));
-
+		sendAll(new UpdateMapChits(type, model.getLostChits(type)), observing);
 	}
 
-	public void setLost(MapChitType lost, ArrayList<MapChitType> array,
-			TileName tile) {
+	public synchronized void setLost(MapChitType lost,
+			ArrayList<MapChitType> array, TileName tile) {
 		model.setLost(lost, array, tile);
 
 	}
 
-	public void requestEnchant(CharacterType actor) {
-		sendAll(new UpdateEnchantedTile(model.getLocation(getPlayerOf(actor)
+	public synchronized void requestEnchant(CharacterType actor) {
+		sendAll(new UpdateEnchantedTile(model.getTile(getPlayerOf(actor)
 				.getCharacter()), actor, model.enchantTile(getPlayerOf(actor)
-				.getPlayer())));
+				.getPlayer())), observing);
 	}
 
 }

@@ -7,7 +7,7 @@ import communication.handler.server.serialized.SerializedMapChit;
 import model.enums.MapChitType;
 import model.enums.TileName;
 
-public class MapChit extends Chit implements Serializable, Comparable<MapChit> {
+public class MapChit extends Chit implements Serializable/*, Comparable<MapChit>*/ {
 	private static final long serialVersionUID = -5805890352154420133L;
 	private MapChitType type;
 	private char identifier;
@@ -102,18 +102,47 @@ public class MapChit extends Chit implements Serializable, Comparable<MapChit> {
 		return sChit;
 	}
 
+	/*@Override
+	public int hashCode() {
+		int hash;
+		hash = identifier;
+		int l = MapChitType.values().length;
+		hash *= l + 1;
+		hash += type == null ? l : type.ordinal();
+		l = TileName.values().length;
+		hash *= l + 1;
+		TileName tn = getTile();
+		hash += tn == null ? l : tn.ordinal();
+		return hash;
+	}
+
 	@Override
 	public int compareTo(MapChit other) {
 		int mine, theirs;
-		mine = type.ordinal();
-		theirs = other.type.ordinal();
+		mine = type == null ? -1 : type.ordinal();
+		theirs = type == null ? -1 : other.type.ordinal();
 		if (mine == theirs) {
-			return identifier - other.identifier;
+			int delt = identifier - other.identifier;
+			if(delt == 0) {
+				TileName t1, t2;
+				t1 = getTile();
+				t2 = other.getTile();
+				int a, b;
+				a = t1 == null ? -1 : t1.ordinal();
+				b = t2 == null ? -1 : t2.ordinal();
+				return a - b;
+			}
+			return delt;
 		}
 		return mine - theirs;
-	}
+	}*/
 
-	public boolean equals(MapChit other) {
-		return (this.identifier == other.identifier && this.type == other.type);
+	@Override
+	public boolean equals(Object other) {
+		if(other instanceof MapChit) {
+			MapChit o = (MapChit) other;
+			return (this.identifier == o.identifier && this.type == o.type && this.getTile() == o.getTile());
+		}
+		return false;
 	}
 }

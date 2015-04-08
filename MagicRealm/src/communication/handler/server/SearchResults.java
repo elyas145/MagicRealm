@@ -38,8 +38,8 @@ public class SearchResults implements ClientNetworkHandler {
 		this.peek = peek;
 	}
 
-	public SearchResults(SearchType loot, int goldValue, MapChitType site) {
-		this.type = loot;
+	public SearchResults(int goldValue, MapChitType site) {
+		this.type = SearchType.LOOT;
 		this.goldValue = goldValue;
 		this.site = site;		
 	}
@@ -72,6 +72,7 @@ public class SearchResults implements ClientNetworkHandler {
 		case LOOT:
 			controller.addGold(goldValue, site);
 			break;
+		
 		default:
 			return;
 		}
@@ -90,10 +91,7 @@ public class SearchResults implements ClientNetworkHandler {
 	}
 
 	public ArrayList<String> getPaths() {
-		if (type == SearchType.PATHS)
-			return discoveredPaths;
-		else
-			return null;
+		return discoveredPaths;
 	}
 
 	public boolean isCity() {

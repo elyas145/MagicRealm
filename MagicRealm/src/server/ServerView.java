@@ -4,10 +4,13 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -15,6 +18,7 @@ import javax.swing.JPanel;
 
 import config.GameConfiguration;
 import config.GraphicsConfiguration;
+import config.NetworkConfiguration;
 
 public class ServerView extends JFrame implements ActionListener{
 
@@ -25,7 +29,7 @@ public class ServerView extends JFrame implements ActionListener{
 	private int ySize = ((int) tk.getScreenSize().getHeight());
 	private JButton yes;
 	private JButton no;
-	
+	boolean selected = false;
 	public ServerView(Server ser) {
 		super("Magic Realm Server");
 		server = ser;
@@ -63,7 +67,7 @@ public class ServerView extends JFrame implements ActionListener{
 			new CheatView(server);
 			server.startServer();
 			pack();
-		}else{
+		}else if(e.getSource().equals(no)){
 			JOptionPane.showMessageDialog(this, "This window will now close, and the server will start without cheat mode.");
 			this.setVisible(false);
 			server.doneSettingCheatMode();

@@ -454,13 +454,14 @@ public class ModelController {
 		int myClearing = board.getLocationOfCounter(
 				player.getCharacter().getType().toCounter())
 				.getClearingNumber();
-		for (MapChit c : board.getMapChitLocations().keySet()) {
-			if ((c.getTile() == myTile) && (c.getClearing() == myClearing)
-					&& (c.getType().type() == ChitType.SITE)
+
+		for (MapChit c : mapChits) {
+			if ((c.getType().type() == ChitType.SITE)
+					&& (c.getTile() == myTile)
+					&& (c.getClearing() == myClearing)
 					&& (player.hasDiscoveredSite(c))) {
-				return new SearchResults(SearchType.LOOT,
-						GameConfiguration.MAX_TREASURE_VALUE / rollValue,
-						c.getType());
+				return new SearchResults(GameConfiguration.MAX_TREASURE_VALUE
+						/ rollValue, c.getType());
 			}
 		}
 		return new SearchResults(SearchType.NONE);
@@ -485,32 +486,36 @@ public class ModelController {
 		ArrayList<MapChit> peek = new ArrayList<MapChit>();
 		boolean castle = false;
 		boolean city = false;
-		LandType land = board.getLocationOfCounter(player.getCharacter().getType().toCounter()).getLandType();
+		LandType land = board.getLocationOfCounter(
+				player.getCharacter().getType().toCounter()).getLandType();
 		for (MapChit chit : mapChits) {
 			System.out.println("Current map chit: " + chit);
 			boolean tile = chit.getTile() == board
 					.getLocationOfCounter(
 							player.getCharacter().getType().toCounter())
 					.getParentTile().getName();
-			boolean clearing = chit.getClearing() == board.getLocationOfCounter(
-					player.getCharacter().getType().toCounter())
+			boolean clearing = chit.getClearing() == board
+					.getLocationOfCounter(
+							player.getCharacter().getType().toCounter())
 					.getClearingNumber();
-			boolean toCheck = land == LandType.MOUNTAIN ? tile : tile && clearing;
-			
+			boolean toCheck = land == LandType.MOUNTAIN ? tile : tile
+					&& clearing;
+
 			if (toCheck) {
 				System.out.println("this chit is on my clearing.");
 				if (chit.getType() == MapChitType.LOST_CITY) {
 					System.out.println("this chit is lost city");
-					city = true;
+					if (!discoveredCity)
+						city = true;
 				} else if (chit.getType() == MapChitType.LOST_CASTLE) {
 					System.out.println("this chit is lost castle");
-					castle = true;
-				}
-				if (lostCity.getWarningAndSite().contains(chit)) {
+					if (!discoveredCastle)
+						castle = true;
+				} else if (lostCity.getWarningAndSite().contains(chit)) {
 					System.out.println("this chit is inside lost city.");
 					if (discoveredCity) {
 						System.out.println("lost city discovered");
-						peek.add(chit);
+						addChit(chit, peek);
 					} else {
 						city = true;
 					}
@@ -518,14 +523,14 @@ public class ModelController {
 					System.out.println("this chit is inside lost castle.");
 					if (discoveredCastle) {
 						System.out.println("lost castle discovered");
-						peek.add(chit);
+						addChit(chit, peek);
 					} else {
 						castle = true;
 					}
 				} else {
 					System.out
 							.println("this chit has nothing to do with lost city nd lost castle.");
-					peek.add(chit);
+					addChit(chit, peek);
 				}
 			}
 		}
@@ -538,21 +543,28 @@ public class ModelController {
 				city);
 	}
 
+	private void addChit(MapChit chit, ArrayList<MapChit> peek) {
+		board.setLocationOfMapChit(chit, chit.getTile());
+		peek.add(chit);
+	}
+
 	private SearchResults searchPassages(Player player) {
 		CounterType playerCounter = player.getCharacter().getType().toCounter();
 		ClearingInterface source = board.getLocationOfCounter(playerCounter);
-		Map<ClearingInterface, ClearingInterface> discoveredPaths = new HashMap<ClearingInterface, ClearingInterface>();
 		ArrayList<String> str = new ArrayList<String>();
 		for (ClearingInterface cl : source.getSurrounding(PathType.SECRET)) {
 			if (!player.hasDiscoveredPath(cl, source)) {
 				player.addDiscoveredPath(cl, source);
-				discoveredPaths.put(cl, source);
-				str.add(cl.getParentTile().getName().toString() + ": "
-						+ source.getClearingNumber() + ", "
-						+ cl.getClearingNumber());
+				logPath(cl, source, str);
 			}
 		}
 		return new SearchResults(SearchType.PASSAGES, null, str);
+	}
+
+	private void logPath(ClearingInterface cl, ClearingInterface source,
+			ArrayList<String> str) {
+		str.add(cl.getParentTile().getName().toString() + ": "
+				+ source.getClearingNumber() + ", " + cl.getClearingNumber());
 	}
 
 	private SearchResults peerTableSearch(Player player, int roll) {
@@ -660,9 +672,7 @@ public class ModelController {
 			if (!player.hasDiscoveredPath(cl, source)) {
 				player.addDiscoveredPath(cl, source);
 				discoveredPaths.put(cl, source);
-				str.add(cl.getParentTile().getName().toString() + ": "
-						+ source.getClearingNumber() + ", "
-						+ cl.getClearingNumber());
+				logPath(cl, source, str);
 			}
 		}
 
@@ -678,14 +688,14 @@ public class ModelController {
 	public void addSite(MapChitType site, TileName tile) {
 		board.setLocationOfMapChit(new MapChit(site), tile);
 		mapChits.add(new MapChit(site, site.getClearing(), tile));
-		System.out.println("added site at " + tile);
+		System.out.println("Added site at " + tile);
 	}
 
 	public void addSound(MapChitType sound, TileName tile) {
 		MapChit mc = new MapChit(sound, sound.getClearing());
 		mapChits.add(mc);
 		board.setLocationOfMapChit(mc, tile);
-		System.out.println("added sound chit: " + sound + " " + tile);
+		System.out.println("Added sound chit: " + sound + " " + tile);
 	}
 
 	public void addWarning(MapChitType type, TileName tile) {
@@ -798,8 +808,13 @@ public class ModelController {
 				.getParentTile().getName());
 	}
 
-	public TileName getLocation(Character character) {
+	public TileName getTile(Character character) {
 		return board.getLocationOfCounter(character.getType().toCounter())
 				.getParentTile().getName();
+	}
+
+	public int getClearing(Character character) {
+		return board.getLocationOfCounter(character.getType().toCounter())
+				.getClearingNumber();
 	}
 }

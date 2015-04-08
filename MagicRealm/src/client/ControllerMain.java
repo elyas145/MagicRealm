@@ -297,10 +297,9 @@ public class ControllerMain implements ClientController {
 	 * 
 	 */
 	@Override
-	public void enterLobby(SerializedBoard sboard) {
+	public void enterLobby() {
 		System.out.println("Enter lobby called.");
 		mainView.enterLobby();
-		initializeBoard(sboard);
 	}
 
 	@Override
@@ -370,7 +369,7 @@ public class ControllerMain implements ClientController {
 	 */
 	public void characterSelected(CharacterType character, CounterType loc) {
 		System.out.println("character selected.");
-		mainView.displayBanner("Please wait for other players.");
+		mainView.displayBanner("Loading, please wait...");
 		if (!server.send(new CharacterSelected(clientID, character, loc))) {
 			System.out.println("failed to send selected character to server.");
 		}
@@ -501,7 +500,8 @@ public class ControllerMain implements ClientController {
 	 */
 	public void endBirdSong(Iterable<Activity> activities) {
 		mainView.displayBanner("Please wait for other players.");
-		server.send(new SubmitActivities(this.clientID, activities));
+		server.send(new SubmitActivities(characters.get(this.clientID)
+				.getType(), activities));
 	}
 
 	/**
@@ -584,16 +584,13 @@ public class ControllerMain implements ClientController {
 					boardView.revealMapChit(c);
 			}
 			for (Character c : characters.values()) {
-				boardView.setCounter(c.getType().toCounter(), board.getCounterPositions().get(c.getType().toCounter())
-						.getParent(), board.getCounterPositions().get(c.getType().toCounter())
-						.getNumber());
 				boardView.hideCounter(c.getType().toCounter());
 			}
 			// boardView.hideAllMapChits();
 		}
 		updateStrings.clear();
 		updateStrings.add("Belongings: ");
-		for(Belonging b : characters.get(clientID).getBelongings()){
+		for (Belonging b : characters.get(clientID).getBelongings()) {
 			updateStrings.add(b.toString());
 		}
 		mainView.updateBelongings(updateStrings);
@@ -623,6 +620,7 @@ public class ControllerMain implements ClientController {
 	@Override
 	public void checkSwordsmanTurn() {
 		System.out.println("recieved check swordsman object.");
+		mainView.hideBanner();
 		server.send(new SetSwordsmanPlay(mainView.confirm(
 				"Would you like to take your turn now?", "Yes ", "No")));
 	}
@@ -649,7 +647,7 @@ public class ControllerMain implements ClientController {
 	public void setAllCharacters(Map<Integer, Character> characters) {
 		for (Integer i : characters.keySet()) {
 			this.characters.put(i, characters.get(i));
-			
+
 		}
 
 	}
@@ -725,17 +723,19 @@ public class ControllerMain implements ClientController {
 		if (!peek.isEmpty()) {
 			updateStrings.clear();
 			updateStrings.add("peeking at map chits.");
+			mainView.updateLog(updateStrings);
+			mainView.revealAllMapChits(peek);
 		}
-		mainView.updateLog(updateStrings);
-		mainView.revealAllMapChits(peek);
 	}
 
 	@Override
 	public void discoverPaths(ArrayList<String> paths) {
 		ArrayList<String> temp = new ArrayList<String>();
-		temp.add("Discovered Paths:");
-		temp.addAll(paths);
-		mainView.updateLog(paths);
+		if (!paths.isEmpty()) {
+			temp.add("Discovered Paths:");
+			temp.addAll(paths);
+			mainView.updateLog(paths);
+		}
 	}
 
 	@Override
@@ -811,8 +811,13 @@ public class ControllerMain implements ClientController {
 	@Override
 	public void addCharacter(int id, Character character) {
 		characters.put(id, character);
-		board.setLocationOfCounter(character.getType().toCounter(), character.getInitialLocation());
-		
+		board.setLocationOfCounter(character.getType().toCounter(),
+				character.getInitialLocation());
+		Clearing c = board
+				.getLocationOfCounter(character.getType().toCounter());
+		boardView.setCounter(character.getType().toCounter(), c.getParentTile()
+				.getName(), c.getNumber());
+		boardView.hideCounter(character.getType().toCounter());
 	}
 
 }

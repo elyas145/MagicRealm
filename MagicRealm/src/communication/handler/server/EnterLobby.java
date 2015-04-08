@@ -5,14 +5,10 @@ import communication.handler.server.serialized.SerializedBoard;
 import client.ClientController;
 
 public class EnterLobby implements ClientNetworkHandler {
-	private SerializedBoard board;
 	
-	public EnterLobby(SerializedBoard board) {
-		this.board = board;
-	}
 	@Override
 	public void handle(ClientController control) {
-		control.enterLobby(board);
+		control.enterLobby();
 	}	
 	@Override
 	public String toString(){

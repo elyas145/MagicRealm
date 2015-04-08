@@ -34,7 +34,7 @@ public interface ClientController {
 
 	void enterCharacterSelection(ArrayList<CharacterType> disabled);
 
-	void enterLobby(SerializedBoard sboard);
+	void enterLobby();
 
 	void exit();
 

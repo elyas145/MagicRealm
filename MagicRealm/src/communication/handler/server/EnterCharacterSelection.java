@@ -13,6 +13,9 @@ public class EnterCharacterSelection implements ClientNetworkHandler{
 	 */
 	private static final long serialVersionUID = -451149504635937593L;
 	private ArrayList<CharacterType> banned;
+	public EnterCharacterSelection() {
+		banned = null;
+	}
 	public EnterCharacterSelection(ArrayList<CharacterType> object) {
 		banned = object;
 	}
