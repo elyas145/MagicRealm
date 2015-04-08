@@ -98,7 +98,7 @@ public class ServerController {
 	 * 
 	 * @param socket
 	 */
-	public synchronized void addClient(Socket socket) {
+	public void addClient(Socket socket) {
 		ClientThread temp = new ClientThread(server, socket);
 		if (countClients() < GameConfiguration.MAX_PLAYERS) {
 			try {
@@ -374,7 +374,7 @@ public class ServerController {
 			startDayLight();
 		}
 	}
-
+	private Semaphore turnSem = new Semaphore(1);
 	private void startDayLight() {
 		state = ServerState.DAYLIGHT;
 		ClientThread swordsmanPlayer = null;
@@ -393,6 +393,12 @@ public class ServerController {
 		Collections.shuffle(cls);
 		// check if the swords man wants to play.
 		for (ClientThread player : cls) {
+			try {
+				turnSem.acquire();
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			if (swordsmanPlayer != null && !swordsmanPlayer.hasPlayed()) {
 				swordsmanPlayer.send(new CheckSwordsmanPlay());
 				try {
@@ -402,6 +408,7 @@ public class ServerController {
 				}
 			}
 			playTurn(player);
+			turnSem.release();
 		}
 
 		// check if swodsman played. if not, they have to play now.
@@ -413,7 +420,7 @@ public class ServerController {
 		// permits.
 		startBirdSong();
 	}
-
+	
 	private void playTurn(ClientThread player) {
 		player.getCharacter().setHiding(false);
 		sendAll(new UpdateHiding(player.getCharacter().getType(), false),
@@ -464,7 +471,6 @@ public class ServerController {
 	}
 
 	private Semaphore playSync = new Semaphore(0);
-
 	public void setSwordsManTurn(boolean playing) {
 		// swordsmanTurn = playing;
 		if (playing) {
@@ -566,7 +572,7 @@ public class ServerController {
 				+ " is not being played!");
 	}
 
-	public synchronized void updateMapChits(MapChitType type) {
+	public void updateMapChits(MapChitType type) {
 		switch (type) {
 		case LOST_CASTLE:
 			model.setLostCastleFound(true);
@@ -578,13 +584,13 @@ public class ServerController {
 		sendAll(new UpdateMapChits(type, model.getLostChits(type)), observing);
 	}
 
-	public synchronized void setLost(MapChitType lost,
+	public void setLost(MapChitType lost,
 			ArrayList<MapChitType> array, TileName tile) {
 		model.setLost(lost, array, tile);
 
 	}
 
-	public synchronized void requestEnchant(CharacterType actor) {
+	public void requestEnchant(CharacterType actor) {
 		sendAll(new UpdateEnchantedTile(model.getTile(getPlayerOf(actor)
 				.getCharacter()), actor, model.enchantTile(getPlayerOf(actor)
 				.getPlayer())), observing);
