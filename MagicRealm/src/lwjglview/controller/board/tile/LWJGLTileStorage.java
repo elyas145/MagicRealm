@@ -21,7 +21,7 @@ public class LWJGLTileStorage extends LWJGLCounterStorage {
 				new ArrayList<Obstruction>(), new ArrayList<Obstruction>());
 		vec3 = Matrix.zeroVector(3);
 		counterRadius = GraphicsConfiguration.CHIT_SCALE * 1.4f;
-		outerRadius = GraphicsConfiguration.TILE_WIDTH * .2f;
+		outerRadius = GraphicsConfiguration.TILE_WIDTH * .44f;
 		clearingRadius = GraphicsConfiguration.CLEARING_RADUS;
 		Obstruction self = new Obstruction(pos, outerRadius, true);
 		obstructions.get(false).add(self);
@@ -48,7 +48,7 @@ public class LWJGLTileStorage extends LWJGLCounterStorage {
 		Matrix rand = vec3;
 		randomLocation(rand);
 		boolean ench = isEnchanted();
-		for (int i = 0; i < 20; ++i) {
+		for (int i = 0; i < 20; ++i) { // find a clear spot
 			int obst = 0;
 			for (Obstruction ob : obstructions.get(ench)) {
 				if (ob.obstructs(rand)) {
@@ -62,11 +62,11 @@ public class LWJGLTileStorage extends LWJGLCounterStorage {
 					ob.recommend(rand);
 				}
 			}
-			if (obst >= 3) {
+			if (obst >= 3) { // chit is stuck
 				randomLocation(rand);
 			}
 		}
-		for (int i = 0; i < 10; ++i) {
+		for (int i = 0; i < 10; ++i) { // settle chit
 			for (Obstruction ob : obstructions.get(ench)) {
 				if (ob.obstructs(rand)) {
 					ob.recommend(rand);
@@ -90,7 +90,7 @@ public class LWJGLTileStorage extends LWJGLCounterStorage {
 	@Override
 	public synchronized void resetAll() {
 		for (int i : chits.keySet()) {
-			moveChit(i);
+			put(i);
 		}
 	}
 

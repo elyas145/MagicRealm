@@ -61,4 +61,5 @@ public interface ViewController {
 	void updateBelongings(ArrayList<String> updates);
 	
 	void revealAllMapChits(Iterable<MapChit> chits);
+	void hideMainMenu();
 }

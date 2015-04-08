@@ -114,7 +114,7 @@ public class LWJGLViewController implements ViewController {
 
 	@Override
 	public void enterLobby() {
-		mainMenu.setVisible(false);
+		hideMainMenu();
 		lobbyView.setVisible(true);
 		if (sounds != null) {
 			sounds.playLobbyTheme();
@@ -236,6 +236,11 @@ public class LWJGLViewController implements ViewController {
 			}
 		}
 		board.revealAllMapChits(chits);
+	}
+	
+	@Override
+	public void hideMainMenu() {
+		mainMenu.setVisible(false);
 	}
 
 	private void init(ResourceHandler rh, SoundController sc) {

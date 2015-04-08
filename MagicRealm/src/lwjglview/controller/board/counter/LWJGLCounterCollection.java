@@ -21,7 +21,8 @@ import model.enums.ValleyChit;
 
 public class LWJGLCounterCollection extends LWJGLDrawableNode {
 
-	public LWJGLCounterCollection(LWJGLCounterLocator par, ResourceHandler res) throws IOException {
+	public LWJGLCounterCollection(LWJGLCounterLocator par, ResourceHandler res)
+			throws IOException {
 		super(par);
 		locations = par;
 		resources = res.getCounterGenerator();
@@ -40,12 +41,16 @@ public class LWJGLCounterCollection extends LWJGLDrawableNode {
 	}
 
 	public LWJGLCounterDrawable create(CounterType tp) {
-		counters.put(tp, resources.generate(tp, locations));
+		synchronized (counters) {
+			counters.put(tp, resources.generate(tp, locations));
+		}
 		return get(tp);
 	}
 
 	public boolean contains(CounterType ct) {
-		return counters.containsKey(ct);
+		synchronized (counters) {
+			return counters.containsKey(ct);
+		}
 	}
 
 	public void getVector(CounterType count, Matrix dest) {
@@ -73,8 +78,10 @@ public class LWJGLCounterCollection extends LWJGLDrawableNode {
 		updateTransformation();
 		gfx.getShaders().useShaderProgram(ShaderType.CHIT_SHADER);
 		// draw all counters
-		for (LWJGLCounterDrawable counter : counters.values()) {
-			counter.draw(gfx);
+		synchronized (counters) {
+			for (LWJGLCounterDrawable counter : counters.values()) {
+				counter.draw(gfx);
+			}
 		}
 	}
 
