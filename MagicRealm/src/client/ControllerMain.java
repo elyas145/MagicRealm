@@ -649,6 +649,7 @@ public class ControllerMain implements ClientController {
 	public void setAllCharacters(Map<Integer, Character> characters) {
 		for (Integer i : characters.keySet()) {
 			this.characters.put(i, characters.get(i));
+			
 		}
 
 	}

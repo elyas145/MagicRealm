@@ -223,6 +223,7 @@ public class ServerController {
 	}
 
 	public void startGame() {
+		sboard = model.getBoard().getSerializedBoard();
 		sendAll(new StartGame(sboard, characters));
 		startBirdSong();
 	}
