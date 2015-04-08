@@ -37,7 +37,7 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode implements
 		translation = Matrix.translation(position);
 		rotation = Matrix.rotationZ(4, -rot);
 		reverseRotation = rotation.inverse();
-		transformation = translation.multiply(rotation);
+		transformation = Matrix.clone(translation);
 		textureLocation = textureLocs;
 		selectionLocation = selectLocs;
 		enchanted = false;
@@ -100,7 +100,7 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode implements
 	}
 
 	public void refreshCounters() {
-		for(int clr: getClearings()) {
+		for (int clr : getClearings()) {
 			getClearing(clr).resetAll();
 		}
 		freeSpace.resetAll();
@@ -110,10 +110,6 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode implements
 	public Matrix calculateMatrix() {
 		Matrix mat = flipper.apply();
 		translation.multiply(mat, transformation);
-		SelectionFrame sf = tiles.getSelectionFrame();
-		if (!sf.isSelectionPass()) {
-			transformation.multiply(rotation, transformation);
-		}
 		return transformation;
 	}
 
@@ -154,9 +150,13 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode implements
 	private void initFaces() {
 		float halfThick = GraphicsConfiguration.TILE_THICKNESS * .5f;
 		Matrix mat = Matrix.translation(0f, 0f, halfThick);
-		faces.add(new LWJGLDrawableLeaf(this, new HexTileFace(this, mat, false)));
-		mat = Matrix.rotationX(4, Mathf.PI).multiply(mat);
-		faces.add(new LWJGLDrawableLeaf(this, new HexTileFace(this, mat, true)));
+		Matrix rot = mat.multiply(rotation);
+		faces.add(new LWJGLDrawableLeaf(this, new HexTileFace(this, mat, rot,
+				false)));
+		Matrix tr = Matrix.rotationX(4, Mathf.PI);
+		tr.multiply(mat, mat);
+		tr.multiply(rot, rot);
+		faces.add(new LWJGLDrawableLeaf(this, new HexTileFace(this, mat, rot, true)));
 		// scale square
 		mat = Matrix.dilation(.5f, halfThick, 1f, 1f);
 		// rotate rectangle
@@ -181,15 +181,13 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode implements
 		protected Matrix calculateTransform() {
 			float i = getInterval();
 			mat.rotateX(i * Mathf.PI + (ench ? 0 : Mathf.PI));
-			rotation.multiply(mat, mat);
-			mat.multiply(reverseRotation, mat);
 			return mat;
 		}
 
 		@Override
 		public void finish() {
 		}
-		
+
 		private boolean ench;
 		private Matrix mat;
 
@@ -211,12 +209,25 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode implements
 		}
 	}
 
-	private class HexTileFace extends TileFace {
+	private class HexTileFace extends TileFace implements MatrixCalculator {
 
-		public HexTileFace(LWJGLDrawableNode par, Matrix mat, boolean ench) {
-			super(par, mat, GLPrimitives.HEXAGON);
+		public HexTileFace(LWJGLDrawableNode par, Matrix nm, Matrix rt,
+				boolean ench) {
+			super(par, nm, GLPrimitives.HEXAGON);
 			tex = textureLocation.get(ench);
 			sel = selectionLocation.get(ench);
+			norm = Matrix.clone(nm);
+			rot = Matrix.clone(rt);
+			setCalculator(this);
+		}
+
+		@Override
+		public Matrix calculateMatrix() {
+			SelectionFrame sf = tiles.getSelectionFrame();
+			if (sf.isSelectionPass()) {
+				return norm;
+			}
+			return rot;
 		}
 
 		@Override
@@ -231,6 +242,8 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode implements
 
 		private LWJGLTextureLoader tex;
 		private LWJGLTextureLoader sel;
+		private Matrix norm;
+		private Matrix rot;
 
 	}
 
