@@ -165,11 +165,11 @@ public class ServerController {
 		}
 	}
 
-	private synchronized void send(int cl, ClientNetworkHandler handle) {
+	private void send(int cl, ClientNetworkHandler handle) {
 		getClient(cl).send(handle);
 	}
 
-	public synchronized void remove(int ID) {
+	public void remove(int ID) {
 		joined.remove(ID);
 		synchronized (waiting) {
 			waiting.remove(ID);
@@ -194,7 +194,7 @@ public class ServerController {
 	 * @param iD
 	 * @param character
 	 */
-	public synchronized void setCharacter(int iD, CharacterType character,
+	public void setCharacter(int iD, CharacterType character,
 			CounterType location) {
 
 		ClientThread clt = getClient(iD);
@@ -207,16 +207,17 @@ public class ServerController {
 		model.setPlayersInitialLocations(clt.getCharacter().getType()
 				.toCounter(), location);
 		disabledCharacters.add(character);
-		characters.put(iD, clt.getCharacter());
-		startWaiting(iD);
 		sendAll(new UpdateCharacterSelection(clt.getCharacterType()), joined);
 		sendAll(new PlayerAdded(iD, clt.getCharacter()), observing);
+		
 		for (Character chr : characters.values()) {
 			send(iD,
 					new UpdateLocationOfCharacter(chr.getType(), model
 							.getTile(chr), model.getClearing(chr)));
 			send(iD, new UpdateHiding(chr.getType(), chr.isHiding()));
 		}
+		characters.put(iD, clt.getCharacter());
+		startWaiting(iD);
 		if (NetworkConfiguration.START_NORMAL) {
 			boolean everyoneSelected = true;
 			// wait for all clients to choose their character
@@ -305,10 +306,10 @@ public class ServerController {
 	 * } } } }
 	 */
 
-	public synchronized void startGame() {
+	public void startGame() {
 		model.setBoardForPlay();
 		sboard = model.getBoard().getSerializedBoard();
-		sendAll(new StartGame(sboard, characters), playing);
+		sendAll(new StartGame(sboard, characters), waiting);
 		startBirdSong();
 	}
 
@@ -341,21 +342,21 @@ public class ServerController {
 		}
 	}
 
-	public synchronized void addSite(MapChitType site, TileName tile) {
+	public void addSite(MapChitType site, TileName tile) {
 		model.addSite(site, tile);
 
 	}
 
-	public synchronized void addSound(MapChitType sound, TileName tile) {
+	public void addSound(MapChitType sound, TileName tile) {
 		model.addSound(sound, tile);
 	}
 
-	public synchronized void addWarning(MapChitType type, TileName tile) {
+	public void addWarning(MapChitType type, TileName tile) {
 		model.addWarning(type, tile);
 
 	}
 
-	public synchronized void submitActivities(CharacterType type,
+	public void submitActivities(CharacterType type,
 			Iterable<Activity> activities) {
 		getPlayerOf(type).setCurrentActivities(activities);
 		boolean done = true;
@@ -464,7 +465,7 @@ public class ServerController {
 
 	private Semaphore playSync = new Semaphore(0);
 
-	public synchronized void setSwordsManTurn(boolean playing) {
+	public void setSwordsManTurn(boolean playing) {
 		// swordsmanTurn = playing;
 		if (playing) {
 			ClientThread ct = getPlayerOf(CharacterType.SWORDSMAN);
@@ -481,7 +482,7 @@ public class ServerController {
 		}
 	}
 
-	public synchronized void hideCharacter(CharacterType actor, int rv) {
+	public void hideCharacter(CharacterType actor, int rv) {
 		if (model.hideCharacter(rv, getPlayerOf(actor).getPlayer())) {
 			sendAll(new UpdateHiding(actor, true), playing);
 		} else {
@@ -489,7 +490,7 @@ public class ServerController {
 		}
 	}
 
-	public synchronized void moveCharacter(CharacterType actor, TileName tile,
+	public void moveCharacter(CharacterType actor, TileName tile,
 			int clearing) {
 		if (model.getBoard().getClearing(tile, clearing).getLandType() == LandType.MOUNTAIN) {
 			if (getPlayerOf(actor).getMountainClearing() == null) {
@@ -514,7 +515,7 @@ public class ServerController {
 		}
 	}
 
-	public synchronized void startSearching(CharacterType actor) {
+	public void startSearching(CharacterType actor) {
 		ClientThread ct = getPlayerOf(actor);
 		ct.send(new RequestSearchInformation());
 		try {
@@ -524,7 +525,7 @@ public class ServerController {
 		}
 	}
 
-	public synchronized void searchChosen(CharacterType car, TableType tbl,
+	public void searchChosen(CharacterType car, TableType tbl,
 			int rv) {
 		// do the search activity with the player
 		ClientThread ct = getPlayerOf(car);
