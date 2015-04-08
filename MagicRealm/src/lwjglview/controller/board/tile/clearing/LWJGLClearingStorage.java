@@ -1,13 +1,12 @@
-package lwjglview.graphics.board.tile.clearing;
+package lwjglview.controller.board.tile.clearing;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import utils.math.linear.Matrix;
-
 import config.GraphicsConfiguration;
-import lwjglview.graphics.board.tile.LWJGLCounterStorage;
-import lwjglview.graphics.board.tile.LWJGLTileDrawable;
+import lwjglview.controller.board.tile.LWJGLCounterStorage;
+import lwjglview.controller.board.tile.LWJGLTileDrawable;
 
 public class LWJGLClearingStorage extends LWJGLCounterStorage {
 	public LWJGLClearingStorage(LWJGLTileDrawable td, Matrix norm, Matrix ench) {
@@ -19,6 +18,7 @@ public class LWJGLClearingStorage extends LWJGLCounterStorage {
 	}
 
 	// get the location of a counter in the clearing
+	@Override
 	public void getLocation(int id, Matrix loc) {
 		int idx = chits.indexOf(id);
 		int row = dim - idx / dim - 1;
@@ -34,6 +34,7 @@ public class LWJGLClearingStorage extends LWJGLCounterStorage {
 		}
 	}
 
+	@Override
 	public void put(int id) {
 		synchronized (chits) {
 			if (!chits.contains(id)) {
@@ -47,6 +48,7 @@ public class LWJGLClearingStorage extends LWJGLCounterStorage {
 		}
 	}
 
+	@Override
 	public void remove(int id) {
 		synchronized (chits) {
 			if (chits.contains(id)) {
@@ -59,6 +61,15 @@ public class LWJGLClearingStorage extends LWJGLCounterStorage {
 						moveChit(chits.get(idx));
 					}
 				}
+			}
+		}
+	}
+	
+	@Override
+	public void getIDs(List<Integer> dest) {
+		synchronized(chits) {
+			for(int i: chits) {
+				dest.add(i);
 			}
 		}
 	}

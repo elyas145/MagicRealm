@@ -1,4 +1,4 @@
-package lwjglview.graphics.board.tile;
+package lwjglview.controller.board.tile;
 
 import java.awt.Color;
 import java.awt.Graphics;

@@ -1,12 +1,13 @@
-package lwjglview.graphics.board.tile;
+package lwjglview.controller.board.tile;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import config.GraphicsConfiguration;
-import lwjglview.graphics.board.tile.clearing.LWJGLClearingStorage;
+import lwjglview.controller.board.tile.clearing.LWJGLClearingStorage;
 import model.EnchantedHolder;
 import utils.math.Mathf;
 import utils.math.linear.Matrix;
@@ -114,6 +115,15 @@ public class LWJGLTileStorage extends LWJGLCounterStorage {
 	public void remove(int id) {
 		synchronized (chits) {
 			chits.remove(id);
+		}
+	}
+	
+	@Override
+	protected void getIDs(List<Integer> dest) {
+		synchronized(chits) {
+			for(int i: chits.keySet()) {
+				dest.add(i);
+			}
 		}
 	}
 
