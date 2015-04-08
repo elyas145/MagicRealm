@@ -19,6 +19,7 @@ import utils.structures.Queue;
 import utils.structures.QueueEmptyException;
 import model.activity.Activity;
 import model.board.Board;
+import model.board.tile.HexTile;
 import model.enums.ActivityType;
 import model.enums.CharacterType;
 import model.enums.ChitType;
@@ -489,15 +490,19 @@ public class ModelController {
 		ArrayList<MapChit> peek = new ArrayList<MapChit>();
 		boolean castle = false;
 		boolean city = false;
+		LandType land = board.getLocationOfCounter(player.getCharacter().getType().toCounter()).getLandType();
 		for (MapChit chit : mapChits) {
 			System.out.println("Current map chit: " + chit);
-			if ((chit.getTile() == board
+			boolean tile = chit.getTile() == board
 					.getLocationOfCounter(
 							player.getCharacter().getType().toCounter())
-					.getParentTile().getName())
-					&& (chit.getClearing() == board.getLocationOfCounter(
-							player.getCharacter().getType().toCounter())
-							.getClearingNumber())) {
+					.getParentTile().getName();
+			boolean clearing = chit.getClearing() == board.getLocationOfCounter(
+					player.getCharacter().getType().toCounter())
+					.getClearingNumber();
+			boolean toCheck = land == LandType.MOUNTAIN ? tile : tile && clearing;
+			
+			if (toCheck) {
 				System.out.println("this chit is on my clearing.");
 				if (chit.getType() == MapChitType.LOST_CITY) {
 					System.out.println("this chit is lost city");
@@ -603,11 +608,29 @@ public class ModelController {
 		ArrayList<MapChit> peek = new ArrayList<MapChit>();
 		boolean city = false;
 		boolean castle = false;
+		ArrayList<TileName> surrounding;
+		CounterType counter = player.getCharacter().getType().toCounter();
+		TileName curr = board
+				.getLocationOfCounter(
+						player.getCharacter().getType().toCounter())
+				.getParentTile().getName();
+		if (board.getLocationOfCounter(counter).getLandType() == LandType.MOUNTAIN) {
+			surrounding = new ArrayList<TileName>(board.getTile(curr)
+					.getSurrounding());
+		} else {
+			surrounding = new ArrayList<TileName>();
+		}
+		surrounding.add(curr);
+		boolean discoverable;
 		for (MapChit chit : mapChits) {
-			if (chit.getTile() == board
-					.getLocationOfCounter(
-							player.getCharacter().getType().toCounter())
-					.getParentTile().getName()) {
+			discoverable = false;
+			for (TileName tn : surrounding) {
+				if (chit.getTile() == tn) {
+					discoverable = true;
+					break;
+				}
+			}
+			if (discoverable) {
 				if (chit.getType() == MapChitType.LOST_CASTLE) {
 					if (!discoveredCastle)
 						castle = true;
@@ -781,6 +804,7 @@ public class ModelController {
 	}
 
 	public TileName getLocation(Character character) {
-		return board.getLocationOfCounter(character.getType().toCounter()).getParentTile().getName();
+		return board.getLocationOfCounter(character.getType().toCounter())
+				.getParentTile().getName();
 	}
 }

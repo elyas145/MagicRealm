@@ -2,6 +2,7 @@ package model.board.tile;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import model.EnchantedHolder;
@@ -180,7 +181,7 @@ public class HexTile implements HexTileInterface {
 	}
 
 	@Override
-	public Iterable<TileName> getSurrounding() {
+	public List<TileName> getSurrounding() {
 		return IterationTools.notNull(surroundings);
 	}
 
