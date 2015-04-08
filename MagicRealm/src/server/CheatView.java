@@ -20,6 +20,7 @@ import javax.swing.JTextField;
 import model.enums.LandType;
 import model.enums.MapChitType;
 import model.enums.TileName;
+import config.GameConfiguration;
 import config.GraphicsConfiguration;
 
 public class CheatView extends JFrame implements ActionListener {
@@ -40,7 +41,7 @@ public class CheatView extends JFrame implements ActionListener {
 	private Container lostPane;
 	private Container lostAndTilePane;
 	private Container soundAndSitePane;
-
+	private JButton startRandom;
 	private Toolkit tk = Toolkit.getDefaultToolkit();
 	private int xSize = ((int) tk.getScreenSize().getWidth());
 	private int ySize = ((int) tk.getScreenSize().getHeight());
@@ -71,7 +72,7 @@ public class CheatView extends JFrame implements ActionListener {
 		start = new JButton("Start");
 		ok = new JButton("OK");
 		setLost = new JButton("lost site");
-
+		startRandom = new JButton("random chits");
 		treasureValue = new JTextField();
 		comboSites = new JComboBox<MapChitType>(MapChitType.SITES);
 		comboTiles = new JComboBox<TileName>(TileName.values());
@@ -87,11 +88,12 @@ public class CheatView extends JFrame implements ActionListener {
 		start.addActionListener(this);
 		ok.addActionListener(this);
 		setLost.addActionListener(this);
-
+		startRandom.addActionListener(this);
 		defaultPane.add(setTreasure);
 		defaultPane.add(setSound);
 		defaultPane.add(setWarning);
 		defaultPane.add(setLost);
+		defaultPane.add(startRandom);
 		defaultPane.add(start);
 		comboContainer = new Container();
 		comboContainer
@@ -261,6 +263,14 @@ public class CheatView extends JFrame implements ActionListener {
 					.setModel(new JComboBox<TileName>(TileName.MOUNTAIN_TILES)
 							.getModel());
 			pack();
+		}else if(e.getSource().equals(startRandom)){
+			server.doneSettingCheatMode();
+			GameConfiguration.RANDOM = true;
+			JOptionPane
+					.showMessageDialog(
+							this,
+							"This window will now close. chits will be set according to algorithm.");
+			this.setVisible(false);
 		}
 	}
 

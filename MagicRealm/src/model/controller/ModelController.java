@@ -159,7 +159,7 @@ public class ModelController {
 	 * chits and counters visible on the board.
 	 */
 	public void setBoardForPlay() {
-		if (!GameConfiguration.Cheat) {
+		if (GameConfiguration.RANDOM) {
 			setUpSoundAndSite();
 			setUpWarning();
 		}

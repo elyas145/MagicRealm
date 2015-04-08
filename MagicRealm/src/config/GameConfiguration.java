@@ -12,6 +12,7 @@ public class GameConfiguration {
 	public static final CounterType INITIAL_SITE = CounterType.VALLEY_INN;
 	
 	public static boolean Cheat = false;
+	public static boolean RANDOM = false;
 	public static final boolean DEBUG_MODE = true;
 	public static final int MAX_TREASURE_VALUE = 50;
 }
