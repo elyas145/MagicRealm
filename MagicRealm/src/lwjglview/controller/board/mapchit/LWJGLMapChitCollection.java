@@ -1,4 +1,4 @@
-package lwjglview.graphics.board.mapchit;
+package lwjglview.controller.board.mapchit;
 
 import java.awt.Color;
 import java.util.HashMap;

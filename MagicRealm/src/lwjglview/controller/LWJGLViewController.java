@@ -251,7 +251,7 @@ public class LWJGLViewController implements ViewController {
 		discovered.addText("Hello");
 		discovered.addText("Goodbye");
 
-		System.setOut(new PrintStream(new OutputStream() { // PRINT OUT TO GAME
+		/*System.setOut(new PrintStream(new OutputStream() { // PRINT OUT TO GAME
 															// LOG
 
 					StringBuilder buff = new StringBuilder();
@@ -270,7 +270,7 @@ public class LWJGLViewController implements ViewController {
 						}
 					}
 
-				}));
+				}));*/
 
 		birdsong = new LWJGLBirdsong(resources, menus);
 		characterSelection = new LWJGLCharacterSelection(rh, graphics, menus);

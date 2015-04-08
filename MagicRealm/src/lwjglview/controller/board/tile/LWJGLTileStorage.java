@@ -1,12 +1,13 @@
-package lwjglview.graphics.board.tile;
+package lwjglview.controller.board.tile;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import config.GraphicsConfiguration;
-import lwjglview.graphics.board.tile.clearing.LWJGLClearingStorage;
+import lwjglview.controller.board.tile.clearing.LWJGLClearingStorage;
 import model.EnchantedHolder;
 import utils.math.Mathf;
 import utils.math.linear.Matrix;
@@ -44,30 +45,6 @@ public class LWJGLTileStorage extends LWJGLCounterStorage {
 		}
 		ob.getLocation(buff);
 	}
-
-	/*
-	@Override
-	public void put(int id) {
-		Matrix rand = vec3;
-		randomLocation(rand);
-		boolean ench = isEnchanted();
-		for (int i = 0; i < 20; ++i) {
-			for (Obstruction ob : obstructions.get(ench)) {
-				if (ob.obstructs(rand)) {
-					ob.recommend(rand);
-				}
-			}
-			for (Obstruction ob : chits.values()) {
-				if (ob.obstructs(rand)) {
-					ob.recommend(rand);
-				}
-			}
-		}
-		synchronized (chits) {
-			chits.put(id, new Obstruction(rand, counterRadius, false));
-		}
-		moveChit(id);
-	}*/
 	
 	@Override
 	public void put(int id) {
@@ -114,6 +91,15 @@ public class LWJGLTileStorage extends LWJGLCounterStorage {
 	public void remove(int id) {
 		synchronized (chits) {
 			chits.remove(id);
+		}
+	}
+	
+	@Override
+	protected void getIDs(List<Integer> dest) {
+		synchronized(chits) {
+			for(int i: chits.keySet()) {
+				dest.add(i);
+			}
 		}
 	}
 

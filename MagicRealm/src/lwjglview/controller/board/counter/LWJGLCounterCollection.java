@@ -1,4 +1,4 @@
-package lwjglview.graphics.board.counter;
+package lwjglview.controller.board.counter;
 
 import java.awt.Color;
 import java.io.IOException;

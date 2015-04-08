@@ -9,17 +9,18 @@ import java.util.Map;
 import org.lwjgl.BufferUtils;
 
 import config.GraphicsConfiguration;
+import lwjglview.controller.board.counter.LWJGLCounterCollection;
+import lwjglview.controller.board.mapchit.LWJGLMapChitCollection;
+import lwjglview.controller.board.tile.LWJGLCounterStorage;
+import lwjglview.controller.board.tile.LWJGLTileCollection;
+import lwjglview.controller.board.tile.LWJGLTileDrawable;
+import lwjglview.controller.board.tile.LWJGLTileStorage;
 import lwjglview.graphics.LWJGLGraphics;
 import lwjglview.graphics.animator.AnimationQueue;
 import lwjglview.graphics.animator.FadeAnimator;
 import lwjglview.graphics.animator.FollowAnimator;
 import lwjglview.graphics.animator.matrixcalculator.MatrixCalculator;
 import lwjglview.graphics.animator.matrixcalculator.StaticMatrixCalculator;
-import lwjglview.graphics.board.counter.LWJGLCounterCollection;
-import lwjglview.graphics.board.mapchit.LWJGLMapChitCollection;
-import lwjglview.graphics.board.tile.LWJGLCounterStorage;
-import lwjglview.graphics.board.tile.LWJGLTileCollection;
-import lwjglview.graphics.board.tile.LWJGLTileDrawable;
 import lwjglview.graphics.counters.LWJGLCounterDrawable;
 import lwjglview.graphics.counters.LWJGLCounterLocator;
 import lwjglview.graphics.shader.GLShaderHandler;
@@ -173,9 +174,10 @@ public class LWJGLBoardDrawable extends LWJGLCounterLocator implements BoardView
 	}
 
 	@Override
-	public synchronized void enchantTile(TileName tile) {
+	public synchronized void setTileEnchanted(TileName tile, boolean ench) {
 		synchronized (tiles) {
-			tiles.setEnchanted(tile, true);
+			tiles.setEnchanted(tile, ench);
+			refreshCounters(tile);
 		}
 	}
 
@@ -378,6 +380,10 @@ public class LWJGLBoardDrawable extends LWJGLCounterLocator implements BoardView
 		loc.tile = tile;
 		loc.clearing = clear;
 		getClearing(tile, clear).put(id);
+	}
+	
+	private void refreshCounters(TileName tn) {
+		tiles.get(tn).refreshCounters();
 	}
 
 	private void resetView(LWJGLGraphics lwgfx) {

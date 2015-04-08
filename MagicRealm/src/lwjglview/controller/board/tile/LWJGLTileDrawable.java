@@ -1,4 +1,4 @@
-package lwjglview.graphics.board.tile;
+package lwjglview.controller.board.tile;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -16,7 +16,7 @@ import lwjglview.graphics.animator.AnimationQueue;
 import lwjglview.graphics.animator.FillerAnimator;
 import lwjglview.graphics.animator.TimedAnimator;
 import lwjglview.graphics.animator.matrixcalculator.MatrixCalculator;
-import lwjglview.graphics.board.tile.clearing.LWJGLClearingStorage;
+import lwjglview.controller.board.tile.clearing.LWJGLClearingStorage;
 import lwjglview.graphics.textures.LWJGLTextureLoader;
 import lwjglview.selection.SelectionFrame;
 import model.EnchantedHolder;
@@ -94,6 +94,16 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode implements
 		return clearings.get(clr);
 	}
 
+	public Iterable<Integer> getClearings() {
+		return clearings.keySet();
+	}
+
+	public void refreshCounters() {
+		for(int clr: getClearings()) {
+			getClearing(clr).resetCounters();
+		}
+	}
+
 	@Override
 	public Matrix calculateMatrix() {
 		Matrix mat = flipper.apply();
@@ -144,6 +154,8 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode implements
 		Matrix mat = Matrix.translation(0f, 0f, halfThick);
 		faces.add(new LWJGLDrawableLeaf(this, new HexTileFace(this, mat, false)));
 		mat = Matrix.rotationX(4, Mathf.PI).multiply(mat);
+		mat.multiply(rotation, mat);
+		mat.multiply(rotation, mat);
 		faces.add(new LWJGLDrawableLeaf(this, new HexTileFace(this, mat, true)));
 		// scale square
 		mat = Matrix.dilation(.5f, halfThick, 1f, 1f);
@@ -241,5 +253,4 @@ public class LWJGLTileDrawable extends LWJGLDrawableNode implements
 	private boolean enchanted;
 	private AnimationQueue flipper;
 	private int identifier;
-
 }
