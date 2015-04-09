@@ -56,8 +56,8 @@ public class Board implements BoardInterface {
 		mapChitsToLoad = new ArrayList<MapChit>();
 
 		try {
-			String path = rh.getResource(ResourceHandler.joinPath("data",
-					"data.json"));
+			String path = ResourceHandler.getResource(ResourceHandler.joinPath(
+					"data", "data.json"));
 			FileReader reader = new FileReader(path);
 			JSONParser parser = new JSONParser();
 			arr = (JSONArray) parser.parse(reader);
