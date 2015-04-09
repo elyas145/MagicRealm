@@ -124,4 +124,8 @@ public class SearchResults implements ClientNetworkHandler {
 		this.discoveredPaths = paths;
 	}
 
+	public int getGold() {
+		return goldValue;
+	}
+
 }

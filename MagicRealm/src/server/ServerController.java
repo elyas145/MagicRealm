@@ -109,6 +109,9 @@ public class ServerController {
 			temp.start();
 			System.out.println("the player id is: " + temp.getID());
 			justJoined(temp);
+			if (GameConfiguration.Cheat) {
+				temp.send(new SetCheatMode());
+			}
 			temp.send(new Integer(socket.getPort()));
 			temp.send(new SetBoard(sboard));
 			if (NetworkConfiguration.START_NORMAL) {
@@ -209,7 +212,7 @@ public class ServerController {
 		disabledCharacters.add(character);
 		sendAll(new UpdateCharacterSelection(clt.getCharacterType()), joined);
 		sendAll(new PlayerAdded(iD, clt.getCharacter()), observing);
-		
+
 		for (Character chr : characters.values()) {
 			send(iD,
 					new UpdateLocationOfCharacter(chr.getType(), model
@@ -235,9 +238,6 @@ public class ServerController {
 					sendAll(new UpdateCharacterSelection(character), waiting);
 				}
 			} else {
-				if (GameConfiguration.Cheat) {
-					sendAll(new SetCheatMode(), waiting);
-				}
 				startGame();
 			}
 		} else {
@@ -373,7 +373,9 @@ public class ServerController {
 			startDayLight();
 		}
 	}
+
 	private Semaphore turnSem = new Semaphore(1);
+
 	private void startDayLight() {
 		state = ServerState.DAYLIGHT;
 		ClientThread swordsmanPlayer = null;
@@ -419,7 +421,7 @@ public class ServerController {
 		// permits.
 		startBirdSong();
 	}
-	
+
 	private void playTurn(ClientThread player) {
 		player.getCharacter().setHiding(false);
 		sendAll(new UpdateHiding(player.getCharacter().getType(), false),
@@ -470,6 +472,7 @@ public class ServerController {
 	}
 
 	private Semaphore playSync = new Semaphore(0);
+
 	public void setSwordsManTurn(boolean playing) {
 		// swordsmanTurn = playing;
 		if (playing) {
@@ -495,8 +498,7 @@ public class ServerController {
 		}
 	}
 
-	public void moveCharacter(CharacterType actor, TileName tile,
-			int clearing) {
+	public void moveCharacter(CharacterType actor, TileName tile, int clearing) {
 		if (model.getBoard().getClearing(tile, clearing).getLandType() == LandType.MOUNTAIN) {
 			if (getPlayerOf(actor).getMountainClearing() == null) {
 				getPlayerOf(actor).setMountainClearing(
@@ -530,11 +532,13 @@ public class ServerController {
 		}
 	}
 
-	public void searchChosen(CharacterType car, TableType tbl,
-			int rv) {
+	public void searchChosen(CharacterType car, TableType tbl, int rv) {
 		// do the search activity with the player
 		ClientThread ct = getPlayerOf(car);
 		SearchResults res = model.performSearch(ct.getPlayer(), tbl, rv);
+		if (tbl == TableType.LOOT) {
+			getPlayerOf(car).addGold(res.getGold());
+		}
 		if (tbl == TableType.LOCATE) {
 			if (res.isCastle() || res.isCity()) {
 				LostSite ls;
@@ -583,8 +587,8 @@ public class ServerController {
 		sendAll(new UpdateMapChits(type, model.getLostChits(type)), observing);
 	}
 
-	public void setLost(MapChitType lost,
-			ArrayList<MapChitType> array, TileName tile) {
+	public void setLost(MapChitType lost, ArrayList<MapChitType> array,
+			TileName tile) {
 		model.setLost(lost, array, tile);
 
 	}

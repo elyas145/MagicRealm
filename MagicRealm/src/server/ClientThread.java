@@ -151,4 +151,7 @@ public class ClientThread extends Thread {
 		}
 		return null;
 	}
+	public void addGold(int g){
+		player.addGold(g);
+	}
 }

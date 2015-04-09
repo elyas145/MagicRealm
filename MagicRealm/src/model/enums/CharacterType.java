@@ -16,4 +16,14 @@ public enum CharacterType {
 			return CounterType.NONE;
 		}
 	}
+	
+	public String toString(){
+		switch(this){
+		case AMAZON: return "Amazon";
+		case CAPTAIN: return "Captain";
+		case SWORDSMAN: return "Swordsman";
+		default:
+			return "None";
+		}
+	}
 }
