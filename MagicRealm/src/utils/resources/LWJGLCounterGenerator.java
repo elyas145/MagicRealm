@@ -5,12 +5,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import utils.math.Mathf;
-import utils.math.linear.Matrix;
 import config.GraphicsConfiguration;
 import lwjglview.graphics.LWJGLDrawableLeaf;
 import lwjglview.graphics.LWJGLDrawableNode;
-import lwjglview.graphics.TransformationDrawable;
 import lwjglview.graphics.counters.LWJGLCounterDrawable;
 import lwjglview.graphics.counters.LWJGLCounterLocator;
 import lwjglview.graphics.model.ModelData;
@@ -40,26 +37,29 @@ public class LWJGLCounterGenerator {
 				throw new RuntimeException(ioe);
 			}
 		}
-		return new LWJGLCounterDrawable(par, data.modelData, data.texture, Color.WHITE);
+		return new LWJGLCounterDrawable(par, data.modelData, data.texture,
+				Color.WHITE);
 	}
-	
+
 	public LWJGLCounterDrawable generate(MapChit mc, LWJGLCounterLocator par) {
 		return generate(mc, par, Color.WHITE);
 	}
 
-	public LWJGLCounterDrawable generate(MapChit mc, LWJGLCounterLocator par, Color col) {
+	public LWJGLCounterDrawable generate(MapChit mc, LWJGLCounterLocator par,
+			Color col) {
 		CounterData data = getCounterData(CounterType.MAP_CHIT);
 		LWJGLTextureLoader texture = mapChitTextures.get(mc);
-		if(texture == null) {
+		if (texture == null) {
 			int w, h;
 			w = GraphicsConfiguration.IMAGE_SCALE_WIDTH;
 			h = GraphicsConfiguration.IMAGE_SCALE_HEIGHT;
-			texture = new LWJGLSingleTextureLoader(new MapChitImageGenerator(mc), w, h);
+			texture = new LWJGLSingleTextureLoader(
+					new MapChitImageGenerator(mc), w, h);
 			mapChitTextures.put(mc, texture);
 		}
 		return new LWJGLCounterDrawable(par, data.modelData, texture, col);
 	}
-	
+
 	private CounterData getCounterData(CounterType ct) {
 		CounterData data = counters.get(CounterType.MAP_CHIT);
 		if (data == null) {
@@ -87,28 +87,10 @@ public class LWJGLCounterGenerator {
 		case VALLEY_GUARD_HOUSE:
 		case VALLEY_HOUSE:
 		case VALLEY_INN:
-			path = "circle_counter.obj";
-			break;
 		case CHARACTER_AMAZON:
 		case CHARACTER_CAPTAIN:
 		case CHARACTER_SWORDSMAN:
-			if (GraphicsConfiguration.SIMPLE_COUNTERS) {
-				path = "circle_counter.obj";
-			} else {
-				switch (ct) {
-				case CHARACTER_AMAZON:
-					path = "lara.obj";
-					break;
-				case CHARACTER_CAPTAIN:
-					path = "captain.obj";
-					break;
-				case CHARACTER_SWORDSMAN:
-					path = "knight4.obj";
-					break;
-				default:
-					path = null;
-				}
-			}
+			path = "circle_counter.obj";
 			break;
 		default:
 			path = "square_counter.obj";
@@ -125,29 +107,6 @@ public class LWJGLCounterGenerator {
 			throws IOException {
 		LWJGLDrawableNode ret = new LWJGLDrawableLeaf(null,
 				ModelData.loadModelData(resources, path));
-		if (!GraphicsConfiguration.SIMPLE_COUNTERS) {
-			TransformationDrawable transform;
-			switch (ct) {
-			case CHARACTER_AMAZON:
-				transform = new TransformationDrawable(null, ret, Matrix
-						.dilation(1.3f, 1.3f, 1.3f, 1f).multiply(
-								Matrix.rotationX(4, Mathf.PI * .5f)));
-				break;
-			case CHARACTER_CAPTAIN:
-				transform = new TransformationDrawable(null, ret, Matrix
-						.dilation(1.3f, 1.3f, 1.3f, 1f).multiply(
-								Matrix.rotationX(4, Mathf.PI * .5f)));
-				break;
-			case CHARACTER_SWORDSMAN:
-				transform = new TransformationDrawable(null, ret, Matrix
-						.dilation(2.7f, 2.7f, 2.7f, 1f).multiply(
-								Matrix.rotationX(4, Mathf.PI * .5f)));
-				break;
-			default:
-				transform = null;
-			}
-			ret = transform;
-		}
 		return ret;
 	}
 
@@ -168,33 +127,13 @@ public class LWJGLCounterGenerator {
 	}
 
 	private static String getName(CounterType counter) {
-		if (GraphicsConfiguration.SIMPLE_COUNTERS) {
-			switch (counter) {
-			case CHARACTER_AMAZON:
-				return "amazon.png";
-			case CHARACTER_CAPTAIN:
-				return "captain.png";
-			case CHARACTER_SWORDSMAN:
-				return "swordsman.png";
-			case VALLEY_CHAPEL:
-				return "chapel.gif";
-			case VALLEY_GUARD_HOUSE:
-				return "guard.gif";
-			case VALLEY_HOUSE:
-				return "house.gif";
-			case VALLEY_INN:
-				return "inn.gif";
-			default:
-				return "penguin.png";
-			}
-		}
 		switch (counter) {
 		case CHARACTER_AMAZON:
-			return "jungle.jpg";
+			return "amazon.png";
 		case CHARACTER_CAPTAIN:
-			return "flag.jpg";
+			return "captain.png";
 		case CHARACTER_SWORDSMAN:
-			return "iron.jpg";
+			return "swordsman.png";
 		case VALLEY_CHAPEL:
 			return "chapel.gif";
 		case VALLEY_GUARD_HOUSE:

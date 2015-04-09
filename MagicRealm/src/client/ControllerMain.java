@@ -43,6 +43,7 @@ import model.enums.PhaseType;
 import model.enums.SearchType;
 import model.enums.TableType;
 import model.enums.TileName;
+import model.enums.TimeOfDay;
 import model.exceptions.MRException;
 import utils.random.Random;
 import utils.resources.ResourceHandler;
@@ -125,8 +126,7 @@ public class ControllerMain implements ClientController {
 	 * called when the client launches the game (controller constructor)
 	 */
 	public void goToMainMenu() {
-		mainView.enterMainMenu(mainMenuListener); // this is the only required
-													// line
+		mainView.enterMainMenu(mainMenuListener);
 	}
 
 	@Override
@@ -135,20 +135,6 @@ public class ControllerMain implements ClientController {
 			System.exit(0);
 		}
 	}
-
-	/*
-	 * private void sendActivities(List<Activity> activities) {
-	 * model.setPlayerActivities(activities, player); }
-	 * 
-	 * private void beginBoardTurn(Player plr) {
-	 * boardView.focusOn(plr.getCharacter().getType().toCounter());
-	 * boardView.hideAllMapChits(); }
-	 * 
-	 * private void startBirdSong(Player player, int day, List<Phase> phases,
-	 * Map<TileName, List<Integer>> tileClrs) {
-	 * mainView.enterBirdSong(player.getCharacter().getType(), day, phases,
-	 * player.getPersonalHistory(), tileClrs); }
-	 */
 
 	/**
 	 * Displays the given message on the client's GUI
@@ -221,12 +207,6 @@ public class ControllerMain implements ClientController {
 	@Override
 	public void raiseException(MRException exception) {
 		mainView.displayMessage(exception.getMessage());
-	}
-
-	@Override
-	public void performPeerChoice() {
-		// TODO perform peer choice
-
 	}
 
 	/**
@@ -303,7 +283,7 @@ public class ControllerMain implements ClientController {
 	}
 
 	@Override
-	public void enterCharacterSelection(ArrayList<CharacterType> disabled) {
+	public void enterCharacterSelection(List<CharacterType> disabled) {
 		System.out.println("Entered player selection.");
 		mainView.hideMainMenu();
 		ArrayList<CharacterType> characters = new ArrayList<CharacterType>();
@@ -386,6 +366,8 @@ public class ControllerMain implements ClientController {
 	public void enterBirdSong() {
 		System.out.println("Entering bird song.");
 		mainView.hideBanner();
+		mainView.setTimeOfDay(TimeOfDay.MIDNIGHT);
+		mainView.setTimeOfDay(TimeOfDay.DUSK);
 		// phases:
 		final ArrayList<Phase> phases = new ArrayList<Phase>();
 
@@ -403,6 +385,7 @@ public class ControllerMain implements ClientController {
 
 			@Override
 			public void onFinish(List<ActivityType> activities) {
+				mainView.setTimeOfDay(TimeOfDay.NOON);
 				final ArrayList<Activity> activitiesList = new ArrayList<Activity>();
 				final int i[] = new int[1];
 				i[0] = 0;
@@ -513,7 +496,6 @@ public class ControllerMain implements ClientController {
 	@Override
 	public void setID(int id) {
 		clientID = id;
-
 	}
 
 	/**
@@ -658,6 +640,7 @@ public class ControllerMain implements ClientController {
 
 	@Override
 	public void requestSearchInformation() {
+		mainView.setTimeOfDay(TimeOfDay.DAWN);
 		final int rollValue[] = new int[1];
 		final Semaphore sem = new Semaphore(0);
 		mainView.selectSearchTable(new TableSelectionListener() {
@@ -720,7 +703,7 @@ public class ControllerMain implements ClientController {
 	}
 
 	@Override
-	public void peekMapChits(ArrayList<MapChit> peek) {
+	public void peekMapChits(List<MapChit> peek) {
 		if (!peek.isEmpty()) {
 			updateStrings.clear();
 			updateStrings.add("Peeking at map chits");
@@ -730,7 +713,7 @@ public class ControllerMain implements ClientController {
 	}
 
 	@Override
-	public void discoverPaths(ArrayList<String> paths) {
+	public void discoverPaths(List<String> paths) {
 		ArrayList<String> temp = new ArrayList<String>();
 		if (!paths.isEmpty()) {
 			temp.add("Discovered Paths:");
@@ -740,7 +723,7 @@ public class ControllerMain implements ClientController {
 	}
 
 	@Override
-	public void discoverChits(ArrayList<MapChit> chits) {
+	public void discoverChits(List<MapChit> chits) {
 		ArrayList<String> updates = new ArrayList<String>();
 		if (!chits.isEmpty())
 			updates.add("You have discovered map chits!");
@@ -755,7 +738,7 @@ public class ControllerMain implements ClientController {
 
 	@Override
 	public void updateMapChits(MapChitType type,
-			ArrayList<SerializedMapChit> smapChits) {
+			List<SerializedMapChit> smapChits) {
 		ArrayList<MapChit> mapChits = new ArrayList<MapChit>();
 		for (SerializedMapChit c : smapChits) {
 			MapChit cm = new MapChit(c);

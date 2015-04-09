@@ -204,8 +204,8 @@ public class ServerController {
 		}
 		System.out.println("SERVER: setting client: " + iD + " character.");
 		clt.setCharacter(character, location);
-		model.setPlayersInitialLocations(clt.getCharacter().getType()
-				.toCounter(), location);
+		CharacterType ct = character;
+		model.setPlayersInitialLocations(ct.toCounter(), location);
 		disabledCharacters.add(character);
 		sendAll(new UpdateCharacterSelection(clt.getCharacterType()), joined);
 		sendAll(new PlayerAdded(iD, clt.getCharacter()), observing);
@@ -242,7 +242,6 @@ public class ServerController {
 			}
 		} else {
 			if (playing.size() == 0) {
-				startPlaying(iD);
 				startGame();
 			} else {
 				sboard = model.getBoard().getSerializedBoard();

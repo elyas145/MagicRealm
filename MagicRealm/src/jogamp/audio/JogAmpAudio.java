@@ -3,6 +3,7 @@ package jogamp.audio;
 import com.jogamp.openal.*;
 import com.jogamp.openal.util.*;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,8 +15,8 @@ import java.util.TimerTask;
 import utils.resources.ResourceHandler;
 
 public class JogAmpAudio {
-	
-	//private static final int MAX_SOUNDS = 10;
+
+	// private static final int MAX_SOUNDS = 10;
 
 	public static JogAmpAudio getInstance() {
 		if (instance == null) {
@@ -59,13 +60,13 @@ public class JogAmpAudio {
 	}
 
 	public void pauseSound(String file) {
-		if(sounds.containsKey(file)) {
+		if (sounds.containsKey(file)) {
 			al.alSourcePause(sounds.get(file).sid);
 		}
 	}
 
 	public void stopSound(String file) {
-		if(sounds.containsKey(file)) {
+		if (sounds.containsKey(file)) {
 			SoundInfo si = sounds.get(file);
 			si.cancelTimer();
 			al.alSourceStop(si.sid);
@@ -96,9 +97,13 @@ public class JogAmpAudio {
 		int bid = buffer[0];
 		buffers.add(bid);
 
-		ALut.alutLoadWAVFile(
-				ResourceHandler.joinPath("src", "resources", "sounds", fname), format,
-				data, size, freq, loop);
+		try {
+			ALut.alutLoadWAVFile(ResourceHandler.getResource(ResourceHandler
+					.joinPath("sounds", fname)), format, data,
+					size, freq, loop);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 		float length = size[0] / (float) (4 * freq[0]);
 		al.alBufferData(bid, format[0], data[0], size[0], freq[0]);
 
@@ -130,30 +135,33 @@ public class JogAmpAudio {
 		al.alListenerfv(AL.AL_VELOCITY, listenerVel, 0);
 		al.alListenerfv(AL.AL_ORIENTATION, listenerOri, 0);
 	}
-	
+
 	private class SoundInfo {
 		public SoundInfo(int s, float l) {
 			sid = s;
 			length = (long) (l * 1000);
 		}
+
 		public void startTimer(final Runnable run) {
-			if(run != null) {
+			if (run != null) {
 				timer = new Timer();
 				timer.schedule(new TimerTask() {
-	
+
 					@Override
 					public void run() {
 						run.run();
 					}
-					
+
 				}, length);
 			}
 		}
+
 		public void cancelTimer() {
-			if(timer != null) {
+			if (timer != null) {
 				timer.cancel();
 			}
 		}
+
 		public int sid;
 		private long length;
 		private Timer timer;

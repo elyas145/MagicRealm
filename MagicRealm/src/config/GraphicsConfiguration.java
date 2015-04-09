@@ -48,8 +48,6 @@ public class GraphicsConfiguration {
 	
 	public static final int INITIAL_ACTION_WIDTH = 200;
 	public static final int INITIAL_ACTION_HEIGHT = 150;
-
-	public static final boolean SIMPLE_COUNTERS = true;
 	
 	public static final int PRE_RENDER_LAYER = LWJGLGraphics.LAYER0;
 	

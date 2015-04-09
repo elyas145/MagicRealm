@@ -29,7 +29,7 @@ public class ResourceHandler {
 		return counterGenerator;
 	}
 
-	public String getResource(String fname) throws IOException {
+	public static String getResource(String fname) throws IOException {
 		if (GameConfiguration.DEBUG_MODE) {
 			String path = ResourceHandler.class.getProtectionDomain()
 					.getCodeSource().getLocation().getPath();
@@ -92,8 +92,8 @@ public class ResourceHandler {
 		return new File(path, joinPath(paths.remove(0), paths)).toString();
 	}
 
-	private String path() throws UnsupportedEncodingException {
-		URL url1 = getClass().getResource("");
+	private static String path() throws UnsupportedEncodingException {
+		URL url1 = ResourceHandler.class.getResource("");
 		String ur = url1.toString();
 		ur = ur.substring(9);
 		String truePath = ur.split("client.jar")[0];

@@ -2,7 +2,6 @@ package client;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -25,7 +24,7 @@ public interface ClientController {
 
 	void enterBirdSong();
 
-	void enterCharacterSelection(ArrayList<CharacterType> disabled);
+	void enterCharacterSelection(List<CharacterType> disabled);
 
 	void enterLobby();
 
@@ -41,12 +40,9 @@ public interface ClientController {
 
 	void moveCounter(CounterType counter, TileName tt, int clearing);
 
-	void performPeerChoice();
-
 	void raiseException(MRException exception);
 
 	void revealMapChits(Iterable<MapChit> chits);
-
 
 	void setHiding(CharacterType character, boolean hid);
 
@@ -78,15 +74,14 @@ public interface ClientController {
 
 	void requestSearchInformation();
 
-	void peekMapChits(ArrayList<MapChit> peek);
-	void discoverPaths(ArrayList<String> paths);
-	
+	void peekMapChits(List<MapChit> peek);
+	void discoverPaths(List<String> paths);
 
 	void requestSearchChoice(TableType table);
 
-	void discoverChits(ArrayList<MapChit> peek);
+	void discoverChits(List<MapChit> peek);
 
-	void updateMapChits(MapChitType type, ArrayList<SerializedMapChit> mapChits);
+	void updateMapChits(MapChitType type, List<SerializedMapChit> mapChits);
 
 	void clueLost(MapChitType type);
 

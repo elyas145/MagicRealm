@@ -26,6 +26,7 @@ import model.enums.ActivityType;
 import model.enums.CharacterType;
 import model.enums.SearchType;
 import model.enums.TileName;
+import model.enums.TimeOfDay;
 import utils.handler.Handler;
 import utils.resources.ResourceHandler;
 import utils.string.TextTools;
@@ -59,6 +60,14 @@ public class LWJGLViewController implements ViewController {
 	@Override
 	public void focusOnBoard(TileName selectedTile, Integer selectedClearing) {
 		board.focusOn(selectedTile, selectedClearing);
+	}
+	
+	private TimeOfDay currentTOD = TimeOfDay.DUSK;
+	@Override
+	public void setTimeOfDay(TimeOfDay tod) {
+		if(tod != currentTOD) {
+			board.setTimeOfDay(currentTOD = tod);
+		}
 	}
 
 	@Override
@@ -198,7 +207,7 @@ public class LWJGLViewController implements ViewController {
 	}
 	
 	@Override
-	public void updateLog(ArrayList<String> updates) {
+	public void updateLog(List<String> updates) {
 		ArrayList<String> dest = new ArrayList<String>();
 		for(String s: updates) {
 			dest.clear();
@@ -210,7 +219,7 @@ public class LWJGLViewController implements ViewController {
 	}
 	
 	@Override
-	public void updateBelongings(ArrayList<String> updates) {
+	public void updateBelongings(List<String> updates) {
 		for(String s: updates) {
 			belongings.addText(s);
 		}
